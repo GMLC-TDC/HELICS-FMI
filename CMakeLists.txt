@@ -9,17 +9,17 @@
 # LLNS Copyright End
 
 #project name
-project(GridDyn)
+project(helics-fmi)
 
 #states that Cmake version > 3.4
 cmake_minimum_required(VERSION 3.4)
 cmake_policy(VERSION 3.4)
 
 #version number
-set(GRIDDYN_MAJOR 0)
-set(GRIDDYN_MINOR 6)
-set(GRIDDYN_PATCH 5)
-set(GRIDDYN_DATE 07-24-2017)
+set(HELICS_FMI_MAJOR 0)
+set(HELICS_FMI_MINOR 2)
+set(HELICS_FMI_PATCH 2)
+set(HELICS_FMI_DATE 11-07-2017)
 
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config)
 
@@ -56,26 +56,8 @@ IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
   message(FATAL_ERROR "In-source build is not supported. Please, use an empty directory for building the project.")
 ENDIF()
 
-OPTION(ENABLE_EXTRA_COMPILER_WARNINGS "disable compiler warning for GridDyn build" ON)
+OPTION(ENABLE_EXTRA_COMPILER_WARNINGS "disable compiler warning for helics-fmi build" ON)
 
-SHOW_VARIABLE(COMPILER_OPTIMIZATION_LEVEL STRING
-  "set the optimization level for the compiler (not implemented yet)" "normal")
-
-  set(optimization_levels normal;high;machine;full)
-
-set_property(CACHE COMPILER_OPTIMIZATION_LEVEL PROPERTY STRINGS ${optimization_levels})
-
-OPTION(BUILD_SHARED_FMI_LIBRARY "Enable construction of a binary fmi shared library for GridDyn" OFF)
-
-IF(BUILD_SHARED_FMI_LIBRARY)
-	set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-ENDIF(BUILD_SHARED_FMI_LIBRARY)
-
-OPTION(BUILD_GRIDDYN_SHARED_LIBRARY "Enable construction of griddyn binary shared library" OFF)
-
-IF(BUILD_GRIDDYN_SHARED_LIBRARY)
-	set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-ENDIF(BUILD_GRIDDYN_SHARED_LIBRARY)
 
 # -------------------------------------------------------------
 # Setup compiler options and configurations
@@ -146,35 +128,6 @@ include(ExternalProject)
 #########################################################################################
 
 #include(mergestaticlibs)
-# -------------------------------------------------------------
-# Enable OpenMP support?
-# -------------------------------------------------------------
-OPTION(OPENMP_ENABLE "Enable openMP support" ON)
-
-
-
-IF(OPENMP_ENABLE)
-  #message(STATUS "****** finding OpenMP support")
-  FIND_PACKAGE(OpenMP)
-  IF(OPENMP_FOUND)
-    ADD_DEFINITIONS(-DHAVE_OPENMP)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CDD_FLAGS} ${OpenMP_CXX_FLAGS}")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-  ELSE(OPENMP_FOUND)
-    message(STATUS "Disabling OpenMP support, could not determine compiler flags")
-	set(OPENMP_ENABLE FALSE)
-  ENDIF(OPENMP_FOUND)
-ELSE(OPENMP_ENABLE)
-  set(OPENMP_FOUND FALSE)
-ENDIF(OPENMP_ENABLE)
-
-IF (OPENMP_FOUND)
-	OPTION(SUNDIALS_OPENMP "Enable SUNDIALS NVector openMP implementation" ON)
-	OPTION(GRIDDYN_OPENMP "Enable openmp internal to GridDyn--not used yet" OFF)
-ENDIF(OPENMP_FOUND)
-
-OPTION(DISABLE_MULTITHREADING "disable multithreading in GridDyn libraries" OFF)
 
 
 # -------------------------------------------------------------
@@ -186,19 +139,6 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 list(APPEND external_library_list Threads::Threads)
 ENDIF(NOT DISABLE_MULTITHREADING)
-
-# -------------------------------------------------------------
-# Enable MPI support?
-# -------------------------------------------------------------
-
-OPTION(MPI_ENABLE "Enable MPI support" OFF)
-
-IF(MPI_ENABLE)
-  find_package(MPI)
-  # SGS FIXME this should in configure.h somewhere perhaps?
-  ADD_DEFINITIONS(-DHAVE_MPI)
-ENDIF(MPI_ENABLE)
-
 
 # -------------------------------------------------------------
 # Find (and test) the KLU libraries
@@ -317,10 +257,7 @@ endif(SUNDIALS_CVODE_FOUND)
 set(optional_component_test_files)
 set(optional_system_test_files)
 
-set(griddyn_optional_libraries )
-
-
-
+set(helics_fmi_optional_libraries )
 
 set (optional_library_key_headers )
 set (optional_library_functions )
@@ -366,19 +303,13 @@ ENDIF(MSVC)
 SHOW_VARIABLE(BOOST_ROOT PATH "Boost root directory" "${BOOST_ROOT}")
 
 # Minimum version of Boost required 
-set(BOOST_MINIMUM_VERSION 1.58)
+set(BOOST_MINIMUM_VERSION 1.61)
 
 IF(MPI_ENABLE)
-  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem serialization mpi system date_time REQUIRED)
+  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options filesystem serialization mpi system date_time REQUIRED)
 ELSE(MPI_ENABLE)
-  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
+  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options filesystem system date_time REQUIRED)
 ENDIF(MPI_ENABLE)
-
-# Minimum version of Boost required for building tests 
-if (Boost_VERSION LESS 106100)
-  set(TEST_ENABLE OFF)
-  message(WARNING "Boost version >=1.61 required for building tests (Found Boost version ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION})")
-endif()
 
 mark_as_advanced(CLEAR BOOST_ROOT)
 
@@ -401,106 +332,14 @@ INCLUDE_DIRECTORIES(SYSTEM ${Boost_INCLUDE_DIR})
 
 add_subdirectory(src/formatInterpreters)
 
-add_subdirectory(src/core)
-#required for utilities library
-
 add_subdirectory(src/utilities)
 
-add_subdirectory(src/griddyn)
-
-# now go into the optional stuff
+add_subdirectory(src/fmi)
 
 
-# -------------------------------------------------------------
-# Enable support for Plugins
-# -------------------------------------------------------------
+option (HELICS_FMI_GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)
 
-OPTION(ENABLE_PLUGINS "Enable support for plugin modules" OFF)
-
-IF (ENABLE_PLUGINS)
-	IF (Boost_MAJOR_VERSION==1 AND Boost_MINOR_VERSION<61)
-		set(ENABLE_PLUGINS OFF)
-		message("Plugin support requires BOOST 1.61 or higher")
-	ELSE(Boost_MAJOR_VERSION==1 AND Boost_MINOR_VERSION<61)
-		add_subdirectory(plugins)
-		SET(DL_REQUIRED ON)
-	ENDIF(Boost_MAJOR_VERSION==1 AND Boost_MINOR_VERSION<61)
-ENDIF(ENABLE_PLUGINS)
-
-# -------------------------------------------------------------
-# Enable compilation of extraModels?
-# -------------------------------------------------------------
-
-OPTION(LOAD_EXTRA_MODELS "Compile and load extraModels" ON)
-# If extra models are used enabled try to locate the libraries
-# link against them.
-
-if (LOAD_EXTRA_MODELS)
-  add_subdirectory(src/extraModels)
-ENDIF(LOAD_EXTRA_MODELS)
-
-# -------------------------------------------------------------
-# Enable FMI support?
-# -------------------------------------------------------------
-
-OPTION(FMI_ENABLE "Enable FMI support" ON)
-# If FMI is enabled try to locate the libraries
-# link against them.
-
-IF (FMI_ENABLE)
-	IF (Boost_MAJOR_VERSION==1 AND Boost_MINOR_VERSION<61)
-		set(FMI_ENABLE OFF CACHE BOOL "Enable FMI Support" FORCE)
-		message("FMI support requires BOOST 1.61 or higher")
-	ELSE(Boost_MAJOR_VERSION==1 AND Boost_MINOR_VERSION<61)
-		add_subdirectory(src/fmi)
-		SET(DL_REQUIRED ON)
-	ENDIF(Boost_MAJOR_VERSION==1 AND Boost_MINOR_VERSION<61)
-ENDIF(FMI_ENABLE)
-
-
-# -------------------------------------------------------------
-# FSKIT
-# -------------------------------------------------------------
-
-OPTION(FSKIT_ENABLE "Enable FSKIT support" OFF)
-
-IF(FSKIT_ENABLE)
-  find_package(FSKIT)
-  INCLUDE_DIRECTORIES(SYSTEM ${FSKIT_INCLUDE_DIR})
-  set(GRIDDYN_HAVE_FSKIT 1)
-  add_subdirectory(src/fskit)
-ENDIF(FSKIT_ENABLE)
-
-# -------------------------------------------------------------
-# Enable 64 bit indexing (enable to allow for more than 2^31 objects)--that would be a very big model
-# -------------------------------------------------------------
-
-if("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
-  OPTION(ENABLE_64_BIT_INDEXING "set all indexing and count variables to 64 bit unsigned (Usually not required)" OFF)
-endif("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
- 
-#OPTION(BUILD_SERVERMODE "Build GridDyn Server" OFF)
-IF (BUILD_SERVERMODE)
- add_subdirectory(src/gridDynServer)
-ENDIF(BUILD_SERVERMODE)
-
-
-
-
-# ------------------------------------------------------------
-# Enable message logging
-# -------------------------------------------------------------
-OPTION(LOGGING_ENABLED "enable non-warning/error logging messages" ON)
-
-IF(LOGGING_ENABLE)
-OPTION(DEBUG_LOGGING_ENABLED "enable debug logging messages(Note: logging is still controlled via program options this is for program size and speed)" ON)
-OPTION(TRACE_LOGGING_ENABLED "enable trace logging messages(Note: logging is still controlled via program options this is for program size and speed)" ON)
-ENDIF(LOGGING_ENABLE)
-
-
-option (GRIDDYN_GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)
-
-IF (GRIDDYN_GENERATE_DOXYGEN_DOC)
+IF (HELICS_FMI_GENERATE_DOXYGEN_DOC)
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
 
@@ -512,108 +351,14 @@ if(DOXYGEN_FOUND)
 	COMMENT "Generating API documentation with Doxygen" VERBATIM
 )
 endif(DOXYGEN_FOUND)
-endif (GRIDDYN_GENERATE_DOXYGEN_DOC)
-
-
-# -------------------------------------------------------------
-# Enable FNCS executable
-# -------------------------------------------------------------
-
-OPTION(FNCS_EXECUTABLE "Enable the FNCS executable to be built" OFF)
-# If FNCS_EXECUTABLE is load the fncs directory
-# link against them.
-
-IF (FNCS_EXECUTABLE)
-	SHOW_VARIABLE(USE_DUMMY_FNCS BOOL "use a dummy fncs implementation if none is available" OFF)
-	IF(USE_DUMMY_FNCS)
-		HIDE_VARIABLE(USE_FNCS_SHARED_LIBRARY)
-		HIDE_VARIABLE(FNCS_INSTALL_PATH)
-		
-	ELSE(USE_DUMMY_FNCS)
-		SHOW_VARIABLE(USE_FNCS_SHARED_LIBRARY BOOL "used a dynamic shared library for the FNCS interface" OFF)
-		set(ZMQ_NEEDED ON)
-		IF(USE_FNCS_SHARED_LIBRARY)
-			SHOW_VARIABLE(FNCS_INSTALL_PATH PATH "path to the fncs installation" "${FNCS_LIBRARY_PATH}")
-			find_package(FNCS)
-		ELSE (USE_FNCS_SHARED_LIBRARY)
-			HIDE_VARIABLE(FNCS_INSTALL_PATH)
-			SHOW_VARIABLE(CZMQ_LIBRARY_PATH PATH  "path to the czmq libraries" "${CZMQ_LIBRARY_PATH}")
-            SHOW_VARIABLE(CZMQ_INCLUDE_PATH PATH  "path to the czmq headers" "${CZMQ_INCLUDE_PATH}")
-				find_package(CZMQ)
-				list(APPEND griddyn_optional_libraries ${CZMQ_LIBRARY})
-		ENDIF(USE_FNCS_SHARED_LIBRARY)
-		
-	ENDIF(USE_DUMMY_FNCS)
-	add_subdirectory(src/fncs)
-ELSE(FNCS_EXECUTABLE)
-	HIDE_VARIABLE(FNCS_INSTALL_PATH)
-	HIDE_VARIABLE(USE_DUMMY_FNCS)
-	HIDE_VARIABLE(USE_FNCS_SHARED_LIBRARY)
-ENDIF(FNCS_EXECUTABLE)
-
+endif (HELICS_FMI_GENERATE_DOXYGEN_DOC)
 
 # -------------------------------------------------------------
 # Enable HELICS executable
 # -------------------------------------------------------------
 
-OPTION(HELICS_EXECUTABLE "Enable the HELICS executable to be built" OFF)
-# If HELICS_EXECUTABLE is load the fncs directory
-# link against them.
-
-IF (HELICS_EXECUTABLE)
-	SHOW_VARIABLE(HELICS_INSTALL_PATH PATH "path to the helics installation" "${PROJECT_BINARY_DIR}/libs")
-	set(ZMQ_NEEDED ON CACHE BOOL "ZMQ is needed" FORCE)
-ELSE(HELICS_EXECUTABLE)
-	HIDE_VARIABLE(HELICS_INSTALL_PATH)
-ENDIF(HELICS_EXECUTABLE)
-
-# -------------------------------------------------------------
-# Enable ZMQ interfacing
-# -------------------------------------------------------------
-
-OPTION(DIME_ENABLE "Enable connection with Dime" OFF)
-
-IF (DIME_ENABLE)
-set(ZMQ_NEEDED ON CACHE BOOL "ZMQ is needed" FORCE)
-ENDIF(DIME_ENABLE)
-OPTION(ZMQ_ENABLE "Enable ZMQ networking library" ${ZMQ_NEEDED})
-# If ZMQ library is enabled try to locate it and link against it
-
-IF ((ZMQ_ENABLE) OR (ZMQ_NEEDED))
-
-SHOW_VARIABLE(ZMQ_LIBRARY_PATH PATH
-  "path to the zmq libraries" "${PROJECT_BINARY_DIR}/libs")
-  
-SHOW_VARIABLE(ZMQ_INCLUDE_PATH PATH
-  "path to the zmq headers" "${PROJECT_BINARY_DIR}/libs")
-  set(ZMQ_FIND_QUIETLY ON)
-find_package(ZMQ)
-
-if (NOT ZMQ_FOUND)
-OPTION(AUTOBUILD_ZMQ "enable ZMQ to automatically download and build" OFF)
-  IF (AUTOBUILD_ZMQ)
-  include(buildlibZMQ)
-  build_libzmq()
-  set(ZMQ_INSTALL_PATH ${PROJECT_BINARY_DIR}/libs)
-  find_package(ZMQ)
-  ENDIF(AUTOBUILD_ZMQ)
-  
-endif(NOT ZMQ_FOUND)
- 
-  
-# ZMQ_INCLUDE_DIR, where to find zmq.h
-# ZMQ_LIBRARY, the library needed to use ZMQ
-# ZMQ_FOUND, if false, you cannot build anything that requires ZMQ.
-	if (ZMQ_FOUND)
-		add_subdirectory(src/zmqlib)
-	else(ZMQ_FOUND)
-		message(SEND_ERROR "unable to locate zmq library")
-	endif(ZMQ_FOUND)
-ENDIF((ZMQ_ENABLE) OR (ZMQ_NEEDED))
-
-
-IF (HELICS_EXECUTABLE)
-	SHOW_VARIABLE(HELICS_INSTALL_PATH PATH "path to the helics installation" "${PROJECT_BINARY_DIR}/libs")
+SHOW_VARIABLE(HELICS_INSTALL_PATH PATH "path to the helics installation" "${PROJECT_BINARY_DIR}/libs")
+	
 	set(HELICS_INSTALL_PATH ${PROJECT_BINARY_DIR}/libs)
 	find_package(HELICS)
 	IF(NOT HELICS_FOUND)
@@ -636,41 +381,10 @@ IF (HELICS_EXECUTABLE)
 		ENDIF(AUTOBUILD_HELICS)
 	ENDIF(NOT HELICS_FOUND)
 	
-	add_subdirectory(src/helics)
-ENDIF(HELICS_EXECUTABLE)
+add_subdirectory(src/main)
+
 FILE(GLOB KEY_LIBRARY_FILES  ${PROJECT_BINARY_DIR}/libs/bin/*)
 message(STATUS "key files ${KEY_LIBRARY_FILES}")
-# -------------------------------------------------------------
-# load the subdirectories
-# -------------------------------------------------------------
-
-
-
-OPTION(OPTIMIZATION_ENABLE "Enable Optimization libraries" OFF)
-# If OPTIMIZATION is enabled try to locate the libraries
-# link against them.
-IF(OPTIMIZATION_ENABLE)
-	add_subdirectory(src/optimization)
-ENDIF(OPTIMIZATION_ENABLE)
-
-add_subdirectory(src/fileInput)
-
-add_subdirectory(src/coupling)
-
-add_subdirectory(src/gridDynCombined)
-
-IF(BUILD_SHARED_FMI_LIBRARY)
-	add_subdirectory(src/fmi_export)
-ENDIF(BUILD_SHARED_FMI_LIBRARY)
-
-OPTION(BUILD_GRIDDYN_SHARED_LIBRARY "Enable construction of griddyn binary shared library" OFF)
-
-IF(BUILD_GRIDDYN_SHARED_LIBRARY)
-	add_subdirectory(src/griddyn_shared)
-ENDIF(BUILD_GRIDDYN_SHARED_LIBRARY)
-
-add_subdirectory(src/gridDynMain)
-
 
 # -------------------------------------------------------------
 # Enable clang analysis and formatting tools
@@ -681,27 +395,11 @@ OPTION(ENABLE_CLANG_TOOLS "if clang is found enable some custom targets for clan
 if (ENABLE_CLANG_TOOLS)
 include(clang-cxx-dev-tools)
 endif(ENABLE_CLANG_TOOLS)
-# -------------------------------------------------------------
-# Enable testCore construction?
-# -------------------------------------------------------------
 
-OPTION(TEST_ENABLE "Enable unit testing construction" ON)
-
-IF (TEST_ENABLE)
-	#message("otcf:${optional_component_test_files}")
-	add_subdirectory(test)
-IF(BUILD_GRIDDYN_SHARED_LIBRARY)
-	add_subdirectory(test/testSharedLibrary)
-ENDIF(BUILD_GRIDDYN_SHARED_LIBRARY)
-	#enable_testing()
-	#add_test(NAME gridDynTest COMMAND testCore)
-ENDIF(TEST_ENABLE)
 
 FILE(GLOB efiles "examples/*")
 INSTALL(FILES ${efiles} DESTINATION examples)
 
-SET(binfiles bin/configure.griddyn bin/pgriddyn bin/pgriddyn_debug)
-INSTALL(PROGRAMS ${binfiles} DESTINATION bin)
 
 INSTALL(FILES ${KEY_LIBRARY_FILES} DESTINATION bin)
 
@@ -715,28 +413,19 @@ INSTALL(FILES ${KEY_LIBRARY_FILES} DESTINATION bin)
 #FILE(GLOB docs "docs/manuals/*")
 #INSTALL(FILES ${docs} DESTINATION docs)
 
-# -------------------------------------------------------------
-# CTest
-# -------------------------------------------------------------
 
-enable_testing()
-add_test(NAME testComponents COMMAND testComponents)
-
-add_test(NAME testLibrary COMMAND testLibrary)
-         
-add_test(NAME testSystem COMMAND testSystem)
 
 # -------------------------------------------------------------
 # CPack for NSIS Installer
 # -------------------------------------------------------------
 
-set(CPACK_PACKAGE_NAME "GridDyn")
+set(CPACK_PACKAGE_NAME "HELICS-fmi")
 set(CPACK_PACKAGE_VENDOR "Lawrence Livermore National Security")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "GridDyn Installer")
-set(CPACK_PACKAGE_VERSION "${GridDyn_MAJOR_VERSION}.${GridDyn_MINOR_VERSION}")
-set(CPACK_PACKAGE_VERSION_MAJOR ${GridDyn_MAJOR_VERSION})
-set(CPACK_PACKAGE_VERSION_MINOR ${GridDyn_MINOR_VERSION})
-#set(CPACK_PACKAGE_VERSION_PATCH ${GridDyn_VERSION_PATCH})
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Helics-fmi Installer")
+set(CPACK_PACKAGE_VERSION "${HELICS_FMI_MAJOR_VERSION}.${HELICS_FMI_MINOR_VERSION}")
+set(CPACK_PACKAGE_VERSION_MAJOR ${HELICS_FMI_MAJOR_VERSION})
+set(CPACK_PACKAGE_VERSION_MINOR ${HELICS_FMI_MINOR_VERSION})
+#set(CPACK_PACKAGE_VERSION_PATCH ${HELICS_FMI_VERSION_PATCH})
 
 #THIS LINE MUST BE LAST
 include(CPack)
