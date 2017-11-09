@@ -7,9 +7,16 @@ set(BUILD_SHARED_LIBS OFF)
 cmake_minimum_required(VERSION 3.4)
 cmake_policy(VERSION 3.4)
 
-IF (NOT ZLIB_INCLUDES)
-find_package(ZLIB REQUIRED)
-ENDIF(NOT ZLIB_INCLUDES)
+ExternalProject_Add(zlib
+    SOURCE_DIR ${ZLIB_SOURCE_DIR}
+    DOWNLOAD_COMMAND " " 
+    UPDATE_COMMAND " " 
+    BINARY_DIR ${PROJECT_BINARY_DIR}/ThirdParty/Zlib
+    PREFIX=${PROJECT_BINARY_DIR}/libs
+    CMAKE_ARGS 
+        -DBUILD_SHARED_LIBS=OFF
+        
+    )
 
 
 if(CMAKE_HOST_APPLE)
@@ -54,9 +61,6 @@ set(HEADERS
   #mztools.h
   unzip.h
 )
-OPTION(BUILD_SHARED_FMI_LIBRARY "Enable construction of a binary fmi shared library for GridDyn" OFF)
-
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 if(WIN32)
     set(HEADERS ${HEADERS} iowin32.h)
@@ -64,7 +68,7 @@ endif(WIN32)
 
 add_library(minizip ${SOURCES} ${HEADERS})
 
-
+add_dependency(minizip zlib)
 	install(TARGETS minizip
        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/
 	)

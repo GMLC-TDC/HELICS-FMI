@@ -19,7 +19,7 @@ cmake_policy(VERSION 3.4)
 set(HELICS_FMI_MAJOR 0)
 set(HELICS_FMI_MINOR 2)
 set(HELICS_FMI_PATCH 2)
-set(HELICS_FMI_DATE 11-07-2017)
+set(HELICS_FMI_DATE 11-27-2017)
 
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config)
 
@@ -145,122 +145,101 @@ ENDIF(NOT DISABLE_MULTITHREADING)
 # -------------------------------------------------------------
 
 
-OPTION(KLU_ENABLE "Enable KLU support" ON)
+#OPTION(KLU_ENABLE "Enable KLU support" ON)
 
-if(NOT DEFINED SuiteSparse_DIR)
-  set(SuiteSparse_DIR ${PROJECT_BINARY_DIR}/libs CACHE PATH "path to SuiteSparse/KLU")
-endif()
+#if(NOT DEFINED SuiteSparse_DIR)
+#  set(SuiteSparse_DIR ${PROJECT_BINARY_DIR}/libs CACHE PATH "path to SuiteSparse/KLU")
+#endif()
 
-SHOW_VARIABLE(SuiteSparse_DIR PATH
-  "KLU library directory" "${SuiteSparse_DIR}")
+#SHOW_VARIABLE(SuiteSparse_DIR PATH
+#  "KLU library directory" "${SuiteSparse_DIR}")
 
-if(KLU_ENABLE)
-  IF(MSVC)
-    set(SuiteSparse_USE_LAPACK_BLAS ON)
-  ENDIF(MSVC)
-  find_package(SuiteSparse COMPONENTS KLU AMD COLAMD BTF SUITESPARSECONFIG CXSPARSE)
-  if(SuiteSparse_FOUND) 
-        list(APPEND external_library_list ${SuiteSparse_LIBRARIES})
-        #list(APPEND external_link_directories ${SuiteSparse_LIBRARY_DIR})
-        IF (AUTOBUILD_KLU)
-		OPTION(FORCE_KLU_REBUILD "force rebuild of KLU" OFF)
-		IF(FORCE_KLU_REBUILD)
-			include(buildSuiteSparse)
-			build_suitesparse()
-			set(FORCE_KLU_REBUILD OFF CACHE BOOL "force rebuild of KLU" FORCE)
-		ENDIF(FORCE_KLU_REBUILD)
-	ENDIF(AUTOBUILD_KLU)
-  else(SuiteSparse_FOUND)
-	OPTION(AUTOBUILD_KLU "enable Suitesparse to automatically download and build" OFF)
-	IF (AUTOBUILD_KLU)
-		include(buildSuiteSparse)
-		build_suitesparse()
-		set(SuiteSparse_DIR ${PROJECT_BINARY_DIR}/libs)
-		find_package(SuiteSparse COMPONENTS KLU AMD COLAMD BTF SUITESPARSECONFIG CXSPARSE)
-	ENDIF(AUTOBUILD_KLU)
-	if (SuiteSparse_FOUND)
-	   list(APPEND external_library_list ${SuiteSparse_LIBRARIES})
-	else()
-		message( FATAL_ERROR "KLU not functional - support will not be provided")
-		message( "Double check spelling specified libraries (search is case sensitive)")
-	endif()
-  endif(SuiteSparse_FOUND)
+#if(KLU_ENABLE)
+#  IF(MSVC)
+#    set(SuiteSparse_USE_LAPACK_BLAS ON)
+#  ENDIF(MSVC)
+#  find_package(SuiteSparse COMPONENTS KLU AMD COLAMD BTF SUITESPARSECONFIG CXSPARSE)
+#  if(SuiteSparse_FOUND) 
+#        list(APPEND external_library_list ${SuiteSparse_LIBRARIES})
+#        #list(APPEND external_link_directories ${SuiteSparse_LIBRARY_DIR})
+#        IF (AUTOBUILD_KLU)
+#		OPTION(FORCE_KLU_REBUILD "force rebuild of KLU" OFF)
+#		IF(FORCE_KLU_REBUILD)
+#			include(buildSuiteSparse)
+#			build_suitesparse()
+#			set(FORCE_KLU_REBUILD OFF CACHE BOOL "force rebuild of KLU" FORCE)
+#		ENDIF(FORCE_KLU_REBUILD)
+#	ENDIF(AUTOBUILD_KLU)
+#  else(SuiteSparse_FOUND)
+#	OPTION(AUTOBUILD_KLU "enable Suitesparse to automatically download and build" OFF)
+#	IF (AUTOBUILD_KLU)
+#		include(buildSuiteSparse)
+#		build_suitesparse()
+#		set(SuiteSparse_DIR ${PROJECT_BINARY_DIR}/libs)
+#		find_package(SuiteSparse COMPONENTS KLU AMD COLAMD BTF SUITESPARSECONFIG CXSPARSE)
+#	ENDIF(AUTOBUILD_KLU)
+#	if (SuiteSparse_FOUND)
+#	   list(APPEND external_library_list ${SuiteSparse_LIBRARIES})
+#	else()
+#		message( FATAL_ERROR "KLU not functional - support will not be provided")
+#		message( "Double check spelling specified libraries (search is case sensitive)")
+#	endif()
+# endif(SuiteSparse_FOUND)
 
-endif(KLU_ENABLE)
+#endif(KLU_ENABLE)
 
 # -------------------------------------------------------------
 # Sundials
 # -------------------------------------------------------------
 
-if(NOT DEFINED SUNDIALS_DIR)
-  set(SUNDIALS_DIR ${PROJECT_BINARY_DIR}/libs CACHE PATH "path to SUNDIALS")
-endif()
+#if(NOT DEFINED SUNDIALS_DIR)
+#  set(SUNDIALS_DIR ${PROJECT_BINARY_DIR}/libs CACHE PATH "path to SUNDIALS")
+#endif()
 
-SHOW_VARIABLE(SUNDIALS_DIR PATH
-  "SUNDIALS library directory" "${SUNDIALS_DIR}")
+#SHOW_VARIABLE(SUNDIALS_DIR PATH
+#  "SUNDIALS library directory" "${SUNDIALS_DIR}")
   
-  set(SUNDIALS_FIND_QUIETLY ON)
+#  set(SUNDIALS_FIND_QUIETLY ON)
   
-  set(SUNDIALS_REQUIRED IDA KINSOL)
-  if (OPENMP_FOUND)
-  list(APPEND SUNDIALS_REQUIRED nvecopenmp)
-  endif(OPENMP_FOUND)
-find_package(SUNDIALS REQUIRED COMPONENTS ${SUNDIALS_REQUIRED} OPTIONAL_COMPONENTS CVODE ARKODE)
+#find_package(SUNDIALS REQUIRED COMPONENTS CVODE)
 
-  if(SUNDIALS_FOUND) 
-	list(INSERT external_library_list 0 ${SUNDIALS_LIBRARIES})
-  OPTION(FORCE_SUNDIALS_REBUILD "force rebuild of sundials" OFF)
-	IF (AUTOBUILD_SUNDIALS)
+#  if(SUNDIALS_FOUND) 
+#	list(INSERT external_library_list 0 ${SUNDIALS_LIBRARIES})
+#  OPTION(FORCE_SUNDIALS_REBUILD "force rebuild of sundials" OFF)
+#	IF (AUTOBUILD_SUNDIALS)
 		
-		IF(FORCE_SUNDIALS_REBUILD)
-			include(buildSundials)
-			build_sundials()
-			set(FORCE_SUNDIALS_REBUILD OFF CACHE BOOL "force rebuild of sundials" FORCE)
-		ENDIF(FORCE_SUNDIALS_REBUILD)
-	ELSE (AUTOBUILD_SUNDIALS)
-	   IF(FORCE_SUNDIALS_REBUILD)
-			include(buildSundials)
-			build_sundials()
-			set(SUNDIALS_FOUND OFF CACHE BOOL "sundials not found" FORCE)
-			set(SUNDIALS_LIBRARIES NOT_FOUND CACHE FORCE)
-			set(FORCE_SUNDIALS_REBUILD OFF CACHE BOOL "force rebuild of sundials" FORCE)
-			set(SUNDIALS_DIR ${PROJECT_BINARY_DIR}/libs)
-			find_package(SUNDIALS REQUIRED COMPONENTS ${SUNDIALS_REQUIRED} OPTIONAL_COMPONENTS CVODE ARKODE)
-		ENDIF(FORCE_SUNDIALS_REBUILD)
-	ENDIF(AUTOBUILD_SUNDIALS)
-  else(SUNDIALS_FOUND)
-    OPTION(AUTOBUILD_SUNDIALS "enable Sundials to automatically download and build" OFF)
-    message(STATUS "abs=${AUTOBUILD_SUNDIALS}")
-    IF (AUTOBUILD_SUNDIALS)
-      include(buildSundials)
-      build_sundials()
-      set(SUNDIALS_DIR ${PROJECT_BINARY_DIR}/libs)
-      find_package(SUNDIALS REQUIRED COMPONENTS ${SUNDIALS_REQUIRED} OPTIONAL_COMPONENTS CVODE ARKODE)
-    ENDIF(AUTOBUILD_SUNDIALS)
-  if (SUNDIALS_FOUND)
-    list(INSERT external_library_list 0 ${SUNDIALS_LIBRARIES})
-  else (SUNDIALS_FOUND)
-	message( FATAL_ERROR "sundials not found - unable to continue")
-	message( "Double check spelling specified libraries (search is case sensitive)")
-  endif(SUNDIALS_FOUND)
-  endif(SUNDIALS_FOUND)
-
-
-if (SUNDIALS_ARKODE_FOUND)
-set(LOAD_ARKODE TRUE)
-endif(SUNDIALS_ARKODE_FOUND)
-
-if (SUNDIALS_CVODE_FOUND)
-set(LOAD_CVODE TRUE)
-endif(SUNDIALS_CVODE_FOUND)
-
-set(optional_component_test_files)
-set(optional_system_test_files)
-
-set(helics_fmi_optional_libraries )
-
-set (optional_library_key_headers )
-set (optional_library_functions )
+#		IF(FORCE_SUNDIALS_REBUILD)
+#			include(buildSundials)
+#			build_sundials()
+#			set(FORCE_SUNDIALS_REBUILD OFF CACHE BOOL "force rebuild of sundials" FORCE)
+#		ENDIF(FORCE_SUNDIALS_REBUILD)
+#	ELSE (AUTOBUILD_SUNDIALS)
+#	   IF(FORCE_SUNDIALS_REBUILD)
+#			include(buildSundials)
+#			build_sundials()
+#			set(SUNDIALS_FOUND OFF CACHE BOOL "sundials not found" FORCE)
+#			set(SUNDIALS_LIBRARIES NOT_FOUND CACHE FORCE)
+#			set(FORCE_SUNDIALS_REBUILD OFF CACHE BOOL "force rebuild of sundials" FORCE)
+#			set(SUNDIALS_DIR ${PROJECT_BINARY_DIR}/libs)
+#			find_package(SUNDIALS REQUIRED COMPONENTS CVODE)
+#		ENDIF(FORCE_SUNDIALS_REBUILD)
+#	ENDIF(AUTOBUILD_SUNDIALS)
+# else(SUNDIALS_FOUND)
+#    OPTION(AUTOBUILD_SUNDIALS "enable Sundials to automatically download and build" OFF)
+#    message(STATUS "abs=${AUTOBUILD_SUNDIALS}")
+#    IF (AUTOBUILD_SUNDIALS)
+#      include(buildSundials)
+#      build_sundials()
+#      set(SUNDIALS_DIR ${PROJECT_BINARY_DIR}/libs)
+#      find_package(SUNDIALS REQUIRED COMPONENTS CVODE)
+#    ENDIF(AUTOBUILD_SUNDIALS)
+#  if (SUNDIALS_FOUND)
+#    list(INSERT external_library_list 0 ${SUNDIALS_LIBRARIES})
+#  else (SUNDIALS_FOUND)
+#	message( FATAL_ERROR "sundials not found - unable to continue")
+#	message( "Double check spelling specified libraries (search is case sensitive)")
+#  endif(SUNDIALS_FOUND)
+#  endif(SUNDIALS_FOUND)
 
 # -------------------------------------------------------------
 # BOOST
@@ -269,7 +248,7 @@ set (optional_library_functions )
 IF (MSVC)
 find_path(BOOST_TEST_PATH 
 			NAMES 			boost/version.hpp
-			PATHS		C:/boost_1_65_0
+			PATHS		C:/boost_1_65_1
 						C:/boost_1_64_0
 						C:/boost_1_63_0
 						C:/boost_1_61_0
@@ -277,7 +256,7 @@ find_path(BOOST_TEST_PATH
 						D:/boost_1_64_0
 						D:/boost_1_63_0
 						D:/boost_1_61_0
-						C:/boost/boost_1_65_0
+						C:/boost/boost_1_65_1
 						C:/boost/boost_1_64_0
 						C:/boost/boost_1_63_0
 						C:/boost/boost_1_61_0
@@ -285,11 +264,11 @@ find_path(BOOST_TEST_PATH
 						D:/boost/boost_1_64_0
 						D:/boost/boost_1_63_0
 						D:/boost/boost_1_61_0
-						C:/local/boost_1_65_0
+						C:/local/boost_1_65_1
 						C:/local/boost_1_64_0
 						C:/local/boost_1_63_0
 						C:/local/boost_1_61_0
-						D:/local/boost_1_65_0
+						D:/local/boost_1_65_1
 						D:/local/boost_1_64_0
 						D:/local/boost_1_63_0
 						D:/local/boost_1_61_0
@@ -305,11 +284,8 @@ SHOW_VARIABLE(BOOST_ROOT PATH "Boost root directory" "${BOOST_ROOT}")
 # Minimum version of Boost required 
 set(BOOST_MINIMUM_VERSION 1.61)
 
-IF(MPI_ENABLE)
-  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options filesystem serialization mpi system date_time REQUIRED)
-ELSE(MPI_ENABLE)
-  find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options filesystem system date_time REQUIRED)
-ENDIF(MPI_ENABLE)
+find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options filesystem system date_time REQUIRED)
+
 
 mark_as_advanced(CLEAR BOOST_ROOT)
 
@@ -335,7 +311,6 @@ add_subdirectory(src/formatInterpreters)
 add_subdirectory(src/utilities)
 
 add_subdirectory(src/fmi)
-
 
 option (HELICS_FMI_GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)
 

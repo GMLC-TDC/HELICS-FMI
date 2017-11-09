@@ -12,11 +12,8 @@
 
 set(utilities_sources
 	gridRandom.cpp
-	saturation.cpp
-	stackInfo.cpp
 	stringOps.cpp
 	string_viewOps.cpp
-	ThreePhaseFunctions.cpp
 	matrixOps.cpp
 	stringConversion.cpp
 	units.cpp
@@ -29,7 +26,6 @@ set(utilities_sources
 	matrixCreation.cpp
 	logger.cpp
 	matrixDataSparse.cpp
-	OperatingBoundary.cpp
 	stringToCmdLine.cpp
 	)
 
@@ -39,24 +35,17 @@ set(utilities_headers
 	timeSeries.hpp
 	charMapper.h
 	timeSeriesMulti.hpp
-	ThreePhaseFunctions.h
 	vectorOps.hpp
 	generic_string_ops.hpp
 	stringOps.h
 	string_viewOps.h
 	string_viewDef.h
 	optionalDef.hpp
-	gridRandom.h
-	saturation.h
-	stackInfo.h
-	vectData.hpp
 	matrixData.hpp
 	matrixOps.h
 	matrixDataCompact.hpp
 	matrixDataSparse.hpp
 	matrixDataSparse_impl.hpp
-	matrixDataBoost.hpp
-	matrixDataSparseSM.hpp
 	matrixDataTranslate.hpp
 	matrixDataContainer.hpp
 	matrixDataScale.hpp
@@ -77,60 +66,33 @@ set(utilities_headers
 	timeRepresentation.hpp
 	indexTypes.hpp
 	logger.h
-	OperatingBoundary.h
 	stringToCmdLine.h
 	)
 
 add_library(utilities STATIC ${utilities_sources} ${utilities_headers})
 
-include(buildZlib)
+include(escape_string)
 
-include(buildMiniZip)
-###########################################
-# building zlib
-###########################################
-set(ZLIB_ROOT_DIR ${PROJECT_BINARY_DIR}/libs)
+escape_string(project_src_dir_string ${PROJECT_SOURCE_DIR})
+escape_string(binary_dir_string ${CMAKE_BINARY_DIR})
 
-unset(ZLIB_FOUND)
-find_package(ZLIB)
+externalProject_Add(minizip
+    SOURCE_DIR ${project_src_dir_string}/ThirdParty/Zlib/zlib-1.2.6
+    DOWNLOAD_COMMAND " "
+    UPDATE_COMMAND " "
+	BINARY_DIR ${binary_dir_string}/ThirdParty/Minizip
+	PREFIX  ${binary_dir_string}/libs
+    CMAKE_ARGS 
+		-DZLIB_SOURCE_DIR=${zlib_source_dir}
 
-if (NOT ZLIB_FOUND)
-build_zlib()
-find_package(ZLIB)
-endif (NOT ZLIB_FOUND)
-
-
-
-
-###########################################
-# building minizip
-###########################################
-set(MINIZIP_ROOT_DIR ${PROJECT_BINARY_DIR}/libs)
-set(NO_SYSTEM_MINIZIP 1)
-find_package(MiniZip)
-
-if (NOT MINIZIP_FOUND)
-build_minizip()
-find_package(MiniZip)
-endif (NOT MINIZIP_FOUND)
-
-IF (ENABLE_64_BIT_INDEXING)
-add_definitions(-DENABLE_64_BIT_INDEXING)
-ENDIF(ENABLE_64_BIT_INDEXING)
+		
+	INSTALL_DIR ${binary_dir_string}/libs
+	)
 
 
-list(APPEND external_library_list ${MINIZIP_LIBRARIES} ${ZLIB_LIBRARIES})
-
-set (external_library_list ${external_library_list} PARENT_SCOPE)
+add_dependencies(utilities minizip)
 
 INSTALL(TARGETS utilities
        LIBRARY DESTINATION lib
        ARCHIVE DESTINATION lib)
 
-INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  DESTINATION include/griddyn
-  FILES_MATCHING PATTERN "*.h")
-
-INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  DESTINATION include/griddyn
-  FILES_MATCHING PATTERN "*.hpp")
