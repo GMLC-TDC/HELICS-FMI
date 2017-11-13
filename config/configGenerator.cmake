@@ -31,10 +31,10 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   endif()
 endif()
 
+#boost libraries don't compile under /std:c++latest flag 1.66 might solve this issue
 #if (MSVC)
 #set(VERSION_OPTION /std:c++latest)
 #endif()
-
 
 try_compile(OPTIONAL_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/config/test_compiler_cxx/check_optional.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION})
 
@@ -93,3 +93,12 @@ endif()
 if (UNUSED_AVAILABLE)
 set(HAVE_UNUSED 1)
 endif()
+
+if (NOT NO_CONFIG_GENERATION)
+if (CONFIGURE_TARGET_LOCATION)
+CONFIGURE_FILE(compiler-config.h.in ${CONFIGURE_TARGET_LOCATION}/compiler-config.h)
+else()
+CONFIGURE_FILE(compiler-config.h.in ${PROJECT_BINARY_DIR}/compiler-config.h)
+endif()
+
+endif(NOT NO_CONFIG_GENERATION)
