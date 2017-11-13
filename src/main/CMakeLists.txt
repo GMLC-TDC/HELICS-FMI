@@ -22,9 +22,9 @@ INCLUDE_DIRECTORIES(.)
 INCLUDE_DIRECTORIES(${formatInterpreter_include_directories})
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/fmi)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/utilities)
+INCLUDE_DIRECTORIES(${HELICS_INCLUDE_DIR})
 
-set(GRIDYNMAIN_BINARY_LOC ${CMAKE_CURRENT_BINARY_DIR} PARENT_SCOPE)
-
+target_link_libraries(helics-fmi helics ${external_library_list})
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET helics-fmi POST_BUILD        # Adds a post-build event to helics-fmi

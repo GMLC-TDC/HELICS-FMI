@@ -106,7 +106,7 @@ ELSE(UNIX)
   set(Boost_USE_STATIC_LIBS ON)
   ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
   ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
-  add_compile_options(/EHsc /std:c++latest)
+  add_compile_options(/EHsc)
   if (ENABLE_EXTRA_COMPILER_WARNINGS)
    add_compile_options(-W4 /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484 )
   endif(ENABLE_EXTRA_COMPILER_WARNINGS)
@@ -245,55 +245,7 @@ ENDIF(NOT DISABLE_MULTITHREADING)
 # BOOST
 # -------------------------------------------------------------
 
-IF (MSVC)
-find_path(BOOST_TEST_PATH 
-			NAMES 			boost/version.hpp
-			PATHS		C:/boost_1_65_1
-						C:/boost_1_64_0
-						C:/boost_1_63_0
-						C:/boost_1_61_0
-						D:/boost_1_65_0
-						D:/boost_1_64_0
-						D:/boost_1_63_0
-						D:/boost_1_61_0
-						C:/boost/boost_1_65_1
-						C:/boost/boost_1_64_0
-						C:/boost/boost_1_63_0
-						C:/boost/boost_1_61_0
-						D:/boost/boost_1_65_0
-						D:/boost/boost_1_64_0
-						D:/boost/boost_1_63_0
-						D:/boost/boost_1_61_0
-						C:/local/boost_1_65_1
-						C:/local/boost_1_64_0
-						C:/local/boost_1_63_0
-						C:/local/boost_1_61_0
-						D:/local/boost_1_65_1
-						D:/local/boost_1_64_0
-						D:/local/boost_1_63_0
-						D:/local/boost_1_61_0
-		)
-		
-		if (BOOST_TEST_PATH)
-		set(BOOST_ROOT ${BOOST_TEST_PATH})
-		endif(BOOST_TEST_PATH)
-ENDIF(MSVC)
-
-SHOW_VARIABLE(BOOST_ROOT PATH "Boost root directory" "${BOOST_ROOT}")
-
-# Minimum version of Boost required 
-set(BOOST_MINIMUM_VERSION 1.61)
-
-find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options filesystem system date_time REQUIRED)
-
-
-mark_as_advanced(CLEAR BOOST_ROOT)
-
-message("Using Boost include files : ${Boost_INCLUDE_DIR}")
-message("Using Boost libraries ${Boost_LIBRARY_DIRS}")
-
-list(APPEND external_library_list ${Boost_LIBRARIES})
-  list(APPEND external_link_directories ${Boost_LIBRARY_DIRS})
+include(addBoost)
 
 # -------------------------------------------------------------
 # global include directories
@@ -333,29 +285,34 @@ endif (HELICS_FMI_GENERATE_DOXYGEN_DOC)
 # -------------------------------------------------------------
 
 SHOW_VARIABLE(HELICS_INSTALL_PATH PATH "path to the helics installation" "${PROJECT_BINARY_DIR}/libs")
-	
-	set(HELICS_INSTALL_PATH ${PROJECT_BINARY_DIR}/libs)
-	find_package(HELICS)
-	IF(NOT HELICS_FOUND)
-		OPTION(AUTOBUILD_HELICS "enable HELICS to automatically download and build" OFF)
-		IF(AUTOBUILD_HELICS)
+
+if(EXISTS "${HELICS_INSTALL_PATH}/lib/helics/helics-targets.cmake")
+	IF (AUTOBUILD_HELICS)
+		OPTION(FORCE_HELICS_REBUILD "force rebuild of helics" OFF)
+		IF(FORCE_HELICS_REBUILD)
 			include(buildHELICS)
 			build_helics()
 			set(HELICS_INSTALL_PATH ${PROJECT_BINARY_DIR}/libs)
-			find_package(HELICS)
-		ENDIF(AUTOBUILD_HELICS)
-	ELSE (NOT HELICS_FOUND)
-		OPTION(FORCE_HELICS_REBUILD "force rebuild of helics" OFF)
-		IF (AUTOBUILD_HELICS)
-			IF(FORCE_HELICS_REBUILD)
-				include(buildHELICS)
-				build_helics()
-				set(HELICS_INSTALL_PATH ${PROJECT_BINARY_DIR}/libs)
-				set(FORCE_HELICS_REBUILD OFF CACHE BOOL "force rebuild of helics" FORCE)
-			ENDIF(FORCE_HELICS_REBUILD)
-		ENDIF(AUTOBUILD_HELICS)
-	ENDIF(NOT HELICS_FOUND)
-	
+			set(FORCE_HELICS_REBUILD OFF CACHE BOOL "force rebuild of helics" FORCE)
+		ENDIF(FORCE_HELICS_REBUILD)
+	ENDIF(AUTOBUILD_HELICS)
+	include(${HELICS_INSTALL_PATH}/lib/helics/helics-targets.cmake)
+	set(HELICS_FOUND TRUE)
+else()
+   OPTION(AUTOBUILD_HELICS "enable HELICS to automatically download and build" OFF)
+	IF(AUTOBUILD_HELICS)
+		include(buildHELICS)
+		build_helics()
+		set(HELICS_INSTALL_PATH ${PROJECT_BINARY_DIR}/libs)
+		set(HELICS_FOUND TRUE)
+		include(${HELICS_INSTALL_PATH}/lib/helics/helics-targets.cmake)
+	ELSE(AUTOBUILD_HELICS)
+		 message( FATAL_ERROR "Unable to locate HELICS library")
+	ENDIF(AUTOBUILD_HELICS)
+endif()
+
+set(HELICS_INCLUDE_DIR ${HELICS_INSTALL_PATH}/include)
+
 add_subdirectory(src/main)
 
 FILE(GLOB KEY_LIBRARY_FILES  ${PROJECT_BINARY_DIR}/libs/bin/*)
@@ -371,9 +328,6 @@ if (ENABLE_CLANG_TOOLS)
 include(clang-cxx-dev-tools)
 endif(ENABLE_CLANG_TOOLS)
 
-
-FILE(GLOB efiles "examples/*")
-INSTALL(FILES ${efiles} DESTINATION examples)
 
 
 INSTALL(FILES ${KEY_LIBRARY_FILES} DESTINATION bin)

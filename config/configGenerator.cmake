@@ -31,9 +31,9 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   endif()
 endif()
 
-if (MSVC)
-set(VERSION_OPTION /std:c++latest)
-endif()
+#if (MSVC)
+#set(VERSION_OPTION /std:c++latest)
+#endif()
 
 
 try_compile(OPTIONAL_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/config/test_compiler_cxx/check_optional.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION})
