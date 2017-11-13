@@ -94,7 +94,7 @@ ELSE(UNIX)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Woverloaded-virtual>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wredundant-decls>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wcast-align>)
-  #this options produces lots of warning but is useful for checking ever once in a while with Clang GCC warnin notices with this aren't as useful
+  #this options produces lots of warning but is useful for checking every once in a while with Clang, GCC warning notices with this aren't as useful
   #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wpadded>)
   endif(ENABLE_EXTRA_COMPILER_WARNINGS)
   ENDIF(MINGW)
@@ -106,9 +106,9 @@ ELSE(UNIX)
   set(Boost_USE_STATIC_LIBS ON)
   ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
   ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
-  add_compile_options(/EHsc)
+  add_compile_options(/EHsc /std:c++latest)
   if (ENABLE_EXTRA_COMPILER_WARNINGS)
-   add_compile_options(-W4 /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484)
+   add_compile_options(-W4 /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484 )
   endif(ENABLE_EXTRA_COMPILER_WARNINGS)
  
 ENDIF(MSVC)
@@ -378,6 +378,8 @@ INSTALL(FILES ${efiles} DESTINATION examples)
 
 INSTALL(FILES ${KEY_LIBRARY_FILES} DESTINATION bin)
 
+
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/helics-fmi-config.h.in ${PROJECT_BINARY_DIR}/libs/include/helics-fmi-config.h)
 
 # -------------------------------------------------------------
 # Future Additions 

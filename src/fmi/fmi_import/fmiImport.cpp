@@ -12,7 +12,7 @@
 
 #include "fmiImport.h"
 #include "fmiObjects.h"
-#include "config.h"
+#include "helics-fmi-config.h"
 #include "utilities/zipUtilities.h"
 
 #include "utilities/stringOps.h"
@@ -299,7 +299,7 @@ path fmiLibrary::findSoPath (fmutype_t type)
         }
 		break;
     }
-	if CONSTEXPR_IF(sizeof (void *) == 8)
+	if IF_CONSTEXPR(sizeof (void *) == 8)
     {
 #ifdef _WIN32
         sopath /= "win64";

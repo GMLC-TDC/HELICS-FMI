@@ -30,7 +30,7 @@ extern const utilities::charMapper<bool> numCheck;
 extern const utilities::charMapper<bool> numCheckEnd;
 
 using utilities::string_view;
-
+using utilities::sv_string;
 template< typename X>
 X strViewToInteger(string_view input, size_t *rem = nullptr)
 {
@@ -122,7 +122,7 @@ inline float numConv(utilities::string_view V)
 template <>
 inline long double numConv(string_view V)
 {
-	return std::stold(V.to_string());
+	return std::stold(sv_string(V));
 }
 
 //template for numeric conversion returning the position
@@ -135,13 +135,13 @@ inline X numConvComp(string_view V, size_t &rem)
 template <>
 inline double numConvComp(string_view V, size_t &rem)
 {
-	return std::stod(V.to_string(), &rem);
+	return std::stod(sv_string(V), &rem);
 }
 
 template <>
 inline long double numConvComp(string_view V, size_t &rem)
 {
-	return std::stold(V.to_string(), &rem);
+	return std::stold(sv_string(V), &rem);
 }
 
 

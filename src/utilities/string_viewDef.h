@@ -14,7 +14,7 @@
 #define STRINGVIEWDEFS_H_
 #pragma once
 
-#include "config.h"
+#include "helics-fmi-config.h"
 #include <vector>
 
 #ifdef HAVE_STRING_VIEW
@@ -22,6 +22,10 @@
 namespace utilities
 {
 	using string_view = std::string_view;
+    inline std::string sv_string(const string_view &sv)
+    {
+        return std::string(sv);
+    }
 }
 #else
 #ifdef HAVE_EXP_STRING_VIEW
@@ -29,12 +33,20 @@ namespace utilities
 namespace utilities
 {
 	using string_view = std::experimental::string_view;
+    inline std::string sv_string(const string_view &sv)
+    {
+        return sv.to_string();
+    }
 }
 #else
 #include <boost/utility/string_view.hpp>
 namespace utilities
 {
 	using string_view=boost::string_view;
+    inline std::string sv_string(const string_view &sv)
+    {
+        return sv.to_string();
+    }
 }
 	
 #endif

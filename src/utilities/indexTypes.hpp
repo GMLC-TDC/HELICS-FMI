@@ -3,7 +3,7 @@
 #define INDEX_TYPES_H_
 #pragma once
 
-#include "griddyn-config.h"  //TODO:: move these into the config-file as opposed to griddyn specific
+#include "helics-fmi-config.h" 
 #include <cstdint>
 #include <limits>
 

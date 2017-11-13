@@ -31,41 +31,65 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   endif()
 endif()
 
-include(CheckIncludeFileCXX)
-check_include_file_cxx("optional" HAVE_OPTIONAL)
-check_include_file_cxx("experimental/optional" HAVE_EXP_OPTIONAL)
-check_include_file_cxx("variant" HAVE_VARIANT)
-
-include(CheckCXXFeatureTestingMacro)
-check_cxx_feature_testing_macro(variable_templates "" HAVE_VARIABLE_TEMPLATES)
-check_cxx_feature_testing_macro(if_constexpr "" HAVE_CONSTEXPR_IF)
-check_cxx_feature_testing_macro(lib_clamp "algorithm" HAVE_CLAMP)
-check_cxx_feature_testing_macro(lib_hypot "cmath" HAVE_HYPOT3)
-
-check_cxx_feature_testing_macro(lib_string_view "string_view" HAVE_STRING_VIEW 201603)
-check_cxx_feature_testing_macro(lib_experimental_string_view "experimental/string_view" HAVE_EXP_STRING_VIEW 201411)
-
-if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.0)
-	set(HAVE_FALLTHROUGH ON)
-	set(HAVE_UNUSED ON)
-	message(STATUS "gt 4.0 ${CMAKE_CXX_COMPILER_VERSION}")
-  endif()
-elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0)
-	set(HAVE_FALLTHROUGH ON)
-	set(HAVE_UNUSED ON)
-  endif()
-elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-#intel doesn't really have anything beyond the minimum
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 17.0)
-  
-  endif()
-elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
-  message(STATUS "win_comp_version ${CMAKE_CXX_COMPILER_VERSION}")
-  set(HAVE_VARIABLE_TEMPLATES ON)
+if (MSVC)
+set(VERSION_OPTION /std:c++latest)
 endif()
 
-if (NOT NO_CONFIG_GENERATION)
-CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/config.h.in ${PROJECT_BINARY_DIR}/libs/include/config.h)
-endif(NOT NO_CONFIG_GENERATION)
+
+try_compile(OPTIONAL_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/config/test_compiler_cxx/check_optional.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION})
+
+try_compile(VARIANT_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/config/test_compiler_cxx/check_variant.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION})
+
+try_compile(STRING_VIEW_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/config/test_compiler_cxx/check_string_view.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION})
+
+try_compile(EXPERIMENTAL_STRING_VIEW_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/config/test_compiler_cxx/check_experimental_string_view.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION})
+try_compile(CLAMP_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/config/test_compiler_cxx/check_clamp.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION})
+try_compile(HYPOT3_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/config/test_compiler_cxx/check_hypot3.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION} )
+try_compile(IFCONSTEXPR_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/config/test_compiler_cxx/check_constexpr_if.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION} )
+try_compile(FALLTHROUGH_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/config/test_compiler_cxx/check_fallthrough.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION})
+
+try_compile(VARIABLE_TEMPLATE_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/config/test_compiler_cxx/check_variable_template.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION})
+
+try_compile(UNUSED_AVAILABLE ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/config/test_compiler_cxx/check_unused.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION} )
+
+
+#message(STATUS ${RESULT})
+if (OPTIONAL_AVAILABLE)
+set(HAVE_OPTIONAL 1)
+endif()
+
+if (EXPERIMENTAL_STRING_VIEW_AVAILABLE)
+set(HAVE_EXPERIMENTAL_STRING_VIEW 1)
+endif()
+
+if (VARIANT_AVAILABLE)
+set(HAVE_VARIANT 1)
+endif()
+
+if (STRING_VIEW_AVAILABLE)
+set(HAVE_STRING_VIEW 1)
+endif()
+
+if (CLAMP_AVAILABLE)
+set(HAVE_CLAMP 1)
+endif()
+
+if (HYPOT3_AVAILABLE)
+set(HAVE_HYPOT3 1)
+endif()
+
+if (IFCONSTEXPR_AVAILABLE)
+set(HAVE_IF_CONSTEXPR 1)
+endif()
+
+if (FALLTHROUGH_AVAILABLE)
+set(HAVE_FALLTHROUGH 1)
+endif()
+
+if (VARIABLE_TEMPLATE_AVAILABLE)
+set(HAVE_VARIABLE_TEMPLATE 1)
+endif()
+
+if (UNUSED_AVAILABLE)
+set(HAVE_UNUSED 1)
+endif()

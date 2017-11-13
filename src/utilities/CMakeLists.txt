@@ -71,26 +71,39 @@ set(utilities_headers
 
 add_library(utilities STATIC ${utilities_sources} ${utilities_headers})
 
-include(escape_string)
 
-escape_string(project_src_dir_string ${PROJECT_SOURCE_DIR})
-escape_string(binary_dir_string ${CMAKE_BINARY_DIR})
+include(buildZlib)
 
-externalProject_Add(minizip
-    SOURCE_DIR ${project_src_dir_string}/ThirdParty/Zlib/zlib-1.2.6
-    DOWNLOAD_COMMAND " "
-    UPDATE_COMMAND " "
-	BINARY_DIR ${binary_dir_string}/ThirdParty/Minizip
-	PREFIX  ${binary_dir_string}/libs
-    CMAKE_ARGS 
-		-DZLIB_SOURCE_DIR=${zlib_source_dir}
+include(buildMiniZip)
+###########################################
+# building zlib
+###########################################
+set(ZLIB_ROOT_DIR ${PROJECT_BINARY_DIR}/libs)
 
-		
-	INSTALL_DIR ${binary_dir_string}/libs
-	)
+unset(ZLIB_FOUND)
+find_package(ZLIB)
+
+if (NOT ZLIB_FOUND)
+build_zlib()
+find_package(ZLIB)
+endif (NOT ZLIB_FOUND)
 
 
-add_dependencies(utilities minizip)
+
+
+###########################################
+# building minizip
+###########################################
+set(MINIZIP_ROOT_DIR ${PROJECT_BINARY_DIR}/libs)
+set(NO_SYSTEM_MINIZIP 1)
+find_package(MiniZip)
+
+if (NOT MINIZIP_FOUND)
+build_minizip()
+find_package(MiniZip)
+endif (NOT MINIZIP_FOUND)
+
+target_link_libraries(utilities ${MINIZIP_LIBRARIES} ${ZLIB_LIBRARIES})
 
 INSTALL(TARGETS utilities
        LIBRARY DESTINATION lib

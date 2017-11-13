@@ -7,16 +7,9 @@ set(BUILD_SHARED_LIBS OFF)
 cmake_minimum_required(VERSION 3.4)
 cmake_policy(VERSION 3.4)
 
-ExternalProject_Add(zlib
-    SOURCE_DIR ${ZLIB_SOURCE_DIR}
-    DOWNLOAD_COMMAND " " 
-    UPDATE_COMMAND " " 
-    BINARY_DIR ${PROJECT_BINARY_DIR}/ThirdParty/Zlib
-    PREFIX=${PROJECT_BINARY_DIR}/libs
-    CMAKE_ARGS 
-        -DBUILD_SHARED_LIBS=OFF
-        
-    )
+IF (NOT ZLIB_INCLUDES)
+find_package(ZLIB REQUIRED)
+ENDIF(NOT ZLIB_INCLUDES)
 
 
 if(CMAKE_HOST_APPLE)
@@ -68,7 +61,7 @@ endif(WIN32)
 
 add_library(minizip ${SOURCES} ${HEADERS})
 
-add_dependency(minizip zlib)
+
 	install(TARGETS minizip
        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/
 	)

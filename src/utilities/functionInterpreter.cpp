@@ -18,7 +18,7 @@
 #endif
 
 #include "functionInterpreter.h"
-#include "config.h"
+#include "helics-fmi-config.h"
 #include "gridRandom.h"
 #include "mapOps.hpp"
 #include "stringOps.h"
