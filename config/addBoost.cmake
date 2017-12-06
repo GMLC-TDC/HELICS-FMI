@@ -1,68 +1,39 @@
-# LLNS Copyright Start
-# Copyright (c) 2017, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department 
-# of Energy by Lawrence Livermore National Laboratory in part under 
-# Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
-# Produced at the Lawrence Livermore National Laboratory.
-# All rights reserved.
-# For details, see the LICENSE file.
-# LLNS Copyright End
-
 IF (MSVC)
 
-set( boost_paths
-C:/boost_1_65_1
- C:/boost_1_64_0
-C:/boost_1_63_0
-C:/boost_1_61_0
+set (boost_versions
+#boost_1_66_0
+#boost_1_66_0_b1
+boost_1_65_1
+boost_1_65_0
+boost_1_64_0
+boost_1_63_0
+boost_1_62_0
+boost_1_61_0
 )
-IF (IS_DIRECTORY C:/boost)
-list(APPEND boost_paths
-C:/boost/boost_1_65_1
- C:/boost/boost_1_64_0
-C:/boost/boost_1_63_0
-C:/boost/boost_1_61_0
+
+set(poss_prefixes
+C:
+C:/boost
+C:/local
+C:/boost
+C:/Libraries
+D:
+D:/boost
+D:/local
+D:/boost
 )
-ENDIF()
 
-IF (IS_DIRECTORY C:/local)
-list(APPEND boost_paths
-C:/local/boost_1_65_1
- C:/local/boost_1_64_0
-C:/local/boost_1_63_0
-C:/local/boost_1_61_0
-)
-ENDIF()
+# create an empty list
+list(APPEND boost_paths "")
 
+foreach( dir ${poss_prefixes})
+	foreach( boostver ${boost_versions})
+		IF (IS_DIRECTORY ${dir}/${boostver})
+			list(APPEND boost_paths ${dir}/${boostver})
+		ENDIF()
+	endforeach()
+endforeach()
 
-IF (EXISTS D:/)
-list(APPEND boost_paths
-D:/boost_1_65_1
- D:/boost_1_64_0
-D:/boost_1_63_0
-D:/boost_1_61_0
-)
-IF (IS_DIRECTORY D:/boost)
-list(APPEND boost_paths
-D:/boost/boost_1_65_1
- D:/boost/boost_1_64_0
-D:/boost/boost_1_63_0
-D:/boost/boost_1_61_0
-)
-ENDIF()
-
-IF (IS_DIRECTORY D:/local)
-list(APPEND boost_paths
-D:/local/boost_1_65_1
- D:/local/boost_1_64_0
-D:/local/boost_1_63_0
-D:/local/boost_1_61_0
-)
-ENDIF()
-
-ENDIF()
-
- message(STATUS ${boost_paths})
 
 find_path(BOOST_TEST_PATH
 			NAMES 			boost/version.hpp
@@ -76,15 +47,37 @@ ENDIF(MSVC)
 
 SHOW_VARIABLE(BOOST_ROOT PATH "Boost root directory" "${BOOST_ROOT}")
 
-# Minimum version of Boost required for building HELICS
+# Minimum version of Boost required for building GridDyn
 set(BOOST_MINIMUM_VERSION 1.61)
- find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options filesystem system date_time REQUIRED)
+
+find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
 
 mark_as_advanced(CLEAR BOOST_ROOT)
 
 message(STATUS "Using Boost include files : ${Boost_INCLUDE_DIR}")
-message(STATUS "Using Boost libraries in : ${Boost_LIBRARY_DIRS}")
-message(STATUS "Using Boost libraries : ${Boost_LIBRARIES}")
+#message(STATUS "Using Boost libraries in : ${Boost_LIBRARY_DIRS}")
+#message(STATUS "Using Boost libraries : ${Boost_LIBRARIES}")
+set(modifier,"")
+foreach(loop_var ${Boost_LIBRARIES})
+	if (${loop_var} MATCHES "debug")
+		list(INSERT modifier 0 ${loop_var})
+	elseif(${loop_var} MATCHES "optimized")
+		list(INSERT modifier 0 ${loop_var})
+	else()
+		#message("Boost_LIBRARIES ${loop_var}")
+		if(${loop_var} MATCHES "unit_test")
+			list(APPEND Boost_LIBRARIES_test ${modifier} ${loop_var})
+		else()
+			list(APPEND Boost_LIBRARIES_core ${modifier} ${loop_var})
+		endif()
+		list(LENGTH modifier modifier_size)
+		if (modifier_size GREATER 0)
+		list(REMOVE_AT modifier -1)
+		endif()
+	endif()
+endforeach(loop_var)
 
-list(APPEND external_library_list ${Boost_LIBRARIES})
+#message(STATUS "Using Boost core libraries : ${Boost_LIBRARIES_core}")
+#message(STATUS "Using Boost test libraries : ${Boost_LIBRARIES_test}")
+list(APPEND external_library_list ${Boost_LIBRARIES_core})
 list(APPEND external_link_directories ${Boost_LIBRARY_DIRS})

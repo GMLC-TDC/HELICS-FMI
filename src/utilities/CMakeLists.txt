@@ -80,30 +80,21 @@ include(buildMiniZip)
 ###########################################
 set(ZLIB_ROOT_DIR ${PROJECT_BINARY_DIR}/libs)
 
-unset(ZLIB_FOUND)
-find_package(ZLIB)
-
-if (NOT ZLIB_FOUND)
+if (NOT EXISTS ${PROJECT_BINARY_DIR}/libs/cmake/zlib-targets.cmake)
 build_zlib()
-find_package(ZLIB)
-endif (NOT ZLIB_FOUND)
-
-
-
+endif()
+include(${PROJECT_BINARY_DIR}/libs/cmake/zlib-targets.cmake)
 
 ###########################################
 # building minizip
 ###########################################
-set(MINIZIP_ROOT_DIR ${PROJECT_BINARY_DIR}/libs)
-set(NO_SYSTEM_MINIZIP 1)
-find_package(MiniZip)
-
-if (NOT MINIZIP_FOUND)
+set(ZLIB_INCLUDES ${PROJECT_BINARY_DIR}/libs/include)
+if (NOT EXISTS ${PROJECT_BINARY_DIR}/libs/cmake/minizip-targets.cmake)
 build_minizip()
-find_package(MiniZip)
-endif (NOT MINIZIP_FOUND)
+endif()
+include(${PROJECT_BINARY_DIR}/libs/cmake/minizip-targets.cmake)
 
-target_link_libraries(utilities ${MINIZIP_LIBRARIES} ${ZLIB_LIBRARIES})
+target_link_libraries(utilities minizip zlib)
 
 INSTALL(TARGETS utilities
        LIBRARY DESTINATION lib

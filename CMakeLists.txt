@@ -19,11 +19,13 @@ cmake_policy(VERSION 3.4)
 set(HELICS_FMI_MAJOR 0)
 set(HELICS_FMI_MINOR 2)
 set(HELICS_FMI_PATCH 2)
-set(HELICS_FMI_DATE 11-27-2017)
+set(HELICS_FMI_DATE 12-20-2017)
 
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config)
 
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
 
 # -------------------------------------------------------------
 # MACRO definitions
@@ -286,7 +288,7 @@ endif (HELICS_FMI_GENERATE_DOXYGEN_DOC)
 
 SHOW_VARIABLE(HELICS_INSTALL_PATH PATH "path to the helics installation" "${PROJECT_BINARY_DIR}/libs")
 
-if(EXISTS "${HELICS_INSTALL_PATH}/lib/helics/helics-targets.cmake")
+if(EXISTS "${HELICS_INSTALL_PATH}/cmake/HELICS/HELICSImport.cmake")
 	IF (AUTOBUILD_HELICS)
 		OPTION(FORCE_HELICS_REBUILD "force rebuild of helics" OFF)
 		IF(FORCE_HELICS_REBUILD)
@@ -296,7 +298,7 @@ if(EXISTS "${HELICS_INSTALL_PATH}/lib/helics/helics-targets.cmake")
 			set(FORCE_HELICS_REBUILD OFF CACHE BOOL "force rebuild of helics" FORCE)
 		ENDIF(FORCE_HELICS_REBUILD)
 	ENDIF(AUTOBUILD_HELICS)
-	include(${HELICS_INSTALL_PATH}/lib/helics/helics-targets.cmake)
+	include(${HELICS_INSTALL_PATH}/cmake/HELICS/HELICSImport.cmake)
 	set(HELICS_FOUND TRUE)
 else()
    OPTION(AUTOBUILD_HELICS "enable HELICS to automatically download and build" OFF)
@@ -305,13 +307,12 @@ else()
 		build_helics()
 		set(HELICS_INSTALL_PATH ${PROJECT_BINARY_DIR}/libs)
 		set(HELICS_FOUND TRUE)
-		include(${HELICS_INSTALL_PATH}/lib/helics/helics-targets.cmake)
+		include(${HELICS_INSTALL_PATH}/cmake/HELICS/HELICSImport.cmake)
 	ELSE(AUTOBUILD_HELICS)
 		 message( FATAL_ERROR "Unable to locate HELICS library")
 	ENDIF(AUTOBUILD_HELICS)
 endif()
 
-set(HELICS_INCLUDE_DIR ${HELICS_INSTALL_PATH}/include)
 
 add_subdirectory(src/main)
 

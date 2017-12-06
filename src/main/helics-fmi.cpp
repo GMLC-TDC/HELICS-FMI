@@ -15,9 +15,9 @@
 #include <string>
 #include <iostream>
 #include <vector>
-#include "helics/application_api/ValueFederate.h"
-#include "helics/application_api/Publications.hpp"
-#include "helics/application_api/Subscriptions.hpp"
+#include "helics/ValueFederate.h"
+#include "helics/Publications.hpp"
+#include "helics/Subscriptions.hpp"
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
