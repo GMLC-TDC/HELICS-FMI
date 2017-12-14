@@ -15,9 +15,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
-#include "helics/ValueFederate.h"
-#include "helics/Publications.hpp"
-#include "helics/Subscriptions.hpp"
+#include "helics/helics.hpp"
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
@@ -28,6 +26,7 @@ int main(int argc, char *argv[])
     std::ifstream infile;
     po::variables_map vm;
     argumentParser(argc, argv, vm);
+
 }
 
 void argumentParser(int argc, const char *const *argv, po::variables_map &vm_map)
@@ -50,9 +49,11 @@ void argumentParser(int argc, const char *const *argv, po::variables_map &vm_map
         ("core,c", po::value<std::string>(), "type of the core to connect to")
         ("stop", po::value<double>(), "the time to stop recording")
         ("timedelta", po::value<double>(), "the time delta of the federate")
+        ("integrator", po::value<std::string>(), "the type of integrator to use (cvode,arkode,boost")
+        ("integrator-args",po::value<std::string>(),"arguments to pass to the integrator")
         ("coreinit,i", po::value<std::string>(), "the core initialization string");
 
-    hidden.add_options() ("input", po::value<std::string>(), "input file");
+    hidden.add_options() ("input", po::value<std::string>(), "input file can be an fmu, json, or xml file");
     // clang-format on
 
     po::options_description cmd_line("command line options");
@@ -116,7 +117,7 @@ void argumentParser(int argc, const char *const *argv, po::variables_map &vm_map
     // check to make sure we have some input file or the capture is specified
     if ((vm_map.count("input") == 0) && (vm_map.count("capture") == 0) && (vm_map.count("tags") == 0))
     {
-        std::cerr << " no input file, tags, or captures specified\n";
+        std::cerr << " no input file specified exiting program\n";
         std::cerr << visible << '\n';
         return;
     }

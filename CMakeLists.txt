@@ -132,15 +132,35 @@ include(ExternalProject)
 #include(mergestaticlibs)
 
 
-# -------------------------------------------------------------
-# Find multithreading headers and includes
-# -------------------------------------------------------------
 
-IF (NOT DISABLE_MULTITHREADING)
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
-list(APPEND external_library_list Threads::Threads)
-ENDIF(NOT DISABLE_MULTITHREADING)
+include(GNUInstallDirs)
+
+# -------------------------------------------------------------
+# setting the RPATH
+# -------------------------------------------------------------
+# use, i.e. don't skip the full RPATH for the build tree
+SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+
+# when building, don't use the install RPATH already
+# (but later on when installing)
+SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
+
+# add the automatically determined parts of the RPATH
+# which point to directories outside the build tree to the install RPATH
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+
+# the RPATH to be used when installing, but only if it's not a system directory
+LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/bin" isSystemDir)
+IF("${isSystemDir}" STREQUAL "-1")
+   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
+ENDIF("${isSystemDir}" STREQUAL "-1")
+
+if (NOT USE_BOOST_STATIC_LIBS)
+list(APPEND CMAKE_INSTALL_RPATH ${Boost_LIBRARY_DIRS})
+endif()
 
 # -------------------------------------------------------------
 # Find (and test) the KLU libraries
@@ -194,55 +214,7 @@ ENDIF(NOT DISABLE_MULTITHREADING)
 # Sundials
 # -------------------------------------------------------------
 
-#if(NOT DEFINED SUNDIALS_DIR)
-#  set(SUNDIALS_DIR ${PROJECT_BINARY_DIR}/libs CACHE PATH "path to SUNDIALS")
-#endif()
-
-#SHOW_VARIABLE(SUNDIALS_DIR PATH
-#  "SUNDIALS library directory" "${SUNDIALS_DIR}")
-  
-#  set(SUNDIALS_FIND_QUIETLY ON)
-  
-#find_package(SUNDIALS REQUIRED COMPONENTS CVODE)
-
-#  if(SUNDIALS_FOUND) 
-#	list(INSERT external_library_list 0 ${SUNDIALS_LIBRARIES})
-#  OPTION(FORCE_SUNDIALS_REBUILD "force rebuild of sundials" OFF)
-#	IF (AUTOBUILD_SUNDIALS)
-		
-#		IF(FORCE_SUNDIALS_REBUILD)
-#			include(buildSundials)
-#			build_sundials()
-#			set(FORCE_SUNDIALS_REBUILD OFF CACHE BOOL "force rebuild of sundials" FORCE)
-#		ENDIF(FORCE_SUNDIALS_REBUILD)
-#	ELSE (AUTOBUILD_SUNDIALS)
-#	   IF(FORCE_SUNDIALS_REBUILD)
-#			include(buildSundials)
-#			build_sundials()
-#			set(SUNDIALS_FOUND OFF CACHE BOOL "sundials not found" FORCE)
-#			set(SUNDIALS_LIBRARIES NOT_FOUND CACHE FORCE)
-#			set(FORCE_SUNDIALS_REBUILD OFF CACHE BOOL "force rebuild of sundials" FORCE)
-#			set(SUNDIALS_DIR ${PROJECT_BINARY_DIR}/libs)
-#			find_package(SUNDIALS REQUIRED COMPONENTS CVODE)
-#		ENDIF(FORCE_SUNDIALS_REBUILD)
-#	ENDIF(AUTOBUILD_SUNDIALS)
-# else(SUNDIALS_FOUND)
-#    OPTION(AUTOBUILD_SUNDIALS "enable Sundials to automatically download and build" OFF)
-#    message(STATUS "abs=${AUTOBUILD_SUNDIALS}")
-#    IF (AUTOBUILD_SUNDIALS)
-#      include(buildSundials)
-#      build_sundials()
-#      set(SUNDIALS_DIR ${PROJECT_BINARY_DIR}/libs)
-#      find_package(SUNDIALS REQUIRED COMPONENTS CVODE)
-#    ENDIF(AUTOBUILD_SUNDIALS)
-#  if (SUNDIALS_FOUND)
-#    list(INSERT external_library_list 0 ${SUNDIALS_LIBRARIES})
-#  else (SUNDIALS_FOUND)
-#	message( FATAL_ERROR "sundials not found - unable to continue")
-#	message( "Double check spelling specified libraries (search is case sensitive)")
-#  endif(SUNDIALS_FOUND)
-#  endif(SUNDIALS_FOUND)
-
+include(addSundials)
 # -------------------------------------------------------------
 # BOOST
 # -------------------------------------------------------------
@@ -354,10 +326,10 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/helics-fmi-config.h.in ${PROJECT_BINARY_DIR
 set(CPACK_PACKAGE_NAME "HELICS-fmi")
 set(CPACK_PACKAGE_VENDOR "Lawrence Livermore National Security")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Helics-fmi Installer")
-set(CPACK_PACKAGE_VERSION "${HELICS_FMI_MAJOR_VERSION}.${HELICS_FMI_MINOR_VERSION}")
-set(CPACK_PACKAGE_VERSION_MAJOR ${HELICS_FMI_MAJOR_VERSION})
-set(CPACK_PACKAGE_VERSION_MINOR ${HELICS_FMI_MINOR_VERSION})
-#set(CPACK_PACKAGE_VERSION_PATCH ${HELICS_FMI_VERSION_PATCH})
+set(CPACK_PACKAGE_VERSION "${HELICS_FMI_MAJOR}.${HELICS_FMI_MINOR}.${HELICS_FMI_PATCH}")
+set(CPACK_PACKAGE_VERSION_MAJOR ${HELICS_FMI_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${HELICS_FMI_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${HELICS_FMI_PATCH})
 
 #THIS LINE MUST BE LAST
 include(CPack)

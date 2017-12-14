@@ -33,10 +33,11 @@ ExternalProject_Add(helics
      
     CMAKE_ARGS 
         -DCMAKE_INSTALL_PREFIX=${binary_dir_string}/libs
-        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_BUILD_TYPE=\$\{CMAKE_BUILD_TYPE\}
 		-DBOOST_ROOT=${BOOST_ROOT}
 		-DBUILD_HELICS_TESTS=OFF
-		-DBUILD_SHARED_LIBS=OFF
+		-DBUILD_HELICS_EXAMPLES=OFF
+		-DBUILD_C_SHARED_LIB=OFF
 		-DBUILD_PYTHON=OFF
         -DCMAKE_CXX_COMPILER=${cxx_compiler_string}
         -DCMAKE_C_COMPILER=${c_compiler_string}
@@ -48,59 +49,34 @@ ExternalProject_Add(helics
     )")
 
 
-
-    file(WRITE ${trigger_build_dir}/CMakeLists.txt "${CMAKE_LIST_CONTENT}")
-    execute_process(COMMAND ${CMAKE_COMMAND} -Wno-dev -D CMAKE_CXX_COMPILER=${cxx_compilier_string} -D CMAKE_C_COMPILER=${c_compiler_string} -D CMAKE_LINKER=${linker_string}
-        -G ${CMAKE_GENERATOR} .. 
+if (NOT BUILD_RELEASE_ONLY)
+	
+	message(STATUS "Configuring HELICS Autobuild for debug logging to ${PROJECT_BINARY_DIR}/logs/helics_autobuild_config_debug.log")
+	execute_process(COMMAND ${CMAKE_COMMAND} -Wno-dev -D CMAKE_CXX_COMPILER=${cxx_compilier_string} -D CMAKE_C_COMPILER=${c_compiler_string} -D CMAKE_LINKER=${linker_string}
+         -D CMAKE_BUILD_TYPE=Debug -G ${CMAKE_GENERATOR} .. 
         WORKING_DIRECTORY ${trigger_build_dir}/build
+		OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/helics_autobuild_config_debug.log
         )
+		
+	message(STATUS "Building HELICS debug build logging to ${PROJECT_BINARY_DIR}/logs/helics_autobuild_build_debug.log")
+	 execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Debug
+        WORKING_DIRECTORY ${trigger_build_dir}/build
+		OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/helics_autobuild_build_debug.log
+        )
+
+  endif()
+  
+  message(STATUS "Configuring HELICS Autobuild for release logging to ${PROJECT_BINARY_DIR}/logs/helics_autobuild_config_release.log")
+    execute_process(COMMAND ${CMAKE_COMMAND} -Wno-dev -D CMAKE_CXX_COMPILER=${cxx_compilier_string} -D CMAKE_C_COMPILER=${c_compiler_string} -D CMAKE_LINKER=${linker_string}
+         -D CMAKE_BUILD_TYPE=Release -G ${CMAKE_GENERATOR} .. 
+        WORKING_DIRECTORY ${trigger_build_dir}/build
+		OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/helics_autobuild_config_release.log
+        )
+	
+	message(STATUS "Building HELICS release build logging to ${PROJECT_BINARY_DIR}/logs/helics_autobuild_build_release.log")
     execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release
         WORKING_DIRECTORY ${trigger_build_dir}/build
+		OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/helics_autobuild_build_release.log
         )
-        
-    
-#now build the debug version	
-        set(trigger_build_debug_dir ${binary_dir_string}/autobuild/force_helics_debug)
-     file(MAKE_DIRECTORY ${trigger_build_debug_dir} ${trigger_build_debug_dir}/build)
-
-    #generate false dependency project
-    set(CMAKE_LIST_CONTENT_DEBUG "
-    cmake_minimum_required(VERSION 3.4)
-    include(ExternalProject)
-ExternalProject_Add(helics
-    SOURCE_DIR ${binary_dir_string}/Download/helics
-    DOWNLOAD_COMMAND " " 
-    UPDATE_COMMAND " " 
-    BINARY_DIR ${binary_dir_string}/ThirdParty/helics-debug
-     
-    CMAKE_ARGS 
-        -DCMAKE_INSTALL_PREFIX=${binary_dir_string}/libs/debug
-        -DCMAKE_BUILD_TYPE=Debug
-		-DBOOST_ROOT=${BOOST_ROOT}
-		-DBUILD_HELICS_TESTS=OFF
-		-DBUILD_SHARED_LIBS=OFF
-		-DBUILD_PLAYER=OFF
-		-DBUILD_RECORDER=OFF
-		-DBUILD_BROKER=OFF
-		-DBUILD_PYTHON=OFF
-        -DCMAKE_CXX_COMPILER=${cxx_compiler_string}
-        -DCMAKE_C_COMPILER=${c_compiler_string}
-		-DZMQ_ENABLE=ON
-		-DZMQ_INSTALL_PATH=${zmq_target}/
-        -DCMAKE_LINKER=${linker_string}
-        
-    INSTALL_DIR ${binary_dir_string}/libs/debug
-    )")
-
-
-    file(WRITE ${trigger_build_debug_dir}/CMakeLists.txt "${CMAKE_LIST_CONTENT_DEBUG}")
-
-    execute_process(COMMAND ${CMAKE_COMMAND} -Wno-dev -D CMAKE_CXX_COMPILER=${cxx_compiler_string} -D CMAKE_C_COMPILER=${c_compiler_string} -D CMAKE_LINKER=${linker_string}
-        -G ${CMAKE_GENERATOR} .. 
-        WORKING_DIRECTORY ${trigger_build_debug_dir}/build
-        )
-    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Debug
-        WORKING_DIRECTORY ${trigger_build_debug_dir}/build
-        )
-
-endfunction()
+	
+	endfunction()
