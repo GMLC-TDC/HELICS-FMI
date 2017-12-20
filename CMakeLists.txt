@@ -286,10 +286,12 @@ else()
 endif()
 
 
-add_subdirectory(src/main)
 
 FILE(GLOB KEY_LIBRARY_FILES  ${PROJECT_BINARY_DIR}/libs/bin/*)
 message(STATUS "key files ${KEY_LIBRARY_FILES}")
+
+
+add_subdirectory(src/main)
 
 # -------------------------------------------------------------
 # Enable clang analysis and formatting tools

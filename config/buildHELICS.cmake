@@ -14,9 +14,6 @@ function (build_helics)
 	escape_string(binary_dir_string ${CMAKE_BINARY_DIR})
     set(trigger_build_dir ${binary_dir_string}/autobuild/force_helics)
 
-    get_filename_component(ZMQ_TARGET ${ZMQ_INCLUDE_DIR} DIRECTORY)
-	escape_string(zmq_target "${ZMQ_TARGET}")
-	message(STATUS "BUILDING HELICS WITH ZMQ target=${ZMQ_TARGET}")
     #mktemp dir in build tree
     file(MAKE_DIRECTORY ${trigger_build_dir} ${trigger_build_dir}/build)
 
@@ -38,17 +35,19 @@ ExternalProject_Add(helics
 		-DBUILD_HELICS_TESTS=OFF
 		-DBUILD_HELICS_EXAMPLES=OFF
 		-DBUILD_C_SHARED_LIB=OFF
+		-DCMAKE_DEBUG_POSTFIX=d
 		-DBUILD_PYTHON=OFF
         -DCMAKE_CXX_COMPILER=${cxx_compiler_string}
         -DCMAKE_C_COMPILER=${c_compiler_string}
-		-DZMQ_ENABLE=ON
-		-DZMQ_INSTALL_PATH:PATH=${zmq_target}/
+		-DZeroMQ_ENABLE=ON
         -DCMAKE_LINKER=${linker_string}
         
     INSTALL_DIR ${binary_dir_string}/libs
     )")
 
 
+ file(WRITE ${trigger_build_dir}/CMakeLists.txt "${CMAKE_LIST_CONTENT}")
+ 
 if (NOT BUILD_RELEASE_ONLY)
 	
 	message(STATUS "Configuring HELICS Autobuild for debug logging to ${PROJECT_BINARY_DIR}/logs/helics_autobuild_config_debug.log")

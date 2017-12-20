@@ -42,5 +42,7 @@ ENDIF(UNIX)
 
 add_library(fmiLibrary ${fmiImport_sources} ${fmiImport_headers})
 
+target_link_libraries(fmiLibrary formatInterpreter utilities)
+
 INCLUDE_DIRECTORIES(.)
 
