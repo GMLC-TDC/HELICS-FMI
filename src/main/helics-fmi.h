@@ -12,8 +12,9 @@
 
 #ifndef HELICS_FMI_HEADER_H_
 #define HELICS_FMI_HEADER_H_
+#pragma once
 
-#include "helics/application_api/ValueFederate.h"
+#include "helics/application_api/ValueFederate.hpp"
 #include "fmi_import/fmiImport.h"
 #include "fmi_import/fmiObjects.h"
 
