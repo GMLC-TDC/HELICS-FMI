@@ -18,7 +18,9 @@
 #include "helics/helics.hpp"
 #include "helics-fmi-config.h"
 #include "fmi_import/fmiImport.h"
+#include "helics/core/helicsVersion.hpp"
 #include "helics-fmi.h"
+
 namespace po = boost::program_options;
 namespace filesystem = boost::filesystem;
 
@@ -127,7 +129,7 @@ void argumentParser(int argc, const char *const *argv, po::variables_map &vm_map
 
     if (cmd_vm.count("version") > 0)
     {
-        std::cout << "HELICS VERSION " << helics::getHelicsVersionString() << '\n';
+        std::cout << "HELICS VERSION " << helics::helicsVersionString() << '\n';
         std::cout << "HELICS_FMI_VERSION " << HELICS_FMI_MAJOR << "." << HELICS_FMI_MINOR << "." << HELICS_FMI_PATCH << " (" << HELICS_FMI_DATE << ")\n";
         return;
     }
@@ -264,7 +266,6 @@ void argumentParserFI(int argc, const char *const *argv, po::variables_map &vm_m
 
     if (cmd_vm.count("version") > 0)
     {
-        std::cout << helics::getHelicsVersionString() << '\n';
         return;
     }
 

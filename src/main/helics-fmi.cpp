@@ -32,7 +32,7 @@ std::unique_ptr<fmiCoSimFederate> createFmiValueFederate(fmi2CoSimObject *obj, h
     auto outputs = obj->getOutputNames();
     for (auto output : outputs)
     {
-        fed->pubs.emplace_back(&(fed->fed), output, helics::helicsType_t::helicsDouble);
+        fed->pubs.emplace_back(&(fed->fed), output, helics::helics_type_t::helicsDouble);
     }
     return fed;
 }
