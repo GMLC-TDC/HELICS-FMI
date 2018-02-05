@@ -11,6 +11,7 @@
 #project name
 
 set(utilities_sources
+argParser.cpp
 	gridRandom.cpp
 	stringOps.cpp
 	string_viewOps.cpp
@@ -31,6 +32,7 @@ set(utilities_sources
 
 set(utilities_headers
 	units.h
+	argParser.h
 	dataDictionary.hpp
 	timeSeries.hpp
 	charMapper.h

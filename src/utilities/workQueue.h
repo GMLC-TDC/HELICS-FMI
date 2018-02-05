@@ -316,9 +316,9 @@ class workQueue
     int priorityRatio = defaultPriorityRatio;  //!< the ratio of medium Priority blocks to low priority blocks
     int numWorkers = 0;  //!< counter for the number of workers
     std::atomic<int> MedCounter{0};  //!< the counter to use low instead of Med
-    simpleQueue<std::shared_ptr<basicWorkBlock>> workToDoHigh;  //!< queue containing the work to do
-    simpleQueue<std::shared_ptr<basicWorkBlock>> workToDoMed;  //!< queue containing the work to do
-    simpleQueue<std::shared_ptr<basicWorkBlock>> workToDoLow;  //!< queue containing the work to do
+    SimpleQueue<std::shared_ptr<basicWorkBlock>> workToDoHigh;  //!< queue containing the work to do
+    SimpleQueue<std::shared_ptr<basicWorkBlock>> workToDoMed;  //!< queue containing the work to do
+    SimpleQueue<std::shared_ptr<basicWorkBlock>> workToDoLow;  //!< queue containing the work to do
 	std::vector<std::thread> threadpool;  //!< the threads
 	std::mutex queueLock;  //!< mutex for condition variable
     std::condition_variable queueCondition;  //!< condition variable for waking the threads
