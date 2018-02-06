@@ -10,29 +10,20 @@
 * LLNS Copyright End
 */
 
-#include "helics-fmi.h"
+#include "FmiModelExchangeFederate.hpp"
 #include "fmi_import/fmiObjects.h"
 
-std::unique_ptr<fmiCoSimFederate> createFmiValueFederate(fmi2CoSimObject *obj, helics::FederateInfo &fi)
+FmiModelExchangeFederate::FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj, const helics::FederateInfo &fi) :me(std::move(obj)), fed(fi)
 {
-    if (obj == nullptr)
-    {
-        return nullptr;
-    }
-    auto fed = std::make_unique<fmiCoSimFederate>();
-    fed->obj = obj;
-    fed->fed = helics::ValueFederate(fi);
-
     auto inputs = obj->getInputNames();
     for (auto input : inputs)
     {
-        fed->subs.emplace_back(&(fed->fed), input);
+        subs.emplace_back(&fed, input);
     }
 
     auto outputs = obj->getOutputNames();
     for (auto output : outputs)
     {
-        fed->pubs.emplace_back(&(fed->fed), output, helics::helics_type_t::helicsDouble);
+        pubs.emplace_back(&fed, output, helics::helics_type_t::helicsDouble);
     }
-    return fed;
 }

@@ -10,10 +10,9 @@
 * LLNS Copyright End
 */
 
-#ifndef HELICS_FMI_HEADER_H_
-#define HELICS_FMI_HEADER_H_
 #pragma once
 
+#include <memory>
 #include "helics/application_api/ValueFederate.hpp"
 #include "fmi_import/fmiImport.h"
 #include "fmi_import/fmiObjects.h"
@@ -22,16 +21,14 @@
 #include "helics/application_api/Subscriptions.hpp"
 
 /** class defining a cosimulation federate*/
-class fmiCoSimFederate
+class FmiCoSimFederate
 {
-public:
+private:
     helics::ValueFederate fed;  //!< the federate
-    fmi2CoSimObject *obj;   //!< the co-simulation object
+    std::shared_ptr<fmi2CoSimObject> cs;   //!< the co-simulation object
 
     std::vector<helics::Publication> pubs; //!< known publications
     std::vector<helics::Subscription> subs; //!< known subscriptions
+public:
+    FmiCoSimFederate(std::shared_ptr<fmi2CoSimObject> obj, const helics::FederateInfo &fi);
 };
-
-std::unique_ptr<fmiCoSimFederate> createFmiValueFederate(fmi2CoSimObject *obj, helics::FederateInfo &fi);
-
-#endif HELICS_FMI_HEADER_H_

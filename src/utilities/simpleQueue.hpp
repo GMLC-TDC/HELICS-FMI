@@ -32,6 +32,9 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 
 #include "optionalDef.hpp"
 
+template <typename T>
+using opt = utilities::optional<T>;
+
 /** class for very simple thread safe queue
 @details  uses two vectors for the operations,  once the pull vector is empty it swaps the vectors
 and reverses it so it can pop from the back as well as an atomic flag indicating the queue is empty
@@ -244,7 +247,7 @@ class SimpleQueue
     /** extract the first element from the queue
     @return an empty optional if there is no element otherwise the optional will contain a value
     */
-    utilities::optional<X> pop ()
+    opt<X> pop ()
     {
         std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
         if (pullElements.empty ())
@@ -303,7 +306,7 @@ class SimpleQueue
     @return an optional object with an object of type T if available
     */
     template <typename = std::enable_if<std::is_copy_assignable<X>::value>>
-    utilities::optional<X> peek () const
+    opt<X> peek () const
     {
         std::lock_guard<std::mutex> lock (m_pullLock);
 

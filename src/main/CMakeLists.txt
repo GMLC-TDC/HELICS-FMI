@@ -9,12 +9,14 @@
 # LLNS Copyright End
 
 set(helics-fmi_sources
-	helics-fmi.cpp
+	FmiCoSimFederate.cpp
+	FmiModelExchangeFederate.cpp
 	helics-fmi-main.cpp
 	)
 	
 set(helics-fmi_headers
-	helics-fmi.h
+	FmiCoSimFederate.hpp
+	FmiModelExchangeFederate.hpp
 	)
 
 add_executable(helics-fmi ${helics-fmi_sources} ${helics-fmi_headers})

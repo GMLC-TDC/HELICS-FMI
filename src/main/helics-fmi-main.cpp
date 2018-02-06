@@ -11,15 +11,12 @@
 */
 
 #include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
-#include <string>
 #include <iostream>
-#include <vector>
-#include "helics/helics.hpp"
 #include "helics-fmi-config.h"
 #include "fmi_import/fmiImport.h"
 #include "helics/core/helicsVersion.hpp"
-#include "helics-fmi.h"
+#include "FmiModelExchangeFederate.hpp"
+#include "FmiCoSimFederate.hpp"
 #include "utilities/argParser.h"
 
 namespace filesystem = boost::filesystem;
@@ -64,15 +61,19 @@ int main(int argc, char *argv[])
     fmiLibrary fmi;
     if ((ext == ".fmu")||(ext==".FMU"))
     {
-        fmi.loadFMU(filename);
-        auto obj = fmi.createCoSimulationObject("obj1");
-        if (!obj)
-        {
-            std::cerr << "helics-fmi only support co-simulation at this time\n";
-        }
         helics::FederateInfo fi("fmi");
         fi.loadInfoFromArgs(argc, argv);
-        auto fed = createFmiValueFederate(obj.get(),fi );
+        fmi.loadFMU(filename);
+        if (fmi.checkFlag(fmuCapabilityFlags::coSimulationCapable))
+        {
+            std::shared_ptr<fmi2CoSimObject> obj = fmi.createCoSimulationObject("obj1");
+            auto fed = std::make_unique<FmiCoSimFederate>(obj, fi);
+        }
+        else
+        {
+            std::shared_ptr<fmi2ModelExchangeObject> obj = fmi.createModelExchangeObject("obj1");
+            auto fed = std::make_unique<FmiModelExchangeFederate>(obj, fi);
+        }
 
     }
     else if (ext == ".json")
