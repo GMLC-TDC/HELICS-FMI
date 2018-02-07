@@ -20,6 +20,8 @@
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 
+class OdeSolverBase;
+
 /** class defining a modelExchange federate*/
 class FmiModelExchangeFederate
 {
@@ -29,7 +31,10 @@ private:
 
     std::vector<helics::Publication> pubs; //!< known publications
     std::vector<helics::Subscription> subs; //!< known subscriptions
+    double stepSize = 0.01; //!< the default step size of the simulation
 public:
     FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj, const helics::FederateInfo &fi);
+    ~FmiModelExchangeFederate()
+    std::unique_ptr<OdeSolverBase> solver;
 };
 

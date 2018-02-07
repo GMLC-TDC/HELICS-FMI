@@ -15,13 +15,15 @@ project(helics-fmi)
 cmake_minimum_required(VERSION 3.4)
 cmake_policy(VERSION 3.4)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 #version number
 set(HELICS_FMI_MAJOR 0)
-set(HELICS_FMI_MINOR 2)
-set(HELICS_FMI_PATCH 2)
-set(HELICS_FMI_DATE 12-20-2017)
+set(HELICS_FMI_MINOR 3)
+set(HELICS_FMI_PATCH 0)
+set(HELICS_FMI_DATE 02-06-2018)
 
-SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config)
+SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config/cmake)
 
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
@@ -58,71 +60,32 @@ IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
   message(FATAL_ERROR "In-source build is not supported. Please, use an empty directory for building the project.")
 ENDIF()
 
-OPTION(ENABLE_EXTRA_COMPILER_WARNINGS "disable compiler warning for helics-fmi build" ON)
+include(compiler_warnings)
 
-
-# -------------------------------------------------------------
-# Setup compiler options and configurations
-# -------------------------------------------------------------
-message(STATUS "setting up for ${CMAKE_CXX_COMPILER_ID}")
 IF(UNIX)
   # Since default builds of boost library under Unix don't use
   # CMake, turn off using CMake build and find include/libs the
   # regular way.
   set(Boost_NO_BOOST_CMAKE ON)
-
   set(Boost_USE_MULTITHREADED      OFF)   # Needed if MT libraries not built
-  if (ENABLE_EXTRA_COMPILER_WARNINGS)
-	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wall>)
-	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-pedantic>)
-	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wextra>)
-	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wshadow>)
-	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wstrict-aliasing=1>)
-	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wunreachable-code>)
-	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wstrict-overflow=5>)
-	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Woverloaded-virtual>)
-	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wredundant-decls>)
-	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wcast-align>)
-  endif(ENABLE_EXTRA_COMPILER_WARNINGS)
+  option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
 ELSE(UNIX)
   IF(MINGW)
-  if (ENABLE_EXTRA_COMPILER_WARNINGS)
- add_compile_options(-Wall -pedantic)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wextra>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wshadow>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wstrict-aliasing=1>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wunreachable-code>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wstrict-overflow=5>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Woverloaded-virtual>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wredundant-decls>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wcast-align>)
-  #this options produces lots of warning but is useful for checking every once in a while with Clang, GCC warning notices with this aren't as useful
-  #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wpadded>)
-  endif(ENABLE_EXTRA_COMPILER_WARNINGS)
+  option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
+  ELSE(MINGW)
+  #this would most likely be MSVC
+   option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
   ENDIF(MINGW)
-  
-# -------------------------------------------------------------
-# Extra definitions for visual studio
-# -------------------------------------------------------------
-  IF(MSVC)
-  set(Boost_USE_STATIC_LIBS ON)
-  ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
-  ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
-  add_compile_options(/EHsc)
-  if (ENABLE_EXTRA_COMPILER_WARNINGS)
-   add_compile_options(-W4 /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484 )
-  endif(ENABLE_EXTRA_COMPILER_WARNINGS)
- 
-ENDIF(MSVC)
 ENDIF(UNIX)
 
 #message(STATUS ${CMAKE_CXX_FLAGS})
-include(configGenerator)
 
+OPTION(ENABLE_CXX_17 "set to ON to enable C++17 compilation features" OFF)
+include(CheckLatestCXXStandardOption)
 IF (VERSION_OPTION)
-	add_compile_options(${VERSION_OPTION})
+	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
 ELSE ()
-set(CMAKE_CXX_STANDARD 14)
+	set(CMAKE_CXX_STANDARD 14)
 ENDIF ()
 
 include(ExternalProject)
@@ -244,15 +207,45 @@ IF (HELICS_FMI_GENERATE_DOXYGEN_DOC)
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
 
-	SHOW_VARIABLE(DOXYGEN_OUTPUT_DIR PATH "location to put Doxygen docs" "${CMAKE_CURRENT_SOURCE_DIR}/docs")
-	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+	SHOW_VARIABLE(DOXYGEN_OUTPUT_DIR PATH "location to put Doxygen docs" "${PROJECT_BINARY_DIR}/docs")
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
 	add_custom_target(doc
 	${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/docs}
+	WORKING_DIRECTORY ${DOXYGET_OUTPUT_DIR}
 	COMMENT "Generating API documentation with Doxygen" VERBATIM
 )
 endif(DOXYGEN_FOUND)
 endif (HELICS_FMI_GENERATE_DOXYGEN_DOC)
+
+
+include(GNUInstallDirs)
+
+# -------------------------------------------------------------
+# setting the RPATH
+# -------------------------------------------------------------
+# use, i.e. don't skip the full RPATH for the build tree
+SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+
+# when building, don't use the install RPATH already
+# (but later on when installing)
+SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
+
+# add the automatically determined parts of the RPATH
+# which point to directories outside the build tree to the install RPATH
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+
+# the RPATH to be used when installing, but only if it's not a system directory
+LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/bin" isSystemDir)
+IF("${isSystemDir}" STREQUAL "-1")
+   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
+ENDIF("${isSystemDir}" STREQUAL "-1")
+
+if (NOT Boost_USE_STATIC_LIBS)
+list(APPEND CMAKE_INSTALL_RPATH ${Boost_LIBRARY_DIRS})
+endif()
 
 # -------------------------------------------------------------
 # Enable HELICS executable
@@ -308,7 +301,7 @@ endif(ENABLE_CLANG_TOOLS)
 INSTALL(FILES ${KEY_LIBRARY_FILES} DESTINATION bin)
 
 
-CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/helics-fmi-config.h.in ${PROJECT_BINARY_DIR}/libs/include/helics-fmi-config.h)
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/config/helics-fmi-config.h.in ${PROJECT_BINARY_DIR}/libs/include/helics-fmi-config.h)
 
 # -------------------------------------------------------------
 # Future Additions 

@@ -76,11 +76,11 @@ int main(int argc, char *argv[])
         }
 
     }
-    else if (ext == ".json")
+    else if ((ext == ".json")||(ext==".JSON"))
     {
 
     }
-    else if (ext == ".xml")
+    else if ((ext == ".xml")||(ext==".XML"))
     {
 
     }
