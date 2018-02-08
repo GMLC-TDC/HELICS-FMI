@@ -49,8 +49,8 @@ SHOW_VARIABLE(BOOST_ROOT PATH "Boost root directory" "${BOOST_ROOT}")
 
 # Minimum version of Boost required for building GridDyn
 set(BOOST_MINIMUM_VERSION 1.61)
-
-find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time REQUIRED)
+#most others needed are included through HELICS
+find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS unit_test_framework REQUIRED)
 
 mark_as_advanced(CLEAR BOOST_ROOT)
 

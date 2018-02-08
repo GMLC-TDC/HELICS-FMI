@@ -25,6 +25,9 @@ class OdeSolverBase;
 /** class defining a modelExchange federate*/
 class FmiModelExchangeFederate
 {
+public:
+    FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj, const helics::FederateInfo &fi);
+    ~FmiModelExchangeFederate();
 private:
     helics::ValueFederate fed;  //!< the federate
     std::shared_ptr<fmi2ModelExchangeObject> me;   //!< the model exchange object
@@ -32,9 +35,6 @@ private:
     std::vector<helics::Publication> pubs; //!< known publications
     std::vector<helics::Subscription> subs; //!< known subscriptions
     double stepSize = 0.01; //!< the default step size of the simulation
-public:
-    FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj, const helics::FederateInfo &fi);
-    ~FmiModelExchangeFederate()
     std::unique_ptr<OdeSolverBase> solver;
 };
 

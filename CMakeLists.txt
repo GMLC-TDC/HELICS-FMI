@@ -60,7 +60,7 @@ IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
   message(FATAL_ERROR "In-source build is not supported. Please, use an empty directory for building the project.")
 ENDIF()
 
-include(compiler_warnings)
+include(compiler_flags)
 
 IF(UNIX)
   # Since default builds of boost library under Unix don't use
@@ -79,14 +79,6 @@ ELSE(UNIX)
 ENDIF(UNIX)
 
 #message(STATUS ${CMAKE_CXX_FLAGS})
-
-OPTION(ENABLE_CXX_17 "set to ON to enable C++17 compilation features" OFF)
-include(CheckLatestCXXStandardOption)
-IF (VERSION_OPTION)
-	add_compile_options($<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
-ELSE ()
-	set(CMAKE_CXX_STANDARD 14)
-ENDIF ()
 
 include(ExternalProject)
 

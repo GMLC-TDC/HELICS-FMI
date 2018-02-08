@@ -12,8 +12,9 @@
 
 #include "FmiModelExchangeFederate.hpp"
 #include "fmi_import/fmiObjects.h"
+#include "OdeSolverBase.hpp"
 
-FmiModelExchangeFederate::FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj, const helics::FederateInfo &fi) :me(std::move(obj)), fed(fi)
+FmiModelExchangeFederate::FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj, const helics::FederateInfo &fi):me(std::move(obj)), fed(fi)
 {
     auto inputs = obj->getInputNames();
     for (auto input : inputs)
@@ -27,3 +28,6 @@ FmiModelExchangeFederate::FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExch
         pubs.emplace_back(&fed, output, helics::helics_type_t::helicsDouble);
     }
 }
+
+
+FmiModelExchangeFederate::~FmiModelExchangeFederate() = default;
