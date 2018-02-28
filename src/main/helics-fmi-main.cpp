@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     }
     else if (res == utilities::versionReturn)
     {
-        std::cout << "HELICS VERSION " << helics::helicsVersionString() << '\n';
+        std::cout << "HELICS VERSION " << helics::versionString << '\n';
         std::cout << "HELICS_FMI_VERSION " << HELICS_FMI_MAJOR << "." << HELICS_FMI_MINOR << "." << HELICS_FMI_PATCH << " (" << HELICS_FMI_DATE << ")\n";
         return (0);
     }

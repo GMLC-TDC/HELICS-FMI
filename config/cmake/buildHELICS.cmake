@@ -9,6 +9,12 @@ function (build_helics)
 	escape_string(c_compiler_string ${CMAKE_C_COMPILER})
 	escape_string(linker_string ${CMAKE_LINKER})
 	
+	set(extra_cxx_flags ${CMAKE_CXX_FLAGS})
+	
+	if (VERSION_OPTION)
+		set(extra_cxx_flags "${extra_cxx_flags} ${VERSION_OPTION}")
+	endif()
+	
 	#message(STATUS "${CMAKE_CXX_COMPILER} to ${compiler_string}")
 	
 	escape_string(binary_dir_string ${CMAKE_BINARY_DIR})
@@ -31,14 +37,17 @@ ExternalProject_Add(helics
     CMAKE_ARGS 
         -DCMAKE_INSTALL_PREFIX=${binary_dir_string}/libs
         -DCMAKE_BUILD_TYPE=\$\{CMAKE_BUILD_TYPE\}
-		-DBOOST_ROOT=${BOOST_ROOT}
+		-DBOOST_TEST_PATH=${BOOST_ROOT}
 		-DBUILD_HELICS_TESTS=OFF
 		-DBUILD_HELICS_EXAMPLES=OFF
 		-DBUILD_C_SHARED_LIB=OFF
 		-DCMAKE_DEBUG_POSTFIX=d
 		-DBUILD_PYTHON=OFF
+		-DGENERATE_PYTHON=OFF
         -DCMAKE_CXX_COMPILER=${cxx_compiler_string}
         -DCMAKE_C_COMPILER=${c_compiler_string}
+		\"-DCMAKE_CXX_FLAGS=${extra_cxx_flags}\"
+		\"-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}\"
 		-DZeroMQ_ENABLE=ON
         -DCMAKE_LINKER=${linker_string}
         
