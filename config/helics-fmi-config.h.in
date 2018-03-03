@@ -13,6 +13,8 @@
 #pragma once
 #include "compiler-config.h"
 
+#cmakedefine BOOST_STATIC
+
 #define HELICS_FMI_MAJOR ${HELICS_FMI_MAJOR}
 #define HELICS_FMI_MINOR ${HELICS_FMI_MINOR}
 #define HELICS_FMI_PATCH ${HELICS_FMI_PATCH}

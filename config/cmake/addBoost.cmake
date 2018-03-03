@@ -46,12 +46,20 @@ ENDIF(MSVC)
 
 SHOW_VARIABLE(BOOST_ROOT PATH "Boost root directory" "${BOOST_ROOT}")
 
-# Minimum version of Boost required for building GridDyn
+# Minimum version of Boost required for building HELICS-fmi
 set(BOOST_MINIMUM_VERSION 1.61)
 #most others needed are included through HELICS
 find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS unit_test_framework REQUIRED)
 
-mark_as_advanced(CLEAR BOOST_ROOT)
+# Minimum version of Boost required for building test suite
+if (Boost_VERSION GREATER 106599)
+	#in 1.166 there were some changes to asio and inclusion of beast that will enable other components
+	set(BOOST_VERSION_LEVEL 2)
+else()
+	set(BOOST_VERSION_LEVEL 1)
+ENDIF()
+
+#mark_as_advanced(CLEAR BOOST_ROOT)
 
 message(STATUS "Using Boost include files : ${Boost_INCLUDE_DIR}")
 #message(STATUS "Using Boost libraries in : ${Boost_LIBRARY_DIRS}")

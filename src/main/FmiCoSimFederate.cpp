@@ -20,7 +20,7 @@ FmiCoSimFederate::FmiCoSimFederate(std::shared_ptr<fmi2CoSimObject> obj, const h
     {
         subs.emplace_back(&fed, input);
     }
-
+     
     auto outputs = obj->getOutputNames();
     for (auto output : outputs)
     {

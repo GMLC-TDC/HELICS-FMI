@@ -80,6 +80,11 @@ ELSE(UNIX)
   ENDIF(MINGW)
 ENDIF(UNIX)
 
+IF (USE_BOOST_STATIC_LIBS)
+  set(Boost_USE_STATIC_LIBS ON)
+  set(BOOST_STATIC ON)
+ENDIF ()
+
 #message(STATUS ${CMAKE_CXX_FLAGS})
 
 include(ExternalProject)
@@ -302,6 +307,18 @@ INSTALL(FILES ${KEY_LIBRARY_FILES} DESTINATION bin)
 
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/config/helics-fmi-config.h.in ${PROJECT_BINARY_DIR}/libs/include/helics-fmi/helics-fmi-config.h)
 
+#-----------------------------------------------------------------------------
+# Setup CTEST environment
+#-----------------------------------------------------------------------------
+OPTION(BUILD_HELICS_FMI_TESTS "Enable the test Executables to be built" ON)
+# enable testing
+if (BUILD_HELICS_FMI_TESTS)
+include (CTest)
+enable_testing ()
+add_subdirectory (tests)
+endif(BUILD_HELICS_FMI_TESTS)
+
+
 # -------------------------------------------------------------
 # Future Additions 
 # -------------------------------------------------------------
@@ -320,7 +337,7 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/config/helics-fmi-config.h.in ${PROJECT_BIN
 set(CPACK_PACKAGE_NAME "HELICS-fmi")
 set(CPACK_PACKAGE_VENDOR "Lawrence Livermore National Security")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Helics-fmi Installer")
-set(CPACK_PACKAGE_VERSION "${HELICS_FMI_MAJOR}.${HELICS_FMI_MINOR}.${HELICS_FMI_PATCH}")
+set(CPACK_PACKAGE_VERSION ${HELICS_FMI_VERSION})
 set(CPACK_PACKAGE_VERSION_MAJOR ${HELICS_FMI_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${HELICS_FMI_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${HELICS_FMI_PATCH})

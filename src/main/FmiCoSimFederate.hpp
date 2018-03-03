@@ -20,7 +20,7 @@
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 
-/** class defining a cosimulation federate*/
+/** class defining a co-simulation federate*/
 class FmiCoSimFederate
 {
 private:

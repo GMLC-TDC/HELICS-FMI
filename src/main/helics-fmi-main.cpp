@@ -68,6 +68,7 @@ int main(int argc, char *argv[])
         {
             std::shared_ptr<fmi2CoSimObject> obj = fmi.createCoSimulationObject("obj1");
             auto fed = std::make_unique<FmiCoSimFederate>(obj, fi);
+            
         }
         else
         {

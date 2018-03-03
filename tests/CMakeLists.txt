@@ -17,6 +17,7 @@ fmiLoadTests.cpp
 helics-fmiTests.cpp
 )
 
+link_directories(${Boost_LIBRARY_DIRS})
 
 add_executable(helics_fmi-tests ${helics_fmi_test_sources})
 
@@ -25,10 +26,9 @@ set_target_properties (helics_fmi-tests PROPERTIES FOLDER tests)
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
-target_link_libraries(helics_fmi-tests helics_apps-static helics-static)
+target_link_libraries(helics_fmi-tests helics-static)
 
 target_link_libraries(helics_fmi-tests ${Boost_LIBRARIES_test})
-
 
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
@@ -39,7 +39,7 @@ add_test(NAME helics_fmi-tests COMMAND helics_fmi-tests --log_level=test_suite -
 
 target_compile_definitions(helics_fmi-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
 
-target_compile_definitions(helics_fmi-tests PRIVATE -DHELICS_BIN_LOC=\"${CMAKE_BINARY_DIR}/src/helics/\")
+target_compile_definitions(helics_fmi-tests PRIVATE -DHELICS_BIN_LOC=\"${CMAKE_BINARY_DIR}/src/helics-fmi/\")
 
 IF(WIN32)
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
