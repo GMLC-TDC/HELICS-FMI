@@ -14,7 +14,7 @@
 #define OPTIONALDEFS_H_
 #pragma once
 
-#include "helics-fmi-config.h"
+#include "helics-fmi/helics-fmi-config.h"
 
 #ifdef HAVE_OPTIONAL
 #include <optional>

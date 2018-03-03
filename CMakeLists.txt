@@ -21,7 +21,9 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(HELICS_FMI_MAJOR 0)
 set(HELICS_FMI_MINOR 3)
 set(HELICS_FMI_PATCH 0)
-set(HELICS_FMI_DATE 02-06-2018)
+set(HELICS_FMI_DATE 03-02-2018)
+set(HELICS_FMI_VERSION "${HELICS_FMI_MAJOR}.${HELICS_FMI_MINOR}.${HELICS_FMI_PATCH}")
+set(HELICS_FMI_VERSION_STRING "${HELICS_FMI_VERSION} ${HELIC_FMI_DATE}")
 
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config/cmake)
 
@@ -86,7 +88,12 @@ include(ExternalProject)
 
 #include(mergestaticlibs)
 
-
+# -------------------------------------------------------------
+# Get some configuration for C++17 as that becomes available
+# -------------------------------------------------------------
+#message(STATUS ${CMAKE_CXX_FLAGS})
+set(CONFIGURE_TARGET_LOCATION ${PROJECT_BINARY_DIR}/libs/include/helics-fmi/)
+include(configGenerator)
 
 include(GNUInstallDirs)
 
@@ -293,7 +300,7 @@ endif(ENABLE_CLANG_TOOLS)
 INSTALL(FILES ${KEY_LIBRARY_FILES} DESTINATION bin)
 
 
-CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/config/helics-fmi-config.h.in ${PROJECT_BINARY_DIR}/libs/include/helics-fmi-config.h)
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/config/helics-fmi-config.h.in ${PROJECT_BINARY_DIR}/libs/include/helics-fmi/helics-fmi-config.h)
 
 # -------------------------------------------------------------
 # Future Additions 

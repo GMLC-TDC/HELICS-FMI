@@ -9,60 +9,13 @@
  * For details, see the LICENSE file.
  * LLNS Copyright End
  */
-#ifndef CONFIG_UTILITIES_H
-#define CONFIG_UTILITIES_H
+
 #pragma once
-
-#cmakedefine HAVE_STRING_VIEW
-
-#cmakedefine HAVE_EXP_STRING_VIEW
-
-#cmakedefine HAVE_FILESYSTEM
-
-#cmakedefine HAVE_OPTIONAL
-
-#cmakedefine HAVE_VARIANT
-
-#cmakedefine HAVE_VARIABLE_TEMPLATES
-
-#cmakedefine HAVE_IF_CONSTEXPR
-
-#ifdef HAVE_IF_CONSTEXPR
-#define IF_CONSTEXPR  constexpr
-#else
-#define IF_CONSTEXPR /*disables code*/
-#endif
-
-#cmakedefine HAVE_FALLTHROUGH
-
-#ifdef HAVE_FALLTHROUGH
-#define FALLTHROUGH [[fallthrough]];
-#else
-#define FALLTHROUGH //fallthrough
-#endif
-
-#cmakedefine HAVE_UNUSED
-
-#ifdef HAVE_UNUSED
-#define UNUSED [[unused]]
-#else
-#define UNUSED /*UNUSED*/
-#endif
-
-#cmakedefine HAVE_CLAMP
-
-#cmakedefine HAVE_HYPOT3
-
-#cmakedefine ENABLE_64_BIT_INDEXING
-
-#cmakedefine DISABLE_MULTITHREADING
-
-#cmakedefine KLU_ENABLE
+#include "compiler-config.h"
 
 #define HELICS_FMI_MAJOR ${HELICS_FMI_MAJOR}
 #define HELICS_FMI_MINOR ${HELICS_FMI_MINOR}
 #define HELICS_FMI_PATCH ${HELICS_FMI_PATCH}
+#define HELICS_FMI_VERSION_BUILD "${HELICS_FMI_VERSION_BUILD}"
+#define HELICS_FMI_VERSION_STRING "${HELICS_FMI_VERSION_STRING}"
 #define HELICS_FMI_DATE "${HELICS_FMI_DATE}"
-
-#endif //CONFIG_UTILITIES_H_
-

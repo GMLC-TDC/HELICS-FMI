@@ -3,7 +3,7 @@
 #define INDEX_TYPES_H_
 #pragma once
 
-#include "helics-fmi-config.h" 
+#include "helics-fmi/helics-fmi-config.h" 
 #include <cstdint>
 #include <limits>
 

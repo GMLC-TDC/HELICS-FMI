@@ -12,7 +12,7 @@
 
 #include <boost/filesystem.hpp>
 #include <iostream>
-#include "helics-fmi-config.h"
+#include "helics-fmi/helics-fmi-config.h"
 #include "fmi_import/fmiImport.h"
 #include "helics/core/helicsVersion.hpp"
 #include "FmiModelExchangeFederate.hpp"
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     else if (res == utilities::versionReturn)
     {
         std::cout << "HELICS VERSION " << helics::versionString << '\n';
-        std::cout << "HELICS_FMI_VERSION " << HELICS_FMI_MAJOR << "." << HELICS_FMI_MINOR << "." << HELICS_FMI_PATCH << " (" << HELICS_FMI_DATE << ")\n";
+        std::cout << "HELICS_FMI_VERSION " << HELICS_FMI_VERSION_STRING<<'\n';
         return (0);
     }
     // check to make sure we have some input file or the capture is specified

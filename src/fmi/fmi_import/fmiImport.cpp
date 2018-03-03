@@ -12,7 +12,7 @@
 
 #include "fmiImport.h"
 #include "fmiObjects.h"
-#include "helics-fmi-config.h"
+#include "helics-fmi/helics-fmi-config.h"
 #include "utilities/zipUtilities.h"
 
 #include "utilities/stringOps.h"

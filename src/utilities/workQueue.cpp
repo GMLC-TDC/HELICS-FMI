@@ -11,7 +11,7 @@
  */
 
 #include "workQueue.h"
-#include "helics-fmi-config.h"
+#include "helics-fmi/helics-fmi-config.h"
 #include <iostream>
 
 // static definitions in workQueue class

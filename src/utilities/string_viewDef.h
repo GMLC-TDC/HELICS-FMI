@@ -14,7 +14,7 @@
 #define STRINGVIEWDEFS_H_
 #pragma once
 
-#include "helics-fmi-config.h"
+#include "helics-fmi/helics-fmi-config.h"
 #include <vector>
 
 #ifdef HAVE_STRING_VIEW
