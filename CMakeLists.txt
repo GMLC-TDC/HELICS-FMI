@@ -342,5 +342,28 @@ set(CPACK_PACKAGE_VERSION_MAJOR ${HELICS_FMI_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${HELICS_FMI_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${HELICS_FMI_PATCH})
 
+if (WIN32)
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}\\\\LICENSE")
+else(WIN32)
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
+endif(WIN32)
+
+ if (WIN32)
+#	set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico")
+#	set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
+#	set(CPACK_NSIS_INSTALL_ROOT "C:\\\\local\\\\")
+	set(CPACK_NSIS_URL_INFO_ABOUT "https://www.github.com/GMLC-TDC/Helics-fmi")
+set(CPACK_NSIS_MENU_LINKS 
+	"https://www.github.com/GMLC-TDC/Helics-fmi" "source code"
+	"https://gmlc-tdc.github.io/HELICS-src/" "Helics Documentation"
+	"https://www.helics-fmi.org" "Helics FMI Web page"
+	"https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg" "TDC YouTube channel")
+else (WIN32)
+	#set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
+endif(WIN32)
+
+
+set(CPACK_SOURCE_IGNORE_FILES  "/Build*/;/build*/;/.git/")
+
 #THIS LINE MUST BE LAST
 include(CPack)

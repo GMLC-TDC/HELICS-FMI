@@ -1,3 +1,4 @@
+SHOW_VARIABLE(BOOST_INSTALL_PATH PATH "Boost root directory" "${BOOST_INSTALL_PATH}")
 IF (MSVC)
 
 set (boost_versions
@@ -24,35 +25,41 @@ D:/boost
 
 # create an empty list
 list(APPEND boost_paths "")
-
+mark_as_advanced(BOOST_INSTALL_PATH)
 foreach( dir ${poss_prefixes})
 	foreach( boostver ${boost_versions})
 		IF (IS_DIRECTORY ${dir}/${boostver})
-			list(APPEND boost_paths ${dir}/${boostver})
+			IF (EXISTS ${dir}/${boostver}/boost/version.hpp)
+				list(APPEND boost_paths ${dir}/${boostver})
+			ENDIF()
 		ENDIF()
 	endforeach()
 endforeach()
 
-
 find_path(BOOST_TEST_PATH
 			NAMES 			boost/version.hpp
-			PATHS		${boost_paths}
+			PATHS		${BOOST_INSTALL_PATH}
+						${boost_paths}
 		)
 
 		if (BOOST_TEST_PATH)
 		set(BOOST_ROOT ${BOOST_TEST_PATH})
 		endif(BOOST_TEST_PATH)
+ELSE(MSVC)
+set(BOOST_ROOT "${BOOST_INSTALL_PATH}")
 ENDIF(MSVC)
 
-SHOW_VARIABLE(BOOST_ROOT PATH "Boost root directory" "${BOOST_ROOT}")
 
-# Minimum version of Boost required for building HELICS-fmi
-set(BOOST_MINIMUM_VERSION 1.61)
-#most others needed are included through HELICS
-find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS unit_test_framework REQUIRED)
+
+# Minimum version of Boost required for building HELICS
+set(BOOST_MINIMUM_VERSION 1.58)
+set(Boost_USE_STATIC_LIBS   ${USE_BOOST_STATIC_LIBS})
+find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time timer chrono REQUIRED)
 
 # Minimum version of Boost required for building test suite
-if (Boost_VERSION GREATER 106599)
+if (Boost_VERSION LESS 106100)
+  set(BOOST_VERSION_LEVEL 0)
+elseif (Boost_VERSION GREATER 106599)
 	#in 1.166 there were some changes to asio and inclusion of beast that will enable other components
 	set(BOOST_VERSION_LEVEL 2)
 else()
@@ -61,7 +68,7 @@ ENDIF()
 
 #mark_as_advanced(CLEAR BOOST_ROOT)
 
-message(STATUS "Using Boost include files : ${Boost_INCLUDE_DIR}")
+#message(STATUS "Using Boost include files : ${Boost_INCLUDE_DIR}")
 #message(STATUS "Using Boost libraries in : ${Boost_LIBRARY_DIRS}")
 #message(STATUS "Using Boost libraries : ${Boost_LIBRARIES}")
 set(modifier,"")
@@ -86,5 +93,4 @@ endforeach(loop_var)
 
 #message(STATUS "Using Boost core libraries : ${Boost_LIBRARIES_core}")
 #message(STATUS "Using Boost test libraries : ${Boost_LIBRARIES_test}")
-list(APPEND external_library_list ${Boost_LIBRARIES_core})
-list(APPEND external_link_directories ${Boost_LIBRARY_DIRS})
+

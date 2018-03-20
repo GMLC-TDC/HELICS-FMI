@@ -96,7 +96,7 @@ build_minizip()
 endif()
 include(${PROJECT_BINARY_DIR}/libs/cmake/minizip-targets.cmake)
 
-target_link_libraries(utilities minizip zlib)
+target_link_libraries(utilities PUBLIC minizip::minizip zlib::zlib)
 
 INSTALL(TARGETS utilities
        LIBRARY DESTINATION lib
