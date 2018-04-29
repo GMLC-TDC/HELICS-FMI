@@ -2,6 +2,7 @@ SHOW_VARIABLE(BOOST_INSTALL_PATH PATH "Boost root directory" "${BOOST_INSTALL_PA
 IF (MSVC)
 
 set (boost_versions
+boost_1_67_0
 boost_1_66_0
 boost_1_65_1
 boost_1_65_0
@@ -15,12 +16,12 @@ set(poss_prefixes
 C:
 C:/boost
 C:/local
-C:/boost
+C:/local/boost
 C:/Libraries
 D:
 D:/boost
 D:/local
-D:/boost
+D:/local/boost
 )
 
 # create an empty list
@@ -30,8 +31,8 @@ foreach( dir ${poss_prefixes})
 	foreach( boostver ${boost_versions})
 		IF (IS_DIRECTORY ${dir}/${boostver})
 			IF (EXISTS ${dir}/${boostver}/boost/version.hpp)
-				list(APPEND boost_paths ${dir}/${boostver})
-			ENDIF()
+			list(APPEND boost_paths ${dir}/${boostver})
+		ENDIF()
 		ENDIF()
 	endforeach()
 endforeach()
@@ -50,10 +51,9 @@ set(BOOST_ROOT "${BOOST_INSTALL_PATH}")
 ENDIF(MSVC)
 
 
+# Minimum version of Boost required for building GridDyn
+set(BOOST_MINIMUM_VERSION 1.61)
 
-# Minimum version of Boost required for building HELICS
-set(BOOST_MINIMUM_VERSION 1.58)
-set(Boost_USE_STATIC_LIBS   ${USE_BOOST_STATIC_LIBS})
 find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS program_options unit_test_framework filesystem system date_time timer chrono REQUIRED)
 
 # Minimum version of Boost required for building test suite
