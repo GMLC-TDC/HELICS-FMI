@@ -106,7 +106,7 @@ template<>
 std::string fmi2Object::get<std::string>(const std::string &param) const
 {
 	auto ref = info->getVariableInfo(param);
-	if (ref.type != fmi_variable_type_t::string)
+	if (ref.type._value != fmi_variable_type::string)
 	{
 		handleNonOKReturnValues(fmi2Status::fmi2Discard);
 		return ""; //if we get here just return an empty string otherwise we threw an exception
@@ -169,7 +169,7 @@ void fmi2Object::set(const fmiVariableSet &vrset, fmi2Real value[])
 void fmi2Object::set(const std::string &param, const char *val)
 {
 	auto ref = info->getVariableInfo(param);
-	if (!(ref.type == fmi_variable_type_t::string))
+	if (!(ref.type._value == fmi_variable_type::string))
 	{
 		handleNonOKReturnValues(fmi2Status::fmi2Discard);
 		return;
@@ -184,7 +184,7 @@ void fmi2Object::set(const std::string &param, const char *val)
 void fmi2Object::set(const std::string &param, const std::string &val)
 {
 	auto ref = info->getVariableInfo(param);
-	if (!(ref.type == fmi_variable_type_t::string))
+	if (!(ref.type._value == fmi_variable_type::string))
 	{
 		handleNonOKReturnValues(fmi2Status::fmi2Discard);
 		return;
@@ -200,7 +200,7 @@ void fmi2Object::set(const std::string &param, const std::string &val)
 void fmi2Object::setFlag(const std::string &param, bool val)
 {
     auto ref = info->getVariableInfo(param);
-    if (!(ref.type == fmi_variable_type_t::string))
+    if (!(ref.type._value == fmi_variable_type::string))
     {
         handleNonOKReturnValues(fmi2Status::fmi2Discard);
         return;
@@ -275,13 +275,13 @@ fmi2Real fmi2Object::getPartialDerivative(int index_x, int index_y, double dx)
 /** check if an output is real and actually is an output*/
 bool isRealOutput(const variableInformation &vI)
 {
-	return ((vI.index >= 0) && (vI.type == fmi_variable_type_t::real) && (vI.causality == fmi_causality_type_t::output));
+	return ((vI.index >= 0) && (vI.type._value == fmi_variable_type::real) && (fmi_causality::output == vI.causality._value));
 }
 
 /** check if an input is real and actually is an input*/
 bool isRealInput(const variableInformation &vI)
 {
-	return ((vI.index >= 0) && (vI.type == fmi_variable_type_t::real) && (vI.causality == fmi_causality_type_t::input));
+	return ((vI.index >= 0) && (vI.type._value == fmi_variable_type::real) && (vI.causality._value == fmi_causality::input));
 }
 
 void fmi2Object::setOutputVariables(const std::vector<std::string> &outNames)
@@ -458,20 +458,20 @@ std::vector<std::string> fmi2Object::getInputNames() const
 }
 
 
-bool fmi2Object::isParameter(const std::string &param, fmi_variable_type_t type)
+bool fmi2Object::isParameter(const std::string &param, fmi_variable_type type)
 {
 	auto &vi = info->getVariableInfo(param);
 	if (vi.index >= 0)
 	{
-		if ((vi.causality == fmi_causality_type_t::parameter) || (vi.causality == fmi_causality_type_t::input))
+		if ((vi.causality._value == fmi_causality::parameter) || (vi.causality._value == fmi_causality::input))
 		{
 			if (vi.type == type)
 			{
 				return true;
 			}
-			if (type == fmi_variable_type_t::numeric)
+			if (type._value == fmi_variable_type::numeric)
 			{
-				if (vi.type != fmi_variable_type_t::string)
+				if (vi.type._value != fmi_variable_type::string)
 				{
 					return true;
 				}
@@ -482,7 +482,7 @@ bool fmi2Object::isParameter(const std::string &param, fmi_variable_type_t type)
 	return false;
 }
 
-bool fmi2Object::isVariable(const std::string &var, fmi_variable_type_t type)
+bool fmi2Object::isVariable(const std::string &var, fmi_variable_type type)
 {
 	auto &vi = info->getVariableInfo(var);
 	if (vi.index >= 0)
@@ -491,9 +491,9 @@ bool fmi2Object::isVariable(const std::string &var, fmi_variable_type_t type)
 		{
 			return true;
 		}
-		if (type == fmi_variable_type_t::numeric)
+		if (type._value == fmi_variable_type::numeric)
 		{
-			if (vi.type != fmi_variable_type_t::string)
+			if (vi.type._value != fmi_variable_type::string)
 			{
 				return true;
 			}

@@ -216,8 +216,8 @@ public:
 	std::vector<std::string> getOutputNames() const;
 	std::vector<std::string> getInputNames() const;
 
-	bool isParameter(const std::string &param, fmi_variable_type_t type = fmi_variable_type_t::numeric);
-	bool isVariable(const std::string &var, fmi_variable_type_t type = fmi_variable_type_t::numeric);
+	bool isParameter(const std::string &param, fmi_variable_type type = fmi_variable_type::numeric);
+	bool isVariable(const std::string &var, fmi_variable_type type = fmi_variable_type::numeric);
 	std::shared_ptr<const fmiCommonFunctions> getFmiCommonFunctions() const
 	{
 		return commonFunctions;

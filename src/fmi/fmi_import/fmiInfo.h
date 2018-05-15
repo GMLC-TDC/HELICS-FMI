@@ -61,9 +61,9 @@ public:
 	bool reinit = false;
 	bool derivative = false;
 	bool isAlias = false;
-	fmi_variability variability = fmi_variability_type_t::continuous;
-	fmi_causality causality = fmi_causality_type_t::local;
-	fmi_variable_type type = fmi_variable_type_t::real;
+	fmi_variability variability = fmi_variability::continuous;
+	fmi_causality causality = fmi_causality::local;
+	fmi_variable_type type = fmi_variable_type::real;
 	double start=0;
 	double min=-1e48;
 	double max=1e48;
@@ -121,7 +121,7 @@ public:
 
 	const fmi2ValueReference *getValueRef() const;
 	size_t getVRcount() const;
-	fmi_variable_type_t getType() const;
+	fmi_variable_type getType() const;
 	/** add a new reference
 	@param[in] newvr the value reference to add
 	*/
@@ -136,7 +136,7 @@ public:
 	void remove(fmi2ValueReference rmvr);
 	void clear();
 private:
-	fmi_variable_type type = fmi_variable_type_t::real;
+	fmi_variable_type type = fmi_variable_type::real;
 	//boost::container::small_vector<fmi2ValueReference, 4> vrset;
     std::vector<fmi2ValueReference> vrset;
 };
@@ -227,6 +227,6 @@ enum class fmuMode
 };
 
 
-bool checkType(const variableInformation& info, fmi_variable_type_t type, fmi_causality_type_t caus);
+bool checkType(const variableInformation& info, fmi_variable_type type, fmi_causality caus);
 
 #endif

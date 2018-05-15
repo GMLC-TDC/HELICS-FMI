@@ -11,7 +11,7 @@ function (build_helics)
 	
 	#message(STATUS "${CMAKE_CXX_COMPILER} to ${compiler_string}")
 	
-	escape_string(binary_dir_string ${CMAKE_BINARY_DIR})
+	escape_string(install_location_string ${HELICS_INSTALL_PATH})
     set(trigger_build_dir ${binary_dir_string}/autobuild/force_helics)
 
     get_filename_component(ZeroMQ_TARGET ${ZeroMQ_INSTALL_PATH} DIRECTORY)
@@ -22,25 +22,24 @@ function (build_helics)
 
     #generate false dependency project
     set(CMAKE_LIST_CONTENT "
-    cmake_minimum_required(VERSION 3.4)
+    cmake_minimum_required(VERSION 3.5)
     include(ExternalProject)
 ExternalProject_Add(helics
     SOURCE_DIR ${binary_dir_string}/Download/helics
     GIT_REPOSITORY  https://github.com/GMLC-TDC/HELICS-src.git
-	GIT_TAG cmake_configure_update
+	GIT_TAG v1.1.0
     DOWNLOAD_COMMAND " " 
     UPDATE_COMMAND " " 
     BINARY_DIR ${binary_dir_string}/ThirdParty/helics
      
     CMAKE_ARGS 
-        -DCMAKE_INSTALL_PREFIX=${binary_dir_string}/libs
+        -DCMAKE_INSTALL_PREFIX=${install_location_string}
 		-DBOOST_INSTALL_PATH=${BOOST_ROOT}
 		-DUSE_BOOST_STATIC_LIBS=${USE_BOOST_STATIC_LIBS}
 		-DCMAKE_BUILD_TYPE=\$\{CMAKE_BUILD_TYPE\}
 		-DBUILD_HELICS_TESTS=OFF
 		-DBUILD_HELICS_EXAMPLES=OFF
 		-DBUILD_C_SHARED_LIB=OFF
-		-DBUILD_PYTHON_INTERFACE=OFF
         -DCMAKE_CXX_COMPILER=${cxx_compiler_string}
         -DCMAKE_C_COMPILER=${c_compiler_string}
 		-DCMAKE_LINKER=${linker_string}

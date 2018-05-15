@@ -40,9 +40,9 @@ size_t fmiVariableSet::getVRcount() const
 	return vrset.size();
 }
 
-fmi_variable_type_t fmiVariableSet::getType() const
+fmi_variable_type fmiVariableSet::getType() const
 {
-	return type.value();
+	return type;
 }
 
 void fmiVariableSet::push(fmi2ValueReference newvr)

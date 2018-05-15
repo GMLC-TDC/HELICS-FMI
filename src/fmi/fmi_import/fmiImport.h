@@ -172,7 +172,7 @@ public:
 	}
 	/** check if the shared object file for the fmu has been loaded
 	@return true if loaded false if not*/
-	bool isSoLoaded(fmutype_t type = fmutype_t::unknown) const;
+	bool isSoLoaded(fmu_type type = fmu_type::unknown) const;
 	/** load the FMU from the fmu path
 	@param[in] path the fmu*/
 	void loadFMU(const std::string &fmupath);
@@ -185,7 +185,7 @@ public:
 	void close();
 	const std::string &getName() const { return modelName; }
 	int getCounts(const std::string &countType) const;
-	void loadSharedLibrary(fmutype_t type=fmutype_t::unknown);
+	void loadSharedLibrary(fmu_type type=fmu_type::unknown);
 
 	bool checkFlag(fmuCapabilityFlags flag) const;
 
@@ -198,7 +198,7 @@ private: //private functions
 	int extract();
 	
 
-	boost::filesystem::path findSoPath(fmutype_t type = fmutype_t::unknown);
+	boost::filesystem::path findSoPath(fmu_type type = fmu_type::unknown);
 	void loadBaseFunctions();
 	void loadCommonFunctions();
 	void loadModelExchangeFunctions();
