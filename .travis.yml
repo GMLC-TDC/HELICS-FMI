@@ -1,0 +1,23 @@
+dist: trusty
+language: cpp
+
+cache:
+  ccache: true
+  directories:
+    - dependencies
+
+env:
+  global:
+    - MAKEFLAGS="-j 2"
+
+branches:
+  except:
+    - gh-pages
+
+script:
+  - mkdir build && cd build
+  - cmake .. -DAUTOBUILD_HELICS=ON -DBUILD_RELEASE_ONLY=ON
+  - make ${MAKEFLAGS}
+
+notifications:
+    email: false
