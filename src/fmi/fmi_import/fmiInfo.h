@@ -13,12 +13,10 @@
 /** @file
 @brief file containing classes and types for managing information about FMU's
 */
-#ifndef FMI_INFORMATION_H_
-#define FMI_INFORMATION_H_
 #pragma once
 
 #include "utilities/matrixDataOrdered.hpp"
-#include "FMI2/fmi2TypesPlatform.h"
+#include "../FMI2/fmi2TypesPlatform.h"
 #include "fmiEnumDefinitions.h"
 
 #ifdef __GNUC__
@@ -228,5 +226,3 @@ enum class fmuMode
 
 
 bool checkType(const variableInformation& info, fmi_variable_type type, fmi_causality caus);
-
-#endif

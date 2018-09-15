@@ -14,7 +14,7 @@
 #include "fmi_import/fmiObjects.h"
 #include "OdeSolverBase.hpp"
 
-FmiModelExchangeFederate::FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj, const helics::FederateInfo &fi):me(std::move(obj)), fed(fi)
+FmiModelExchangeFederate::FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj, const helics::FederateInfo &fi):me(std::move(obj)), fed(std::string(),fi)
 {
     auto inputs = obj->getInputNames();
     for (auto input : inputs)

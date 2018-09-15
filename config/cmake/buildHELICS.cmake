@@ -10,14 +10,11 @@ function (build_helics)
 	escape_string(linker_string ${CMAKE_LINKER})
 	
 	#message(STATUS "${CMAKE_CXX_COMPILER} to ${compiler_string}")
-	
+    escape_string(binary_dir_string ${PROJECT_BINARY_DIR})
+
 	escape_string(install_location_string ${HELICS_INSTALL_PATH})
     set(trigger_build_dir ${binary_dir_string}/autobuild/force_helics)
 
-    get_filename_component(ZeroMQ_TARGET ${ZeroMQ_INSTALL_PATH} DIRECTORY)
-	escape_string(zmq_target "${ZeroMQ_TARGET}")
-	message(STATUS "BUILDING HELICS WITH ZMQ target=${ZeroMQ_TARGET}")
-    #mktemp dir in build tree
     file(MAKE_DIRECTORY ${trigger_build_dir} ${trigger_build_dir}/build)
 
     #generate false dependency project
@@ -27,7 +24,7 @@ function (build_helics)
 ExternalProject_Add(helics
     SOURCE_DIR ${binary_dir_string}/Download/helics
     GIT_REPOSITORY  https://github.com/GMLC-TDC/HELICS-src.git
-	GIT_TAG v1.1.0
+	GIT_TAG v2.0.0-alpha.1
     DOWNLOAD_COMMAND " " 
     UPDATE_COMMAND " " 
     BINARY_DIR ${binary_dir_string}/ThirdParty/helics
@@ -36,6 +33,7 @@ ExternalProject_Add(helics
         -DCMAKE_INSTALL_PREFIX=${install_location_string}
 		-DBOOST_INSTALL_PATH=${BOOST_ROOT}
 		-DUSE_BOOST_STATIC_LIBS=${USE_BOOST_STATIC_LIBS}
+        -DCMAKE_POSITION_INDEPENDENT_CODE=${CMAKE_POSITION_INDEPENDENT_CODE}
 		-DCMAKE_BUILD_TYPE=\$\{CMAKE_BUILD_TYPE\}
 		-DBUILD_HELICS_TESTS=OFF
 		-DBUILD_HELICS_EXAMPLES=OFF
@@ -44,17 +42,17 @@ ExternalProject_Add(helics
         -DCMAKE_C_COMPILER=${c_compiler_string}
 		-DCMAKE_LINKER=${linker_string}
 		-DENABLE_CXX_17=${ENABLE_CXX_17}
-		-DMPI_ENABLE=${GRIDDYN_HAVE_MPI}
 		-DZeroMQ_ENABLE=ON
-		-DZeroMQ_INSTALL_PATH:PATH=${zmq_target}/
-		-DZMQ_USE_STATIC_LIBRARY=${ZMQ_USE_STATIC_LIBRARY}
+		-DAUTOBUILD_INSTALL_PATH=${AUTOBUILD_INSTALL_PATH}
         
         
-    INSTALL_DIR ${binary_dir_string}/libs
+    INSTALL_DIR ${install_location_string}
 
     )")
 
 	file(WRITE ${trigger_build_dir}/CMakeLists.txt "${CMAKE_LIST_CONTENT}")
+
+if (MSVC)
 
 if (NOT BUILD_RELEASE_ONLY)
 	
@@ -73,18 +71,48 @@ if (NOT BUILD_RELEASE_ONLY)
 
   endif()
   
-  message(STATUS "Configuring HELICS Autobuild for release logging to ${PROJECT_BINARY_DIR}/logs/helics_autobuild_config_release.log")
+  if (NOT BUILD_DEBUG_ONLY)
+  if (NOT MSVC_RELEASE_BUILD_TYPE)
+		set(MSVC_RELEASE_BUILD_TYPE "Release")
+	endif()
+  message(STATUS "Configuring HELICS Autobuild for ${MSVC_RELEASE_BUILD_TYPE} logging to ${PROJECT_BINARY_DIR}/logs/helics_autobuild_config_release.log")
     execute_process(COMMAND ${CMAKE_COMMAND} -Wno-dev -D CMAKE_CXX_COMPILER=${cxx_compiler_string} -D CMAKE_C_COMPILER=${c_compiler_string} -D CMAKE_LINKER=${linker_string}
-         -D CMAKE_BUILD_TYPE=Release -G ${CMAKE_GENERATOR} .. 
+         -D CMAKE_BUILD_TYPE=${MSVC_RELEASE_BUILD_TYPE} -G ${CMAKE_GENERATOR} .. 
         WORKING_DIRECTORY ${trigger_build_dir}/build
 		OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/helics_autobuild_config_release.log
         )
 	
-	message(STATUS "Building HELICS release build logging to ${PROJECT_BINARY_DIR}/logs/helics_autobuild_build_release.log")
-    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release
+	message(STATUS "Building HELICS ${MSVC_RELEASE_BUILD_TYPE} build logging to ${PROJECT_BINARY_DIR}/logs/helics_autobuild_build_release.log")
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${MSVC_RELEASE_BUILD_TYPE}
         WORKING_DIRECTORY ${trigger_build_dir}/build
 		OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/helics_autobuild_build_release.log
         )
+	endif()
+else(MSVC)
+
+	if (CMAKE_BUILD_TYPE)
+	list(APPEND valid_btypes "Release" "Debug" "RelWithDebInfo" "MinSizeRel")
+	if (${CMAKE_BUILD_TYPE} IN_LIST valid_btypes)
+		set(LOCAL_BUILD_TYPE ${CMAKE_BUILD_TYPE})
+	else()
+		set(LOCAL_BUILD_TYPE "RelWithDebInfo")
+	endif()
+else ()
+	set(LOCAL_BUILD_TYPE "Release")
+endif()
 	
+	message(STATUS "Configuring HELICS Autobuild for ${LOCAL_BUILD_TYPE} logging to ${PROJECT_BINARY_DIR}/logs/helics_autobuild_config.log")
+    execute_process(COMMAND ${CMAKE_COMMAND} -Wno-dev -D CMAKE_CXX_COMPILER=${cxx_compiler_string} -D CMAKE_C_COMPILER=${c_compiler_string} -D CMAKE_LINKER=${linker_string}
+         -D CMAKE_BUILD_TYPE=${LOCAL_BUILD_TYPE} -G ${CMAKE_GENERATOR} .. 
+        WORKING_DIRECTORY ${trigger_build_dir}/build
+		OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/helics_autobuild_config.log
+        )
+	
+	message(STATUS "Building HELICS ${LOCAL_BUILD_TYPE} build logging to ${PROJECT_BINARY_DIR}/logs/helics_autobuild_build.log")
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${LOCAL_BUILD_TYPE}
+        WORKING_DIRECTORY ${trigger_build_dir}/build
+		OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/helics_autobuild_build.log
+        )
+	endif(MSVC)
 	endfunction()
         
