@@ -17,11 +17,19 @@ addons:
     packages:
       - g++-4.9
 
+env:
+  - MATRIX_EVAL="COMPILER=gcc && CC=gcc-4.9 && CXX=g++-4.9"
+       
 branches:
   except:
     - gh-pages
 
-script:
+before_install:
+  - eval "${MATRIX_EVAL}"
+
+install:
+  - source scripts/install-ci-dependencies.sh
+
   # Download and install the most recent development version of HELICS (2.0)
   # The install path should not be cached by Travis, to ensure we are building against the latest version
   # Install prefix folder must be created before running script
@@ -30,11 +38,13 @@ script:
   - chmod 755 *.sh
   - ./helics-install-Linux.sh --skip-license --prefix=helics-prefix
   
-  # Print the HELICS version and ensure required shared libraries are found
+
+script:
+    # Print the HELICS version and ensure required shared libraries are found
   - helics-prefix/bin/helics_broker --version
   
   - mkdir build && cd build
-  - cmake .. -DHELICS_INSTALL_PATH=helics-prefix -DBUILD_RELEASE_ONLY=ON
+  - cmake .. -DHELICS_INSTALL_PATH=helics-prefix -DBOOST_INSTALL_PATH=dependencies/boost -DBUILD_RELEASE_ONLY=ON
   - make ${MAKEFLAGS}
 
 notifications:
