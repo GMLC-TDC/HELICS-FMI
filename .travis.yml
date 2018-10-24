@@ -15,9 +15,12 @@ branches:
     - gh-pages
 
 script:
+  - mkdir helics-prefix && pushd helics-prefix
   - wget https://dl.bintray.com/helics/develop/HELICS_2_0/helics-install-$(uname -s).sh
-  - ./helics-install-Linux.sh --skip-license --prefix=helics
-  - helics/bin/helics_broker --version
+  - chmod 755 *.sh
+  - ./helics-install-Linux.sh --skip-license
+  - popd
+  - helics-prefix/bin/helics_broker --version
   - mkdir build && cd build
   - cmake .. -DAUTOBUILD_HELICS=ON -DBUILD_RELEASE_ONLY=ON
   - make ${MAKEFLAGS}
