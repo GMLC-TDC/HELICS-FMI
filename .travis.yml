@@ -34,7 +34,7 @@ script:
   - helics-prefix/bin/helics_broker --version
   
   - mkdir build && cd build
-  - cmake .. -DAUTOBUILD_HELICS=ON -DBUILD_RELEASE_ONLY=ON
+  - cmake .. -DHELICS_INSTALL_PATH=helics-prefix -DBUILD_RELEASE_ONLY=ON
   - make ${MAKEFLAGS}
 
 notifications:
