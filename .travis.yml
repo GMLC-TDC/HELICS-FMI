@@ -22,12 +22,17 @@ branches:
     - gh-pages
 
 script:
-  - mkdir helics-prefix && pushd helics-prefix
+  # Download and install the most recent development version of HELICS (2.0)
+  # The install path should not be cached by Travis, to ensure we are building against the latest version
+  # Install prefix folder must be created before running script
+  - mkdir helics-prefix
   - wget https://dl.bintray.com/helics/develop/HELICS_2_0/helics-install-$(uname -s).sh
   - chmod 755 *.sh
-  - ./helics-install-Linux.sh --skip-license
-  - popd
+  - ./helics-install-Linux.sh --skip-license --prefix=helics-prefix
+  
+  # Print the HELICS version and ensure required shared libraries are found
   - helics-prefix/bin/helics_broker --version
+  
   - mkdir build && cd build
   - cmake .. -DAUTOBUILD_HELICS=ON -DBUILD_RELEASE_ONLY=ON
   - make ${MAKEFLAGS}
