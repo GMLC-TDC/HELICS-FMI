@@ -33,10 +33,10 @@ install:
   # Download and install the most recent development version of HELICS (2.0)
   # The install path should not be cached by Travis, to ensure we are building against the latest version
   # Install prefix folder must be created before running script
-  - mkdir helics-prefix
+  - mkdir ${TRAVIS_BUILD_DIR}/helics-prefix
   - wget https://dl.bintray.com/helics/develop/HELICS_2_0/helics-install-$(uname -s).sh
   - chmod 755 *.sh
-  - ./helics-install-Linux.sh --skip-license --prefix=helics-prefix
+  - ./helics-install-Linux.sh --skip-license --prefix=${TRAVIS_BUILD_DIR}/helics-prefix
   
 
 script:
@@ -44,7 +44,7 @@ script:
   - helics-prefix/bin/helics_broker --version
   
   - mkdir build && cd build
-  - cmake .. -DHELICS_INSTALL_PATH=helics-prefix -DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost -DBUILD_RELEASE_ONLY=ON
+  - cmake .. -DHELICS_INSTALL_PATH=${TRAVIS_BUILD_DIR}/helics-prefix -DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost -DBUILD_RELEASE_ONLY=ON
   - make ${MAKEFLAGS}
 
 notifications:
