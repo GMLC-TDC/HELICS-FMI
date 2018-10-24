@@ -1,7 +1,7 @@
 # LLNS Copyright Start
 # Copyright (c) 2017, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department 
-# of Energy by Lawrence Livermore National Laboratory in part under 
+# This work was performed under the auspices of the U.S. Department
+# of Energy by Lawrence Livermore National Laboratory in part under
 # Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
 # Produced at the Lawrence Livermore National Laboratory.
 # All rights reserved.
@@ -13,7 +13,7 @@ set(helics-fmi_sources
 	FmiModelExchangeFederate.cpp
 	helics-fmi-main.cpp
 	)
-	
+
 set(helics-fmi_headers
 	FmiCoSimFederate.hpp
 	FmiModelExchangeFederate.hpp
@@ -27,7 +27,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/fmi)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/utilities)
 INCLUDE_DIRECTORIES(${HELICS_INCLUDE_DIR})
 
-target_link_libraries(helics-fmi Helics::helics-static fmiLibrary ${external_library_list})
+target_link_libraries(helics-fmi HELICS::helics-static fmiLibrary ${external_library_list})
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET helics-fmi POST_BUILD        # Adds a post-build event to helics-fmi
