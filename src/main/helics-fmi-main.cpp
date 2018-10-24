@@ -61,7 +61,8 @@ int main(int argc, char *argv[])
     fmiLibrary fmi;
     if ((ext == ".fmu")||(ext==".FMU"))
     {
-        helics::FederateInfo fi("fmi");
+        helics::FederateInfo fi;
+        fi.defName = "fmi";
         fi.loadInfoFromArgs(argc, argv);
         fmi.loadFMU(filename);
         if (fmi.checkFlag(fmuCapabilityFlags::coSimulationCapable))

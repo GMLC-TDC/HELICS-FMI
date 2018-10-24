@@ -13,7 +13,7 @@
 #include "FmiCoSimFederate.hpp"
 #include "fmi_import/fmiObjects.h"
 
-FmiCoSimFederate::FmiCoSimFederate(std::shared_ptr<fmi2CoSimObject> obj, const helics::FederateInfo &fi):cs(std::move(obj)),fed(fi)
+FmiCoSimFederate::FmiCoSimFederate(std::shared_ptr<fmi2CoSimObject> obj, const helics::FederateInfo &fi):cs(std::move(obj)),fed(std::string(),fi)
 {
     auto inputs = obj->getInputNames();
     for (auto input : inputs)

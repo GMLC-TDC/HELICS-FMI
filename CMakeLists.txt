@@ -11,183 +11,192 @@
 cmake_minimum_required(VERSION 3.5)
 cmake_policy(VERSION 3.5)
 
-project(HELICS-FMI VERSION 0.3.0)
+project(HELICS-FMI VERSION 0.4.0)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-#version number
-set (HELICS-FMI_VERSION_BUILD )
-set (HELICS-FMI_DATE "05-15-2018")
-
-set (HELICS-FMI_VERSION_UNDERSCORE "${HELICS-FMI_VERSION_MAJOR}_${HELICS-FMI_VERSION_MINOR}_${HELICS-FMI_VERSION_PATCH}")
+#set (HELICS-FMI_VERSION_BUILD alpha.1)
+set (HELICS-FMI_DATE "08-30-18")
+set(
+  HELICS-FMI_VERSION_UNDERSCORE
+  "${HELICS-FMI_VERSION_MAJOR}_${HELICS-FMI_VERSION_MINOR}_${HELICS-FMI_VERSION_PATCH}"
+)
 if(HELICS-FMI_VERSION_BUILD)
-	set (HELICS-FMI_VERSION "${HELICS-FMI_VERSION}-${HELICS-FMI_VERSION_BUILD}")
-	set (HELICS-FMI_VERSION_UNDERSCORE "${HELICS-FMI_VERSION_UNDERSCORE}-${HELICS-FMI_VERSION_BUILD}")
+  set(HELICS-FMI_VERSION "${HELICS-FMI_VERSION}-${HELICS-FMI_VERSION_BUILD}")
+  set(HELICS-FMI_VERSION_UNDERSCORE "${HELICS-FMI_VERSION_UNDERSCORE}-${HELICS-FMI_VERSION_BUILD}")
 endif()
-set (HELICS-FMI_VERSION_STRING "${HELICS-FMI_VERSION} (${HELICS-FMI_DATE})")
+set(HELICS-FMI_VERSION_STRING "${HELICS-FMI_VERSION} (${HELICS-FMI_DATE})")
 
-SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config/cmake)
-
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+# -----------------------------------------------------------------------------
+# set the module path and include some common macros
+# -----------------------------------------------------------------------------
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/")
+include(extraMacros)
+include(CMakeDependentOption)
 
 FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
 
-# -------------------------------------------------------------
-# MACRO definitions
-# -------------------------------------------------------------
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  if(WIN32)
+    if(MSYS)
+      set(
+        CMAKE_INSTALL_PREFIX "/usr/local/helics-fmi_${HELICS-FMI_VERSION_UNDERSCORE}/"
+        CACHE PATH "default install path"
+        FORCE
+      )
+		else(MSYS)
+      set(
+        CMAKE_INSTALL_PREFIX "C:/local/helics-fmi_${HELICS-FMI_VERSION_UNDERSCORE}/"
+        CACHE PATH "default install path"
+        FORCE
+      )
+		endif(MSYS)
+	endif(WIN32)
+endif()
 
-# Macros to hide/show cached variables.
-# These two macros can be used to "hide" or "show" in the
-# list of cached variables various variables and/or options 
-# that depend on other options.
-# Note that once a variable is modified, it will preserve its
-# value (hiding it merely makes it internal)
+show_variable(
+  AUTOBUILD_INSTALL_PATH
+  PATH
+  "location to install the autobuild libraries and Headers"
+  "${PROJECT_BINARY_DIR}/libs"
+)
 
-MACRO(HIDE_VARIABLE var)
-  IF(DEFINED ${var})
-    SET(${var} "${${var}}" CACHE INTERNAL "")
-  ENDIF(DEFINED ${var})
-ENDMACRO(HIDE_VARIABLE)
-
-MACRO(SHOW_VARIABLE var type doc default)
-  IF(DEFINED ${var})
-    SET(${var} "${${var}}" CACHE "${type}" "${doc}" FORCE)
-  ELSE(DEFINED ${var})
-    SET(${var} "${default}" CACHE "${type}" "${doc}")
-  ENDIF(DEFINED ${var})
-ENDMACRO(SHOW_VARIABLE)
-
+mark_as_advanced(AUTOBUILD_INSTALL_PATH)
 
 # Prohibit in-source build
 IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
   message(FATAL_ERROR "In-source build is not supported. Please, use an empty directory for building the project.")
 ENDIF()
 
+
+add_library(helics_fmi_base INTERFACE)
+
 include(compiler_flags)
+message(STATUS "setting version build options to \"${VERSION_OPTION}\"")
+if(VERSION_OPTION)
+  if(MSVC)
+		target_compile_options(helics_fmi_base INTERFACE ${VERSION_OPTION})
+	else()
+    target_compile_options(
+      helics_fmi_base
+      INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>
+    )
+  endif(MSVC)
+endif(VERSION_OPTION)
 
-IF(UNIX)
-  # Since default builds of boost library under Unix don't use
-  # CMake, turn off using CMake build and find include/libs the
-  # regular way.
-  set(Boost_NO_BOOST_CMAKE ON)
-  set(Boost_USE_MULTITHREADED      OFF)   # Needed if MT libraries not built
-  option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
-ELSE(UNIX)
-  IF(MINGW)
-  option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
-  ELSE(MINGW)
-  #this would most likely be MSVC
-   option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
-  ENDIF(MINGW)
-ENDIF(UNIX)
+cmake_dependent_option(
+  STATIC_STANDARD_LIB
+  "Link against a static standard lib"
+  OFF
+  "NOT USE_LIBCXX"
+  OFF
+)
+include(ucm)
+mark_as_advanced(STATIC_STANDARD_LIB)
+if(STATIC_STANDARD_LIB)
+	ucm_set_runtime(STATIC)
+else()
+	ucm_set_runtime(DYNAMIC)
+endif()
 
-IF (USE_BOOST_STATIC_LIBS)
-  set(Boost_USE_STATIC_LIBS ON)
-  set(BOOST_STATIC ON)
-ENDIF ()
+if(MSVC)
+	option(EMBEDDED_DEBUG_INFO "embed debug info into obj files" OFF)
+	mark_as_advanced(EMBEDDED_DEBUG_INFO)
+  if(EMBEDDED_DEBUG_INFO)
+		ucm_set_embedded_debug(EMBEDDED)
+	else()
+		ucm_set_embedded_debug(EXTERNAL)
+	endif()
+endif(MSVC)
 
-#message(STATUS ${CMAKE_CXX_FLAGS})
-
-include(ExternalProject)
+# -------------------------------------------------------------
+# Get some configuration for C++17 as that becomes available
+# -------------------------------------------------------------
+# message(STATUS ${CMAKE_CXX_FLAGS})
+set(CONFIGURE_TARGET_LOCATION ${AUTOBUILD_INSTALL_PATH}/include/helics-fmi/)
+include(configGenerator)
 
 #########################################################################################
 
 #include(mergestaticlibs)
 
-# -------------------------------------------------------------
-# Get some configuration for C++17 as that becomes available
-# -------------------------------------------------------------
-#message(STATUS ${CMAKE_CXX_FLAGS})
-set(CONFIGURE_TARGET_LOCATION ${PROJECT_BINARY_DIR}/libs/include/helics-fmi/)
-include(configGenerator)
-
 include(GNUInstallDirs)
 
 # -------------------------------------------------------------
-# setting the RPATH
+# BOOST  find the boost libraries
 # -------------------------------------------------------------
-# use, i.e. don't skip the full RPATH for the build tree
-SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
-
-# when building, don't use the install RPATH already
-# (but later on when installing)
-SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
-
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
-
-# add the automatically determined parts of the RPATH
-# which point to directories outside the build tree to the install RPATH
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
-
-# the RPATH to be used when installing, but only if it's not a system directory
-LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/bin" isSystemDir)
-IF("${isSystemDir}" STREQUAL "-1")
-   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
-ENDIF("${isSystemDir}" STREQUAL "-1")
-
-if (NOT USE_BOOST_STATIC_LIBS)
-list(APPEND CMAKE_INSTALL_RPATH ${Boost_LIBRARY_DIRS})
-endif()
-
-# -------------------------------------------------------------
-# Find (and test) the KLU libraries
-# -------------------------------------------------------------
+set(
+  BOOST_REQUIRED_LIBRARIES
+  program_options
+  unit_test_framework
+  filesystem
+  system
+  date_time
+  timer
+  chrono
+)
+include(addBoost)
 
 
-#OPTION(KLU_ENABLE "Enable KLU support" ON)
 
-#if(NOT DEFINED SuiteSparse_DIR)
-#  set(SuiteSparse_DIR ${PROJECT_BINARY_DIR}/libs CACHE PATH "path to SuiteSparse/KLU")
-#endif()
-
-#SHOW_VARIABLE(SuiteSparse_DIR PATH
-#  "KLU library directory" "${SuiteSparse_DIR}")
-
-#if(KLU_ENABLE)
-#  IF(MSVC)
-#    set(SuiteSparse_USE_LAPACK_BLAS ON)
-#  ENDIF(MSVC)
-#  find_package(SuiteSparse COMPONENTS KLU AMD COLAMD BTF SUITESPARSECONFIG CXSPARSE)
-#  if(SuiteSparse_FOUND) 
-#        list(APPEND external_library_list ${SuiteSparse_LIBRARIES})
-#        #list(APPEND external_link_directories ${SuiteSparse_LIBRARY_DIR})
-#        IF (AUTOBUILD_KLU)
-#		OPTION(FORCE_KLU_REBUILD "force rebuild of KLU" OFF)
-#		IF(FORCE_KLU_REBUILD)
-#			include(buildSuiteSparse)
-#			build_suitesparse()
-#			set(FORCE_KLU_REBUILD OFF CACHE BOOL "force rebuild of KLU" FORCE)
-#		ENDIF(FORCE_KLU_REBUILD)
-#	ENDIF(AUTOBUILD_KLU)
-#  else(SuiteSparse_FOUND)
-#	OPTION(AUTOBUILD_KLU "enable Suitesparse to automatically download and build" OFF)
-#	IF (AUTOBUILD_KLU)
-#		include(buildSuiteSparse)
-#		build_suitesparse()
-#		set(SuiteSparse_DIR ${PROJECT_BINARY_DIR}/libs)
-#		find_package(SuiteSparse COMPONENTS KLU AMD COLAMD BTF SUITESPARSECONFIG CXSPARSE)
-#	ENDIF(AUTOBUILD_KLU)
-#	if (SuiteSparse_FOUND)
-#	   list(APPEND external_library_list ${SuiteSparse_LIBRARIES})
-#	else()
-#		message( FATAL_ERROR "KLU not functional - support will not be provided")
-#		message( "Double check spelling specified libraries (search is case sensitive)")
-#	endif()
-# endif(SuiteSparse_FOUND)
-
-#endif(KLU_ENABLE)
+target_link_libraries(helics_fmi_base INTERFACE Boostlibs::core)
 
 # -------------------------------------------------------------
 # Sundials
 # -------------------------------------------------------------
 
 include(addSundials)
-# -------------------------------------------------------------
-# BOOST
-# -------------------------------------------------------------
 
-include(addBoost)
+# -------------------------------------------------------------
+# setting the RPATH
+# -------------------------------------------------------------
+# use, i.e. don't skip the full RPATH for the build tree
+set(CMAKE_SKIP_BUILD_RPATH  FALSE)
+
+# when building, don't use the install RPATH already (but later on when installing)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+
+set(CMAKE_MACOSX_RPATH ON)
+set(
+  CMAKE_BUILD_RPATH
+  "./;${AUTOBUILD_INSTALL_PATH}/bin;${AUTOBUILD_INSTALL_PATH}/lib;${AUTOBUILD_INSTALL_PATH}/lib64"
+)
+
+# add the automatically determined parts of the RPATH which point to directories outside
+# the build tree to the install RPATH
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+# the RPATH to be used when installing, but only if it's not a system directory
+list(
+  FIND
+    CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
+    "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}" isSystemDir
+)
+if("${isSystemDir}" STREQUAL "-1")
+  list(
+    APPEND
+      CMAKE_INSTALL_RPATH CMAKE_INSTALL_RPATH
+      "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}"
+  )
+endif()
+
+list(
+  FIND
+    CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
+    "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" isSystemDir
+)
+if("${isSystemDir}" STREQUAL "-1")
+    list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+endif()
+
+if(NOT Boost_USE_STATIC_LIBS)
+	list(APPEND CMAKE_INSTALL_RPATH ${Boost_LIBRARY_DIRS})
+	list(APPEND CMAKE_BUILD_RPATH ${Boost_LIBRARY_DIRS})
+endif()
+
+# add the local directory to the rpath
+list(APPEND CMAKE_INSTALL_RPATH "./")
+
 
 # -------------------------------------------------------------
 # global include directories
@@ -222,35 +231,6 @@ if(DOXYGEN_FOUND)
 endif(DOXYGEN_FOUND)
 endif (HELICS_FMI_GENERATE_DOXYGEN_DOC)
 
-
-include(GNUInstallDirs)
-
-# -------------------------------------------------------------
-# setting the RPATH
-# -------------------------------------------------------------
-# use, i.e. don't skip the full RPATH for the build tree
-SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
-
-# when building, don't use the install RPATH already
-# (but later on when installing)
-SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
-
-# add the automatically determined parts of the RPATH
-# which point to directories outside the build tree to the install RPATH
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
-
-# the RPATH to be used when installing, but only if it's not a system directory
-LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/bin" isSystemDir)
-IF("${isSystemDir}" STREQUAL "-1")
-   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
-ENDIF("${isSystemDir}" STREQUAL "-1")
-
-if (NOT Boost_USE_STATIC_LIBS)
-list(APPEND CMAKE_INSTALL_RPATH ${Boost_LIBRARY_DIRS})
-endif()
 
 # -------------------------------------------------------------
 # Enable HELICS executable
@@ -310,7 +290,9 @@ endif(BUILD_HELICS_FMI_TESTS)
 # -------------------------------------------------------------
 # CPack for NSIS Installer
 # -------------------------------------------------------------
+OPTION(ENABLE_PACKAGE_BUILD "Add projects for making packages and installers for HELICS" OFF)
 
+IF(ENABLE_PACKAGE_BUILD)
 set(CPACK_PACKAGE_NAME "HELICS-fmi")
 set(CPACK_PACKAGE_VENDOR "Lawrence Livermore National Security")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Helics-fmi Installer")
@@ -344,3 +326,5 @@ set(CPACK_SOURCE_IGNORE_FILES  "/Build*/;/build*/;/.git/")
 
 #THIS LINE MUST BE LAST
 include(CPack)
+
+ENDIF(ENABLE_PACKAGE_BUILD)

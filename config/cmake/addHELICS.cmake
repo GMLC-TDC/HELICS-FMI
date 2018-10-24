@@ -1,8 +1,11 @@
 
 IF (MSVC)
 	set(HELICS_PATH_HINTS
-		C:/local/helics_1_1_0)
+		C:/local/helics_2_0_0
+		)
 ENDIF(MSVC)
+
+include(GNUInstallDirs)
 
 SHOW_VARIABLE(HELICS_INSTALL_PATH PATH "path to the helics installation" "${PROJECT_BINARY_DIR}/libs")
 
@@ -11,9 +14,10 @@ set(HELICS_CMAKE_SUFFIXES
 	lib/cmake/HELICS/
 			cmake/HELICS/)
 	
-find_package(HELICS QUIET
+find_package(HELICS 2 QUIET
 	HINTS 
 		${HELICS_INSTALL_PATH}
+		$ENV{HELICS_INSTALL_PATH}
 		${HELICS_PATH_HINTS}
 	PATH_SUFFIXES ${HELICS_CMAKE_SUFFIXES}
 	)

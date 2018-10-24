@@ -23,15 +23,10 @@ add_executable(helics_fmi-tests ${helics_fmi_test_sources})
 
 set_target_properties (helics_fmi-tests PROPERTIES FOLDER tests)
 
-
-include_directories(SYSTEM ${Boost_INCLUDE_DIR})
-
 target_link_libraries(helics_fmi-tests HELICS::helics-static)
 
 target_link_libraries(helics_fmi-tests ${Boost_LIBRARIES_test})
-target_include_directories(helics_fmi-tests PRIVATE ${HELICS_INCLUDE_DIR})
 
-include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
