@@ -1,0 +1,51 @@
+dist: trusty
+language: cpp
+
+cache:
+  ccache: true
+  directories:
+    - dependencies
+
+env:
+  global:
+    - MAKEFLAGS="-j 2"
+    
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.9
+
+env:
+  - MATRIX_EVAL="COMPILER=gcc && CC=gcc-4.9 && CXX=g++-4.9"
+       
+branches:
+  except:
+    - gh-pages
+
+before_install:
+  - eval "${MATRIX_EVAL}"
+
+install:
+  - source scripts/install-ci-dependencies.sh
+
+  # Download and install the most recent development version of HELICS (2.0)
+  # The install path should not be cached by Travis, to ensure we are building against the latest version
+  # Install prefix folder must be created before running script
+  - mkdir ${TRAVIS_BUILD_DIR}/helics-prefix
+  - wget https://dl.bintray.com/helics/develop/HELICS_2_0/helics-install-$(uname -s).sh
+  - chmod 755 *.sh
+  - ./helics-install-Linux.sh --skip-license --prefix=${TRAVIS_BUILD_DIR}/helics-prefix
+  
+
+script:
+    # Print the HELICS version and ensure required shared libraries are found
+  - helics-prefix/bin/helics_broker --version
+  
+  - mkdir build && cd build
+  - cmake .. -DHELICS_INSTALL_PATH=${TRAVIS_BUILD_DIR}/helics-prefix -DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost -DBUILD_RELEASE_ONLY=ON
+  - make ${MAKEFLAGS}
+
+notifications:
+    email: false
