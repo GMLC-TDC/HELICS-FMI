@@ -96,7 +96,7 @@ build_minizip()
 endif()
 include(${PROJECT_BINARY_DIR}/libs/cmake/minizip-targets.cmake)
 
-target_link_libraries(utilities PUBLIC minizip::minizip zlib::zlib)
+target_link_libraries(utilities PUBLIC minizip::minizip zlib::zlib helics_fmi_base)
 
 INSTALL(TARGETS utilities
        LIBRARY DESTINATION lib
