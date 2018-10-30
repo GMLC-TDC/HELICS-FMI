@@ -16,18 +16,27 @@
 
 FmiModelExchangeFederate::FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj, const helics::FederateInfo &fi):me(std::move(obj)), fed(std::string(),fi)
 {
-    auto inputs = obj->getInputNames();
-    for (auto input : inputs)
-    {
-        subs.emplace_back(&fed, input);
-    }
+	if (me)
+	{
+        auto inputNames = me->getInputNames ();
+        for (auto input : inputNames)
+        {
+            inputs.emplace_back (&fed, input);
+        }
 
-    auto outputs = obj->getOutputNames();
-    for (auto output : outputs)
-    {
-        pubs.emplace_back(&fed, output, helics::helics_type_t::helicsDouble);
-    }
+        auto outputs = me->getOutputNames ();
+        for (auto output : outputs)
+        {
+            pubs.emplace_back (&fed, output, helics::helics_type_t::helicsDouble);
+        }
+	}
+    
 }
 
 
 FmiModelExchangeFederate::~FmiModelExchangeFederate() = default;
+
+void FmiModelExchangeFederate::run ()
+{
+		
+}

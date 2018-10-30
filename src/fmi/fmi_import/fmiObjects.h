@@ -83,30 +83,30 @@ public:
 		auto ref = info->getVariableInfo(param);
 		fmi2Status retval=fmi2Status::fmi2Discard;
 		T ret(0);
-		switch (ref.type.value())
+		switch (ref.type._value)
 		{
-			case fmi_variable_type_t::real:
+			case fmi_variable_type::real:
 			{
 				fmi2Real res;
 				retval=commonFunctions->fmi2GetReal(comp, &(ref.valueRef), 1, &res);
 				ret = T(res);
 			}
 			break;
-			case fmi_variable_type_t::integer:
+			case fmi_variable_type::integer:
 			{
 				fmi2Integer res;
 				retval=commonFunctions->fmi2GetInteger(comp, &(ref.valueRef), 1, &res);
 				ret = T(res);
 			}
 			break;
-			case fmi_variable_type_t::boolean:
+			case fmi_variable_type::boolean:
 			{
 				fmi2Boolean res;
 				retval=commonFunctions->fmi2GetBoolean(comp, &(ref.valueRef), 1, &res);
 				ret = T(res);
 			}
 			break;
-			case fmi_variable_type_t::enumeration:
+			case fmi_variable_type::enumeration:
 			{
 				fmi2Integer res;
 				retval=commonFunctions->fmi2GetInteger(comp, &(ref.valueRef), 1, &res);
@@ -143,27 +143,27 @@ public:
 
 		auto ref = info->getVariableInfo(param);
 		fmi2Status ret = fmi2Status::fmi2Discard;
-		switch (ref.type.value())
+		switch (ref.type._value)
 		{
-		case fmi_variable_type_t::real:
+		case fmi_variable_type::real:
 		{
 			fmi2Real val2 = static_cast<fmi2Real>(val);
 			ret=commonFunctions->fmi2SetReal(comp, &(ref.valueRef), 1, &val2);
 		}
 		break;
-		case fmi_variable_type_t::integer:
+		case fmi_variable_type::integer:
 		{
 			fmi2Integer val2 = static_cast<fmi2Integer>(val);
 			ret=commonFunctions->fmi2SetInteger(comp, &(ref.valueRef), 1, &val2);
 		}
 		break;
-		case fmi_variable_type_t::boolean:
+		case fmi_variable_type::boolean:
 		{
 			fmi2Boolean val2 = static_cast<fmi2Boolean>(val);
 			ret=commonFunctions->fmi2SetBoolean(comp, &(ref.valueRef), 1, &val2);
 		}
 		break;
-		case fmi_variable_type_t::enumeration:
+		case fmi_variable_type::enumeration:
 		{
 			fmi2Integer val2 = static_cast<fmi2Integer>(val);
 			ret=commonFunctions->fmi2SetInteger(comp, &(ref.valueRef), 1, &val2);

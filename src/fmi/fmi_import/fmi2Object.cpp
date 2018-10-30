@@ -425,7 +425,7 @@ std::vector<std::string> fmi2Object::getOutputNames() const
 	std::vector<std::string> oVec;
 	if (activeOutputs.getVRcount() == 0)
 	{
-		oVec=info->getVariableNames("outputs");
+		oVec=info->getVariableNames("output");
 	}
 	else
 	{
@@ -444,7 +444,7 @@ std::vector<std::string> fmi2Object::getInputNames() const
 	std::vector<std::string> oVec;
 	if (activeInputs.getVRcount() == 0)
 	{
-		oVec = info->getVariableNames("inputs");
+		oVec = info->getVariableNames("input");
 	}
 	else
 	{

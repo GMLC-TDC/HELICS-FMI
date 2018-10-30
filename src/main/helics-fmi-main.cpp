@@ -69,12 +69,13 @@ int main(int argc, char *argv[])
         {
             std::shared_ptr<fmi2CoSimObject> obj = fmi.createCoSimulationObject("obj1");
             auto fed = std::make_unique<FmiCoSimFederate>(obj, fi);
-            
+            fed->run ();
         }
         else
         {
             std::shared_ptr<fmi2ModelExchangeObject> obj = fmi.createModelExchangeObject("obj1");
             auto fed = std::make_unique<FmiModelExchangeFederate>(obj, fi);
+            fed->run ();
         }
 
     }
@@ -86,4 +87,6 @@ int main(int argc, char *argv[])
     {
 
     }
+
+
 }

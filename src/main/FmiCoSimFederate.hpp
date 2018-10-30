@@ -18,7 +18,7 @@
 #include "fmi_import/fmiObjects.h"
 
 #include "helics/application_api/Publications.hpp"
-#include "helics/application_api/Subscriptions.hpp"
+#include "helics/application_api/Inputs.hpp"
 
 /** class defining a co-simulation federate*/
 class FmiCoSimFederate
@@ -28,7 +28,8 @@ private:
     std::shared_ptr<fmi2CoSimObject> cs;   //!< the co-simulation object
 
     std::vector<helics::Publication> pubs; //!< known publications
-    std::vector<helics::Subscription> subs; //!< known subscriptions
+    std::vector<helics::Input> inputs; //!< known inputs
 public:
     FmiCoSimFederate(std::shared_ptr<fmi2CoSimObject> obj, const helics::FederateInfo &fi);
+  void run ();
 };
