@@ -1,7 +1,7 @@
 # LLNS Copyright Start
 # Copyright (c) 2017, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department 
-# of Energy by Lawrence Livermore National Laboratory in part under 
+# This work was performed under the auspices of the U.S. Department
+# of Energy by Lawrence Livermore National Laboratory in part under
 # Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
 # Produced at the Lawrence Livermore National Laboratory.
 # All rights reserved.
@@ -17,7 +17,7 @@ set(fmiImport_sources
 	fmi_import/fmiVariableSet.cpp
 	fmi_import/fmiEnumDefinitions.cpp
 	fmi_import/fmiLibraryManager.cpp
-	
+
 	)
 
 set(fmiImport_headers
@@ -42,5 +42,5 @@ ENDIF(UNIX)
 
 add_library(fmiLibrary ${fmiImport_sources} ${fmiImport_headers})
 
-target_link_libraries(fmiLibrary formatInterpreter utilities)
+target_link_libraries(fmiLibrary formatInterpreter utilities ${CMAKE_DL_LIBS})
 
