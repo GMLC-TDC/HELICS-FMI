@@ -171,6 +171,8 @@ public:
 	int loadFile(const std::string &xmlfile);
 	/** check if a given flag is set*/
 	bool checkFlag(fmuCapabilityFlags flag) const;
+
+	const fmuDefaultExpirement &getExperiment() const { return defaultExpirement; }
 	/** get the counts for various items in a fmu
 	@details
 	@param[in] countType the type of counts to get

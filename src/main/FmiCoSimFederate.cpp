@@ -55,4 +55,7 @@ void FmiCoSimFederate::run ()
         fed.enterExecutingMode ();
     }
     cs->setMode (fmuMode::stepMode);
+	
+	auto &def = cs->fmuInformation().getExperiment();
+	
 }

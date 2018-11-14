@@ -10,8 +10,6 @@
 * LLNS Copyright End
 */
 
-#ifndef _FMI_OBJECTS_H_
-#define _FMI_OBJECTS_H_
 #pragma once
 
 #include "fmiImport.h"
@@ -200,10 +198,12 @@ public:
 
 	fmiVariableSet getVariableSet(const std::string &variable) const;
 	fmiVariableSet getVariableSet(int index) const;
-	const fmiInfo *fmuInformation() const
+
+	const fmiInfo &fmuInformation() const
 	{
-		return info.get();
+		return *info;
 	}
+
 	int inputSize() const
 	{
 		return static_cast<int>(activeInputs.getVRcount());
@@ -341,4 +341,3 @@ private:
 	std::shared_ptr<const fmiCoSimFunctions> CoSimFunctions;
 	bool stepPending;
 };
-#endif
