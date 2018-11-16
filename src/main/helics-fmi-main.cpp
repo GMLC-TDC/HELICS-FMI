@@ -23,7 +23,7 @@ namespace filesystem = boost::filesystem;
 
 static const utilities::ArgDescriptors fmiArgs{
   {"stop", "the time to stop the fmi"},
-  {"integrator", "the type of integrator to use (cvode,arkode,boost"},
+  {"integrator", "the type of integrator to use (cvode,arkode,boost)"},
   {"step", "the step size to use (specified in seconds or as a time string (10ms)"},
   {"stop", "the stop time to use (specified in seconds or as a time string (10ms)"},
   {"integrator-args", "arguments to pass to the integrator"}};
@@ -70,13 +70,13 @@ int main (int argc, char *argv[])
         {
             std::shared_ptr<fmi2CoSimObject> obj = fmi.createCoSimulationObject ("obj1");
             auto fed = std::make_unique<FmiCoSimFederate> (obj, fi);
-            fed->run ();
+            fed->run (helics::timeZero,helics::timeZero);
         }
         else
         {
             std::shared_ptr<fmi2ModelExchangeObject> obj = fmi.createModelExchangeObject ("obj1");
             auto fed = std::make_unique<FmiModelExchangeFederate> (obj, fi);
-            fed->run ();
+            fed->run (helics::timeZero, helics::timeZero);
         }
     }
     else if ((ext == ".json") || (ext == ".JSON"))

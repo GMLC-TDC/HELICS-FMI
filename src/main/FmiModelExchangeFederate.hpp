@@ -28,8 +28,7 @@ public:
     FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj, const helics::FederateInfo &fi);
     ~FmiModelExchangeFederate();
 
-	void run ();
-
+	void run(helics::Time step, helics::Time stop);
   private:
     helics::ValueFederate fed;  //!< the federate
     std::shared_ptr<fmi2ModelExchangeObject> me;   //!< the model exchange object
