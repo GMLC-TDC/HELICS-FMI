@@ -36,7 +36,7 @@ FmiModelExchangeFederate::FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExch
 
 FmiModelExchangeFederate::~FmiModelExchangeFederate() = default;
 
-void FmiModelExchangeFederate::run ()
+void FmiModelExchangeFederate::run (helics::Time step, helics::Time stop)
 {
 		
 }

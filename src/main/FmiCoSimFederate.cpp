@@ -32,7 +32,7 @@ FmiCoSimFederate::FmiCoSimFederate (std::shared_ptr<fmi2CoSimObject> obj, const 
     }
 }
 
-void FmiCoSimFederate::run ()
+void FmiCoSimFederate::run (helics::Time step, helics::Time stop)
 {
     fed.enterInitializingMode ();
     cs->setMode (fmuMode::initializationMode);
@@ -57,5 +57,9 @@ void FmiCoSimFederate::run ()
     cs->setMode (fmuMode::stepMode);
 	
 	auto &def = cs->fmuInformation().getExperiment();
+	if (step>=helics::timeZero)
+	{
+
+	}
 	
 }

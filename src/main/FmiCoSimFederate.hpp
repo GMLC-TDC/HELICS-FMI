@@ -31,5 +31,5 @@ private:
     std::vector<helics::Input> inputs; //!< known inputs
 public:
     FmiCoSimFederate(std::shared_ptr<fmi2CoSimObject> obj, const helics::FederateInfo &fi);
-  void run ();
+  void run (helics::Time step, helics::Time stop);
 };
