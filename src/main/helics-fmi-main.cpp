@@ -10,9 +10,9 @@
  * LLNS Copyright End
  */
 
-#include "FmiCoSimFederate.hpp"
-#include "FmiModelExchangeFederate.hpp"
-#include "fmi_import/fmiImport.h"
+#include "helicsFMI/FmiCoSimFederate.hpp"
+#include "helicsFMI/FmiModelExchangeFederate.hpp"
+#include "fmi/fmi_import/fmiImport.h"
 #include "helics-fmi/helics-fmi-config.h"
 #include "helics/core/helicsVersion.hpp"
 #include "utilities/argParser.h"

@@ -215,6 +215,17 @@ add_subdirectory(src/utilities)
 
 add_subdirectory(src/fmi)
 
+# -------------------------------------------------------------
+# Enable HELICS executable
+# -------------------------------------------------------------
+
+SHOW_VARIABLE(HELICS_INSTALL_PATH PATH "path to the helics installation" "${PROJECT_BINARY_DIR}/libs")
+
+include(addHELICS)
+
+
+add_subdirectory(src/helicsFMI)
+
 option (HELICS_FMI_GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)
 
 IF (HELICS_FMI_GENERATE_DOXYGEN_DOC)
@@ -230,15 +241,6 @@ if(DOXYGEN_FOUND)
 )
 endif(DOXYGEN_FOUND)
 endif (HELICS_FMI_GENERATE_DOXYGEN_DOC)
-
-
-# -------------------------------------------------------------
-# Enable HELICS executable
-# -------------------------------------------------------------
-
-SHOW_VARIABLE(HELICS_INSTALL_PATH PATH "path to the helics installation" "${PROJECT_BINARY_DIR}/libs")
-
-include(addHELICS)
 
 
 FILE(GLOB KEY_LIBRARY_FILES  ${PROJECT_BINARY_DIR}/libs/bin/*)

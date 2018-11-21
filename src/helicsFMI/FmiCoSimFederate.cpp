@@ -63,6 +63,7 @@ void FmiCoSimFederate::run (helics::Time step, helics::Time stop)
 		}
 	}
 	fed.setTimeProperty(helics_property_time_period, step);
+	
     fed.enterInitializingMode ();
     cs->setMode (fmuMode::initializationMode);
     std::vector<fmi2Real> outputs (pubs.size ());
@@ -72,7 +73,11 @@ void FmiCoSimFederate::run (helics::Time step, helics::Time stop)
     {
         pubs[ii].publish (outputs[ii]);
     }
-
+	cs->getCurrentInputs(inp.data());
+	for (int ii = 0; ii < inputs.size(); ++ii)
+	{
+		inp[ii] = inputs[ii].setDefault(inp[ii]);
+	}
     auto result = fed.enterExecutingMode (helics::iteration_request::iterate_if_needed);
     if (result == helics::iteration_result::iterating)
     {

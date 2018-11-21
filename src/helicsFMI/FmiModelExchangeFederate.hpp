@@ -13,8 +13,8 @@
 
 #include <memory>
 #include "helics/application_api/ValueFederate.hpp"
-#include "fmi_import/fmiImport.h"
-#include "fmi_import/fmiObjects.h"
+#include "fmi/fmi_import/fmiImport.h"
+#include "fmi/fmi_import/fmiObjects.h"
 
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Inputs.hpp"
