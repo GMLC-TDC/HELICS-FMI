@@ -14,7 +14,7 @@
 
 static const std::string nullStr = std::string ("");
 
-jsonElement::jsonElement (Json_gd::Value vElement, std::string newName)
+jsonElement::jsonElement (helics_fmi::Json::Value vElement, std::string newName)
     : name (std::move (newName)), element (std::move (vElement))
 {
     elementIndex = 0;
@@ -32,7 +32,7 @@ jsonElement::jsonElement (Json_gd::Value vElement, std::string newName)
 
 void jsonElement::clear ()
 {
-    element = Json_gd::nullValue;
+    element = helics_fmi::Json::nullValue;
     elementIndex = 0;
     arrayIndex = 0;
     arraytype = false;

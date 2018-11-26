@@ -275,7 +275,7 @@ license you like.
 
 #endif // if !defined(JSON_IS_AMALGAMATION)
 
-namespace Json_helics {
+namespace helics_fmi { namespace Json {
 typedef int Int;
 typedef unsigned int UInt;
 #if defined(JSON_NO_INT64)
@@ -296,10 +296,10 @@ typedef UInt64 LargestUInt;
 #define JSON_HAS_INT64
 #endif // if defined(JSON_NO_INT64)
 #if JSONCPP_USING_SECURE_MEMORY
-#define JSONCPP_STRING        std::basic_string<char, std::char_traits<char>, Json_helics::SecureAllocator<char> >
-#define JSONCPP_OSTRINGSTREAM std::basic_ostringstream<char, std::char_traits<char>, Json_helics::SecureAllocator<char> >
+#define JSONCPP_STRING        std::basic_string<char, std::char_traits<char>, Json::SecureAllocator<char> >
+#define JSONCPP_OSTRINGSTREAM std::basic_ostringstream<char, std::char_traits<char>, Json::SecureAllocator<char> >
 #define JSONCPP_OSTREAM       std::basic_ostream<char, std::char_traits<char>>
-#define JSONCPP_ISTRINGSTREAM std::basic_istringstream<char, std::char_traits<char>, Json_helics::SecureAllocator<char> >
+#define JSONCPP_ISTRINGSTREAM std::basic_istringstream<char, std::char_traits<char>, Json::SecureAllocator<char> >
 #define JSONCPP_ISTREAM       std::istream
 #else
 #define JSONCPP_STRING        std::string
@@ -308,7 +308,8 @@ typedef UInt64 LargestUInt;
 #define JSONCPP_ISTRINGSTREAM std::istringstream
 #define JSONCPP_ISTREAM       std::istream
 #endif // if JSONCPP_USING_SECURE_MEMORY
-} // end namespace Json_helics
+} // end namespace Json
+} // namespace helics_fmi
 
 #endif // JSON_CONFIG_H_INCLUDED
 
@@ -337,7 +338,8 @@ typedef UInt64 LargestUInt;
 #include "config.h"
 #endif // if !defined(JSON_IS_AMALGAMATION)
 
-namespace Json_helics {
+namespace helics_fmi {
+	namespace Json {
 
 // writer.h
 class FastWriter;
@@ -359,8 +361,8 @@ class ValueIteratorBase;
 class ValueIterator;
 class ValueConstIterator;
 
-} // namespace Json_helics
-
+} // namespace Json
+} // namespace helics_fmi
 #endif // JSON_FORWARDS_H_INCLUDED
 
 // //////////////////////////////////////////////////////////////////////
@@ -390,7 +392,8 @@ class ValueConstIterator;
 
 #pragma pack(push, 8)
 
-namespace Json_helics {
+namespace helics_fmi { 
+	namespace Json {
 
 /** \brief Configuration passed to reader and writer.
  * This configuration object can be used to force the Reader or Writer
@@ -432,8 +435,8 @@ public:
   bool allowNumericKeys_;
 };
 
-} // namespace Json_helics
-
+} // namespace Json
+} // namespace helics_fmi
 #pragma pack(pop)
 
 #endif // CPPTL_JSON_FEATURES_H_INCLUDED
@@ -499,7 +502,8 @@ public:
 
 /** \brief JSON (JavaScript Object Notation).
  */
-namespace Json_helics {
+namespace helics_fmi {
+	namespace Json {
 
 /** Base class for all exceptions we throw.
  *
@@ -518,7 +522,7 @@ protected:
  *
  * E.g. out-of-memory (when we use malloc), stack-overflow, malicious input
  *
- * \remark derived from Json_helics::Exception
+ * \remark derived from Json::Exception
  */
 class JSON_API RuntimeError : public Exception {
 public:
@@ -529,7 +533,7 @@ public:
  *
  * These are precondition-violations (user bugs) and internal errors (our bugs).
  *
- * \remark derived from Json_helics::Exception
+ * \remark derived from Json::Exception
  */
 class JSON_API LogicError : public Exception {
 public:
@@ -582,8 +586,8 @@ enum PrecisionType {
  *
  * Example of usage:
  * \code
- * Json_helics::Value aValue( StaticString("some text") );
- * Json_helics::Value object;
+ * Json::Value aValue( StaticString("some text") );
+ * Json::Value object;
  * static const StaticString code("code");
  * object[code] = 1234;
  * \endcode
@@ -640,15 +644,15 @@ public:
   typedef std::vector<JSONCPP_STRING> Members;
   typedef ValueIterator iterator;
   typedef ValueConstIterator const_iterator;
-  typedef Json_helics::UInt UInt;
-  typedef Json_helics::Int Int;
+  typedef Json::UInt UInt;
+  typedef Json::Int Int;
 #if defined(JSON_HAS_INT64)
-  typedef Json_helics::UInt64 UInt64;
-  typedef Json_helics::Int64 Int64;
+  typedef Json::UInt64 UInt64;
+  typedef Json::Int64 Int64;
 #endif // defined(JSON_HAS_INT64)
-  typedef Json_helics::LargestInt LargestInt;
-  typedef Json_helics::LargestUInt LargestUInt;
-  typedef Json_helics::ArrayIndex ArrayIndex;
+  typedef Json::LargestInt LargestInt;
+  typedef Json::LargestUInt LargestUInt;
+  typedef Json::ArrayIndex ArrayIndex;
 
   // Required for boost integration, e. g. BOOST_TEST
   typedef std::string value_type;
@@ -657,26 +661,26 @@ public:
   static const Value& nullRef;  ///< just a kludge for binary-compatibility; same as null
   static Value const& nullSingleton(); ///< Prefer this to null or nullRef.
 
-  /// Minimum signed integer value that can be stored in a Json_helics::Value.
+  /// Minimum signed integer value that can be stored in a Json::Value.
   static const LargestInt minLargestInt;
-  /// Maximum signed integer value that can be stored in a Json_helics::Value.
+  /// Maximum signed integer value that can be stored in a Json::Value.
   static const LargestInt maxLargestInt;
-  /// Maximum unsigned integer value that can be stored in a Json_helics::Value.
+  /// Maximum unsigned integer value that can be stored in a Json::Value.
   static const LargestUInt maxLargestUInt;
 
-  /// Minimum signed int value that can be stored in a Json_helics::Value.
+  /// Minimum signed int value that can be stored in a Json::Value.
   static const Int minInt;
-  /// Maximum signed int value that can be stored in a Json_helics::Value.
+  /// Maximum signed int value that can be stored in a Json::Value.
   static const Int maxInt;
-  /// Maximum unsigned int value that can be stored in a Json_helics::Value.
+  /// Maximum unsigned int value that can be stored in a Json::Value.
   static const UInt maxUInt;
 
 #if defined(JSON_HAS_INT64)
-  /// Minimum signed 64 bits int value that can be stored in a Json_helics::Value.
+  /// Minimum signed 64 bits int value that can be stored in a Json::Value.
   static const Int64 minInt64;
-  /// Maximum signed 64 bits int value that can be stored in a Json_helics::Value.
+  /// Maximum signed 64 bits int value that can be stored in a Json::Value.
   static const Int64 maxInt64;
-  /// Maximum unsigned 64 bits int value that can be stored in a Json_helics::Value.
+  /// Maximum unsigned 64 bits int value that can be stored in a Json::Value.
   static const UInt64 maxUInt64;
 #endif // defined(JSON_HAS_INT64)
 
@@ -754,9 +758,9 @@ This is useful since clear() and resize() will not alter types.
 
     Examples:
 \code
-Json_helics::Value null_value; // null
-Json_helics::Value arr_value(Json_helics::arrayValue); // []
-Json_helics::Value obj_value(Json_helics::objectValue); // {}
+Json::Value null_value; // null
+Json::Value arr_value(Json::arrayValue); // []
+Json::Value obj_value(Json::objectValue); // {}
 \endcode
   */
   Value(ValueType type = nullValue);
@@ -781,7 +785,7 @@ Json_helics::Value obj_value(Json_helics::objectValue); // {}
    * Example of usage:
    * \code
    * static StaticString foo("some text");
-   * Json_helics::Value aValue(foo);
+   * Json::Value aValue(foo);
    * \endcode
    */
   Value(const StaticString& value);
@@ -947,7 +951,7 @@ Json_helics::Value obj_value(Json_helics::objectValue); // {}
    * the new entry is not duplicated.
    * Example of use:
    * \code
-   * Json_helics::Value object;
+   * Json::Value object;
    * static const StaticString code("code");
    * object[code] = 1234;
    * \endcode
@@ -1345,8 +1349,8 @@ public:
 
 inline void swap(Value& a, Value& b) { a.swap(b); }
 
-} // namespace Json_helics
-
+} // namespace Json
+} // namespace helics_fmi
 #pragma pack(pop)
 
 #if defined(JSONCPP_DISABLE_DLL_INTERFACE_WARNING)
@@ -1395,7 +1399,8 @@ inline void swap(Value& a, Value& b) { a.swap(b); }
 
 #pragma pack(push, 8)
 
-namespace Json_helics {
+namespace helics_fmi {
+	namespace Json {
 
 /** \brief Unserialize a <a HREF="http://www.json.org">JSON</a> document into a
  *Value.
@@ -1472,7 +1477,7 @@ public:
              bool collectComments = true);
 
   /// \brief Parse from input stream.
-  /// \see Json_helics::operator>>(std::istream&, Json_helics::Value&).
+  /// \see Json::operator>>(std::istream&, Json::Value&).
   bool parse(JSONCPP_ISTREAM& is, Value& root, bool collectComments = true);
 
   /** \brief Returns a user friendly string that list errors in the parsed
@@ -1659,7 +1664,7 @@ public:
 
 Usage:
 \code
-  using namespace Json_helics;
+  using namespace Json;
   CharReaderBuilder builder;
   builder["collectComments"] = false;
   Value value;
@@ -1669,7 +1674,7 @@ Usage:
 */
 class JSON_API CharReaderBuilder : public CharReader::Factory {
 public:
-  // Note: We use a Json_helics::Value so that we can add data-members to this class
+  // Note: We use a Json::Value so that we can add data-members to this class
   // without a major version bump.
   /** Configuration of this builder.
     These are case-sensitive.
@@ -1707,7 +1712,7 @@ public:
     JSON Value.
     \sa setDefaults()
     */
-  Json_helics::Value settings_;
+  Json::Value settings_;
 
   CharReaderBuilder();
   ~CharReaderBuilder() JSONCPP_OVERRIDE;
@@ -1717,24 +1722,24 @@ public:
   /** \return true if 'settings' are legal and consistent;
    *   otherwise, indicate bad settings via 'invalid'.
    */
-  bool validate(Json_helics::Value* invalid) const;
+  bool validate(Json::Value* invalid) const;
 
   /** A simple way to update a specific setting.
    */
   Value& operator[](JSONCPP_STRING key);
 
   /** Called by ctor, but you can use this to reset settings_.
-   * \pre 'settings' != NULL (but Json_helics::null is fine)
+   * \pre 'settings' != NULL (but Json::null is fine)
    * \remark Defaults:
    * \snippet src/lib_json/json_reader.cpp CharReaderBuilderDefaults
    */
-  static void setDefaults(Json_helics::Value* settings);
+  static void setDefaults(Json::Value* settings);
   /** Same as old Features::strictMode().
-   * \pre 'settings' != NULL (but Json_helics::null is fine)
+   * \pre 'settings' != NULL (but Json::null is fine)
    * \remark Defaults:
    * \snippet src/lib_json/json_reader.cpp CharReaderBuilderStrictMode
    */
-  static void strictMode(Json_helics::Value* settings);
+  static void strictMode(Json::Value* settings);
 };
 
 /** Consume entire stream and use its begin/end.
@@ -1753,7 +1758,7 @@ bool JSON_API parseFromStream(
  This can be used to read a file into a particular sub-object.
  For example:
  \code
- Json_helics::Value root;
+ Json::Value root;
  cin >> root["dir"]["file"];
  cout << root;
  \endcode
@@ -1768,12 +1773,12 @@ bool JSON_API parseFromStream(
  }
  \endverbatim
  \throw std::exception on parse error.
- \see Json_helics::operator<<()
+ \see Json::operator<<()
 */
 JSON_API JSONCPP_ISTREAM& operator>>(JSONCPP_ISTREAM&, Value&);
 
-} // namespace Json_helics
-
+} // namespace Json
+} // namespace helics_fmi
 #pragma pack(pop)
 
 #if defined(JSONCPP_DISABLE_DLL_INTERFACE_WARNING)
@@ -1819,7 +1824,8 @@ JSON_API JSONCPP_ISTREAM& operator>>(JSONCPP_ISTREAM&, Value&);
 
 #pragma pack(push, 8)
 
-namespace Json_helics {
+namespace helics_fmi { 
+	namespace Json {
 
 class Value;
 
@@ -1827,7 +1833,7 @@ class Value;
 
 Usage:
 \code
-  using namespace Json_helics;
+  using namespace Json;
   void writeToStdout(StreamWriter::Factory const& factory, Value const& value) {
     std::unique_ptr<StreamWriter> const writer(
       factory.newStreamWriter());
@@ -1872,12 +1878,12 @@ JSONCPP_STRING JSON_API writeString(StreamWriter::Factory const& factory, Value 
 
 Usage:
 \code
-  using namespace Json_helics;
+  using namespace Json;
   Value value = ...;
   StreamWriterBuilder builder;
   builder["commentStyle"] = "None";
   builder["indentation"] = "   ";  // or whatever you like
-  std::unique_ptr<Json_helics::StreamWriter> writer(
+  std::unique_ptr<Json::StreamWriter> writer(
       builder.newStreamWriter());
   writer->write(value, &std::cout);
   std::cout << std::endl;  // add lf and flush
@@ -1885,7 +1891,7 @@ Usage:
 */
 class JSON_API StreamWriterBuilder : public StreamWriter::Factory {
 public:
-  // Note: We use a Json_helics::Value so that we can add data-members to this class
+  // Note: We use a Json::Value so that we can add data-members to this class
   // without a major version bump.
   /** Configuration of this builder.
     Available settings (case-sensitive):
@@ -1913,7 +1919,7 @@ public:
     JSON Value.
     \sa setDefaults()
     */
-  Json_helics::Value settings_;
+  Json::Value settings_;
 
   StreamWriterBuilder();
   ~StreamWriterBuilder() JSONCPP_OVERRIDE;
@@ -1926,17 +1932,17 @@ public:
   /** \return true if 'settings' are legal and consistent;
    *   otherwise, indicate bad settings via 'invalid'.
    */
-  bool validate(Json_helics::Value* invalid) const;
+  bool validate(Json::Value* invalid) const;
   /** A simple way to update a specific setting.
    */
   Value& operator[](JSONCPP_STRING key);
 
   /** Called by ctor, but you can use this to reset settings_.
-   * \pre 'settings' != NULL (but Json_helics::null is fine)
+   * \pre 'settings' != NULL (but Json::null is fine)
    * \remark Defaults:
    * \snippet src/lib_json/json_writer.cpp StreamWriterBuilderDefaults
    */
-  static void setDefaults(Json_helics::Value* settings);
+  static void setDefaults(Json::Value* settings);
 };
 
 /** \brief Abstract class for writers.
@@ -2146,11 +2152,11 @@ JSONCPP_STRING JSON_API valueToString(bool value);
 JSONCPP_STRING JSON_API valueToQuotedString(const char* value);
 
 /// \brief Output using the StyledStreamWriter.
-/// \see Json_helics::operator>>()
+/// \see Json::operator>>()
 JSON_API JSONCPP_OSTREAM& operator<<(JSONCPP_OSTREAM&, const Value& root);
 
-} // namespace Json_helics
-
+} // namespace Json
+} // namespace helics_fmi
 #pragma pack(pop)
 
 #if defined(JSONCPP_DISABLE_DLL_INTERFACE_WARNING)
@@ -2195,12 +2201,12 @@ JSON_API JSONCPP_OSTREAM& operator<<(JSONCPP_OSTREAM&, const Value& root);
 
 // @todo <= add detail about condition in exception
 # define JSON_ASSERT(condition)                                                \
-  {if (!(condition)) {Json_helics::throwLogicError( "assert json failed" );}}
+  {if (!(condition)) {Json::throwLogicError( "assert json failed" );}}
 
 # define JSON_FAIL_MESSAGE(message)                                            \
   {                                                                            \
     JSONCPP_OSTRINGSTREAM oss; oss << message;                                    \
-    Json_helics::throwLogicError(oss.str());                                          \
+    Json::throwLogicError(oss.str());                                          \
     abort();                                                                   \
   }
 

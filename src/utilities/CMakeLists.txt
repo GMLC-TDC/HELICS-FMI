@@ -69,6 +69,7 @@ set(utilities_headers
 	indexTypes.hpp
 	logger.h
 	stringToCmdLine.h
+	factoryTemplates.hpp
 	)
 
 add_library(utilities STATIC ${utilities_sources} ${utilities_headers})

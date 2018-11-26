@@ -12,13 +12,13 @@ set(
     solver_headers
    solverInterface.h
     sundialsInterface.h
-
     sundialsMatrixData.h
     basicOdeSolver.h
     solverMode.hpp
 	cvodeInterface.h
 	arkodeInterface.h
 	solver_definitions.hpp
+	SolvableObject.hpp
 )
 
 set(

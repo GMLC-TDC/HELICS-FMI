@@ -12,9 +12,10 @@
 
 #pragma once
 
-#include "core/helperObject.h"
-#include "griddyn/gridComponentHelperClasses.h"
-
+#include "helperObject.h"
+#include "solverMode.hpp"
+#include "solver_definitions.hpp"
+#include "SolvableObject.hpp"
 #include <exception>
 #include <memory>
 #include <vector>
@@ -26,8 +27,6 @@ enum class solver_print_level
     s_error_log = 1,
     s_error_trap = 0,
 };
-
-class gridDynSimulation;
 
 /** error class for throwing solver exceptions*/
 class solverException : public std::exception
@@ -141,7 +140,7 @@ class SolverInterface : public helperObject
     coreTime solveTime = negTime;  //!< storage for the time the solver is called
     std::string jacFile;  //!< the file to write the Jacobian to
     std::string stateFile;  //!< the file to write the state and residual to
-    gridDynSimulation *m_gds = nullptr;  //!< pointer the gridDynSimulation object used
+    SolvableObject *sobj = nullptr;  //!< pointer the gridDynSimulation object used
     count_t svsize = 0;  //!< the state size
     count_t nnz = 0;  //!< the actual number of non-zeros in a Jacobian
     std::bitset<32> flags;  //!< flags for the solver

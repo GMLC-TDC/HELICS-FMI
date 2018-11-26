@@ -10,13 +10,11 @@
  * LLNS Copyright End
  */
 
-#include "../gridDynSimulation.h"
+#include "SolvableObject.hpp"
 #include "basicOdeSolver.h"
-#include "basicSolver.h"
-#include "core/coreExceptions.h"
-#include "core/factoryTemplates.hpp"
-#include "idaInterface.h"
-#include "kinsolInterface.h"
+
+#include "utilities/factoryTemplates.hpp"
+
 #include "utilities/mapOps.hpp"
 #include "utilities/stringConversion.h"
 #include <iostream>
@@ -26,18 +24,10 @@ namespace griddyn
 {
 namespace solvers
 {
-static childClassFactoryArg<basicSolver, SolverInterface, basicSolver::mode_t>
-  basicFactoryG (stringVec{"basic", "gauss"}, basicSolver::mode_t::gauss);
-static childClassFactoryArg<basicSolver, SolverInterface, basicSolver::mode_t>
-  basicFactoryGS (stringVec{"gs", "gauss-seidel"}, basicSolver::mode_t::gauss_seidel);
-#ifdef LOAD_CVODE
-static childClassFactory<basicOdeSolver, SolverInterface> basicOdeFactory (stringVec{"basicode", "euler"});
-#else
-// if cvode is not available this becomes the default differential solver
-static childClassFactory<basicOdeSolver, solverInterface>
-  basicOdeFactory (stringVec{"basicode", "dyndiff", "differential"});
 
-#endif
+// if cvode is not available this becomes the default differential solver
+static childClassFactory<basicOdeSolver, SolverInterface>
+  basicOdeFactory (stringVec{"basicode", "dyndiff", "differential"});
 
 }  // namespace solvers
 SolverInterface::SolverInterface (const std::string &objName) : helperObject (objName) {}

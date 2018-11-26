@@ -107,8 +107,7 @@ license you like.
  *
  * It is an internal header that must not be exposed.
  */
-
-namespace Json_helics {
+namespace helics_fmi{ namespace Json {
 static char getDecimalPoint() {
 #ifdef JSONCPP_NO_LOCALE_SUPPORT
   return '\0';
@@ -209,8 +208,8 @@ static inline void fixZerosInTheEnd(char* begin, char* end) {
   }
 }
 
-} // namespace Json_helics {
-
+} // namespace Json \n 
+} // namespace helics_fmi {
 #endif // LIB_JSONCPP_JSON_TOOL_H_INCLUDED
 
 // //////////////////////////////////////////////////////////////////////
@@ -283,7 +282,8 @@ static inline void fixZerosInTheEnd(char* begin, char* end) {
 
 static size_t const stackLimit_g = JSONCPP_DEPRECATED_STACK_LIMIT; // see readValue()
 
-namespace Json_helics {
+namespace helics_fmi{
+	namespace Json {
 
 #if __cplusplus >= 201103L || (defined(_CPPLIB_VER) && _CPPLIB_VER >= 520)
 typedef std::unique_ptr<CharReader> CharReaderPtr;
@@ -2208,11 +2208,11 @@ static void getValidReaderKeys(std::set<JSONCPP_STRING>* valid_keys)
   valid_keys->insert("rejectDupKeys");
   valid_keys->insert("allowSpecialFloats");
 }
-bool CharReaderBuilder::validate(Json_helics::Value* invalid) const
+bool CharReaderBuilder::validate(Json::Value* invalid) const
 {
-  Json_helics::Value my_invalid;
+  Json::Value my_invalid;
   if (!invalid) invalid = &my_invalid;  // so we do not need to test for NULL
-  Json_helics::Value& inv = *invalid;
+  Json::Value& inv = *invalid;
   std::set<JSONCPP_STRING> valid_keys;
   getValidReaderKeys(&valid_keys);
   Value::Members keys = settings_.getMemberNames();
@@ -2230,7 +2230,7 @@ Value& CharReaderBuilder::operator[](JSONCPP_STRING key)
   return settings_[key];
 }
 // static
-void CharReaderBuilder::strictMode(Json_helics::Value* settings)
+void CharReaderBuilder::strictMode(Json::Value* settings)
 {
 //! [CharReaderBuilderStrictMode]
   (*settings)["allowComments"] = false;
@@ -2245,7 +2245,7 @@ void CharReaderBuilder::strictMode(Json_helics::Value* settings)
 //! [CharReaderBuilderStrictMode]
 }
 // static
-void CharReaderBuilder::setDefaults(Json_helics::Value* settings)
+void CharReaderBuilder::setDefaults(Json::Value* settings)
 {
 //! [CharReaderBuilderDefaults]
   (*settings)["collectComments"] = true;
@@ -2288,7 +2288,8 @@ JSONCPP_ISTREAM& operator>>(JSONCPP_ISTREAM& sin, Value& root) {
   return sin;
 }
 
-} // namespace Json_helics
+} // namespace Json
+} // namespace helics_fmi
 
 // //////////////////////////////////////////////////////////////////////
 // End of content of file: src/lib_json/json_reader.cpp
@@ -2309,8 +2310,8 @@ JSONCPP_ISTREAM& operator>>(JSONCPP_ISTREAM& sin, Value& root) {
 // See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
 
 // included by json_value.cpp
-
-namespace Json_helics {
+namespace helics_fmi{ 
+	namespace Json {
 
 // //////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////
@@ -2469,7 +2470,8 @@ ValueIterator& ValueIterator::operator=(const SelfType& other) {
   return *this;
 }
 
-} // namespace Json_helics
+} // namespace Json
+} // namespace helics_fmi
 
 // //////////////////////////////////////////////////////////////////////
 // End of content of file: src/lib_json/json_valueiterator.inl
@@ -2511,8 +2513,8 @@ ValueIterator& ValueIterator::operator=(const SelfType& other) {
 #endif
 
 #define JSON_ASSERT_UNREACHABLE assert(false)
-
-namespace Json_helics {
+namespace helics_fmi{ 
+	namespace Json {
 
 // This is a walkaround to avoid the static initialization of Value::null.
 // kNull must be word-aligned to avoid crashing on ARM.  We use an alignment of
@@ -2566,7 +2568,7 @@ static inline bool InRange(double d, T min, U max) {
   return d >= min && d <= max;
 }
 #else  // if !defined(JSON_USE_INT64_DOUBLE_CONVERSION)
-static inline double integerToDouble(Json_helics::UInt64 value) {
+static inline double integerToDouble(Json::UInt64 value) {
   return static_cast<double>(Int64(value / 2)) * 2.0 + static_cast<double>(Int64(value & 1));
 }
 
@@ -2598,7 +2600,7 @@ static inline char* duplicateStringValue(const char* value,
   char* newString = static_cast<char*>(malloc(length + 1));
   if (newString == NULL) {
     throwRuntimeError(
-        "in Json_helics::Value::duplicateStringValue(): "
+        "in Json::Value::duplicateStringValue(): "
         "Failed to allocate string value buffer");
   }
   memcpy(newString, value, length);
@@ -2615,13 +2617,13 @@ static inline char* duplicateAndPrefixStringValue(
   // Avoid an integer overflow in the call to malloc below by limiting length
   // to a sane value.
   JSON_ASSERT_MESSAGE(length <= static_cast<unsigned>(Value::maxInt) - sizeof(unsigned) - 1U,
-                      "in Json_helics::Value::duplicateAndPrefixStringValue(): "
+                      "in Json::Value::duplicateAndPrefixStringValue(): "
                       "length too big for prefixing");
   unsigned actualLength = length + static_cast<unsigned>(sizeof(unsigned)) + 1U;
   char* newString = static_cast<char*>(malloc(actualLength));
   if (newString == 0) {
     throwRuntimeError(
-        "in Json_helics::Value::duplicateAndPrefixStringValue(): "
+        "in Json::Value::duplicateAndPrefixStringValue(): "
         "Failed to allocate string value buffer");
   }
   *reinterpret_cast<unsigned*>(newString) = length;
@@ -2667,7 +2669,8 @@ static inline void releaseStringValue(char* value, unsigned) {
 }
 #endif // JSONCPP_USING_SECURE_MEMORY
 
-} // namespace Json_helics
+} // namespace Json
+} // namespace helics_fmi
 
 // //////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////
@@ -2680,8 +2683,8 @@ static inline void releaseStringValue(char* value, unsigned) {
 
 #include "json_valueiterator.inl"
 #endif // if !defined(JSON_IS_AMALGAMATION)
-
-namespace Json_helics {
+namespace helics_fmi{ 
+	namespace Json {
 
 Exception::Exception(JSONCPP_STRING const& msg)
   : msg_(msg)
@@ -2731,7 +2734,7 @@ void Value::CommentInfo::setComment(const char* text, size_t len) {
   JSON_ASSERT(text != 0);
   JSON_ASSERT_MESSAGE(
       text[0] == '\0' || text[0] == '/',
-      "in Json_helics::Value::setComment(): Comments must start with /");
+      "in Json::Value::setComment(): Comments must start with /");
   // It seems that /**/ style comments are acceptable as well.
   comment_ = duplicateStringValue(text, len);
 }
@@ -3054,7 +3057,7 @@ bool Value::operator>(const Value& other) const { return other < *this; }
 bool Value::operator==(const Value& other) const {
   // if ( type_ != other.type_ )
   // GCC 2.95.3 says:
-  // attempt to take address of bit-field structure member `Json_helics::Value::type_'
+  // attempt to take address of bit-field structure member `Json::Value::type_'
   // Beats me, but a temp solves the problem.
   int temp = other.type_;
   if (type_ != temp)
@@ -3100,7 +3103,7 @@ bool Value::operator!=(const Value& other) const { return !(*this == other); }
 
 const char* Value::asCString() const {
   JSON_ASSERT_MESSAGE(type_ == stringValue,
-                      "in Json_helics::Value::asCString(): requires stringValue");
+                      "in Json::Value::asCString(): requires stringValue");
   if (value_.string_ == 0) return 0;
   unsigned this_len;
   char const* this_str;
@@ -3111,7 +3114,7 @@ const char* Value::asCString() const {
 #if JSONCPP_USING_SECURE_MEMORY
 unsigned Value::getCStringLength() const {
   JSON_ASSERT_MESSAGE(type_ == stringValue,
-	                  "in Json_helics::Value::asCString(): requires stringValue");
+	                  "in Json::Value::asCString(): requires stringValue");
   if (value_.string_ == 0) return 0;
   unsigned this_len;
   char const* this_str;
@@ -3402,7 +3405,7 @@ Value::operator bool() const { return ! isNull(); }
 void Value::clear() {
   JSON_ASSERT_MESSAGE(type_ == nullValue || type_ == arrayValue ||
                           type_ == objectValue,
-                      "in Json_helics::Value::clear(): requires complex value");
+                      "in Json::Value::clear(): requires complex value");
   start_ = 0;
   limit_ = 0;
   switch (type_) {
@@ -3417,7 +3420,7 @@ void Value::clear() {
 
 void Value::resize(ArrayIndex newSize) {
   JSON_ASSERT_MESSAGE(type_ == nullValue || type_ == arrayValue,
-                      "in Json_helics::Value::resize(): requires arrayValue");
+                      "in Json::Value::resize(): requires arrayValue");
   if (type_ == nullValue)
     *this = Value(arrayValue);
   ArrayIndex oldSize = size();
@@ -3436,7 +3439,7 @@ void Value::resize(ArrayIndex newSize) {
 Value& Value::operator[](ArrayIndex index) {
   JSON_ASSERT_MESSAGE(
       type_ == nullValue || type_ == arrayValue,
-      "in Json_helics::Value::operator[](ArrayIndex): requires arrayValue");
+      "in Json::Value::operator[](ArrayIndex): requires arrayValue");
   if (type_ == nullValue)
     *this = Value(arrayValue);
   CZString key(index);
@@ -3452,14 +3455,14 @@ Value& Value::operator[](ArrayIndex index) {
 Value& Value::operator[](int index) {
   JSON_ASSERT_MESSAGE(
       index >= 0,
-      "in Json_helics::Value::operator[](int index): index cannot be negative");
+      "in Json::Value::operator[](int index): index cannot be negative");
   return (*this)[ArrayIndex(index)];
 }
 
 const Value& Value::operator[](ArrayIndex index) const {
   JSON_ASSERT_MESSAGE(
       type_ == nullValue || type_ == arrayValue,
-      "in Json_helics::Value::operator[](ArrayIndex)const: requires arrayValue");
+      "in Json::Value::operator[](ArrayIndex)const: requires arrayValue");
   if (type_ == nullValue)
     return nullSingleton();
   CZString key(index);
@@ -3472,7 +3475,7 @@ const Value& Value::operator[](ArrayIndex index) const {
 const Value& Value::operator[](int index) const {
   JSON_ASSERT_MESSAGE(
       index >= 0,
-      "in Json_helics::Value::operator[](int index) const: index cannot be negative");
+      "in Json::Value::operator[](int index) const: index cannot be negative");
   return (*this)[ArrayIndex(index)];
 }
 
@@ -3559,7 +3562,7 @@ void Value::dupMeta(const Value& other) {
 Value& Value::resolveReference(const char* key) {
   JSON_ASSERT_MESSAGE(
       type_ == nullValue || type_ == objectValue,
-      "in Json_helics::Value::resolveReference(): requires objectValue");
+      "in Json::Value::resolveReference(): requires objectValue");
   if (type_ == nullValue)
     *this = Value(objectValue);
   CZString actualKey(
@@ -3579,7 +3582,7 @@ Value& Value::resolveReference(char const* key, char const* cend)
 {
   JSON_ASSERT_MESSAGE(
       type_ == nullValue || type_ == objectValue,
-      "in Json_helics::Value::resolveReference(key, end): requires objectValue");
+      "in Json::Value::resolveReference(key, end): requires objectValue");
   if (type_ == nullValue)
     *this = Value(objectValue);
   CZString actualKey(
@@ -3605,7 +3608,7 @@ Value const* Value::find(char const* key, char const* cend) const
 {
   JSON_ASSERT_MESSAGE(
       type_ == nullValue || type_ == objectValue,
-      "in Json_helics::Value::find(key, end, found): requires objectValue or nullValue");
+      "in Json::Value::find(key, end, found): requires objectValue or nullValue");
   if (type_ == nullValue) return NULL;
   CZString actualKey(key, static_cast<unsigned>(cend-key), CZString::noDuplication);
   ObjectValues::const_iterator it = value_.map_->find(actualKey);
@@ -3699,7 +3702,7 @@ bool Value::removeMember(JSONCPP_STRING const& key, Value* removed)
 void Value::removeMember(const char* key)
 {
   JSON_ASSERT_MESSAGE(type_ == nullValue || type_ == objectValue,
-                      "in Json_helics::Value::removeMember(): requires objectValue");
+                      "in Json::Value::removeMember(): requires objectValue");
   if (type_ == nullValue)
     return;
 
@@ -3764,7 +3767,7 @@ bool Value::isMember(const CppTL::ConstString& key) const {
 Value::Members Value::getMemberNames() const {
   JSON_ASSERT_MESSAGE(
       type_ == nullValue || type_ == objectValue,
-      "in Json_helics::Value::getMemberNames(), value must be objectValue");
+      "in Json::Value::getMemberNames(), value must be objectValue");
   if (type_ == nullValue)
     return Value::Members();
   Members members;
@@ -3964,7 +3967,7 @@ JSONCPP_STRING Value::toStyledString() const {
   StreamWriterBuilder builder;
 
   JSONCPP_STRING out = this->hasComment(commentBefore) ? "\n" : "";
-  out += Json_helics::writeString(builder, *this);
+  out += Json::writeString(builder, *this);
   out += "\n";
 
   return out;
@@ -4167,7 +4170,8 @@ Value& Path::make(Value& root) const {
   return *node;
 }
 
-} // namespace Json_helics
+} // namespace Json
+} // namespace helics_fmi
 
 // //////////////////////////////////////////////////////////////////////
 // End of content of file: src/lib_json/json_value.cpp
@@ -4265,7 +4269,8 @@ Value& Path::make(Value& root) const {
 #pragma warning(disable : 4996)
 #endif
 
-namespace Json_helics {
+namespace helics_fmi{
+	namespace Json {
 
 #if __cplusplus >= 201103L || (defined(_CPPLIB_VER) && _CPPLIB_VER >= 520)
 typedef std::unique_ptr<StreamWriter> StreamWriterPtr;
@@ -5399,11 +5404,11 @@ static void getValidWriterKeys(std::set<JSONCPP_STRING>* valid_keys)
   valid_keys->insert("precision");
   valid_keys->insert("precisionType");
 }
-bool StreamWriterBuilder::validate(Json_helics::Value* invalid) const
+bool StreamWriterBuilder::validate(Json::Value* invalid) const
 {
-  Json_helics::Value my_invalid;
+  Json::Value my_invalid;
   if (!invalid) invalid = &my_invalid;  // so we do not need to test for NULL
-  Json_helics::Value& inv = *invalid;
+  Json::Value& inv = *invalid;
   std::set<JSONCPP_STRING> valid_keys;
   getValidWriterKeys(&valid_keys);
   Value::Members keys = settings_.getMemberNames();
@@ -5421,7 +5426,7 @@ Value& StreamWriterBuilder::operator[](JSONCPP_STRING key)
   return settings_[key];
 }
 // static
-void StreamWriterBuilder::setDefaults(Json_helics::Value* settings)
+void StreamWriterBuilder::setDefaults(Json::Value* settings)
 {
   //! [StreamWriterBuilderDefaults]
   (*settings)["commentStyle"] = "All";
@@ -5448,7 +5453,8 @@ JSONCPP_OSTREAM& operator<<(JSONCPP_OSTREAM& sout, Value const& root) {
   return sout;
 }
 
-} // namespace Json_helics
+} // namespace Json
+} // namespace helics_fmi
 
 // //////////////////////////////////////////////////////////////////////
 // End of content of file: src/lib_json/json_writer.cpp

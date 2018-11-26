@@ -19,16 +19,16 @@ class jsonElement
   public:
     int elementIndex = 0;
     std::string name;
-    Json_gd::ArrayIndex arrayIndex = 0;
+    helics_fmi::Json::ArrayIndex arrayIndex = 0;
     jsonElement () noexcept {}
-    jsonElement (Json_gd::Value vElement, std::string newName);
+    jsonElement (helics_fmi::Json::Value vElement, std::string newName);
 
     void clear ();
-    const Json_gd::Value &getElement () const { return (arraytype) ? element[arrayIndex] : element; }
-    Json_gd::ArrayIndex count () const { return (arraytype) ? element.size () : Json_gd::ArrayIndex (1); }
+    const helics_fmi::Json::Value &getElement () const { return (arraytype) ? element[arrayIndex] : element; }
+	helics_fmi::Json::ArrayIndex count () const { return (arraytype) ? element.size () : helics_fmi::Json::ArrayIndex (1); }
     bool isNull () const { return (arraytype) ? element[arrayIndex].isNull () : element.isNull (); }
 
   private:
-    Json_gd::Value element = Json_gd::nullValue;
+	  helics_fmi::Json::Value element = helics_fmi::Json::nullValue;
     bool arraytype = false;
 };
