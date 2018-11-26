@@ -141,6 +141,14 @@ include(addBoost)
 
 target_link_libraries(helics_fmi_base INTERFACE Boostlibs::core)
 
+# ------------------------------------------------------------
+# Find (and test) the KLU libraries
+# ------------------------------------------------------------
+if(ENABLE_KLU)
+    include(addKLU_targets)
+endif()
+
+
 # -------------------------------------------------------------
 # Sundials
 # -------------------------------------------------------------
@@ -223,7 +231,7 @@ SHOW_VARIABLE(HELICS_INSTALL_PATH PATH "path to the helics installation" "${PROJ
 
 include(addHELICS)
 
-
+add_subdirectory(src/solvers)
 add_subdirectory(src/helicsFMI)
 
 option (HELICS_FMI_GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)

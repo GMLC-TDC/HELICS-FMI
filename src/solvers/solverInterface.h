@@ -13,13 +13,11 @@
 #pragma once
 
 #include "core/helperObject.h"
-#include "solver_definitions.hpp"
+#include "griddyn/gridComponentHelperClasses.h"
 
 #include <exception>
 #include <memory>
 #include <vector>
-#include <string>
-
 namespace griddyn
 {
 enum class solver_print_level

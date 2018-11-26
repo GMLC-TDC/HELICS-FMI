@@ -11,7 +11,7 @@
  */
 
 #include "FmiCoSimFederate.hpp"
-#include "fmi_import/fmiObjects.h"
+#include "fmi/fmi_import/fmiObjects.h"
 #include <algorithm>
 
 FmiCoSimFederate::FmiCoSimFederate (std::shared_ptr<fmi2CoSimObject> obj, const helics::FederateInfo &fi)

@@ -10,6 +10,8 @@
  * LLNS Copyright End
  */
 
+#ifndef _BASIC_ODE_SOLVER_INTERFACE_H_
+#define _BASIC_ODE_SOLVER_INTERFACE_H_
 #pragma once
 
 #include "solverInterface.h"

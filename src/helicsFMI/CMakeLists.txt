@@ -11,23 +11,14 @@
 set(helicsFMI_sources
 	FmiCoSimFederate.cpp
 	FmiModelExchangeFederate.cpp
-	basicOdeSolver.cpp
-	arkodeInterface.cpp
-	sundialsInterface.cpp
-	cvodeInterface.cpp
 	)
 
 set(helicsFMI_headers
 	FmiCoSimFederate.hpp
 	FmiModelExchangeFederate.hpp
-	sundialsInterface.h
-	basicOdeSolver.h
-	arkodeInterface.h
-	cvodeInterface.h
-	solverInterface.h
 	)
 
 add_library(helicsFMI STATIC ${helicsFMI_sources} ${helicsFMI_headers})
 
-target_link_libraries(helicsFMI HELICS::helics-static fmiLibrary helics_fmi_base )
+target_link_libraries(helicsFMI HELICS::helics-static fmiLibrary helics_fmi_base solvers )
 

@@ -11,8 +11,8 @@
 */
 
 #include "FmiModelExchangeFederate.hpp"
-#include "fmi_import/fmiObjects.h"
-#include "OdeSolverBase.hpp"
+#include "fmi/fmi_import/fmiObjects.h"
+#include "solvers/solverInterface.h"
 
 FmiModelExchangeFederate::FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj, const helics::FederateInfo &fi):me(std::move(obj)), fed(std::string(),fi)
 {
