@@ -76,7 +76,7 @@ void FmiCoSimFederate::run (helics::Time step, helics::Time stop)
 	cs->getCurrentInputs(inp.data());
 	for (int ii = 0; ii < inputs.size(); ++ii)
 	{
-		inp[ii] = inputs[ii].setDefault(inp[ii]);
+		inputs[ii].setDefault(inp[ii]);
 	}
     auto result = fed.enterExecutingMode (helics::iteration_request::iterate_if_needed);
     if (result == helics::iteration_result::iterating)

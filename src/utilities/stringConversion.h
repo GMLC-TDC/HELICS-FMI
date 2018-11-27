@@ -9,11 +9,7 @@
  * For details, see the LICENSE file.
  * LLNS Copyright End
  */
-
-#ifndef STRINGCONVERSION_H_
-#define STRINGCONVERSION_H_
-
-
+#pragma once
 #include "charMapper.h"
 #include "stringOps.h"
 #include <type_traits>
@@ -215,6 +211,3 @@ std::vector<X> str2vector (const stringVector &tokens, const X defValue)
     }
     return av;
 }
-
-
-#endif

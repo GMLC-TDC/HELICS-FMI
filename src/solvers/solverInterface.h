@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "helperObject.h"
+#include "utilities/helperObject.h"
 #include "solverMode.hpp"
 #include "solver_definitions.hpp"
 #include "SolvableObject.hpp"
@@ -125,24 +125,24 @@ class SolverInterface : public helperObject
 
     // solver outputs
 
-    std::vector<index_t> maskElements;  //!< vector of constant states in any problem
+    std::vector<solver_index_type> maskElements;  //!< vector of constant states in any problem
     std::string solverLogFile;  //!< file name and location of log file reference
     solver_print_level printLevel = solver_print_level::s_error_trap;  //!< print_level for solver
     int solverPrintLevel = 1;  //!< print level for internal solver logging
-    count_t rootCount = 0;  //!< the number of root finding functions
-    count_t solverCallCount = 0;  //!< the number of times the solver has been called
-    count_t jacCallCount = 0;  //!< the number of times the Jacobian function has been called
-    count_t funcCallCount = 0;  //!< the number of times the function evaluation has been called
-    count_t rootCallCount = 0;
-    count_t max_iterations = 10000;  //!< the maximum number of iterations in the solver loop
+    solver_index_type rootCount = 0;  //!< the number of root finding functions
+    solver_index_type solverCallCount = 0;  //!< the number of times the solver has been called
+    solver_index_type jacCallCount = 0;  //!< the number of times the Jacobian function has been called
+    solver_index_type funcCallCount = 0;  //!< the number of times the function evaluation has been called
+    solver_index_type rootCallCount = 0;
+    solver_index_type max_iterations = 10000;  //!< the maximum number of iterations in the solver loop
     solverMode mode;  //!< to the solverMode
     double tolerance = 1e-8;  //!< the default solver tolerance
-    coreTime solveTime = negTime;  //!< storage for the time the solver is called
+    double solveTime = -1e39;  //!< storage for the time the solver is called
     std::string jacFile;  //!< the file to write the Jacobian to
     std::string stateFile;  //!< the file to write the state and residual to
     SolvableObject *sobj = nullptr;  //!< pointer the gridDynSimulation object used
-    count_t svsize = 0;  //!< the state size
-    count_t nnz = 0;  //!< the actual number of non-zeros in a Jacobian
+    solver_index_type svsize = 0;  //!< the state size
+    solver_index_type nnz = 0;  //!< the actual number of non-zeros in a Jacobian
     std::bitset<32> flags;  //!< flags for the solver
     int lastErrorCode = 0;  //!< the last error Code
   public:
@@ -155,7 +155,7 @@ class SolverInterface : public helperObject
     @param[in] gds  gridDynSimulation to link with
     @param[in] sMode the solverMode associated with the solver
     */
-    SolverInterface (gridDynSimulation *gds, const solverMode &sMode);
+    SolverInterface (SolvableObject *sobj, const solverMode &sMode);
 
     /** @brief make a copy of the solver interface
     @param[in] fullCopy set to true to initialize and copy over all data to the new object
@@ -203,13 +203,13 @@ class SolverInterface : public helperObject
     @param[in] numRoots  the number of root functions in the solution
     @return the function status
     */
-    virtual void allocate (count_t size, count_t numRoots = 0);
+    virtual void allocate (solver_index_type size, solver_index_type numRoots = 0);
 
     /** @brief initialize the solver to time t0
     @param[in] t0  the time for the initialization
     @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
     */
-    virtual void initialize (coreTime t0);
+    virtual void initialize (double t0);
 
     /** @brief reinitialize the sparse components
     @param[in] mode the reinitialization mode
@@ -227,7 +227,7 @@ class SolverInterface : public helperObject
     @param[in] constraints  flag indicating that constraints should be used
     @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
     */
-    virtual int calcIC (coreTime t0, coreTime tstep0, ic_modes mode, bool constraints);
+    virtual int calcIC (double t0, double tstep0, ic_modes mode, bool constraints);
     /** @brief get the current solution
      usually called after a call to CalcIC to get the calculated conditions
     @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
@@ -240,7 +240,7 @@ class SolverInterface : public helperObject
     /** @brief update the number of roots to find
     @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
     */
-    virtual void setRootFinding (index_t numRoots);
+    virtual void setRootFinding (solver_index_type numRoots);
 
     /** @brief get a parameter from the solver
   @param[in] param  a string with the desired name of the parameter or result
@@ -269,18 +269,18 @@ class SolverInterface : public helperObject
     */
     virtual bool getFlag (const std::string &flag) const override;
     /** get the last time the solver was called*/
-    coreTime getSolverTime () const { return solveTime; }
+    double getSolverTime () const { return solveTime; }
     /** @brief perform the solver calculations
   @param[in] tStop  the requested return time   not that useful for algebraic solvers
   @param[out]  tReturn  the actual return time
   @param[in] stepMode  the step mode
   @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
   */
-    virtual int solve (coreTime tStop, coreTime &tReturn, step_mode stepMode = step_mode::normal);
+    virtual int solve (double tStop, double &tReturn, step_mode stepMode = step_mode::normal);
     /** @brief resize the storage array for the Jacobian
     @param[in] nonZeroCount  the number of elements to potentially store
     */
-    virtual void setMaxNonZeros (count_t nonZeroCount);
+    virtual void setMaxNonZeros (solver_index_type nonZeroCount);
     /** @brief check if the SolverInterface has been initialized
     @return true if initialized false if not
     */
@@ -290,27 +290,27 @@ class SolverInterface : public helperObject
     @param[in] logLevel  the level of logging to display
     @param[in] iconly  flag indicating that the logging should be for the initial condition calculation only
     */
-    virtual void logSolverStats (print_level logLevel, bool iconly = false) const;
+    virtual void logSolverStats (solver_print_level logLevel, bool iconly = false) const;
     /** @brief helper function to log error weight information
     @param[in] logLevel  the level of logging to display
     */
-    virtual void logErrorWeights (print_level logLevel) const;
+    virtual void logErrorWeights (solver_print_level logLevel) const;
 
     /** @brief get the state size
     @return the state size
     */
-    count_t size () const { return svsize; }
+    solver_index_type size () const { return svsize; }
 
     /** @brief get the actual number of non-zeros in the Jacobian
     @return the state size
     */
-    count_t nonZeros () const { return nnz; }
+    solver_index_type nonZeros () const { return nnz; }
 
     const solverMode &getSolverMode () const { return mode; }
 
     void lock () { flags.set (locked_flag); }
 
-    void setIndex (index_t newIndex) { mode.offsetIndex = newIndex; }
+    void setIndex (solver_index_type newIndex) { mode.offsetIndex = newIndex; }
     /** @brief print out all the state values
     @param[in] getNames use the actual state names vs some coding
     */
@@ -319,11 +319,11 @@ class SolverInterface : public helperObject
     @param[in] gds the gridDynSimulationObject to attach to
     @param[in] sMode the solverMode associated with the solver
     */
-    virtual void setSimulationData (gridDynSimulation *gds, const solverMode &sMode);
+    virtual void setSimulationData (SolvableObject *sobj, const solverMode &sMode);
     /** @brief input the simulation data to attach to
     @param[in] gds the gridDynSimulationObject to attach to
     */
-    virtual void setSimulationData (gridDynSimulation *gds);
+    virtual void setSimulationData (SolvableObject *sobj);
 
     /** @brief input the solverMode associated with the solver
     @param[in] sMode the solverMode to attach to
@@ -336,21 +336,21 @@ class SolverInterface : public helperObject
     overriding specific information in the Jacobian calculations and the residual calculations
     @param[in] msk  the indices of the state elements to fix
     */
-    void setMaskElements (std::vector<index_t> msk);
+    void setMaskElements (std::vector<solver_index_type> msk);
 
     /** @brief add an index to the mask
       masks isolate specific values and don't let the solver alter them  for newton based solvers this implies
     overriding specific information in the Jacobian calculations and the residual calculations
     @param[in] newMaskElement the index of the values to mask
     */
-    void addMaskElement (index_t newMaskElement);
+    void addMaskElement (solver_index_type newMaskElement);
 
     /** @brief add several new elements to a mask
       masks isolate specific values and don't let the solver alter them  for newton based solvers this implies
     overriding specific information in the Jacobian calculations and the residual calculations
     @param[in] newMsk  a vector of indices to add to an existing mask
     */
-    void addMaskElements (const std::vector<index_t> &newMsk);
+    void addMaskElements (const std::vector<solver_index_type> &newMsk);
 
     void logMessage (int errorCode, const std::string &message);
 
@@ -372,7 +372,7 @@ class SolverInterface : public helperObject
 @param[in] sMode the solverMode to construct the SolverInterface from
 @return a unique_ptr to a SolverInterface object
 */
-std::unique_ptr<SolverInterface> makeSolver (gridDynSimulation *gds, const solverMode &sMode);
+std::unique_ptr<SolverInterface> makeSolver (SolvableObject *sobj, const solverMode &sMode);
 /** @brief make a solver from a string
 @param[in] type the type of SolverInterface to create
 @return a unique_ptr to a SolverInterface object

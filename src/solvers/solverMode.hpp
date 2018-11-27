@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "../gridDynDefinitions.hpp"
+#include "solver_definitions.hpp"
 #include <bitset>
 
 namespace griddyn
@@ -63,7 +63,7 @@ enum class approxKeyMask : unsigned int
 
 KEY_QUAL unsigned int indexVal (approxKeyMask key) { return static_cast<unsigned int> (key); }
 
-enum defindedSolverModes : index_t
+enum defindedSolverModes : solver_index_type
 {
     local_mode = 0,
     power_flow = 1,
@@ -84,12 +84,12 @@ class solverMode
     bool parameters = false;  //!< indicator if the solver uses parameters
     std::bitset<32> approx;  //!<  a bitset containing the approximation assumptions the solver wishes to be made
     //!(request not obligation)
-    index_t offsetIndex = kNullLocation;  //!< index into an array of solverOffsets
-    index_t pairedOffsetIndex = kNullLocation;  //!< the index of a paired solverMode --namely one containing state
+    solver_index_type offsetIndex = invalidLocation;  //!< index into an array of solverOffsets
+    solver_index_type pairedOffsetIndex = invalidLocation;  //!< the index of a paired solverMode --namely one containing state
     //! information not calculated by this mode
     /**@brief solverMode constructor
   @param[in] index the index to put in offsetIndex*/
-    explicit solverMode (index_t index);
+    explicit solverMode (solver_index_type index);
     /**@brief solverMode default constructor*/
     solverMode () = default;
     bool operator== (const solverMode &b) const

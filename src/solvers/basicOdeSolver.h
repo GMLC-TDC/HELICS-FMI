@@ -27,7 +27,7 @@ class basicOdeSolver : public SolverInterface
     std::vector<double> deriv;  //!< temp state data location 1
     std::vector<double> state2;  //!< temp state data location 2
     std::vector<double> type;  //!< type data
-    coreTime deltaT = 0.005;  //!< the default time step
+    double deltaT = 0.005;  //!< the default time step
   public:
     /** @brief default constructor*/
     explicit basicOdeSolver (const std::string &objName = "basicOde");
@@ -35,7 +35,7 @@ class basicOdeSolver : public SolverInterface
     @param[in] gds  the gridDynSimulation to link to
     @param[in] sMode the solverMode to solve with
     */
-    basicOdeSolver (gridDynSimulation *gds, const solverMode &sMode);
+    basicOdeSolver (SolvableObject *sobj, const solverMode &sMode);
 
     virtual std::unique_ptr<SolverInterface> clone (bool fullCopy = false) const override;
 
@@ -47,16 +47,15 @@ class basicOdeSolver : public SolverInterface
     const double *state_data () const noexcept override;
     const double *deriv_data () const noexcept override;
     const double *type_data () const noexcept override;
-    virtual void allocate (count_t stateCount, count_t numRoots = 0) override;
-    virtual void initialize (coreTime t0) override;
+    virtual void allocate (solver_index_type stateCount, solver_index_type numRoots = 0) override;
+    virtual void initialize (double t0) override;
 
     virtual double get (const std::string &param) const override;
     virtual void set (const std::string &param, const std::string &val) override;
     virtual void set (const std::string &param, double val) override;
 
-    virtual int solve (coreTime tStop, coreTime &tReturn, step_mode stepMode = step_mode::normal) override;
+    virtual int solve (double tStop, double &tReturn, step_mode stepMode = step_mode::normal) override;
 };
 
 }  // namespace solvers
 }  // namespace griddyn
-#endif

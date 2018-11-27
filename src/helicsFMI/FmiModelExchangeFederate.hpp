@@ -19,7 +19,11 @@
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Inputs.hpp"
 
-class OdeSolverBase;
+namespace griddyn
+{
+	class SolverInterface;
+}
+
 
 /** class defining a modelExchange federate*/
 class FmiModelExchangeFederate
@@ -36,6 +40,6 @@ public:
     std::vector<helics::Publication> pubs; //!< known publications
     std::vector<helics::Input> inputs; //!< known subscriptions
     double stepSize = 0.01; //!< the default step size of the simulation
-    std::unique_ptr<OdeSolverBase> solver;
+    std::unique_ptr<griddyn::SolverInterface> solver;
 };
 

@@ -12,7 +12,6 @@
 
 #include "basicOdeSolver.h"
 
-#include "../gridDynSimulation.h"
 #include "utilities/vectorOps.hpp"
 #include <algorithm>
 #include <cmath>
@@ -27,7 +26,7 @@ basicOdeSolver::basicOdeSolver (const std::string &objName) : SolverInterface (o
     mode.differential = true;
     mode.algebraic = false;
 }
-basicOdeSolver::basicOdeSolver (gridDynSimulation *gds, const solverMode &sMode) : SolverInterface (gds, sMode) {}
+basicOdeSolver::basicOdeSolver (SolvableObject *sobj, const solverMode &sMode) : SolverInterface (sobj, sMode) {}
 std::unique_ptr<SolverInterface> basicOdeSolver::clone (bool fullCopy) const
 {
 	std::unique_ptr<SolverInterface> si = std::make_unique<basicOdeSolver>();
@@ -52,7 +51,7 @@ double *basicOdeSolver::type_data () noexcept { return type.data (); }
 const double *basicOdeSolver::state_data () const noexcept { return state.data (); }
 const double *basicOdeSolver::deriv_data () const noexcept { return deriv.data (); }
 const double *basicOdeSolver::type_data () const noexcept { return type.data (); }
-void basicOdeSolver::allocate (count_t stateCount, count_t numRoots)
+void basicOdeSolver::allocate (solver_index_type stateCount, solver_index_type numRoots)
 {
     // load the vectors
     if (stateCount != svsize)
@@ -67,7 +66,7 @@ void basicOdeSolver::allocate (count_t stateCount, count_t numRoots)
     }
 }
 
-void basicOdeSolver::initialize (coreTime t0)
+void basicOdeSolver::initialize (double t0)
 {
     if (!flags[allocated_flag])
     {
@@ -108,23 +107,23 @@ void basicOdeSolver::set (const std::string &param, double val)
     }
 }
 
-int basicOdeSolver::solve (coreTime tStop, coreTime &tReturn, step_mode stepMode)
+int basicOdeSolver::solve (double tStop, double &tReturn, step_mode stepMode)
 {
     if (solveTime == tStop)
     {
         tReturn = tStop;
         return FUNCTION_EXECUTION_SUCCESS;
     }
-    coreTime Tstep = (std::min) (deltaT, tStop - solveTime);
-    if (mode.pairedOffsetIndex != kNullLocation)
+   double Tstep = (std::min) (deltaT, tStop - solveTime);
+    if (mode.pairedOffsetIndex != invalidLocation)
     {
-        int ret = m_gds->dynAlgebraicSolve (solveTime, state.data (), deriv.data (), mode);
+        int ret = sobj->dynAlgebraicSolve (solveTime, state.data (), deriv.data (), mode);
         if (ret < FUNCTION_EXECUTION_SUCCESS)
         {
             return ret;
         }
     }
-    m_gds->derivativeFunction (solveTime, state.data (), deriv.data (), mode);
+    sobj->derivativeFunction (solveTime, state.data (), deriv.data (), mode);
     std::transform (state.begin (), state.end (), deriv.begin (), state.begin (),
                     [Tstep](double a, double b) { return fma (Tstep, b, a); });
     solveTime += Tstep;
@@ -136,13 +135,13 @@ int basicOdeSolver::solve (coreTime tStop, coreTime &tReturn, step_mode stepMode
             Tstep = (std::min) (deltaT, tStop - solveTime);
             if (mode.pairedOffsetIndex != kNullLocation)
             {
-                int ret = m_gds->dynAlgebraicSolve (solveTime, state.data (), deriv.data (), mode);
+                int ret = sobj->dynAlgebraicSolve (solveTime, state.data (), deriv.data (), mode);
                 if (ret < FUNCTION_EXECUTION_SUCCESS)
                 {
                     return ret;
                 }
             }
-            m_gds->derivativeFunction (solveTime, state.data (), deriv.data (), mode);
+            sobj->derivativeFunction (solveTime, state.data (), deriv.data (), mode);
             std::transform (state.begin (), state.end (), deriv.begin (), state.begin (),
                             [Tstep](double a, double b) { return fma (Tstep, b, a); });
             solveTime += Tstep;

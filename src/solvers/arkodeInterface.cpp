@@ -10,12 +10,10 @@
  * LLNS Copyright End
  */
 
+#include <cstdio>
+
 #include "arkodeInterface.h"
 
-#include "core/coreExceptions.h"
-
-#include "../gridDynSimulation.h"
-#include "../simulation/gridDynSimulationFileOps.h"
 #include "utilities/stringOps.h"
 #include "utilities/vectorOps.hpp"
 
@@ -54,7 +52,7 @@ arkodeInterface::arkodeInterface (const std::string &objName) : sundialsInterfac
     mode.algebraic = false;
 }
 
-arkodeInterface::arkodeInterface (gridDynSimulation *gds, const solverMode &sMode) : sundialsInterface (gds, sMode)
+arkodeInterface::arkodeInterface (SolvableObject *sobj, const solverMode &sMode) : sundialsInterface (sobj, sMode)
 {
     mode.dynamic = true;
     mode.differential = true;
@@ -204,7 +202,7 @@ double arkodeInterface::get (const std::string &param) const
 }
 
 // output solver stats
-void arkodeInterface::logSolverStats (print_level logLevel, bool /*iconly*/) const
+void arkodeInterface::logSolverStats (solver_print_level logLevel, bool /*iconly*/) const
 {
     if (!flags[initialized_flag])
     {
@@ -248,9 +246,9 @@ void arkodeInterface::logSolverStats (print_level logLevel, bool /*iconly*/) con
     logstr += "Last step                          = " + std::to_string (hlast) + '\n';
     logstr += "Tolerance scale factor             = " + std::to_string (tolsfac) + '\n';
 
-    if (m_gds != nullptr)
+    if (sobj != nullptr)
     {
-        m_gds->log (m_gds, logLevel, logstr);
+       // sobj->log (sobj, logLevel, logstr);
     }
     else
     {
@@ -258,7 +256,7 @@ void arkodeInterface::logSolverStats (print_level logLevel, bool /*iconly*/) con
     }
 }
 
-void arkodeInterface::logErrorWeights (print_level logLevel) const
+void arkodeInterface::logErrorWeights (solver_print_level logLevel) const
 {
     N_Vector eweight = NVECTOR_NEW (use_omp, svsize);
     N_Vector ele = NVECTOR_NEW (use_omp, svsize);
@@ -276,9 +274,9 @@ void arkodeInterface::logErrorWeights (print_level logLevel) const
           std::to_string (kk) + ':' + std::to_string (ewdata[kk]) + '\t' + std::to_string (eldata[kk]) + '\n';
     }
 
-    if (m_gds != nullptr)
+    if (sobj != nullptr)
     {
-        m_gds->log (m_gds, logLevel, logstr);
+     //   sobj->log (sobj, logLevel, logstr);
     }
     else
     {
@@ -312,13 +310,13 @@ static const std::map<int, std::string> arkodeRetCodes{
 
 };
 
-void arkodeInterface::initialize (coreTime time0)
+void arkodeInterface::initialize (double time0)
 {
     if (!flags[allocated_flag])
     {
         throw (InvalidSolverOperation ());
     }
-    auto jsize = m_gds->jacSize (mode);
+    auto jsize = sobj->jacobianSize (mode);
 
     // dynInitializeB CVode - Sundials
 
@@ -326,7 +324,7 @@ void arkodeInterface::initialize (coreTime time0)
     check_flag (&retval, "ARKodeSetUserData", 1);
 
     // guessState an initial condition
-    m_gds->guessState (time0, state_data (), deriv_data (), mode);
+    sobj->guessCurrentValue (time0, state_data (), deriv_data (), mode);
 
     retval = ARKodeInit (solverMem, arkodeFunc, arkodeFunc, time0, state);
     check_flag (&retval, "ARKodeInit", 1);
@@ -429,9 +427,9 @@ void arkodeInterface::getCurrentData ()
     */
 }
 
-int arkodeInterface::solve (coreTime tStop, coreTime &tReturn, step_mode stepMode)
+int arkodeInterface::solve (double tStop, double &tReturn, step_mode stepMode)
 {
-    assert (rootCount == m_gds->rootSize (mode));
+   // assert (rootCount == sobj->rootSize (mode));
     ++solverCallCount;
     icCount = 0;
     double tret;
@@ -456,8 +454,8 @@ void arkodeInterface::getRoots ()
 void arkodeInterface::loadMaskElements ()
 {
     std::vector<double> mStates (svsize, 0.0);
-    m_gds->getVoltageStates (mStates.data (), mode);
-    m_gds->getAngleStates (mStates.data (), mode);
+//    sobj->getVoltageStates (mStates.data (), mode);
+ //   sobj->getAngleStates (mStates.data (), mode);
     maskElements = vecFindgt<double, index_t> (mStates, 0.5);
     tempState.resize (svsize);
     double *lstate = NV_DATA_S (state);
@@ -474,24 +472,24 @@ int arkodeFunc (realtype time, N_Vector state, N_Vector dstate_dt, void *user_da
     sd->funcCallCount++;
     if (sd->mode.pairedOffsetIndex != kNullLocation)
     {
-        int ret = sd->m_gds->dynAlgebraicSolve (time, NVECTOR_DATA (sd->use_omp, state),
+        int ret = sd->sobj->dynAlgebraicSolve (time, NVECTOR_DATA (sd->use_omp, state),
                                                 NVECTOR_DATA (sd->use_omp, dstate_dt), sd->mode);
         if (ret < FUNCTION_EXECUTION_SUCCESS)
         {
             return ret;
         }
     }
-    int ret = sd->m_gds->derivativeFunction (time, NVECTOR_DATA (sd->use_omp, state),
+    int ret = sd->sobj->derivativeFunction (time, NVECTOR_DATA (sd->use_omp, state),
                                              NVECTOR_DATA (sd->use_omp, dstate_dt), sd->mode);
 
     if (sd->flags[fileCapture_flag])
     {
         if (!sd->stateFile.empty ())
         {
-            writeVector (time, STATE_INFORMATION, sd->funcCallCount, sd->mode.offsetIndex, sd->svsize,
-                         NVECTOR_DATA (sd->use_omp, state), sd->stateFile, (sd->funcCallCount != 1));
-            writeVector (time, DERIVATIVE_INFORMATION, sd->funcCallCount, sd->mode.offsetIndex, sd->svsize,
-                         NVECTOR_DATA (sd->use_omp, dstate_dt), sd->stateFile);
+      //      writeVector (time, STATE_INFORMATION, sd->funcCallCount, sd->mode.offsetIndex, sd->svsize,
+       //                  NVECTOR_DATA (sd->use_omp, state), sd->stateFile, (sd->funcCallCount != 1));
+      //      writeVector (time, DERIVATIVE_INFORMATION, sd->funcCallCount, sd->mode.offsetIndex, sd->svsize,
+       //                  NVECTOR_DATA (sd->use_omp, dstate_dt), sd->stateFile);
         }
     }
     return ret;
@@ -500,7 +498,7 @@ int arkodeFunc (realtype time, N_Vector state, N_Vector dstate_dt, void *user_da
 int arkodeRootFunc (realtype time, N_Vector state, realtype *gout, void *user_data)
 {
     auto sd = reinterpret_cast<arkodeInterface *> (user_data);
-    sd->m_gds->rootFindingFunction (time, NVECTOR_DATA (sd->use_omp, state), sd->deriv_data (), gout, sd->mode);
+    sd->sobj->rootFindingFunction (time, NVECTOR_DATA (sd->use_omp, state), sd->deriv_data (), gout, sd->mode);
 
     return FUNCTION_EXECUTION_SUCCESS;
 }

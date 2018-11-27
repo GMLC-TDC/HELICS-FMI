@@ -11,10 +11,9 @@
 */
 
 #include "helperObject.h"
-#include "coreExceptions.h"
-#include "utilities/dataDictionary.h"
-#include "utilities/stringOps.h"
-#include "utilities/string_viewOps.h"
+#include "dataDictionary.h"
+#include "stringOps.h"
+#include "string_viewOps.h"
 namespace griddyn
 {
 // start at 100 since there are some objects that use low numbers as a check for interface number and the id as

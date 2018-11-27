@@ -10,12 +10,10 @@
  * LLNS Copyright End
  */
 
+#include <cstdio>
+
 #include "cvodeInterface.h"
 
-#include "core/coreExceptions.h"
-
-#include "../gridDynSimulation.h"
-#include "../simulation/gridDynSimulationFileOps.h"
 #include "utilities/stringOps.h"
 #include "utilities/vectorOps.hpp"
 
@@ -56,7 +54,7 @@ cvodeInterface::cvodeInterface (const std::string &objName) : sundialsInterface 
     mode.algebraic = false;
 }
 
-cvodeInterface::cvodeInterface (gridDynSimulation *gds, const solverMode &sMode) : sundialsInterface (gds, sMode)
+cvodeInterface::cvodeInterface (SolvableObject *sobj, const solverMode &sMode) : sundialsInterface (sobj, sMode)
 {
     mode.dynamic = true;
     mode.differential = true;
@@ -190,11 +188,7 @@ double cvodeInterface::get (const std::string &param) const
     }
     else if (param == "jac calls")
     {
-#ifdef KLU_ENABLE
-//	CVodeCVodeSlsGetNumJacEvals(solverMem, &val);
-#else
-        CVodeDlsGetNumJacEvals (solverMem, &val);
-#endif
+		CVodeGetNumGEvals(solverMem, &val);
     }
     else
     {
@@ -205,7 +199,7 @@ double cvodeInterface::get (const std::string &param) const
 }
 
 // output solver stats
-void cvodeInterface::logSolverStats (print_level logLevel, bool /*iconly*/) const
+void cvodeInterface::logSolverStats (solver_print_level logLevel, bool /*iconly*/) const
 {
     if (!flags[initialized_flag])
     {
@@ -256,9 +250,9 @@ void cvodeInterface::logSolverStats (print_level logLevel, bool /*iconly*/) cons
     logstr += "Last step                          = " + std::to_string (hlast) + '\n';
     logstr += "Tolerance scale factor             = " + std::to_string (tolsfac) + '\n';
 
-    if (m_gds != nullptr)
+    if (sobj != nullptr)
     {
-        m_gds->log (m_gds, logLevel, logstr);
+      //  sobj->log (sobj, logLevel, logstr);
     }
     else
     {
@@ -266,7 +260,7 @@ void cvodeInterface::logSolverStats (print_level logLevel, bool /*iconly*/) cons
     }
 }
 
-void cvodeInterface::logErrorWeights (print_level logLevel) const
+void cvodeInterface::logErrorWeights (solver_print_level logLevel) const
 {
     N_Vector eweight = NVECTOR_NEW (use_omp, svsize);
     N_Vector ele = NVECTOR_NEW (use_omp, svsize);
@@ -283,9 +277,9 @@ void cvodeInterface::logErrorWeights (print_level logLevel) const
           std::to_string (kk) + ':' + std::to_string (ewdata[kk]) + '\t' + std::to_string (eldata[kk]) + '\n';
     }
 
-    if (m_gds != nullptr)
+    if (sobj != nullptr)
     {
-        m_gds->log (m_gds, logLevel, logstr);
+       // sobj->log (sobj, logLevel, logstr);
     }
     else
     {
@@ -318,14 +312,14 @@ static const std::map<int, std::string> cvodeRetCodes{
   {CV_BAD_DKY, "Bad DKY"},
 };
 
-void cvodeInterface::initialize (coreTime time0)
+void cvodeInterface::initialize (double time0)
 {
     if (!flags[allocated_flag])
     {
         throw (InvalidSolverOperation ());
     }
 
-    auto jsize = m_gds->jacSize (mode);
+    auto jsize = sobj->jacobianSize (mode);
 
     // dynInitializeB CVode - Sundials
 
@@ -333,7 +327,7 @@ void cvodeInterface::initialize (coreTime time0)
     check_flag (&retval, "CVodeSetUserData", 1);
 
     // guessState an initial condition
-    m_gds->guessState (time0, state_data (), deriv_data (), mode);
+    sobj->guessCurrentValue (time0, state_data (), deriv_data (), mode);
 
     retval = CVodeInit (solverMem, cvodeFunc, time0, state);
     check_flag (&retval, "CVodeInit", 1);
@@ -437,9 +431,9 @@ void cvodeInterface::getCurrentData ()
     */
 }
 
-int cvodeInterface::solve (coreTime tStop, coreTime &tReturn, step_mode stepMode)
+int cvodeInterface::solve (double tStop, double &tReturn, step_mode stepMode)
 {
-    assert (rootCount == m_gds->rootSize (mode));
+    //assert (rootCount == sobj->rootSize (mode));
     ++solverCallCount;
     icCount = 0;
 
@@ -468,8 +462,8 @@ void cvodeInterface::getRoots ()
 void cvodeInterface::loadMaskElements ()
 {
     std::vector<double> mStates (svsize, 0.0);
-    m_gds->getVoltageStates (mStates.data (), mode);
-    m_gds->getAngleStates (mStates.data (), mode);
+  //  sobj->getVoltageStates (mStates.data (), mode);
+  //  sobj->getAngleStates (mStates.data (), mode);
     maskElements = vecFindgt<double, index_t> (mStates, 0.5);
     tempState.resize (svsize);
     double *lstate = NV_DATA_S (state);
@@ -486,24 +480,24 @@ int cvodeFunc (realtype time, N_Vector state, N_Vector dstate_dt, void *user_dat
     sd->funcCallCount++;
     if (sd->mode.pairedOffsetIndex != kNullLocation)
     {
-        int ret = sd->m_gds->dynAlgebraicSolve (time, NVECTOR_DATA (sd->use_omp, state),
+        int ret = sd->sobj->dynAlgebraicSolve (time, NVECTOR_DATA (sd->use_omp, state),
                                                 NVECTOR_DATA (sd->use_omp, dstate_dt), sd->mode);
         if (ret < FUNCTION_EXECUTION_SUCCESS)
         {
             return ret;
         }
     }
-    int ret = sd->m_gds->derivativeFunction (time, NVECTOR_DATA (sd->use_omp, state),
+    int ret = sd->sobj->derivativeFunction (time, NVECTOR_DATA (sd->use_omp, state),
                                              NVECTOR_DATA (sd->use_omp, dstate_dt), sd->mode);
 
     if (sd->flags[fileCapture_flag])
     {
         if (!sd->stateFile.empty ())
         {
-            writeVector (time, STATE_INFORMATION, sd->funcCallCount, sd->mode.offsetIndex, sd->svsize,
-                         NVECTOR_DATA (sd->use_omp, state), sd->stateFile, (sd->funcCallCount != 1));
-            writeVector (time, DERIVATIVE_INFORMATION, sd->funcCallCount, sd->mode.offsetIndex, sd->svsize,
-                         NVECTOR_DATA (sd->use_omp, dstate_dt), sd->stateFile);
+         //   writeVector (time, STATE_INFORMATION, sd->funcCallCount, sd->mode.offsetIndex, sd->svsize,
+          //               NVECTOR_DATA (sd->use_omp, state), sd->stateFile, (sd->funcCallCount != 1));
+          //  writeVector (time, DERIVATIVE_INFORMATION, sd->funcCallCount, sd->mode.offsetIndex, sd->svsize,
+           //              NVECTOR_DATA (sd->use_omp, dstate_dt), sd->stateFile);
         }
     }
 
@@ -513,7 +507,7 @@ int cvodeFunc (realtype time, N_Vector state, N_Vector dstate_dt, void *user_dat
 int cvodeRootFunc (realtype time, N_Vector state, realtype *gout, void *user_data)
 {
     auto sd = reinterpret_cast<cvodeInterface *> (user_data);
-    sd->m_gds->rootFindingFunction (time, NVECTOR_DATA (sd->use_omp, state), sd->deriv_data (), gout, sd->mode);
+    sd->sobj->rootFindingFunction (time, NVECTOR_DATA (sd->use_omp, state), sd->deriv_data (), gout, sd->mode);
 
     return FUNCTION_EXECUTION_SUCCESS;
 }

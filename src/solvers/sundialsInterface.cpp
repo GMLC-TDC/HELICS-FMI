@@ -33,20 +33,15 @@ namespace griddyn
 {
 namespace solvers
 {
-static childClassFactory<kinsolInterface, SolverInterface> kinFactory (stringVec{"kinsol", "algebraic"});
-static childClassFactory<idaInterface, SolverInterface> idaFactory (stringVec{"ida", "dae", "dynamic"});
-#ifdef LOAD_CVODE
-static childClassFactory<cvodeInterface, SolverInterface>
-  cvodeFactory (stringVec{"cvode", "dyndiff", "differential"});
-#endif
 
-#ifdef LOAD_ARKODE
-static childClassFactory<arkodeInterface, SolverInterface> arkodeFactory (stringVec{"arkode"});
-#endif
+static childClassFactory<cvodeInterface, SolverInterface>
+  cvodeFactory (stringVector{"cvode", "dyndiff", "differential"});
+
+static childClassFactory<arkodeInterface, SolverInterface> arkodeFactory (stringVector{"arkode"});
 
 sundialsInterface::sundialsInterface (const std::string &objName) : SolverInterface (objName) { tolerance = 1e-8; }
-sundialsInterface::sundialsInterface (gridDynSimulation *gds, const solverMode &sMode)
-    : SolverInterface (gds, sMode)
+sundialsInterface::sundialsInterface (SolvableObject *sobj, const solverMode &sMode)
+    : SolverInterface (sobj, sMode)
 {
     tolerance = 1e-8;
 }
@@ -405,7 +400,7 @@ int sundialsJac (realtype time,
         {
             matrixDataFilter<double> filterAd (*(a1));
             filterAd.addFilter (sd->maskElements);
-            sd->m_gds->jacobianFunction (time, NVECTOR_DATA (sd->use_omp, state),
+            sd->sobj->jacobianFunction (time, NVECTOR_DATA (sd->use_omp, state),
                                          (dstate_dt != nullptr) ? NVECTOR_DATA (sd->use_omp, dstate_dt) : nullptr,
                                          filterAd, cj, sd->mode);
             for (auto &v : sd->maskElements)
@@ -415,7 +410,7 @@ int sundialsJac (realtype time,
         }
         else
         {
-            sd->m_gds->jacobianFunction (time, NVECTOR_DATA (sd->use_omp, state),
+            sd->sobj->jacobianFunction (time, NVECTOR_DATA (sd->use_omp, state),
                                          (dstate_dt != nullptr) ? NVECTOR_DATA (sd->use_omp, dstate_dt) : nullptr,
                                          *a1, cj, sd->mode);
         }
@@ -427,7 +422,7 @@ int sundialsJac (realtype time,
             a1->compact ();
             if (SM_CONTENT_S (J)->NNZ < static_cast<int> (a1->size ()))
             {
-                jacobianAnalysis (*a1, sd->m_gds, sd->mode, 5);
+           //     jacobianAnalysis (*a1, sd->sobj, sd->mode, 5);
             }
         }
 #endif
@@ -438,7 +433,7 @@ int sundialsJac (realtype time,
             if (!sd->jacFile.empty ())
             {
                 auto val = static_cast<long int> (sd->get ("nliterations"));
-                writeArray (time, 1, val, sd->mode.offsetIndex, *a1, sd->jacFile);
+             //   writeArray (time, 1, val, sd->mode.offsetIndex, *a1, sd->jacFile);
             }
         }
     }
@@ -450,7 +445,7 @@ int sundialsJac (realtype time,
         {
             matrixDataFilter<double> filterAd (*a1);
             filterAd.addFilter (sd->maskElements);
-            sd->m_gds->jacobianFunction (time, NVECTOR_DATA (sd->use_omp, state),
+            sd->sobj->jacobianFunction (time, NVECTOR_DATA (sd->use_omp, state),
                                          NVECTOR_DATA (sd->use_omp, dstate_dt), filterAd, cj, sd->mode);
             for (auto &v : sd->maskElements)
             {
@@ -459,7 +454,7 @@ int sundialsJac (realtype time,
         }
         else
         {
-            sd->m_gds->jacobianFunction (time, NVECTOR_DATA (sd->use_omp, state),
+            sd->sobj->jacobianFunction (time, NVECTOR_DATA (sd->use_omp, state),
                                          NVECTOR_DATA (sd->use_omp, dstate_dt), *a1, cj, sd->mode);
         }
 
@@ -468,14 +463,14 @@ int sundialsJac (realtype time,
         {
             if (!sd->jacFile.empty ())
             {
-                writeArray (time, 1, sd->jacCallCount, sd->mode.offsetIndex, *a1, sd->jacFile);
+            //    writeArray (time, 1, sd->jacCallCount, sd->mode.offsetIndex, *a1, sd->jacFile);
             }
         }
     }
 /*
 matrixDataSparse<double> &a1 = sd->a1;
 
-sd->m_gds->jacobianFunction (time, NVECTOR_DATA(sd->use_omp, state), NVECTOR_DATA(sd->use_omp, dstate_dt), a1,cj,
+sd->sobj->jacobianFunction (time, NVECTOR_DATA(sd->use_omp, state), NVECTOR_DATA(sd->use_omp, dstate_dt), a1,cj,
 sd->mode);
 a1.sortIndexCol ();
 if (sd->flags[useMask_flag])

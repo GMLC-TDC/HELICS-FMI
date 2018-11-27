@@ -9,9 +9,7 @@
  * For details, see the LICENSE file.
  * LLNS Copyright End
  */
-
-#ifndef _ARKODE_SOLVER_INTERFACE_H_
-#define _ARKODE_SOLVER_INTERFACE_H_
+#pragma once
 
 #include "sundialsInterface.h"
 
@@ -24,7 +22,7 @@ namespace solvers
 class arkodeInterface : public sundialsInterface
 {
   public:
-    count_t icCount = 0;  //!< counter for the number of times the initial condition function was called
+    solver_index_type icCount = 0;  //!< counter for the number of times the initial condition function was called
 
   private:
     matrixDataSparse<double> a1;  //!< array structure for holding the Jacobian information
@@ -41,24 +39,24 @@ class arkodeInterface : public sundialsInterface
     @param[in] gds  the gridDynSimulation object to connect to
     @param[in] sMode the solverMode to solve For
     */
-    arkodeInterface (gridDynSimulation *gds, const solverMode &sMode);
+    arkodeInterface (SolvableObject *sobj, const solverMode &sMode);
     /** @brief destructor*/
     virtual ~arkodeInterface ();
 
     virtual std::unique_ptr<SolverInterface> clone (bool fullCopy = false) const override;
 
     virtual void cloneTo (SolverInterface *si, bool fullCopy = false) const override;
-    virtual void allocate (count_t stateCount, count_t numRoots = 0) override;
-    virtual void initialize (coreTime time0) override;
-    virtual void setMaxNonZeros (count_t nonZeroCount) override;
+    virtual void allocate (solver_index_type stateCount, solver_index_type numRoots = 0) override;
+    virtual void initialize (double time0) override;
+    virtual void setMaxNonZeros (solver_index_type nonZeroCount) override;
     virtual void sparseReInit (sparse_reinit_modes sparseReinitMode) override;
     virtual void getCurrentData () override;
-    virtual int solve (coreTime tStop, coreTime &tReturn, step_mode stepMode = step_mode::normal) override;
+    virtual int solve (double tStop, double &tReturn, step_mode stepMode = step_mode::normal) override;
     virtual void getRoots () override;
-    virtual void setRootFinding (count_t numRoots) override;
+    virtual void setRootFinding (solver_index_type numRoots) override;
 
-    virtual void logSolverStats (print_level logLevel, bool iconly = false) const override;
-    virtual void logErrorWeights (print_level logLevel) const override;
+    virtual void logSolverStats (solver_print_level logLevel, bool iconly = false) const override;
+    virtual void logErrorWeights (solver_print_level logLevel) const override;
     virtual void set (const std::string &param, const std::string &val) override;
     virtual void set (const std::string &param, double val) override;
     virtual double get (const std::string &param) const override;
@@ -81,5 +79,3 @@ class arkodeInterface : public sundialsInterface
 
 }  // namespace solvers
 }  // namespace griddyn
-
-#endif

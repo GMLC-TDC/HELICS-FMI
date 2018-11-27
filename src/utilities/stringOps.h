@@ -9,10 +9,7 @@
  * For details, see the LICENSE file.
  * LLNS Copyright End
  */
-
-#ifndef STRINGOPS_H_
-#define STRINGOPS_H_
-
+#pragma once
 
 #include <stdexcept>
 #include <string>
@@ -276,6 +273,3 @@ std::string characterReplace (const std::string &source, char key, std::string r
 */
 std::string xmlCharacterCodeReplace (std::string str);
 }
-
-
-#endif

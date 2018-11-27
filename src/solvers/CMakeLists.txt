@@ -33,12 +33,13 @@ set(
     basicOdeSolver.cpp
 	cvodeInterface.cpp
 	arkodeInterface.cpp
+	solverMode.cpp
 )
 
 add_library(solvers STATIC ${solver_sources} ${solver_headers})
 
 target_link_libraries(solvers PUBLIC SUNDIALS::SUNDIALS)
-if(NOT DISABLE_KLU)
+if(ENABLE_KLU)
     target_link_libraries(solvers PUBLIC SuiteSparse::klu)
-endif(NOT DISABLE_KLU)
+endif(ENABLE_KLU)
 
