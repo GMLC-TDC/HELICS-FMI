@@ -38,7 +38,7 @@ set(
 
 add_library(solvers STATIC ${solver_sources} ${solver_headers})
 
-target_link_libraries(solvers PUBLIC SUNDIALS::SUNDIALS)
+target_link_libraries(solvers PUBLIC utilities SUNDIALS::SUNDIALS)
 if(ENABLE_KLU)
     target_link_libraries(solvers PUBLIC SuiteSparse::klu)
 endif(ENABLE_KLU)
