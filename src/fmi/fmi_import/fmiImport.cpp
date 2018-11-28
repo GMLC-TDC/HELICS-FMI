@@ -23,91 +23,88 @@
 
 using namespace boost::filesystem;
 
-
-
-fmiBaseFunctions::fmiBaseFunctions(const std::shared_ptr<boost::dll::shared_library> &slib)
+fmiBaseFunctions::fmiBaseFunctions (const std::shared_ptr<boost::dll::shared_library> &slib)
 {
-	fmi2GetVersion = slib->get<fmi2GetVersionTYPE>("fmi2GetVersion");
-	fmi2GetTypesPlatform = slib->get<fmi2GetTypesPlatformTYPE>("fmi2GetTypesPlatform");
-	fmi2Instantiate = slib->get<fmi2InstantiateTYPE>("fmi2Instantiate");
+    fmi2GetVersion = slib->get<fmi2GetVersionTYPE> ("fmi2GetVersion");
+    fmi2GetTypesPlatform = slib->get<fmi2GetTypesPlatformTYPE> ("fmi2GetTypesPlatform");
+    fmi2Instantiate = slib->get<fmi2InstantiateTYPE> ("fmi2Instantiate");
 }
 
-fmiCommonFunctions::fmiCommonFunctions(std::shared_ptr<boost::dll::shared_library> slib) : lib(std::move(slib))
+fmiCommonFunctions::fmiCommonFunctions (std::shared_ptr<boost::dll::shared_library> slib) : lib (std::move (slib))
 {
-	// commonFunctions = std::make_shared<fmiCommonFunctions> ();
+    // commonFunctions = std::make_shared<fmiCommonFunctions> ();
 
-	fmi2SetDebugLogging = lib->get<fmi2SetDebugLoggingTYPE>("fmi2SetDebugLogging");
+    fmi2SetDebugLogging = lib->get<fmi2SetDebugLoggingTYPE> ("fmi2SetDebugLogging");
 
-	/* Creation and destruction of FMU instances and setting debug status */
+    /* Creation and destruction of FMU instances and setting debug status */
 
-	fmi2FreeInstance = lib->get<fmi2FreeInstanceTYPE>("fmi2FreeInstance");
+    fmi2FreeInstance = lib->get<fmi2FreeInstanceTYPE> ("fmi2FreeInstance");
 
-	/* Enter and exit initialization mode, terminate and reset */
-	fmi2SetupExperiment = lib->get<fmi2SetupExperimentTYPE>("fmi2SetupExperiment");
-	fmi2EnterInitializationMode = lib->get<fmi2EnterInitializationModeTYPE>("fmi2EnterInitializationMode");
-	fmi2ExitInitializationMode = lib->get<fmi2ExitInitializationModeTYPE>("fmi2ExitInitializationMode");
-	fmi2Terminate = lib->get<fmi2TerminateTYPE>("fmi2Terminate");
-	fmi2Reset = lib->get<fmi2ResetTYPE>("fmi2Reset");
+    /* Enter and exit initialization mode, terminate and reset */
+    fmi2SetupExperiment = lib->get<fmi2SetupExperimentTYPE> ("fmi2SetupExperiment");
+    fmi2EnterInitializationMode = lib->get<fmi2EnterInitializationModeTYPE> ("fmi2EnterInitializationMode");
+    fmi2ExitInitializationMode = lib->get<fmi2ExitInitializationModeTYPE> ("fmi2ExitInitializationMode");
+    fmi2Terminate = lib->get<fmi2TerminateTYPE> ("fmi2Terminate");
+    fmi2Reset = lib->get<fmi2ResetTYPE> ("fmi2Reset");
 
-	/* Getting and setting variable values */
-	fmi2GetReal = lib->get<fmi2GetRealTYPE>("fmi2GetReal");
-	fmi2GetInteger = lib->get<fmi2GetIntegerTYPE>("fmi2GetInteger");
-	fmi2GetBoolean = lib->get<fmi2GetBooleanTYPE>("fmi2GetBoolean");
-	fmi2GetString = lib->get<fmi2GetStringTYPE>("fmi2GetString");
+    /* Getting and setting variable values */
+    fmi2GetReal = lib->get<fmi2GetRealTYPE> ("fmi2GetReal");
+    fmi2GetInteger = lib->get<fmi2GetIntegerTYPE> ("fmi2GetInteger");
+    fmi2GetBoolean = lib->get<fmi2GetBooleanTYPE> ("fmi2GetBoolean");
+    fmi2GetString = lib->get<fmi2GetStringTYPE> ("fmi2GetString");
 
-	fmi2SetReal = lib->get<fmi2SetRealTYPE>("fmi2SetReal");
-	fmi2SetInteger = lib->get<fmi2SetIntegerTYPE>("fmi2SetInteger");
-	fmi2SetBoolean = lib->get<fmi2SetBooleanTYPE>("fmi2SetBoolean");
-	fmi2SetString = lib->get<fmi2SetStringTYPE>("fmi2SetString");
+    fmi2SetReal = lib->get<fmi2SetRealTYPE> ("fmi2SetReal");
+    fmi2SetInteger = lib->get<fmi2SetIntegerTYPE> ("fmi2SetInteger");
+    fmi2SetBoolean = lib->get<fmi2SetBooleanTYPE> ("fmi2SetBoolean");
+    fmi2SetString = lib->get<fmi2SetStringTYPE> ("fmi2SetString");
 
-	/* Getting and setting the internal FMU state */
-	fmi2GetFMUstate = lib->get<fmi2GetFMUstateTYPE>("fmi2GetFMUstate");
-	fmi2SetFMUstate = lib->get<fmi2SetFMUstateTYPE>("fmi2SetFMUstate");
-	fmi2FreeFMUstate = lib->get<fmi2FreeFMUstateTYPE>("fmi2FreeFMUstate");
-	fmi2SerializedFMUstateSize = lib->get<fmi2SerializedFMUstateSizeTYPE>("fmi2SerializedFMUstateSize");
-	fmi2SerializeFMUstate = lib->get<fmi2SerializeFMUstateTYPE>("fmi2SerializeFMUstate");
-	fmi2DeSerializeFMUstate = lib->get<fmi2DeSerializeFMUstateTYPE>("fmi2DeSerializeFMUstate");
+    /* Getting and setting the internal FMU state */
+    fmi2GetFMUstate = lib->get<fmi2GetFMUstateTYPE> ("fmi2GetFMUstate");
+    fmi2SetFMUstate = lib->get<fmi2SetFMUstateTYPE> ("fmi2SetFMUstate");
+    fmi2FreeFMUstate = lib->get<fmi2FreeFMUstateTYPE> ("fmi2FreeFMUstate");
+    fmi2SerializedFMUstateSize = lib->get<fmi2SerializedFMUstateSizeTYPE> ("fmi2SerializedFMUstateSize");
+    fmi2SerializeFMUstate = lib->get<fmi2SerializeFMUstateTYPE> ("fmi2SerializeFMUstate");
+    fmi2DeSerializeFMUstate = lib->get<fmi2DeSerializeFMUstateTYPE> ("fmi2DeSerializeFMUstate");
 
-	/* Getting partial derivatives */
-	fmi2GetDirectionalDerivative = lib->get<fmi2GetDirectionalDerivativeTYPE>("fmi2GetDirectionalDerivative");
+    /* Getting partial derivatives */
+    fmi2GetDirectionalDerivative = lib->get<fmi2GetDirectionalDerivativeTYPE> ("fmi2GetDirectionalDerivative");
 }
 
-fmiModelExchangeFunctions::fmiModelExchangeFunctions(std::shared_ptr<boost::dll::shared_library> slib)
-	: lib(std::move(slib))
+fmiModelExchangeFunctions::fmiModelExchangeFunctions (std::shared_ptr<boost::dll::shared_library> slib)
+    : lib (std::move (slib))
 {
-	fmi2EnterEventMode = lib->get<fmi2EnterEventModeTYPE>("fmi2EnterEventMode");
-	fmi2NewDiscreteStates = lib->get<fmi2NewDiscreteStatesTYPE>("fmi2NewDiscreteStates");
-	fmi2EnterContinuousTimeMode = lib->get<fmi2EnterContinuousTimeModeTYPE>("fmi2EnterContinuousTimeMode");
-	fmi2CompletedIntegratorStep = lib->get<fmi2CompletedIntegratorStepTYPE>("fmi2CompletedIntegratorStep");
+    fmi2EnterEventMode = lib->get<fmi2EnterEventModeTYPE> ("fmi2EnterEventMode");
+    fmi2NewDiscreteStates = lib->get<fmi2NewDiscreteStatesTYPE> ("fmi2NewDiscreteStates");
+    fmi2EnterContinuousTimeMode = lib->get<fmi2EnterContinuousTimeModeTYPE> ("fmi2EnterContinuousTimeMode");
+    fmi2CompletedIntegratorStep = lib->get<fmi2CompletedIntegratorStepTYPE> ("fmi2CompletedIntegratorStep");
 
-	/* Providing independent variables and re-initialization of caching */
-	fmi2SetTime = lib->get<fmi2SetTimeTYPE>("fmi2SetTime");
-	fmi2SetContinuousStates = lib->get<fmi2SetContinuousStatesTYPE>("fmi2SetContinuousStates");
+    /* Providing independent variables and re-initialization of caching */
+    fmi2SetTime = lib->get<fmi2SetTimeTYPE> ("fmi2SetTime");
+    fmi2SetContinuousStates = lib->get<fmi2SetContinuousStatesTYPE> ("fmi2SetContinuousStates");
 
-	/* Evaluation of the model equations */
-	fmi2GetDerivatives = lib->get<fmi2GetDerivativesTYPE>("fmi2GetDerivatives");
-	fmi2GetEventIndicators = lib->get<fmi2GetEventIndicatorsTYPE>("fmi2GetEventIndicators");
-	fmi2GetContinuousStates = lib->get<fmi2GetContinuousStatesTYPE>("fmi2GetContinuousStates");
-	fmi2GetNominalsOfContinuousStates =
-		lib->get<fmi2GetNominalsOfContinuousStatesTYPE>("fmi2GetNominalsOfContinuousStates");
+    /* Evaluation of the model equations */
+    fmi2GetDerivatives = lib->get<fmi2GetDerivativesTYPE> ("fmi2GetDerivatives");
+    fmi2GetEventIndicators = lib->get<fmi2GetEventIndicatorsTYPE> ("fmi2GetEventIndicators");
+    fmi2GetContinuousStates = lib->get<fmi2GetContinuousStatesTYPE> ("fmi2GetContinuousStates");
+    fmi2GetNominalsOfContinuousStates =
+      lib->get<fmi2GetNominalsOfContinuousStatesTYPE> ("fmi2GetNominalsOfContinuousStates");
 }
 
-fmiCoSimFunctions::fmiCoSimFunctions(std::shared_ptr<boost::dll::shared_library> slib) : lib(std::move(slib))
+fmiCoSimFunctions::fmiCoSimFunctions (std::shared_ptr<boost::dll::shared_library> slib) : lib (std::move (slib))
 {
-	fmi2SetRealInputDerivatives = lib->get<fmi2SetRealInputDerivativesTYPE>("fmi2SetRealInputDerivatives");
-	fmi2GetRealOutputDerivatives = lib->get<fmi2GetRealOutputDerivativesTYPE>("fmi2GetRealOutputDerivatives");
+    fmi2SetRealInputDerivatives = lib->get<fmi2SetRealInputDerivativesTYPE> ("fmi2SetRealInputDerivatives");
+    fmi2GetRealOutputDerivatives = lib->get<fmi2GetRealOutputDerivativesTYPE> ("fmi2GetRealOutputDerivatives");
 
-	fmi2DoStep = lib->get<fmi2DoStepTYPE>("fmi2DoStep");
-	fmi2CancelStep = lib->get<fmi2CancelStepTYPE>("fmi2CancelStep");
+    fmi2DoStep = lib->get<fmi2DoStepTYPE> ("fmi2DoStep");
+    fmi2CancelStep = lib->get<fmi2CancelStepTYPE> ("fmi2CancelStep");
 
-	/* Inquire slave status */
-	fmi2GetStatus = lib->get<fmi2GetStatusTYPE>("fmi2GetStatus");
-	fmi2GetRealStatus = lib->get<fmi2GetRealStatusTYPE>("fmi2GetRealStatus");
-	fmi2GetIntegerStatus = lib->get<fmi2GetIntegerStatusTYPE>("fmi2GetIntegerStatus");
-	fmi2GetBooleanStatus = lib->get<fmi2GetBooleanStatusTYPE>("fmi2GetBooleanStatus");
-	fmi2GetStringStatus = lib->get<fmi2GetStringStatusTYPE>("fmi2GetStringStatus");
+    /* Inquire slave status */
+    fmi2GetStatus = lib->get<fmi2GetStatusTYPE> ("fmi2GetStatus");
+    fmi2GetRealStatus = lib->get<fmi2GetRealStatusTYPE> ("fmi2GetRealStatus");
+    fmi2GetIntegerStatus = lib->get<fmi2GetIntegerStatusTYPE> ("fmi2GetIntegerStatus");
+    fmi2GetBooleanStatus = lib->get<fmi2GetBooleanStatusTYPE> ("fmi2GetBooleanStatus");
+    fmi2GetStringStatus = lib->get<fmi2GetStringStatusTYPE> ("fmi2GetStringStatus");
 }
-
 
 fmiLibrary::fmiLibrary () { information = std::make_shared<fmiInfo> (); }
 
@@ -268,8 +265,8 @@ std::unique_ptr<fmi2ModelExchangeObject> fmiLibrary::createModelExchangeObject (
                                                    (R"raw(file:///)raw" + resourceDir.string ()).c_str (),
                                                    reinterpret_cast<fmi2CallbackFunctions *> (callbacks.get ()),
                                                    fmi2False, fmi2False);
-        auto meobj =
-          std::make_unique<fmi2ModelExchangeObject> (comp, information, commonFunctions, ModelExchangeFunctions);
+        auto meobj = std::make_unique<fmi2ModelExchangeObject> (name, comp, information, commonFunctions,
+                                                                ModelExchangeFunctions);
         ++mecount;
         return meobj;
     }
@@ -294,7 +291,7 @@ std::unique_ptr<fmi2CoSimObject> fmiLibrary::createCoSimulationObject (const std
                                          (R"raw(file:///)raw" + resourceDir.string ()).c_str (),
                                          reinterpret_cast<fmi2CallbackFunctions *> (callbacks.get ()), fmi2False,
                                          fmi2False);
-        auto csobj = std::make_unique<fmi2CoSimObject> (comp, information, commonFunctions, CoSimFunctions);
+        auto csobj = std::make_unique<fmi2CoSimObject> (name, comp, information, commonFunctions, CoSimFunctions);
         ++cosimcount;
         return csobj;
     }
@@ -319,18 +316,18 @@ void fmiLibrary::loadSharedLibrary (fmu_type type)
     }
     if (loaded)
     {
-		baseFunctions = fmiBaseFunctions(lib);
-		commonFunctions = std::make_shared<fmiCommonFunctions>(lib);
+        baseFunctions = fmiBaseFunctions (lib);
+        commonFunctions = std::make_shared<fmiCommonFunctions> (lib);
         // Only load one or the other
         if (checkFlag (modelExchangeCapable) && type._value != fmu_type::cosimulation)
         {
-			ModelExchangeFunctions = std::make_shared<fmiModelExchangeFunctions>(lib);
+            ModelExchangeFunctions = std::make_shared<fmiModelExchangeFunctions> (lib);
             soMeLoaded = true;
             soCoSimLoaded = false;
         }
         else if (checkFlag (coSimulationCapable))
         {
-			CoSimFunctions = std::make_shared<fmiCoSimFunctions>(lib);
+            CoSimFunctions = std::make_shared<fmiCoSimFunctions> (lib);
             soCoSimLoaded = true;
             soMeLoaded = false;
         }
@@ -356,7 +353,7 @@ path fmiLibrary::findSoPath (fmu_type type)
         }
         else
         {
-			return path{};
+            return path{};
         }
         break;
     case fmu_type::cosimulation:
