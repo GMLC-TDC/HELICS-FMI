@@ -62,7 +62,7 @@ void FmiCoSimFederate::run (helics::Time step, helics::Time stop)
 			step = std::min(0.2, static_cast<double>(stop) / 100.0);
 		}
 	}
-	fed.setTimeProperty(helics_property_time_period, step);
+	fed.setProperty(helics_property_time_period, step);
     fed.enterInitializingMode ();
     cs->setMode (fmuMode::initializationMode);
     std::vector<fmi2Real> outputs (pubs.size ());
