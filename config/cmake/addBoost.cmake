@@ -34,6 +34,7 @@ mark_as_advanced(USE_BOOST_STATIC_LIBS)
 if (MSVC)
 
 set (boost_versions
+boost_1_69_0
 boost_1_68_0
 boost_1_67_0
 boost_1_66_0
@@ -99,7 +100,7 @@ if (NOT BOOST_REQUIRED_LIBRARIES)
 endif()
 
 # Minimum version of Boost required for building HELICS
-set(BOOST_MINIMUM_VERSION 1.58)
+set(BOOST_MINIMUM_VERSION 1.61)
 set(Boost_USE_STATIC_LIBS   ${USE_BOOST_STATIC_LIBS})
 find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS ${BOOST_REQUIRED_LIBRARIES} REQUIRED)
 

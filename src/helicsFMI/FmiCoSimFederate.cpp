@@ -28,7 +28,7 @@ FmiCoSimFederate::FmiCoSimFederate (std::shared_ptr<fmi2CoSimObject> obj, const 
         auto outputs = cs->getOutputNames ();
         for (auto output : outputs)
         {
-            pubs.emplace_back (&fed, output, helics::helics_type_t::helicsDouble);
+            pubs.emplace_back (&fed, output, helics::data_type::helicsDouble);
         }
     }
 }
@@ -62,7 +62,7 @@ void FmiCoSimFederate::run (helics::Time step, helics::Time stop)
             step = std::min (0.2, static_cast<double> (stop) / 100.0);
         }
     }
-    fed.setTimeProperty (helics_property_time_period, step);
+    fed.setProperty (helics_property_time_period, step);
 
     fed.enterInitializingMode ();
     cs->setMode (fmuMode::initializationMode);
