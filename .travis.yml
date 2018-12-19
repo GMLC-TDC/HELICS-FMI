@@ -34,7 +34,7 @@ install:
   # The install path should not be cached by Travis, to ensure we are building against the latest version
   # Install prefix folder must be created before running script
   - mkdir ${TRAVIS_BUILD_DIR}/helics-prefix
-  - wget https://dl.bintray.com/helics/develop/HELICS_2_0/helics-install-$(uname -s).sh
+  - wget https://dl.bintray.com/helics/develop/develop/helics-install-$(uname -s).sh
   - chmod 755 *.sh
   - ./helics-install-Linux.sh --skip-license --prefix=${TRAVIS_BUILD_DIR}/helics-prefix
   
