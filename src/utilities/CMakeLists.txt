@@ -28,6 +28,7 @@ argParser.cpp
 	logger.cpp
 	matrixDataSparse.cpp
 	stringToCmdLine.cpp
+	helperObject.cpp
 	)
 
 set(utilities_headers
@@ -69,6 +70,8 @@ set(utilities_headers
 	indexTypes.hpp
 	logger.h
 	stringToCmdLine.h
+	factoryTemplates.hpp
+	helperObject.h
 	)
 
 add_library(utilities STATIC ${utilities_sources} ${utilities_headers})

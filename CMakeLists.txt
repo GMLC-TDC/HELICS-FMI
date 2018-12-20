@@ -11,12 +11,12 @@
 cmake_minimum_required(VERSION 3.5)
 cmake_policy(VERSION 3.5)
 
-project(HELICS-FMI VERSION 0.4.0)
+project(HELICS-FMI VERSION 0.5.0)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 #set (HELICS-FMI_VERSION_BUILD alpha.1)
-set (HELICS-FMI_DATE "08-30-18")
+set (HELICS-FMI_DATE "11-30-18")
 set(
   HELICS-FMI_VERSION_UNDERSCORE
   "${HELICS-FMI_VERSION_MAJOR}_${HELICS-FMI_VERSION_MINOR}_${HELICS-FMI_VERSION_PATCH}"
@@ -138,6 +138,14 @@ include(addBoost)
 
 target_link_libraries(helics_fmi_base INTERFACE Boostlibs::core)
 
+# ------------------------------------------------------------
+# Find (and test) the KLU libraries
+# ------------------------------------------------------------
+if(ENABLE_KLU)
+    include(addKLU_targets)
+endif()
+
+
 # -------------------------------------------------------------
 # Sundials
 # -------------------------------------------------------------
@@ -212,6 +220,17 @@ add_subdirectory(src/utilities)
 
 add_subdirectory(src/fmi)
 
+# -------------------------------------------------------------
+# Enable HELICS executable
+# -------------------------------------------------------------
+
+SHOW_VARIABLE(HELICS_INSTALL_PATH PATH "path to the helics installation" "${PROJECT_BINARY_DIR}/libs")
+
+include(addHELICS)
+
+add_subdirectory(src/solvers)
+add_subdirectory(src/helicsFMI)
+
 option (HELICS_FMI_GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)
 
 IF (HELICS_FMI_GENERATE_DOXYGEN_DOC)
@@ -227,15 +246,6 @@ if(DOXYGEN_FOUND)
 )
 endif(DOXYGEN_FOUND)
 endif (HELICS_FMI_GENERATE_DOXYGEN_DOC)
-
-
-# -------------------------------------------------------------
-# Enable HELICS executable
-# -------------------------------------------------------------
-
-SHOW_VARIABLE(HELICS_INSTALL_PATH PATH "path to the helics installation" "${PROJECT_BINARY_DIR}/libs")
-
-include(addHELICS)
 
 
 FILE(GLOB KEY_LIBRARY_FILES  ${PROJECT_BINARY_DIR}/libs/bin/*)

@@ -9,25 +9,16 @@
 # LLNS Copyright End
 
 set(helics-fmi_sources
-	FmiCoSimFederate.cpp
-	FmiModelExchangeFederate.cpp
 	helics-fmi-main.cpp
 	)
 
 set(helics-fmi_headers
-	FmiCoSimFederate.hpp
-	FmiModelExchangeFederate.hpp
 	)
 
 add_executable(helics-fmi ${helics-fmi_sources} ${helics-fmi_headers})
 
-INCLUDE_DIRECTORIES(.)
-INCLUDE_DIRECTORIES(${formatInterpreter_include_directories})
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/fmi)
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/utilities)
-INCLUDE_DIRECTORIES(${HELICS_INCLUDE_DIR})
 
-target_link_libraries(helics-fmi HELICS::helics-static fmiLibrary helics_fmi_base)
+target_link_libraries(helics-fmi helicsFMI)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET helics-fmi POST_BUILD        # Adds a post-build event to helics-fmi

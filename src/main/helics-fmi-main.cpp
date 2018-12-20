@@ -10,16 +10,20 @@
  * LLNS Copyright End
  */
 
-#include "FmiCoSimFederate.hpp"
-#include "FmiModelExchangeFederate.hpp"
-#include "fmi_import/fmiImport.h"
+#include "fmi/fmi_import/fmiImport.h"
+#include "formatInterpreters/jsonReaderElement.h"
 #include "helics-fmi/helics-fmi-config.h"
+#include "helics/core/CoreFactory.hpp"
 #include "helics/core/helicsVersion.hpp"
+#include "helicsFMI/FmiCoSimFederate.hpp"
+#include "helicsFMI/FmiModelExchangeFederate.hpp"
 #include "utilities/argParser.h"
 #include <iostream>
 #include <boost/filesystem.hpp>
 
 namespace filesystem = boost::filesystem;
+
+void runSystem (readerElement &elem);
 
 static const utilities::ArgDescriptors fmiArgs{
   {"stop", "the time to stop the fmi"},
@@ -70,7 +74,7 @@ int main (int argc, char *argv[])
         {
             std::shared_ptr<fmi2CoSimObject> obj = fmi.createCoSimulationObject ("obj1");
             auto fed = std::make_unique<FmiCoSimFederate> (obj, fi);
-            fed->run (helics::timeZero,helics::timeZero);
+            fed->run (helics::timeZero, helics::timeZero);
         }
         else
         {
@@ -81,14 +85,47 @@ int main (int argc, char *argv[])
     }
     else if ((ext == ".json") || (ext == ".JSON"))
     {
-
+        jsonReaderElement system (filename);
+        if (system.isValid ())
+        {
+            runSystem (system);
+        }
     }
-	else if ((ext == ".toml") || (ext == ".TOML"))
-	{
-
-	}
+    else if ((ext == ".toml") || (ext == ".TOML"))
+    {
+    }
     else if ((ext == ".xml") || (ext == ".XML"))
     {
-
     }
+}
+
+void runSystem (readerElement &elem)
+{
+    elem.moveToFirstChild ("fmus");
+    std::vector<std::unique_ptr<FmiCoSimFederate>> feds;
+    auto core = helics::CoreFactory::create (helics::core_type::TEST, "--name=fmu_core --autobroker");
+    while (elem.isValid ())
+    {
+        fmiLibrary fmi;
+        helics::FederateInfo fi;
+        fi.defName = "fmi";
+        fi.coreName = "fmu_core";
+        auto str = elem.getAttributeText ("fmu");
+        fmi.loadFMU (str);
+        std::shared_ptr<fmi2CoSimObject> obj = fmi.createCoSimulationObject (elem.getAttributeText ("name"));
+        auto fed = std::make_unique<FmiCoSimFederate> (obj, fi);
+        feds.push_back (std::move (fed));
+        elem.moveToNextSibling ("fmus");
+    }
+    elem.moveToParent ();
+    elem.moveToFirstChild ("connections");
+    while (elem.isValid ())
+    {
+        auto str1 = elem.getFirstAttribute ().getText ();
+        auto str2 = elem.getNextAttribute ().getText ();
+        elem.moveToNextSibling ();
+		core->dataLink(str1, str2);
+    }
+    feds.clear ();
+    core->disconnect ();
 }
