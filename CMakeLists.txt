@@ -1,7 +1,7 @@
 # LLNS Copyright Start
 # Copyright (c) 2017, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department 
-# of Energy by Lawrence Livermore National Laboratory in part under 
+# This work was performed under the auspices of the U.S. Department
+# of Energy by Lawrence Livermore National Laboratory in part under
 # Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
 # Produced at the Lawrence Livermore National Laboratory.
 # All rights reserved.
@@ -131,9 +131,6 @@ set(
   unit_test_framework
   filesystem
   system
-  date_time
-  timer
-  chrono
 )
 include(addBoost)
 
@@ -287,7 +284,7 @@ endif(BUILD_HELICS_FMI_TESTS)
 
 
 # -------------------------------------------------------------
-# Future Additions 
+# Future Additions
 # -------------------------------------------------------------
 
 #adding dlls
@@ -322,7 +319,7 @@ endif(WIN32)
 #	set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
 #	set(CPACK_NSIS_INSTALL_ROOT "C:\\\\local\\\\")
 	set(CPACK_NSIS_URL_INFO_ABOUT "https://www.github.com/GMLC-TDC/Helics-fmi")
-set(CPACK_NSIS_MENU_LINKS 
+set(CPACK_NSIS_MENU_LINKS
 	"https://www.github.com/GMLC-TDC/Helics-fmi" "source code"
 	"https://gmlc-tdc.github.io/HELICS-src/" "Helics Documentation"
 	"https://www.helics-fmi.org" "Helics FMI Web page"
