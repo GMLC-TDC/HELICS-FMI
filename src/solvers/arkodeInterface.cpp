@@ -18,7 +18,7 @@
 #include "utilities/vectorOps.hpp"
 
 #include <arkode/arkode.h>
-#include <arkode/arkode_direct.h>
+#include <arkode/arkode_erkstep.h>
 
 #ifdef KLU_ENABLE
 #include <sunlinsol/sunlinsol_klu.h>
@@ -64,7 +64,7 @@ arkodeInterface::~arkodeInterface ()
     // clear variables for CVode to use
     if (flags[initialized_flag])
     {
-        ARKodeFree (&solverMem);
+        ERKStepFree (&solverMem);
     }
 }
 
@@ -107,10 +107,8 @@ void arkodeInterface::allocate (count_t stateCount, count_t numRoots)
     // allocate the solverMemory
     if (solverMem != nullptr)
     {
-        ARKodeFree (&(solverMem));
+        ERKStepFree (&(solverMem));
     }
-    solverMem = ARKodeCreate ();
-    check_flag (solverMem, "ARKodeCVodeCreate", 0);
 
     sundialsInterface::allocate (stateCount, numRoots);
 }
@@ -167,9 +165,9 @@ void arkodeInterface::set (const std::string &param, double val)
     {
         if (flags[initialized_flag])
         {
-            ARKodeSetMaxStep (solverMem, maxStep);
-            ARKodeSetMinStep (solverMem, minStep);
-            ARKodeSetInitStep (solverMem, step);
+            ERKStepSetMaxStep (solverMem, maxStep);
+            ERKStepSetMinStep (solverMem, minStep);
+            ERKStepSetInitStep (solverMem, step);
         }
     }
 }
@@ -190,7 +188,7 @@ double arkodeInterface::get (const std::string &param) const
 #ifdef KLU_ENABLE
 //	CVodeCVodeSlsGetNumJacEvals(solverMem, &val);
 #else
-        ARKDlsGetNumJacEvals (solverMem, &val);
+        // ARKDlsGetNumJacEvals (solverMem, &val);
 #endif
     }
     else
@@ -209,37 +207,37 @@ void arkodeInterface::logSolverStats (solver_print_level logLevel, bool /*iconly
         return;
     }
     long int nni = 0;
-    long int nst, nre, nfi, netf, ncfn, nge;
+    long int nst, nre, nfi = 0, netf, ncfn, nge;
     realtype tolsfac, hlast, hcur;
 
-    int retval = ARKodeGetNumRhsEvals (solverMem, &nre, &nfi);
+    int retval = ERKStepGetNumRhsEvals (solverMem, &nre);
     check_flag (&retval, "ARKodeGetNumResEvals", 1);
 
-    retval = ARKodeGetNumNonlinSolvIters (solverMem, &nni);
-    check_flag (&retval, "ARKodeGetNumNonlinSolvIters", 1);
-    retval = ARKodeGetNumNonlinSolvConvFails (solverMem, &ncfn);
-    check_flag (&retval, "ARKodeGetNumNonlinSolvConvFails", 1);
+    // retval = ERKStepGetNumNonlinSolvIters (solverMem, &nni);
+    // check_flag (&retval, "ARKodeGetNumNonlinSolvIters", 1);
+    // retval = ERKStepGetNumNonlinSolvConvFails (solverMem, &ncfn);
+    // check_flag (&retval, "ARKodeGetNumNonlinSolvConvFails", 1);
 
-    retval = ARKodeGetNumSteps (solverMem, &nst);
+    retval = ERKStepGetNumSteps (solverMem, &nst);
     check_flag (&retval, "ARKodeGetNumSteps", 1);
-    retval = ARKodeGetNumErrTestFails (solverMem, &netf);
+    retval = ERKStepGetNumErrTestFails (solverMem, &netf);
     check_flag (&retval, "ARKodeGetNumErrTestFails", 1);
 
-    retval = ARKodeGetNumGEvals (solverMem, &nge);
+    retval = ERKStepGetNumGEvals (solverMem, &nge);
     check_flag (&retval, "ARKodeGetNumGEvals", 1);
-    ARKodeGetCurrentStep (solverMem, &hcur);
+    ERKStepGetCurrentStep (solverMem, &hcur);
 
-    ARKodeGetLastStep (solverMem, &hlast);
-    ARKodeGetTolScaleFactor (solverMem, &tolsfac);
+    ERKStepGetLastStep (solverMem, &hlast);
+    ERKStepGetTolScaleFactor (solverMem, &tolsfac);
 
     std::string logstr = "Arkode Run Statistics: \n";
 
     logstr += "Number of steps                    = " + std::to_string (nst) + '\n';
     logstr += "Number of rhs evaluations     = " + std::to_string (nre) + std::to_string (nfi) + '\n';
-    logstr += "Number of Jacobian evaluations     = " + std::to_string (jacCallCount) + '\n';
-    logstr += "Number of nonlinear iterations     = " + std::to_string (nni) + '\n';
+    // logstr += "Number of Jacobian evaluations     = " + std::to_string (jacCallCount) + '\n';
+    // logstr += "Number of nonlinear iterations     = " + std::to_string (nni) + '\n';
     logstr += "Number of error test failures      = " + std::to_string (netf) + '\n';
-    logstr += "Number of nonlinear conv. failures = " + std::to_string (ncfn) + '\n';
+    //    logstr += "Number of nonlinear conv. failures = " + std::to_string (ncfn) + '\n';
     logstr += "Number of root fn. evaluations     = " + std::to_string (nge) + '\n';
 
     logstr += "Current step                       = " + std::to_string (hcur) + '\n';
@@ -248,7 +246,7 @@ void arkodeInterface::logSolverStats (solver_print_level logLevel, bool /*iconly
 
     if (sobj != nullptr)
     {
-       // sobj->log (sobj, logLevel, logstr);
+        // sobj->log (sobj, logLevel, logstr);
     }
     else
     {
@@ -263,9 +261,9 @@ void arkodeInterface::logErrorWeights (solver_print_level logLevel) const
 
     realtype *eldata = NVECTOR_DATA (use_omp, ele);
     realtype *ewdata = NVECTOR_DATA (use_omp, eweight);
-    int retval = ARKodeGetErrWeights (solverMem, eweight);
+    int retval = ERKStepGetErrWeights (solverMem, eweight);
     check_flag (&retval, "ARKodeGetErrWeights", 1);
-    retval = ARKodeGetEstLocalErrors (solverMem, ele);
+    retval = ERKStepGetEstLocalErrors (solverMem, ele);
     check_flag (&retval, "ARKodeGetEstLocalErrors ", 1);
     std::string logstr = "Error Weight\tEstimated Local Errors\n";
     for (index_t kk = 0; kk < svsize; ++kk)
@@ -276,7 +274,7 @@ void arkodeInterface::logErrorWeights (solver_print_level logLevel) const
 
     if (sobj != nullptr)
     {
-     //   sobj->log (sobj, logLevel, logstr);
+        //   sobj->log (sobj, logLevel, logstr);
     }
     else
     {
@@ -319,29 +317,31 @@ void arkodeInterface::initialize (double time0)
     auto jsize = sobj->jacobianSize (mode);
 
     // dynInitializeB CVode - Sundials
-
-    int retval = ARKodeSetUserData (solverMem, this);
-    check_flag (&retval, "ARKodeSetUserData", 1);
-
     // guessState an initial condition
     sobj->guessCurrentValue (time0, state_data (), deriv_data (), mode);
 
-    retval = ARKodeInit (solverMem, arkodeFunc, arkodeFunc, time0, state);
-    check_flag (&retval, "ARKodeInit", 1);
+    solverMem = ERKStepCreate (arkodeFunc, time0, state);
+    check_flag (solverMem, "ARKStepCreate", 0);
+
+    int retval = ERKStepSetUserData (solverMem, this);
+    check_flag (&retval, "ARKodeSetUserData", 1);
+
+    //  retval = ERKStepInit (solverMem, arkodeFunc, arkodeFunc, time0, state);
+    //  check_flag (&retval, "ARKodeInit", 1);
 
     if (rootCount > 0)
     {
         rootsfound.resize (rootCount);
-        retval = ARKodeRootInit (solverMem, rootCount, arkodeRootFunc);
+        retval = ERKStepRootInit (solverMem, rootCount, arkodeRootFunc);
         check_flag (&retval, "ARKodeRootInit", 1);
     }
 
     N_VConst (tolerance, abstols);
 
-    retval = ARKodeSVtolerances (solverMem, tolerance / 100, abstols);
+    retval = ERKStepSVtolerances (solverMem, tolerance / 100, abstols);
     check_flag (&retval, "ARKodeSVtolerances", 1);
 
-    retval = ARKodeSetMaxNumSteps (solverMem, 1500);
+    retval = ERKStepSetMaxNumSteps (solverMem, 1500);
     check_flag (&retval, "ARKodeSetMaxNumSteps", 1);
 
 #ifdef KLU_ENABLE
@@ -371,32 +371,32 @@ void arkodeInterface::initialize (double time0)
     check_flag (LS, "SUNDenseLinearSolver", 0);
 #endif
 
-    retval = ARKDlsSetLinearSolver (solverMem, LS, J);
+    //    retval = ERKStepSetLinearSolver (solverMem, LS, J);
 
-    check_flag (&retval, "IDADlsSetLinearSolver", 1);
+    // check_flag (&retval, "IDADlsSetLinearSolver", 1);
 
-    retval = ARKDlsSetJacFn (solverMem, arkodeJac);
-    check_flag (&retval, "IDADlsSetJacFn", 1);
+    // retval = ERKStepSetJacFn (solverMem, arkodeJac);
+    // check_flag (&retval, "IDADlsSetJacFn", 1);
 
-    retval = ARKodeSetMaxNonlinIters (solverMem, 20);
-    check_flag (&retval, "ARKodeSetMaxNonlinIters", 1);
+    // retval = ERKStepSetMaxNonlinIters (solverMem, 20);
+    // check_flag (&retval, "ARKodeSetMaxNonlinIters", 1);
 
-    retval = ARKodeSetErrHandlerFn (solverMem, sundialsErrorHandlerFunc, this);
+    retval = ERKStepSetErrHandlerFn (solverMem, sundialsErrorHandlerFunc, this);
     check_flag (&retval, "ARKodeSetErrHandlerFn", 1);
 
     if (maxStep > 0.0)
     {
-        retval = ARKodeSetMaxStep (solverMem, maxStep);
+        retval = ERKStepSetMaxStep (solverMem, maxStep);
         check_flag (&retval, "ARKodeSetMaxStep", 1);
     }
     if (minStep > 0.0)
     {
-        retval = ARKodeSetMinStep (solverMem, minStep);
+        retval = ERKStepSetMinStep (solverMem, minStep);
         check_flag (&retval, "ARKodeSetMinStep", 1);
     }
     if (step > 0.0)
     {
-        retval = ARKodeSetInitStep (solverMem, step);
+        retval = ERKStepSetInitStep (solverMem, step);
         check_flag (&retval, "ARKodeSetInitStep", 1);
     }
     setConstraints ();
@@ -412,7 +412,7 @@ void arkodeInterface::setRootFinding (count_t numRoots)
         rootsfound.resize (numRoots);
     }
     rootCount = numRoots;
-    int retval = ARKodeRootInit (solverMem, numRoots, arkodeRootFunc);
+    int retval = ERKStepRootInit (solverMem, numRoots, arkodeRootFunc);
     check_flag (&retval, "ARKodeRootInit", 1);
 }
 
@@ -429,12 +429,12 @@ void arkodeInterface::getCurrentData ()
 
 int arkodeInterface::solve (double tStop, double &tReturn, step_mode stepMode)
 {
-   // assert (rootCount == sobj->rootSize (mode));
+    // assert (rootCount == sobj->rootSize (mode));
     ++solverCallCount;
     icCount = 0;
     double tret;
     int retval =
-      ARKode (solverMem, tStop, state, &tret, (stepMode == step_mode::normal) ? ARK_NORMAL : ARK_ONE_STEP);
+      ERKStepEvolve (solverMem, tStop, state, &tret, (stepMode == step_mode::normal) ? ARK_NORMAL : ARK_ONE_STEP);
     tReturn = tret;
     check_flag (&retval, "ARKodeSolve", 1, false);
 
@@ -447,15 +447,15 @@ int arkodeInterface::solve (double tStop, double &tReturn, step_mode stepMode)
 
 void arkodeInterface::getRoots ()
 {
-    int ret = ARKodeGetRootInfo (solverMem, rootsfound.data ());
+    int ret = ERKStepGetRootInfo (solverMem, rootsfound.data ());
     check_flag (&ret, "ARKodeGetRootInfo", 1);
 }
 
 void arkodeInterface::loadMaskElements ()
 {
     std::vector<double> mStates (svsize, 0.0);
-//    sobj->getVoltageStates (mStates.data (), mode);
- //   sobj->getAngleStates (mStates.data (), mode);
+    //    sobj->getVoltageStates (mStates.data (), mode);
+    //   sobj->getAngleStates (mStates.data (), mode);
     maskElements = vecFindgt<double, index_t> (mStates, 0.5);
     tempState.resize (svsize);
     double *lstate = NV_DATA_S (state);
@@ -473,23 +473,23 @@ int arkodeFunc (realtype time, N_Vector state, N_Vector dstate_dt, void *user_da
     if (sd->mode.pairedOffsetIndex != kNullLocation)
     {
         int ret = sd->sobj->dynAlgebraicSolve (time, NVECTOR_DATA (sd->use_omp, state),
-                                                NVECTOR_DATA (sd->use_omp, dstate_dt), sd->mode);
+                                               NVECTOR_DATA (sd->use_omp, dstate_dt), sd->mode);
         if (ret < FUNCTION_EXECUTION_SUCCESS)
         {
             return ret;
         }
     }
     int ret = sd->sobj->derivativeFunction (time, NVECTOR_DATA (sd->use_omp, state),
-                                             NVECTOR_DATA (sd->use_omp, dstate_dt), sd->mode);
+                                            NVECTOR_DATA (sd->use_omp, dstate_dt), sd->mode);
 
     if (sd->flags[fileCapture_flag])
     {
         if (!sd->stateFile.empty ())
         {
-      //      writeVector (time, STATE_INFORMATION, sd->funcCallCount, sd->mode.offsetIndex, sd->svsize,
-       //                  NVECTOR_DATA (sd->use_omp, state), sd->stateFile, (sd->funcCallCount != 1));
-      //      writeVector (time, DERIVATIVE_INFORMATION, sd->funcCallCount, sd->mode.offsetIndex, sd->svsize,
-       //                  NVECTOR_DATA (sd->use_omp, dstate_dt), sd->stateFile);
+            //      writeVector (time, STATE_INFORMATION, sd->funcCallCount, sd->mode.offsetIndex, sd->svsize,
+            //                  NVECTOR_DATA (sd->use_omp, state), sd->stateFile, (sd->funcCallCount != 1));
+            //      writeVector (time, DERIVATIVE_INFORMATION, sd->funcCallCount, sd->mode.offsetIndex, sd->svsize,
+            //                  NVECTOR_DATA (sd->use_omp, dstate_dt), sd->stateFile);
         }
     }
     return ret;

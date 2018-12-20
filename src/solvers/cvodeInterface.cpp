@@ -110,7 +110,7 @@ void cvodeInterface::allocate (count_t stateCount, count_t numRoots)
     {
         CVodeFree (&(solverMem));
     }
-    solverMem = CVodeCreate (CV_ADAMS, CV_FUNCTIONAL);
+    solverMem = CVodeCreate (CV_ADAMS);
     check_flag (solverMem, "CVodeCreate", 0);
 
     sundialsInterface::allocate (stateCount, numRoots);
@@ -188,7 +188,7 @@ double cvodeInterface::get (const std::string &param) const
     }
     else if (param == "jac calls")
     {
-		CVodeGetNumGEvals(solverMem, &val);
+        CVodeGetNumGEvals (solverMem, &val);
     }
     else
     {
@@ -252,7 +252,7 @@ void cvodeInterface::logSolverStats (solver_print_level logLevel, bool /*iconly*
 
     if (sobj != nullptr)
     {
-      //  sobj->log (sobj, logLevel, logstr);
+        //  sobj->log (sobj, logLevel, logstr);
     }
     else
     {
@@ -279,7 +279,7 @@ void cvodeInterface::logErrorWeights (solver_print_level logLevel) const
 
     if (sobj != nullptr)
     {
-       // sobj->log (sobj, logLevel, logstr);
+        // sobj->log (sobj, logLevel, logstr);
     }
     else
     {
@@ -433,7 +433,7 @@ void cvodeInterface::getCurrentData ()
 
 int cvodeInterface::solve (double tStop, double &tReturn, step_mode stepMode)
 {
-    //assert (rootCount == sobj->rootSize (mode));
+    // assert (rootCount == sobj->rootSize (mode));
     ++solverCallCount;
     icCount = 0;
 
@@ -462,8 +462,8 @@ void cvodeInterface::getRoots ()
 void cvodeInterface::loadMaskElements ()
 {
     std::vector<double> mStates (svsize, 0.0);
-  //  sobj->getVoltageStates (mStates.data (), mode);
-  //  sobj->getAngleStates (mStates.data (), mode);
+    //  sobj->getVoltageStates (mStates.data (), mode);
+    //  sobj->getAngleStates (mStates.data (), mode);
     maskElements = vecFindgt<double, index_t> (mStates, 0.5);
     tempState.resize (svsize);
     double *lstate = NV_DATA_S (state);
@@ -481,23 +481,23 @@ int cvodeFunc (realtype time, N_Vector state, N_Vector dstate_dt, void *user_dat
     if (sd->mode.pairedOffsetIndex != kNullLocation)
     {
         int ret = sd->sobj->dynAlgebraicSolve (time, NVECTOR_DATA (sd->use_omp, state),
-                                                NVECTOR_DATA (sd->use_omp, dstate_dt), sd->mode);
+                                               NVECTOR_DATA (sd->use_omp, dstate_dt), sd->mode);
         if (ret < FUNCTION_EXECUTION_SUCCESS)
         {
             return ret;
         }
     }
     int ret = sd->sobj->derivativeFunction (time, NVECTOR_DATA (sd->use_omp, state),
-                                             NVECTOR_DATA (sd->use_omp, dstate_dt), sd->mode);
+                                            NVECTOR_DATA (sd->use_omp, dstate_dt), sd->mode);
 
     if (sd->flags[fileCapture_flag])
     {
         if (!sd->stateFile.empty ())
         {
-         //   writeVector (time, STATE_INFORMATION, sd->funcCallCount, sd->mode.offsetIndex, sd->svsize,
-          //               NVECTOR_DATA (sd->use_omp, state), sd->stateFile, (sd->funcCallCount != 1));
-          //  writeVector (time, DERIVATIVE_INFORMATION, sd->funcCallCount, sd->mode.offsetIndex, sd->svsize,
-           //              NVECTOR_DATA (sd->use_omp, dstate_dt), sd->stateFile);
+            //   writeVector (time, STATE_INFORMATION, sd->funcCallCount, sd->mode.offsetIndex, sd->svsize,
+            //               NVECTOR_DATA (sd->use_omp, state), sd->stateFile, (sd->funcCallCount != 1));
+            //  writeVector (time, DERIVATIVE_INFORMATION, sd->funcCallCount, sd->mode.offsetIndex, sd->svsize,
+            //              NVECTOR_DATA (sd->use_omp, dstate_dt), sd->stateFile);
         }
     }
 

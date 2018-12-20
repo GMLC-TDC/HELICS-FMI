@@ -1,71 +1,46 @@
-if(NOT DEFINED SUNDIALS_DIR)
-  set(SUNDIALS_DIR ${AUTOBUILD_INSTALL_PATH} CACHE PATH "path to SUNDIALS")
-endif()
 
-SHOW_VARIABLE(SUNDIALS_DIR PATH
-  "SUNDIALS library directory" "${SUNDIALS_DIR}")
-
-  set(SUNDIALS_FIND_QUIETLY ON)
-
-  set(SUNDIALS_REQUIRED CVODE ARKODE SUNMATRIXDENSE SUNLINSOLDENSE)
+set(BUILD_CVODES OFF CACHE INTERNAL "")
+set(BUILD_IDAS OFF CACHE INTERNAL "")
+set(BUILD_IDA OFF CACHE INTERNAL "")
+set(BUILD_KINSOL OFF CACHE INTERNAL "")
+set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+set(EXAMPLES_ENABLE_C OFF CACHE INTERNAL "")
+set(EXAMPLES_ENABLE_CXX OFF CACHE INTERNAL "")
+set(EXAMPLES_INSTALL OFF CACHE INTERNAL "")
+set(SUNDIALS_INDEX_SIZE 32 CACHE INTERNAL "")
+		
 
   if (ENABLE_KLU)
-	list(APPEND SUNDIALS_REQUIRED sunmatrixsparse sunlinsolklu)
+	set(ENABLE_KLU ON INTERNAL "")
   endif(ENABLE_KLU)
 
-find_package(SUNDIALS REQUIRED COMPONENTS ${SUNDIALS_REQUIRED})
+add_subdirectory(ThirdParty/sundials)
 
-  if(SUNDIALS_FOUND)
-	list(INSERT external_library_list 0 ${SUNDIALS_LIBRARIES})
-  OPTION(FORCE_SUNDIALS_REBUILD "force rebuild of sundials" OFF)
-	IF (AUTOBUILD_SUNDIALS)
+add_library(sundials_all INTERFACE)
+target_include_directories(sundials_all INTERFACE ThirdParty/sundials/include)
+target_include_directories(sundials_all INTERFACE ${CMAKE_BINARY_DIR}/ThirdParty/sundials/include)
+add_library(SUNDIALS::SUNDIALS ALIAS sundials_all) 
 
-		IF(FORCE_SUNDIALS_REBUILD)
-			include(buildSundials)
-			if (MSVC)
-				build_sundials_msvc()
-			elseif(MINGW)
-			build_sundials_mingw()
-		else()
-			build_sundials()
-		endif()
-			set(FORCE_SUNDIALS_REBUILD OFF CACHE BOOL "force rebuild of sundials" FORCE)
-		ENDIF(FORCE_SUNDIALS_REBUILD)
-	ELSE (AUTOBUILD_SUNDIALS)
-	   IF(FORCE_SUNDIALS_REBUILD)
-			include(buildSundials)
-			if (MSVC)
-				build_sundials_msvc()
-			elseif(MINGW)
-			build_sundials_mingw()
-		else()
-			build_sundials()
-		endif()
-			set(SUNDIALS_FOUND OFF CACHE BOOL "sundials not found" FORCE)
-			set(SUNDIALS_LIBRARIES NOT_FOUND FORCE)
-			set(FORCE_SUNDIALS_REBUILD OFF CACHE BOOL "force rebuild of sundials" FORCE)
-			set(SUNDIALS_DIR ${PROJECT_BINARY_DIR}/libs)
-			find_package(SUNDIALS REQUIRED COMPONENTS ${SUNDIALS_REQUIRED})
-		ENDIF(FORCE_SUNDIALS_REBUILD)
-	ENDIF(AUTOBUILD_SUNDIALS)
-  else(SUNDIALS_FOUND)
-    OPTION(AUTOBUILD_SUNDIALS "enable Sundials to automatically download and build" ON)
-    IF (AUTOBUILD_SUNDIALS)
-      include(buildSundials)
-      if (MSVC)
-			build_sundials_msvc()
-		elseif(MINGW)
-			build_sundials_mingw()
-		else()
-			build_sundials()
-		endif()
-      set(SUNDIALS_DIR ${PROJECT_BINARY_DIR}/libs)
-      find_package(SUNDIALS REQUIRED COMPONENTS ${SUNDIALS_REQUIRED})
-    ENDIF(AUTOBUILD_SUNDIALS)
-  if (SUNDIALS_FOUND)
-    list(INSERT external_library_list 0 ${SUNDIALS_LIBRARIES})
-  else (SUNDIALS_FOUND)
-	message( FATAL_ERROR "sundials not found - unable to continue")
-	message( "Double check spelling specified libraries (search is case sensitive)")
-  endif(SUNDIALS_FOUND)
-  endif(SUNDIALS_FOUND)
+set(SUNDIALS_LIBRARIES
+	sundials_arkode_static
+	sundials_cvode_static
+	sundials_nvecserial_static
+	sundials_sunlinsolband_static
+	sundials_sunlinsoldense_static
+	sundials_sunlinsolpcg_static
+	sundials_sunlinsolspbcgs_static
+	sundials_sunlinsolspfgmr_static
+	sundials_sunlinsolspgmr_static
+	sundials_sunlinsolsptfqmr_static
+	sundials_sunmatrixband_static
+	sundials_sunmatrixdense_static
+	sundials_sunmatrixsparse_static
+	sundials_sunnonlinsolfixedpoint_static
+	sundials_sunnonlinsolnewton_static
+)
+set_target_properties ( ${SUNDIALS_LIBRARIES} PROPERTIES FOLDER sundials)
+
+if (MSVC)
+target_compile_options(sundials_cvode_static PRIVATE "/sdl-")
+target_compile_options(sundials_cvode_static PRIVATE "/W3")
+endif()
