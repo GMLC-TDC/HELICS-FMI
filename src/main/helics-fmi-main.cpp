@@ -10,6 +10,7 @@
  * LLNS Copyright End
  */
 
+#include "CLI11/CLI11.hpp"
 #include "fmi/fmi_import/fmiImport.h"
 #include "formatInterpreters/jsonReaderElement.h"
 #include "helics-fmi/helics-fmi-config.h"
@@ -26,7 +27,6 @@ namespace filesystem = boost::filesystem;
 void runSystem (readerElement &elem);
 
 static const utilities::ArgDescriptors fmiArgs{
-  {"stop", "the time to stop the fmi"},
   {"integrator", "the type of integrator to use (cvode,arkode,boost)"},
   {"step", "the step size to use (specified in seconds or as a time string (10ms)"},
   {"stop", "the stop time to use (specified in seconds or as a time string (10ms)"},
@@ -35,32 +35,48 @@ static const utilities::ArgDescriptors fmiArgs{
 int main (int argc, char *argv[])
 {
     std::ifstream infile;
-    utilities::variable_map vm;
-    auto res = argumentParser (argc, argv, vm, fmiArgs, "input");
-    if (res == utilities::helpReturn)
-    {
-        helics::FederateInfo ().loadInfoFromArgs (argc, argv);
-        return 0;
-    }
-    else if (res == utilities::versionReturn)
-    {
-        std::cout << "HELICS VERSION " << helics::versionString << '\n';
-        std::cout << "HELICS_FMI_VERSION " << HELICS_FMI_VERSION_STRING << '\n';
-        return (0);
-    }
+    CLI::App app{"HELICS-FMI for loading and executing FMU's with HELICS"};
+    app
+      .add_flag ("-v,--version",
+                 [](size_t) {
+                     std::cout << "HELICS VERSION " << helics::versionString << '\n';
+                     std::cout << "HELICS_FMI_VERSION " << HELICS_FMI_VERSION_STRING << '\n';
+                 },
+                 "specify the versions of helics and helics-fmi")
+      ->short_circuit ();
+
+    std::string integrator;
+    app.add_option ("--integrator", integrator, "the type of integrator to use(cvode, arkode, boost)");
+    std::vector<std::string> inputs;
+    app.add_option ("input,--input", inputs, "specify the input files")->check (CLI::ExistingFile);
+    std::string integratorArgs;
+    app.add_option ("--integrator-args", integratorArgs, "arguments to pass to the integrator");
+
+    std::string stepTimeString;
+    std::string stopTimeString;
+
+    app.add_option ("--step", stepTimeString,
+                    "the step size to use (specified in seconds or as a time string (10ms)");
+    app.add_option ("--step", stopTimeString,
+                    "the step size to use (specified in seconds or as a time string (10ms)");
+
+    app.set_help_flag ("-h,-?,--help", "print this help module");
+    app.allow_extras ();
+    app.set_config ("--config-file");
+    CLI11_PARSE (app, argc, argv);
+
+    helics::Time stepTime = helics::loadTimeFromString (stepTimeString);
+    helics::Time stopTime = helics::loadTimeFromString (stopTimeString);
+
     // check to make sure we have some input file or the capture is specified
-    if (vm.count ("input") == 0)
+    if (inputs.empty ())
     {
         std::cerr << "no input file specified\n";
         return (-3);
     }
 
-    std::string filename = vm["input"].as<std::string> ();
-    if (!filesystem::exists (filename))
-    {
-        std::cerr << "input file " << filename << " does not exist\n";
-        return (-2);
-    }
+    std::string filename = inputs.front ();
+
     auto ext = filesystem::path (filename).extension ().string ();
 
     fmiLibrary fmi;
@@ -124,7 +140,7 @@ void runSystem (readerElement &elem)
         auto str1 = elem.getFirstAttribute ().getText ();
         auto str2 = elem.getNextAttribute ().getText ();
         elem.moveToNextSibling ();
-		core->dataLink(str1, str2);
+        core->dataLink (str1, str2);
     }
     feds.clear ();
     core->disconnect ();
