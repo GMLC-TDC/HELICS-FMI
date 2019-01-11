@@ -20,7 +20,7 @@ set(HELICS_CMAKE_SUFFIXES
 	lib/cmake/HELICS/
 			cmake/HELICS/)
 	
-find_package(HELICS 2 QUIET
+find_package(HELICS 2
 	HINTS 
 		${HELICS_INSTALL_PATH}
 		$ENV{HELICS_INSTALL_PATH}

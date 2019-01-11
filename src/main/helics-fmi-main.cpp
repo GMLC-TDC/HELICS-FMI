@@ -36,14 +36,13 @@ int main (int argc, char *argv[])
 {
     std::ifstream infile;
     CLI::App app{"HELICS-FMI for loading and executing FMU's with HELICS"};
-    app
-      .add_flag ("-v,--version",
-                 [](size_t) {
-                     std::cout << "HELICS VERSION " << helics::versionString << '\n';
-                     std::cout << "HELICS_FMI_VERSION " << HELICS_FMI_VERSION_STRING << '\n';
-                 },
-                 "specify the versions of helics and helics-fmi")
-      ->short_circuit ();
+    app.add_flag ("-v,--version",
+                  [](size_t) {
+                      std::cout << "HELICS VERSION " << helics::versionString << '\n';
+                      std::cout << "HELICS_FMI_VERSION " << HELICS_FMI_VERSION_STRING << '\n';
+                      throw (CLI::Success ());
+                  },
+                  "specify the versions of helics and helics-fmi");
 
     std::string integrator;
     app.add_option ("--integrator", integrator, "the type of integrator to use(cvode, arkode, boost)");
