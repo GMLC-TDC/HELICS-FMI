@@ -436,6 +436,10 @@ inline std::string fix_newlines(std::string leader, std::string input) {
     return input;
 }
 
+/// this function detects an equal or colon followed by an escaped quote after an argument
+/// then modifies the string to replace the equality with a space.  This is needed
+/// to allow the split up function to work properly and is intended to be used with the find_and_modify function
+/// the return value is the offset+1 which is required by the find_and_modify function
 inline size_t escape_detect(std::string &str, size_t offset) {
     auto next = str[offset + 1];
     if((next == '\"') || (next == '\'') || (next == '`')) {
@@ -446,7 +450,7 @@ inline size_t escape_detect(std::string &str, size_t offset) {
         }
     }
     return offset + 1;
-};
+}
 
 } // namespace detail
 } // namespace CLI
@@ -459,14 +463,13 @@ namespace CLI {
 // These are temporary and are undef'd at the end of this file.
 #define CLI11_ERROR_DEF(parent, name)                                                                                  \
   protected:                                                                                                           \
-    name(std::string error_name, std::string msg, int actual_exit_code)                                                \
-        : parent(std::move(error_name), std::move(msg), actual_exit_code) {}                                           \
-    name(std::string error_name, std::string msg, ExitCodes actual_exit_code)                                          \
-        : parent(std::move(error_name), std::move(msg), actual_exit_code) {}                                           \
+    name(std::string ename, std::string msg, int exit_code) : parent(std::move(ename), std::move(msg), exit_code) {}   \
+    name(std::string ename, std::string msg, ExitCodes exit_code)                                                      \
+        : parent(std::move(ename), std::move(msg), exit_code) {}                                                       \
                                                                                                                        \
   public:                                                                                                              \
-    name(std::string msg, ExitCodes actual_exit_code) : parent(#name, std::move(msg), actual_exit_code) {}             \
-    name(std::string msg, int actual_exit_code) : parent(#name, std::move(msg), actual_exit_code) {}
+    name(std::string msg, ExitCodes exit_code) : parent(#name, std::move(msg), exit_code) {}                           \
+    name(std::string msg, int exit_code) : parent(#name, std::move(msg), exit_code) {}
 
 // This is added after the one above if a class is used directly and builds its own message
 #define CLI11_ERROR_SIMPLE(name)                                                                                       \
@@ -504,19 +507,18 @@ enum class ExitCodes {
 
 /// All errors derive from this one
 class Error : public std::runtime_error {
-    int exit_code;
-    std::string name{"Error"};
+    int actual_exit_code;
+    std::string error_name{"Error"};
 
   public:
-    int get_exit_code() const { return exit_code; }
+    int get_exit_code() const { return actual_exit_code; }
 
-    std::string get_name() const { return name; }
+    std::string get_name() const { return error_name; }
 
-    Error(std::string error_name, std::string msg, int actual_exit_code = static_cast<int>(ExitCodes::BaseClass))
-        : runtime_error(msg), exit_code(actual_exit_code), name(std::move(error_name)) {}
+    Error(std::string name, std::string msg, int exit_code = static_cast<int>(ExitCodes::BaseClass))
+        : runtime_error(msg), actual_exit_code(exit_code), error_name(std::move(name)) {}
 
-    Error(std::string name, std::string msg, ExitCodes actual_exit_code)
-        : Error(name, msg, static_cast<int>(actual_exit_code)) {}
+    Error(std::string name, std::string msg, ExitCodes exit_code) : Error(name, msg, static_cast<int>(exit_code)) {}
 };
 
 // Note: Using Error::Error constructors does not work on GCC 4.7
@@ -602,7 +604,7 @@ class CallForHelp : public ParseError {
     CallForHelp() : CallForHelp("This should be caught in your main function, see examples", ExitCodes::Success) {}
 };
 
-/// Usually somethign like --help-all on command line
+/// Usually something like --help-all on command line
 class CallForAllHelp : public ParseError {
     CLI11_ERROR_DEF(ParseError, CallForAllHelp)
     CallForAllHelp()
