@@ -2780,12 +2780,12 @@ class App {
 
     /// Add set of options (No default, temp reference, such as an inline set)
     template <typename T>
-    Option *add_set(std::string set_name,
+    Option *add_set(std::string option_name,
                     T &member,                   ///< The selected member of the set
                     const std::set<T> &&options, ///< The set of possibilities
                     std::string description = "") {
 
-        std::string simple_name = CLI::detail::split(set_name, ',').at(0);
+        std::string simple_name = CLI::detail::split(option_name, ',').at(0);
         CLI::callback_t fun = [&member, options, simple_name](CLI::results_t res) {
             bool retval = detail::lexical_cast(res[0], member);
             if(!retval)
@@ -2793,7 +2793,7 @@ class App {
             return std::find(std::begin(options), std::end(options), member) != std::end(options);
         };
 
-        Option *opt = add_option(set_name, fun, description, false);
+        Option *opt = add_option(option_name, fun, description, false);
         std::string typeval = detail::type_name<T>();
         typeval += " in {" + detail::join(options) + "}";
         opt->type_name(typeval);
@@ -3263,7 +3263,7 @@ class App {
     /// Set a configuration ini file option, or clear it if no name passed
     Option *set_config(std::string option_name = "",
                        std::string default_filename = "",
-                       std::string help = "Read an ini file",
+                       std::string help_message = "Read an ini file",
                        bool required = false) {
 
         // Remove existing config if present
@@ -3274,7 +3274,7 @@ class App {
         if(!option_name.empty()) {
             config_name_ = default_filename;
             config_required_ = required;
-            config_ptr_ = add_option(option_name, config_name_, help, !default_filename.empty());
+            config_ptr_ = add_option(option_name, config_name_, help_message, !default_filename.empty());
             config_ptr_->configurable(false);
         }
 
@@ -3501,13 +3501,13 @@ class App {
     ///@{
 
     /// Counts the number of times the given option was passed.
-    size_t count(std::string name) const {
+    size_t count(std::string option_name) const {
         for(const Option_p &opt : options_) {
-            if(opt->check_name(name)) {
+            if(opt->check_name(option_name)) {
                 return opt->count();
             }
         }
-        throw OptionNotFound(name);
+        throw OptionNotFound(option_name);
     }
 
     /// Get a subcommand pointer list to the currently selected subcommands (after parsing by by default, in command
@@ -3563,8 +3563,8 @@ class App {
     ///@{
 
     /// Set footer.
-    App *footer(std::string footer) {
-        footer_ = footer;
+    App *footer(std::string footer_string) {
+        footer_ = std::move(footer_string);
         return this;
     }
 
@@ -3760,16 +3760,16 @@ class App {
 
     /// This returns the number of remaining options, minus the -- separator
     size_t remaining_size(bool recurse = false) const {
-        auto count = static_cast<size_t>(std::count_if(
+        auto remaining = static_cast<size_t>(std::count_if(
             std::begin(missing_), std::end(missing_), [](const std::pair<detail::Classifier, std::string> &val) {
                 return val.first != detail::Classifier::POSITIONAL_MARK;
             }));
         if(recurse) {
             for(const App_p &sub : subcommands_) {
-                count += sub->remaining_size(recurse);
+                remaining += sub->remaining_size(recurse);
             }
         }
-        return count;
+        return remaining;
     }
 
     ///@}
@@ -4149,35 +4149,36 @@ class App {
 
         std::string current = args.back();
 
-        std::string name;
+        std::string arg_name;
         std::string value;
         std::string rest;
 
         switch(current_type) {
         case detail::Classifier::LONG:
-            if(!detail::split_long(current, name, value))
+            if(!detail::split_long(current, arg_name, value))
                 throw HorribleError("Long parsed but missing (you should not see this):" + args.back());
             break;
         case detail::Classifier::SHORT:
-            if(!detail::split_short(current, name, rest))
+            if(!detail::split_short(current, arg_name, rest))
                 throw HorribleError("Short parsed but missing! You should not see this");
             break;
         case detail::Classifier::WINDOWS:
-            if(!detail::split_windows(current, name, value))
+            if(!detail::split_windows(current, arg_name, value))
                 throw HorribleError("windows option parsed but missing! You should not see this");
             break;
         default:
             throw HorribleError("parsing got called with invalid option! You should not see this");
         }
 
-        auto op_ptr = std::find_if(std::begin(options_), std::end(options_), [name, current_type](const Option_p &opt) {
-            if(current_type == detail::Classifier::LONG)
-                return opt->check_lname(name);
-            if(current_type == detail::Classifier::SHORT)
-                return opt->check_sname(name);
-            // this will only get called for detail::Classifier::WINDOWS
-            return opt->check_lname(name) || opt->check_sname(name);
-        });
+        auto op_ptr =
+            std::find_if(std::begin(options_), std::end(options_), [arg_name, current_type](const Option_p &opt) {
+                if(current_type == detail::Classifier::LONG)
+                    return opt->check_lname(arg_name);
+                if(current_type == detail::Classifier::SHORT)
+                    return opt->check_sname(arg_name);
+                // this will only get called for detail::Classifier::WINDOWS
+                return opt->check_lname(arg_name) || opt->check_sname(arg_name);
+            });
 
         // Option not found
         if(op_ptr == std::end(options_)) {
