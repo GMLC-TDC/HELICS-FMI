@@ -2757,8 +2757,7 @@ class App {
                               std::string description = "") {
 
         CLI::callback_t fun = [function](CLI::results_t res) {
-            auto count = static_cast<size_t>(res.size());
-            function(count);
+            function(res.size());
             return true;
         };
 
@@ -3556,7 +3555,7 @@ class App {
     }
 
     /// Check with name instead of pointer to see if subcommand was selected
-    bool got_subcommand(std::string name) const { return get_subcommand(name)->parsed_ > 0; }
+    bool got_subcommand(std::string subcommand_name) const { return get_subcommand(subcommand_name)->parsed_ > 0; }
 
     ///@}
     /// @name Help
@@ -3760,16 +3759,16 @@ class App {
 
     /// This returns the number of remaining options, minus the -- separator
     size_t remaining_size(bool recurse = false) const {
-        auto remaining = static_cast<size_t>(std::count_if(
+        auto remaining_options = static_cast<size_t>(std::count_if(
             std::begin(missing_), std::end(missing_), [](const std::pair<detail::Classifier, std::string> &val) {
                 return val.first != detail::Classifier::POSITIONAL_MARK;
             }));
         if(recurse) {
             for(const App_p &sub : subcommands_) {
-                remaining += sub->remaining_size(recurse);
+                remaining_options += sub->remaining_size(recurse);
             }
         }
-        return remaining;
+        return remaining_options;
     }
 
     ///@}
@@ -4509,7 +4508,7 @@ inline std::string Formatter::make_subcommands(const App *app, AppFormatMode mod
     for(const std::string &group : subcmd_groups_seen) {
         out << "\n" << group << ":\n";
         std::vector<const App *> subcommands_group = app->get_subcommands(
-            [&group](const App *app) { return detail::to_lower(app->get_group()) == detail::to_lower(group); });
+            [&group](const App *sub_app) { return detail::to_lower(sub_app->get_group()) == detail::to_lower(group); });
         for(const App *new_com : subcommands_group) {
             if(mode != AppFormatMode::All) {
                 out << make_subcommand(new_com);
