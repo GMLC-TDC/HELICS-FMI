@@ -1,5 +1,5 @@
 ##############################################################################
-#Copyright © 2017-2018,
+#Copyright Â© 2017-2019,
 #Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
@@ -30,6 +30,8 @@ if (USE_BOOST_STATIC_LIBS)
 endif ()
 
 mark_as_advanced(USE_BOOST_STATIC_LIBS)
+
+
 
 if (MSVC)
 
@@ -96,24 +98,20 @@ endif(MSVC)
 HIDE_VARIABLE(BOOST_TEST_PATH)
 
 if (NOT BOOST_REQUIRED_LIBRARIES)
-	set(BOOST_REQUIRED_LIBRARIES program_options unit_test_framework filesystem system)
+	set(BOOST_REQUIRED_LIBRARIES program_options filesystem system)
+	if (BUILD_TESTING)
+		message(STATUS "adding unit testing")
+		list(APPEND BOOST_REQUIRED_LIBRARIES unit_test_framework)
+	endif()
 endif()
 
 # Minimum version of Boost required for building HELICS
-set(BOOST_MINIMUM_VERSION 1.61)
+set(BOOST_MINIMUM_VERSION 1.58)
 set(Boost_USE_STATIC_LIBS   ${USE_BOOST_STATIC_LIBS})
 find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS ${BOOST_REQUIRED_LIBRARIES} REQUIRED)
 
 # Minimum version of Boost required for building test suite
-if (Boost_VERSION LESS 106100)
-  set(BOOST_VERSION_LEVEL 0)
-elseif (Boost_VERSION GREATER 106599)
-	#in 1.166 there were some changes to asio and inclusion of beast that will enable other components
-	set(BOOST_VERSION_LEVEL 2)
-else()
-	set(BOOST_VERSION_LEVEL 1)
-endif()
-
+set(BOOST_VERSION_LEVEL ${Boost_MINOR_VERSION})
 
 #message(STATUS "Using Boost include files : ${Boost_INCLUDE_DIR}")
 #message(STATUS "Using Boost libraries in : ${Boost_LIBRARY_DIRS}")
@@ -161,6 +159,10 @@ if (${Boost_USE_STATIC_LIBS})
 else()
 	add_library(Boostlibs::core UNKNOWN IMPORTED)
 	add_library(Boostlibs::test UNKNOWN IMPORTED)
+#	if(MINGW)
+#		set_property(TARGET Boostlibs::core PROPERTY
+#			INTERFACE_COMPILE_DEFINTIONS BOOST_USE_WINDOWS_H)
+#	endif()
 endif()
 
 list(LENGTH Boost_LIBRARIES_core_debug core_debug_size)

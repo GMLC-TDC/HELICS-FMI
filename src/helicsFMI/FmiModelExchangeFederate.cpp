@@ -29,7 +29,7 @@ FmiModelExchangeFederate::FmiModelExchangeFederate (std::shared_ptr<fmi2ModelExc
         auto outputs = me->getOutputNames ();
         for (auto output : outputs)
         {
-            pubs.emplace_back (&fed, output, helics::data_type::helicsDouble);
+            pubs.emplace_back (&fed, output, helics::data_type::helics_double);
         }
     }
 }
