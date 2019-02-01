@@ -14,7 +14,7 @@ set(SUNDIALS_INDEX_SIZE 32 CACHE INTERNAL "")
 	set(ENABLE_KLU ON INTERNAL "")
   endif(ENABLE_KLU)
 
-add_subdirectory(ThirdParty/sundials)
+add_subdirectory(extern/sundials)
 
 add_library(sundials_all INTERFACE)
 target_include_directories(sundials_all INTERFACE ThirdParty/sundials/include)
