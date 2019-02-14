@@ -1,4 +1,4 @@
-shallow_clone: true
+clone_depth: 1
 
 version: 0.2.0.{build}
 
@@ -11,6 +11,7 @@ configuration:
   - Release
 
 install:
+  - git submodule update --init --recursive
 
 before_build:
   - mkdir build
