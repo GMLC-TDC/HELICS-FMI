@@ -4,7 +4,11 @@ set(JSONCPP_WITH_CMAKE_PACKAGE OFF CACHE INTERNAL "")
 set(JSONCPP_WITH_PKGCONFIG_SUPPORT OFF CACHE INTERNAL "")
 set(JSONCPP_WITH_POST_BUILD_UNITTEST OFF CACHE INTERNAL "")
 
-add_subdirectory("${HELICS-FMI_SOURCE_DIR}/extern/jsoncpp" "${HELIC-FMI_BINARY_DIR}/extern/jsoncpp")
+if(NOT CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 14) # Supported values are ``11``, ``14``, and ``17``.
+endif()
+add_subdirectory("${HELICS-FMI_SOURCE_DIR}/extern/jsoncpp" "${PROJECT_BINARY_DIR}/extern/jsoncpp")
+
 
 mark_as_advanced(
 JSONCPP_WITH_TESTS

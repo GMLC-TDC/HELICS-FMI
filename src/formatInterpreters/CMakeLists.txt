@@ -31,8 +31,8 @@ include(addJsoncpp)
 
 add_library(formatInterpreter STATIC ${elementReader_files})
 
-target_link_libraries(formatInterpreter PUBLIC helics_fmi_base jsoncpp_lib)
-
+target_link_libraries(formatInterpreter PUBLIC helics_fmi_base)
+target_link_libraries(formatInterpreter PRIVATE jsoncpp_lib)
 INSTALL(TARGETS formatInterpreter
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib)

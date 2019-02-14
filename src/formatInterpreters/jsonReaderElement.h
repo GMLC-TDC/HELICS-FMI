@@ -16,7 +16,10 @@
 #include <memory>
 #include <vector>
 
-#include "json/forwards.h"
+namespace Json
+{
+class Value;
+}
 
 class jsonElement;
 
