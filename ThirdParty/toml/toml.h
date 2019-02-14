@@ -8,7 +8,6 @@
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
-
 #include <ctime>
 #include <fstream>
 #include <iomanip>
@@ -228,11 +227,11 @@ inline time_t timegm(std::tm* timeptr)
 {
     return _mkgmtime(timeptr);
 }
+
 // On Windows, Visual Studio does not define gmtime_r. However, mingw might
 // do (or might not do). See https://github.com/mayah/tinytoml/issues/25,
-
 #ifndef gmtime_r
-inline struct tm* gmtime_safe(const time_t* t, struct tm* r)
+inline struct tm* gmtime_r(const time_t* t, struct tm* r)
 {
     // gmtime is threadsafe in windows because it uses TLS
     struct tm *theTm = gmtime(t);
@@ -243,17 +242,7 @@ inline struct tm* gmtime_safe(const time_t* t, struct tm* r)
         return 0;
     }
 }
-#else
-inline struct tm* gmtime_safe(const time_t* t, struct tm* r)
-{
-    return gmtime_r(t, r);
-}
 #endif  // gmtime_r
-#else // _WIN32
-inline struct tm* gmtime_safe(const time_t* t, struct tm* r)
-{
-    return gmtime_r(t, r);
-}
 #endif  // _WIN32
 
 namespace internal {
@@ -280,12 +269,12 @@ enum class TokenType {
 
 class Token {
 public:
-    explicit Token(TokenType type) : type_(type) {}
-    Token(TokenType type, const std::string& v) : type_(type), str_value_(v) {}
-    Token(TokenType type, bool v) : type_(type), int_value_(v) {}
-    Token(TokenType type, std::int64_t v) : type_(type), int_value_(v) {}
-    Token(TokenType type, double v) : type_(type), double_value_(v) {}
-    Token(TokenType type, std::chrono::system_clock::time_point tp) : type_(type), time_value_(tp) {}
+    explicit Token(TokenType tokenType) : type_(tokenType) {}
+    Token(TokenType tokenType, const std::string& v) : type_(tokenType), str_value_(v) {}
+    Token(TokenType tokenType, bool v) : type_(tokenType), int_value_(v) {}
+    Token(TokenType tokenType, std::int64_t v) : type_(tokenType), int_value_(v) {}
+    Token(TokenType tokenType, double v) : type_(tokenType), double_value_(v) {}
+    Token(TokenType tokenType, std::chrono::system_clock::time_point tp) : type_(tokenType), time_value_(tp) {}
 
     TokenType type() const { return type_; }
     const std::string& strValue() const { return str_value_; }
@@ -821,7 +810,7 @@ inline Token Lexer::nextKey()
 {
     std::string s;
     char c;
-    while (current(&c) && (isalnum(c) || c == '_' || c == '-')) {
+    while (current(&c) && (isalnum(static_cast<unsigned char>(c)) || c == '_' || c == '-')) {
         s += c;
         next();
     }
@@ -837,10 +826,10 @@ inline Token Lexer::nextValue()
     std::string s;
     char c;
 
-    if (current(&c) && isalpha(c)) {
+    if (current(&c) && isalpha(static_cast<unsigned char>(c))) {
         s += c;
         next();
-        while (current(&c) && isalpha(c)) {
+        while (current(&c) && isalpha(static_cast<unsigned char>(c))) {
             s += c;
             next();
         }
@@ -1320,7 +1309,7 @@ inline std::string Value::spaces(int num)
 inline std::string Value::escapeKey(const std::string& key)
 {
     auto position = std::find_if(key.begin(), key.end(), [](char c) -> bool {
-        if (std::isalnum(c) || c == '_' || c == '-')
+        if (std::isalnum(static_cast<unsigned char>(c)) || c == '_' || c == '-')
             return false;
         return true;
     });
@@ -1362,7 +1351,7 @@ inline void Value::write(std::ostream* os, const std::string& keyPrefix, int ind
     case TIME_TYPE: {
         time_t tt = std::chrono::system_clock::to_time_t(*time_);
         std::tm t;
-        gmtime_safe(&tt, &t);
+        gmtime_r(&tt, &t);
         char buf[256];
         snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02dZ", t.tm_year + 1900, t.tm_mon + 1, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec);
         (*os) << buf;
