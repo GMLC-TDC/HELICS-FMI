@@ -12,23 +12,23 @@
 
 #pragma once
 
-#include "json/jsoncpp.h"
+#include "json\json.h"
 
 class jsonElement
 {
   public:
     int elementIndex = 0;
     std::string name;
-    helics_fmi::Json::ArrayIndex arrayIndex = 0;
+    Json::ArrayIndex arrayIndex = 0;
     jsonElement () noexcept {}
-    jsonElement (helics_fmi::Json::Value vElement, std::string newName);
+    jsonElement (Json::Value vElement, std::string newName);
 
     void clear ();
-    const helics_fmi::Json::Value &getElement () const { return (arraytype) ? element[arrayIndex] : element; }
-	helics_fmi::Json::ArrayIndex count () const { return (arraytype) ? element.size () : helics_fmi::Json::ArrayIndex (1); }
+    const Json::Value &getElement () const { return (arraytype) ? element[arrayIndex] : element; }
+    Json::ArrayIndex count () const { return (arraytype) ? element.size () : Json::ArrayIndex (1); }
     bool isNull () const { return (arraytype) ? element[arrayIndex].isNull () : element.isNull (); }
 
   private:
-	  helics_fmi::Json::Value element = helics_fmi::Json::nullValue;
+    Json::Value element = Json::nullValue;
     bool arraytype = false;
 };

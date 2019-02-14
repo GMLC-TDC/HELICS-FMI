@@ -15,7 +15,6 @@ tinyxml2ReaderElement.cpp
 tinyxml2ReaderElement.h
 readerElement.h
 readerElement.cpp
-${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp.cpp
 jsonElement.cpp
 jsonElement.h
 jsonReaderElement.cpp
@@ -28,10 +27,11 @@ ${PROJECT_SOURCE_DIR}/ThirdParty/tinyxml2/tinyxml2.cpp
 ${PROJECT_SOURCE_DIR}/ThirdParty/tinyxml2/tinyxml2.h
 )
 
+include(addJsoncpp)
 
 add_library(formatInterpreter STATIC ${elementReader_files})
 
-target_link_libraries(formatInterpreter PUBLIC helics_fmi_base)
+target_link_libraries(formatInterpreter PUBLIC helics_fmi_base jsoncpp_lib)
 
 INSTALL(TARGETS formatInterpreter
 	LIBRARY DESTINATION lib

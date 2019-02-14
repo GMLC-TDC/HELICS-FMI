@@ -19,8 +19,6 @@
 // default initialized empty string
 static const std::string nullStr;
 
-using namespace helics_fmi;
-
 bool isElement (const Json::Value &testValue);
 bool isAttribute (const Json::Value &testValue);
 jsonReaderElement::jsonReaderElement () = default;

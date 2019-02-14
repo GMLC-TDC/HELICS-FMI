@@ -16,13 +16,7 @@
 #include <memory>
 #include <vector>
 
-namespace helics_fmi
-{
-	namespace Json
-{
-class Value;
-} //namespace Json
-} //namespace helics_fmi
+#include "json/forwards.h"
 
 class jsonElement;
 
@@ -75,7 +69,7 @@ class jsonReaderElement : public readerElement
     void clear ();
 
   private:
-    std::shared_ptr<helics_fmi::Json::Value> doc;  //!< document root
+    std::shared_ptr<Json::Value> doc;  //!< document root
     std::vector<std::shared_ptr<jsonElement>> parents;
     std::shared_ptr<jsonElement> current;
     int iteratorCount = 0;
