@@ -2475,18 +2475,21 @@ class Option : public OptionBase<Option> {
         if(results_.empty()) {
             retval = detail::lexical_cast(defaultval_, output);
         } else if(results_.size() == 1) {
-            retval = detail::lexical_cast(results[0], output);
+            retval = detail::lexical_cast(results_[0], output);
         } else {
             switch(multi_option_policy_) {
             case MultiOptionPolicy::TakeFirst:
-                retval = detail::lexical_cast(results.front(), output);
+                retval = detail::lexical_cast(results_.front(), output);
+                break;
             case MultiOptionPolicy::TakeLast:
             default:
-                retval = detail::lexical_cast(results.back(), output);
+                retval = detail::lexical_cast(results_.back(), output);
+                break;
             case MultiOptionPolicy::Throw:
                 throw ConversionError(get_name(), results_);
             case MultiOptionPolicy::Join:
                 retval = detail::lexical_cast(detail::join(results_), output);
+                break;
             }
         }
         if(!retval) {
@@ -2497,9 +2500,10 @@ class Option : public OptionBase<Option> {
     template <typename T> void results(std::vector<T> &output, char delim = '\0') {
         output.clear();
         bool retval = true;
+
         for(const auto &elem : results_) {
             if(delim != '\0') {
-                for(const auto &var : CLI::detail::split(elem, delimiter)) {
+                for(const auto &var : CLI::detail::split(elem, delim)) {
                     if(!var.empty()) {
                         output.emplace_back();
                         retval &= detail::lexical_cast(var, output.back());
@@ -2510,6 +2514,7 @@ class Option : public OptionBase<Option> {
                 retval &= detail::lexical_cast(elem, output.back());
             }
         }
+
         if(!retval) {
             throw ConversionError(get_name(), results_);
         }
@@ -2946,7 +2951,7 @@ class App {
 
     /// Add option for with no value storage
     Option *add_option(std::string option_name, std::string option_description = "") {
-        CLI::callback_t fun = [](CLI::results_t res) { return true; };
+        CLI::callback_t fun = [](CLI::results_t) { return true; };
         return add_option(option_name, fun, option_description, false);
     }
 
@@ -2981,7 +2986,7 @@ class App {
             bool retval = true;
             variable.clear();
             for(const auto &elem : res) {
-                if(delimiter != '\0') {
+                if((delimiter != '\0') && (elem.find_first_of(delimiter) != std::string::npos)) {
                     for(const auto &var : CLI::detail::split(elem, delimiter)) {
                         if(!var.empty()) {
                             variable.emplace_back();
@@ -3013,7 +3018,7 @@ class App {
             bool retval = true;
             variable.clear();
             for(const auto &elem : res) {
-                if(delimiter != '\0') {
+                if((delimiter != '\0') && (elem.find_first_of(delimiter) != std::string::npos)) {
                     for(const auto &var : CLI::detail::split(elem, delimiter)) {
                         if(!var.empty()) {
                             variable.emplace_back();
@@ -3171,6 +3176,7 @@ class App {
                      std::vector<T> &flag_results, ///< A vector of values with the flag results
                      std::string flag_description = "") {
         CLI::callback_t fun = [&flag_results](CLI::results_t res) {
+            bool retval = true;
             for(const auto &elem : res) {
                 flag_results.emplace_back();
                 retval &= detail::lexical_cast(elem, flag_results.back());
