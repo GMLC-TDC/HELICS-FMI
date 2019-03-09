@@ -2948,9 +2948,17 @@ class App {
         opt->type_name(detail::type_name<T>());
         return opt;
     }
+    /// add option with no description or variable assignment
+    Option *add_option(std::string option_name) {
+        CLI::callback_t fun = [](CLI::results_t) { return true; };
+        return add_option(option_name, fun, std::string{}, false);
+    }
 
-    /// Add option for with no value storage
-    Option *add_option(std::string option_name, std::string option_description = "") {
+    /// add option with description but with no variable assignment or callback
+    template <typename T,
+              enable_if_t<std::is_const<T>::value && std::is_constructible<std::string, T>::value, detail::enabler> =
+                  detail::dummy>
+    Option *add_option(std::string option_name, T &option_description) {
         CLI::callback_t fun = [](CLI::results_t) { return true; };
         return add_option(option_name, fun, option_description, false);
     }
@@ -2970,6 +2978,31 @@ class App {
         if(defaulted) {
             std::stringstream out;
             out << variable;
+            opt->default_str(out.str());
+        }
+        return opt;
+    }
+
+    /// Add option for enumerations
+    template <typename T, enable_if_t<std::is_enum<T>::value, detail::enabler> = detail::dummy>
+    Option *add_option(std::string option_name,
+                       T &variable, ///< The variable to set
+                       std::string option_description = "",
+                       bool defaulted = false) {
+
+        CLI::callback_t fun = [&variable](CLI::results_t res) {
+            typename std::underlying_type<T>::type enum_base_value;
+            bool retval = detail::lexical_cast(res[0], enum_base_value);
+            if(retval)
+                variable = static_cast<T>(enum_base_value);
+            return retval;
+        };
+
+        Option *opt = add_option(option_name, fun, option_description, defaulted);
+        opt->type_name(detail::type_name<T>());
+        if(defaulted) {
+            std::stringstream out;
+            out << static_cast<std::underlying_type<T>::type>(variable);
             opt->default_str(out.str());
         }
         return opt;
@@ -3066,7 +3099,8 @@ class App {
     }
 
     /// Set a help flag, replace the existing one if present
-    Option *set_help_flag(std::string flag_name = "", std::string flag_description = "") {
+    Option *set_help_flag(std::string flag_name = "", const std::string &flag_description = "") {
+        // take flag_description by const reference otherwise add_flag tries to assign to flag_description
         if(help_ptr_ != nullptr) {
             remove_option(help_ptr_);
             help_ptr_ = nullptr;
@@ -3082,7 +3116,8 @@ class App {
     }
 
     /// Set a help all flag, replaced the existing one if present
-    Option *set_help_all_flag(std::string help_name = "", std::string help_description = "") {
+    Option *set_help_all_flag(std::string help_name = "", const std::string &help_description = "") {
+        // take flag_description by const reference otherwise add_flag tries to assign to flag_description
         if(help_all_ptr_ != nullptr) {
             remove_option(help_all_ptr_);
             help_all_ptr_ = nullptr;
@@ -3122,10 +3157,21 @@ class App {
     }
 
   public:
-    /// Add option for flag
-    Option *add_flag(std::string flag_name, std::string flag_description = "") {
+    /// add flag with no description or variable assignment
+    Option *add_flag(std::string flag_name) {
         CLI::callback_t fun = [](CLI::results_t) { return true; };
-        return add_flag_internal(flag_name, fun, flag_description);
+        std::string str;
+        return add_flag_internal(flag_name, fun, str);
+    }
+
+    /// add flag with description but with no variable assignment or callback
+    template <typename T,
+              enable_if_t<std::is_const<T>::value && std::is_constructible<std::string, T>::value, detail::enabler> =
+                  detail::dummy>
+    Option *add_flag(std::string flag_name, T &flag_description) {
+        CLI::callback_t fun = [](CLI::results_t) { return true; };
+        std::string str{flag_description};
+        return add_flag_internal(flag_name, fun, str);
     }
 
     /// Add option for flag integer
