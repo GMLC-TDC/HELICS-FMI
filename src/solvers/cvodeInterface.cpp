@@ -34,53 +34,53 @@ namespace griddyn
 {
 namespace solvers
 {
-int cvodeFunc (realtype time, N_Vector state, N_Vector dstate_dt, void *user_data);
+int cvodeFunc(realtype time, N_Vector state, N_Vector dstate_dt, void *user_data);
 
-int cvodeJac (realtype time,
-              N_Vector state,
-              N_Vector dstate_dt,
-              SUNMatrix J,
-              void *user_data,
-              N_Vector tmp1,
-              N_Vector tmp2,
-              N_Vector tmp3);
+int cvodeJac(realtype time,
+             N_Vector state,
+             N_Vector dstate_dt,
+             SUNMatrix J,
+             void *user_data,
+             N_Vector tmp1,
+             N_Vector tmp2,
+             N_Vector tmp3);
 
-int cvodeRootFunc (realtype time, N_Vector state, realtype *gout, void *user_data);
+int cvodeRootFunc(realtype time, N_Vector state, realtype *gout, void *user_data);
 
-cvodeInterface::cvodeInterface (const std::string &objName) : sundialsInterface (objName)
+cvodeInterface::cvodeInterface(const std::string &objName) : sundialsInterface(objName)
 {
     mode.dynamic = true;
     mode.differential = true;
     mode.algebraic = false;
 }
 
-cvodeInterface::cvodeInterface (SolvableObject *sobj, const solverMode &sMode) : sundialsInterface (sobj, sMode)
+cvodeInterface::cvodeInterface(SolvableObject *sobj, const solverMode &sMode) : sundialsInterface(sobj, sMode)
 {
     mode.dynamic = true;
     mode.differential = true;
     mode.algebraic = false;
 }
 
-cvodeInterface::~cvodeInterface ()
+cvodeInterface::~cvodeInterface()
 {
     // clear variables for CVode to use
     if (flags[initialized_flag])
     {
-        CVodeFree (&solverMem);
+        CVodeFree(&solverMem);
     }
 }
 
-std::unique_ptr<SolverInterface> cvodeInterface::clone (bool fullCopy) const
+std::unique_ptr<SolverInterface> cvodeInterface::clone(bool fullCopy) const
 {
-    std::unique_ptr<SolverInterface> si = std::make_unique<cvodeInterface> ();
-    cvodeInterface::cloneTo (si.get (), fullCopy);
+    std::unique_ptr<SolverInterface> si = std::make_unique<cvodeInterface>();
+    cvodeInterface::cloneTo(si.get(), fullCopy);
     return si;
 }
 
-void cvodeInterface::cloneTo (SolverInterface *si, bool fullCopy) const
+void cvodeInterface::cloneTo(SolverInterface *si, bool fullCopy) const
 {
-    sundialsInterface::cloneTo (si, fullCopy);
-    auto ai = dynamic_cast<cvodeInterface *> (si);
+    sundialsInterface::cloneTo(si, fullCopy);
+    auto ai = dynamic_cast<cvodeInterface *>(si);
     if (ai == nullptr)
     {
         return;
@@ -90,56 +90,56 @@ void cvodeInterface::cloneTo (SolverInterface *si, bool fullCopy) const
     ai->step = step;
 }
 
-void cvodeInterface::allocate (count_t stateCount, count_t numRoots)
+void cvodeInterface::allocate(count_t stateCount, count_t numRoots)
 {
     // load the vectors
     if (stateCount == svsize)
     {
         return;
     }
-    flags.reset (initialized_flag);
-    a1.setRowLimit (stateCount);
-    a1.setColLimit (stateCount);
+    flags.reset(initialized_flag);
+    a1.setRowLimit(stateCount);
+    a1.setColLimit(stateCount);
 
     // update the rootCount
     rootCount = numRoots;
-    rootsfound.resize (numRoots);
+    rootsfound.resize(numRoots);
 
     // allocate the solverMemory
     if (solverMem != nullptr)
     {
-        CVodeFree (&(solverMem));
+        CVodeFree(&(solverMem));
     }
-    solverMem = CVodeCreate (CV_ADAMS, CV_FUNCTIONAL);
-    check_flag (solverMem, "CVodeCreate", 0);
+    solverMem = CVodeCreate(CV_ADAMS, CV_FUNCTIONAL);
+    check_flag(solverMem, "CVodeCreate", 0);
 
-    sundialsInterface::allocate (stateCount, numRoots);
+    sundialsInterface::allocate(stateCount, numRoots);
 }
 
-void cvodeInterface::setMaxNonZeros (count_t nonZeroCount)
+void cvodeInterface::setMaxNonZeros(count_t nonZeroCount)
 {
     maxNNZ = nonZeroCount;
-    a1.reserve (nonZeroCount);
-    a1.clear ();
+    a1.reserve(nonZeroCount);
+    a1.clear();
 }
 
-void cvodeInterface::set (const std::string &param, const std::string &val)
+void cvodeInterface::set(const std::string &param, const std::string &val)
 {
-    if (param[0] == '#')
+    if (param.empty() || param[0] == '#')
     {
     }
     else
     {
-        SolverInterface::set (param, val);
+        SolverInterface::set(param, val);
     }
 }
 
-void cvodeInterface::set (const std::string &param, double val)
+void cvodeInterface::set(const std::string &param, double val)
 {
     bool checkStepUpdate = false;
     if (param == "step")
     {
-        if ((maxStep < 0) || (maxStep == step))
+        if (maxStep < 0 || maxStep == step)
         {
             maxStep = val;
         }
@@ -162,20 +162,20 @@ void cvodeInterface::set (const std::string &param, double val)
     }
     else
     {
-        SolverInterface::set (param, val);
+        SolverInterface::set(param, val);
     }
     if (checkStepUpdate)
     {
         if (flags[initialized_flag])
         {
-            CVodeSetMaxStep (solverMem, maxStep);
-            CVodeSetMinStep (solverMem, minStep);
-            CVodeSetInitStep (solverMem, step);
+            CVodeSetMaxStep(solverMem, maxStep);
+            CVodeSetMinStep(solverMem, minStep);
+            CVodeSetInitStep(solverMem, step);
         }
     }
 }
 
-double cvodeInterface::get (const std::string &param) const
+double cvodeInterface::get(const std::string &param) const
 {
     long int val = -1;
     if ((param == "resevals") || (param == "iterationcount"))
@@ -188,18 +188,18 @@ double cvodeInterface::get (const std::string &param) const
     }
     else if (param == "jac calls")
     {
-        CVodeGetNumGEvals (solverMem, &val);
+        CVodeGetNumGEvals(solverMem, &val);
     }
     else
     {
-        return sundialsInterface::get (param);
+        return sundialsInterface::get(param);
     }
 
-    return static_cast<double> (val);
+    return static_cast<double>(val);
 }
 
 // output solver stats
-void cvodeInterface::logSolverStats (solver_print_level logLevel, bool /*iconly*/) const
+void cvodeInterface::logSolverStats(solver_print_level logLevel, bool /*iconly*/) const
 {
     if (!flags[initialized_flag])
     {
@@ -210,45 +210,45 @@ void cvodeInterface::logSolverStats (solver_print_level logLevel, bool /*iconly*
     long int nst, nre, netf, ncfn, nge;
     realtype tolsfac, hlast, hcur;
 
-    int retval = CVodeGetNumRhsEvals (solverMem, &nre);
-    check_flag (&retval, "CVodeGetNumRhsEvals", 1);
-    retval = CVodeGetNumNonlinSolvIters (solverMem, &nni);
-    check_flag (&retval, "CVodeGetNumNonlinSolvIters", 1);
-    retval = CVodeGetNumNonlinSolvConvFails (solverMem, &ncfn);
-    check_flag (&retval, "CVodeGetNumNonlinSolvConvFails", 1);
+    int retval = CVodeGetNumRhsEvals(solverMem, &nre);
+    check_flag(&retval, "CVodeGetNumRhsEvals", 1);
+    retval = CVodeGetNumNonlinSolvIters(solverMem, &nni);
+    check_flag(&retval, "CVodeGetNumNonlinSolvIters", 1);
+    retval = CVodeGetNumNonlinSolvConvFails(solverMem, &ncfn);
+    check_flag(&retval, "CVodeGetNumNonlinSolvConvFails", 1);
 
-    retval = CVodeGetNumSteps (solverMem, &nst);
-    check_flag (&retval, "CVodeGetNumSteps", 1);
-    retval = CVodeGetNumErrTestFails (solverMem, &netf);
-    check_flag (&retval, "CVodeGetNumErrTestFails", 1);
+    retval = CVodeGetNumSteps(solverMem, &nst);
+    check_flag(&retval, "CVodeGetNumSteps", 1);
+    retval = CVodeGetNumErrTestFails(solverMem, &netf);
+    check_flag(&retval, "CVodeGetNumErrTestFails", 1);
 
-    retval = CVodeGetNumGEvals (solverMem, &nge);
-    check_flag (&retval, "CVodeGetNumGEvals", 1);
-    CVodeGetCurrentOrder (solverMem, &kcur);
-    check_flag (&retval, "VodeGetCurrentOrder", 1);
-    CVodeGetCurrentStep (solverMem, &hcur);
-    check_flag (&retval, "CVodeGetCurrentStep", 1);
-    CVodeGetLastOrder (solverMem, &klast);
-    check_flag (&retval, " CVodeGetLastOrder", 1);
-    CVodeGetLastStep (solverMem, &hlast);
-    check_flag (&retval, "CVodeGetLastStep", 1);
-    CVodeGetTolScaleFactor (solverMem, &tolsfac);
-    check_flag (&retval, "CVodeGetTolScaleFactor", 1);
+    retval = CVodeGetNumGEvals(solverMem, &nge);
+    check_flag(&retval, "CVodeGetNumGEvals", 1);
+    CVodeGetCurrentOrder(solverMem, &kcur);
+    check_flag(&retval, "VodeGetCurrentOrder", 1);
+    CVodeGetCurrentStep(solverMem, &hcur);
+    check_flag(&retval, "CVodeGetCurrentStep", 1);
+    CVodeGetLastOrder(solverMem, &klast);
+    check_flag(&retval, " CVodeGetLastOrder", 1);
+    CVodeGetLastStep(solverMem, &hlast);
+    check_flag(&retval, "CVodeGetLastStep", 1);
+    CVodeGetTolScaleFactor(solverMem, &tolsfac);
+    check_flag(&retval, "CVodeGetTolScaleFactor", 1);
 
     std::string logstr = "CVode Run Statistics: \n";
 
-    logstr += "Number of steps                    = " + std::to_string (nst) + '\n';
-    logstr += "Number of residual evaluations     = " + std::to_string (nre) + '\n';
-    logstr += "Number of Jacobian evaluations     = " + std::to_string (jacCallCount) + '\n';
-    logstr += "Number of nonlinear iterations     = " + std::to_string (nni) + '\n';
-    logstr += "Number of error test failures      = " + std::to_string (netf) + '\n';
-    logstr += "Number of nonlinear conv. failures = " + std::to_string (ncfn) + '\n';
-    logstr += "Number of root fn. evaluations     = " + std::to_string (nge) + '\n';
-    logstr += "Current order used                 = " + std::to_string (kcur) + '\n';
-    logstr += "Current step                       = " + std::to_string (hcur) + '\n';
-    logstr += "Last order used                    = " + std::to_string (klast) + '\n';
-    logstr += "Last step                          = " + std::to_string (hlast) + '\n';
-    logstr += "Tolerance scale factor             = " + std::to_string (tolsfac) + '\n';
+    logstr += "Number of steps                    = " + std::to_string(nst) + '\n';
+    logstr += "Number of residual evaluations     = " + std::to_string(nre) + '\n';
+    logstr += "Number of Jacobian evaluations     = " + std::to_string(jacCallCount) + '\n';
+    logstr += "Number of nonlinear iterations     = " + std::to_string(nni) + '\n';
+    logstr += "Number of error test failures      = " + std::to_string(netf) + '\n';
+    logstr += "Number of nonlinear conv. failures = " + std::to_string(ncfn) + '\n';
+    logstr += "Number of root fn. evaluations     = " + std::to_string(nge) + '\n';
+    logstr += "Current order used                 = " + std::to_string(kcur) + '\n';
+    logstr += "Current step                       = " + std::to_string(hcur) + '\n';
+    logstr += "Last order used                    = " + std::to_string(klast) + '\n';
+    logstr += "Last step                          = " + std::to_string(hlast) + '\n';
+    logstr += "Tolerance scale factor             = " + std::to_string(tolsfac) + '\n';
 
     if (sobj != nullptr)
     {
@@ -256,25 +256,24 @@ void cvodeInterface::logSolverStats (solver_print_level logLevel, bool /*iconly*
     }
     else
     {
-        printf ("\n%s", logstr.c_str ());
+        printf("\n%s", logstr.c_str());
     }
 }
 
-void cvodeInterface::logErrorWeights (solver_print_level logLevel) const
+void cvodeInterface::logErrorWeights(solver_print_level logLevel) const
 {
-    N_Vector eweight = NVECTOR_NEW (use_omp, svsize);
-    N_Vector ele = NVECTOR_NEW (use_omp, svsize);
-    realtype *eldata = NVECTOR_DATA (use_omp, ele);
-    realtype *ewdata = NVECTOR_DATA (use_omp, eweight);
-    int retval = CVodeGetErrWeights (solverMem, eweight);
-    check_flag (&retval, "CVodeGetErrWeights", 1);
-    retval = CVodeGetEstLocalErrors (solverMem, ele);
-    check_flag (&retval, "CVodeGetEstLocalErrors", 1);
+    N_Vector eweight = NVECTOR_NEW(use_omp, svsize);
+    N_Vector ele = NVECTOR_NEW(use_omp, svsize);
+    realtype *eldata = NVECTOR_DATA(use_omp, ele);
+    realtype *ewdata = NVECTOR_DATA(use_omp, eweight);
+    int retval = CVodeGetErrWeights(solverMem, eweight);
+    check_flag(&retval, "CVodeGetErrWeights", 1);
+    retval = CVodeGetEstLocalErrors(solverMem, ele);
+    check_flag(&retval, "CVodeGetEstLocalErrors", 1);
     std::string logstr = "Error Weight\tEstimated Local Errors\n";
     for (index_t kk = 0; kk < svsize; ++kk)
     {
-        logstr +=
-          std::to_string (kk) + ':' + std::to_string (ewdata[kk]) + '\t' + std::to_string (eldata[kk]) + '\n';
+        logstr += std::to_string(kk) + ':' + std::to_string(ewdata[kk]) + '\t' + std::to_string(eldata[kk]) + '\n';
     }
 
     if (sobj != nullptr)
@@ -283,10 +282,10 @@ void cvodeInterface::logErrorWeights (solver_print_level logLevel) const
     }
     else
     {
-        printf ("\n%s", logstr.c_str ());
+        printf("\n%s", logstr.c_str());
     }
-    NVECTOR_DESTROY (use_omp, eweight);
-    NVECTOR_DESTROY (use_omp, ele);
+    NVECTOR_DESTROY(use_omp, eweight);
+    NVECTOR_DESTROY(use_omp, ele);
 }
 
 static const std::map<int, std::string> cvodeRetCodes{
@@ -312,115 +311,115 @@ static const std::map<int, std::string> cvodeRetCodes{
   {CV_BAD_DKY, "Bad DKY"},
 };
 
-void cvodeInterface::initialize (double time0)
+void cvodeInterface::initialize(double time0)
 {
     if (!flags[allocated_flag])
     {
-        throw (InvalidSolverOperation ());
+        throw(InvalidSolverOperation());
     }
 
-    auto jsize = sobj->jacobianSize (mode);
+    auto jsize = sobj->jacobianSize(mode);
 
     // dynInitializeB CVode - Sundials
 
-    int retval = CVodeSetUserData (solverMem, this);
-    check_flag (&retval, "CVodeSetUserData", 1);
+    int retval = CVodeSetUserData(solverMem, this);
+    check_flag(&retval, "CVodeSetUserData", 1);
 
     // guessState an initial condition
-    sobj->guessCurrentValue (time0, state_data (), deriv_data (), mode);
+    sobj->guessCurrentValue(time0, state_data(), deriv_data(), mode);
 
-    retval = CVodeInit (solverMem, cvodeFunc, time0, state);
-    check_flag (&retval, "CVodeInit", 1);
+    retval = CVodeInit(solverMem, cvodeFunc, time0, state);
+    check_flag(&retval, "CVodeInit", 1);
 
     if (rootCount > 0)
     {
-        rootsfound.resize (rootCount);
-        retval = CVodeRootInit (solverMem, rootCount, cvodeRootFunc);
-        check_flag (&retval, "CVodeRootInit", 1);
+        rootsfound.resize(rootCount);
+        retval = CVodeRootInit(solverMem, rootCount, cvodeRootFunc);
+        check_flag(&retval, "CVodeRootInit", 1);
     }
 
-    N_VConst (tolerance, abstols);
+    N_VConst(tolerance, abstols);
 
-    retval = CVodeSVtolerances (solverMem, tolerance / 100, abstols);
-    check_flag (&retval, "CVodeSVtolerances", 1);
+    retval = CVodeSVtolerances(solverMem, tolerance / 100, abstols);
+    check_flag(&retval, "CVodeSVtolerances", 1);
 
-    retval = CVodeSetMaxNumSteps (solverMem, 1500);
-    check_flag (&retval, "CVodeSetMaxNumSteps", 1);
+    retval = CVodeSetMaxNumSteps(solverMem, 1500);
+    check_flag(&retval, "CVodeSetMaxNumSteps", 1);
 
 #ifdef KLU_ENABLE
     if (flags[dense_flag])
     {
-        J = SUNDenseMatrix (svsize, svsize);
-        check_flag (J, "SUNDenseMatrix", 0);
+        J = SUNDenseMatrix(svsize, svsize);
+        check_flag(J, "SUNDenseMatrix", 0);
         /* Create KLU solver object */
-        LS = SUNDenseLinearSolver (state, J);
-        check_flag (LS, "SUNDenseLinearSolver", 0);
+        LS = SUNDenseLinearSolver(state, J);
+        check_flag(LS, "SUNDenseLinearSolver", 0);
     }
     else
     {
         /* Create sparse SUNMatrix */
-        J = SUNSparseMatrix (svsize, svsize, jsize, CSR_MAT);
-        check_flag (J, "SUNSparseMatrix", 0);
+        J = SUNSparseMatrix(svsize, svsize, jsize, CSR_MAT);
+        check_flag(J, "SUNSparseMatrix", 0);
 
         /* Create KLU solver object */
-        LS = SUNKLU (state, J);
-        check_flag (LS, "SUNKLU", 0);
+        LS = SUNKLU(state, J);
+        check_flag(LS, "SUNKLU", 0);
     }
 #else
-    J = SUNDenseMatrix (svsize, svsize);
-    check_flag (J, "SUNSparseMatrix", 0);
+    J = SUNDenseMatrix(svsize, svsize);
+    check_flag(J, "SUNSparseMatrix", 0);
     /* Create KLU solver object */
-    LS = SUNDenseLinearSolver (state, J);
-    check_flag (LS, "SUNDenseLinearSolver", 0);
+    LS = SUNDenseLinearSolver(state, J);
+    check_flag(LS, "SUNDenseLinearSolver", 0);
 #endif
 
-    retval = CVDlsSetLinearSolver (solverMem, LS, J);
+    retval = CVDlsSetLinearSolver(solverMem, LS, J);
 
-    check_flag (&retval, "IDADlsSetLinearSolver", 1);
+    check_flag(&retval, "IDADlsSetLinearSolver", 1);
 
-    retval = CVDlsSetJacFn (solverMem, cvodeJac);
-    check_flag (&retval, "IDADlsSetJacFn", 1);
+    retval = CVDlsSetJacFn(solverMem, cvodeJac);
+    check_flag(&retval, "IDADlsSetJacFn", 1);
 
-    retval = CVodeSetMaxNonlinIters (solverMem, 20);
-    check_flag (&retval, "CVodeSetMaxNonlinIters", 1);
+    retval = CVodeSetMaxNonlinIters(solverMem, 20);
+    check_flag(&retval, "CVodeSetMaxNonlinIters", 1);
 
-    retval = CVodeSetErrHandlerFn (solverMem, sundialsErrorHandlerFunc, this);
-    check_flag (&retval, "CVodeSetErrHandlerFn", 1);
+    retval = CVodeSetErrHandlerFn(solverMem, sundialsErrorHandlerFunc, this);
+    check_flag(&retval, "CVodeSetErrHandlerFn", 1);
 
     if (maxStep > 0.0)
     {
-        retval = CVodeSetMaxStep (solverMem, maxStep);
-        check_flag (&retval, "CVodeSetMaxStep", 1);
+        retval = CVodeSetMaxStep(solverMem, maxStep);
+        check_flag(&retval, "CVodeSetMaxStep", 1);
     }
     if (minStep > 0.0)
     {
-        retval = CVodeSetMinStep (solverMem, minStep);
-        check_flag (&retval, "CVodeSetMinStep", 1);
+        retval = CVodeSetMinStep(solverMem, minStep);
+        check_flag(&retval, "CVodeSetMinStep", 1);
     }
     if (step > 0.0)
     {
-        retval = CVodeSetInitStep (solverMem, step);
-        check_flag (&retval, "CVodeSetInitStep", 1);
+        retval = CVodeSetInitStep(solverMem, step);
+        check_flag(&retval, "CVodeSetInitStep", 1);
     }
-    setConstraints ();
+    setConstraints();
 
-    flags.set (initialized_flag);
+    flags.set(initialized_flag);
 }
 
-void cvodeInterface::sparseReInit (sparse_reinit_modes reInitMode) { KLUReInit (reInitMode); }
+void cvodeInterface::sparseReInit(sparse_reinit_modes reInitMode) { KLUReInit(reInitMode); }
 
-void cvodeInterface::setRootFinding (count_t numRoots)
+void cvodeInterface::setRootFinding(count_t numRoots)
 {
-    if (numRoots != static_cast<index_t> (rootsfound.size ()))
+    if (numRoots != static_cast<index_t>(rootsfound.size()))
     {
-        rootsfound.resize (numRoots);
+        rootsfound.resize(numRoots);
     }
     rootCount = numRoots;
-    int retval = CVodeRootInit (solverMem, numRoots, cvodeRootFunc);
-    check_flag (&retval, "CVodeRootInit", 1);
+    int retval = CVodeRootInit(solverMem, numRoots, cvodeRootFunc);
+    check_flag(&retval, "CVodeRootInit", 1);
 }
 
-void cvodeInterface::getCurrentData ()
+void cvodeInterface::getCurrentData()
 {
     /*
     int retval = CVodeGetConsistentIC(solverMem, state, deriv);
@@ -431,16 +430,16 @@ void cvodeInterface::getCurrentData ()
     */
 }
 
-int cvodeInterface::solve (double tStop, double &tReturn, step_mode stepMode)
+int cvodeInterface::solve(double tStop, double &tReturn, step_mode stepMode)
 {
     // assert (rootCount == sobj->rootSize (mode));
     ++solverCallCount;
     icCount = 0;
 
     double tret;
-    int retval = CVode (solverMem, tStop, state, &tret, (stepMode == step_mode::normal) ? CV_NORMAL : CV_ONE_STEP);
+    int retval = CVode(solverMem, tStop, state, &tret, (stepMode == step_mode::normal) ? CV_NORMAL : CV_ONE_STEP);
     tReturn = tret;
-    check_flag (&retval, "CVodeSolve", 1, false);
+    check_flag(&retval, "CVodeSolve", 1, false);
     if (retval == CV_ROOT_RETURN)
     {
         retval = SOLVER_ROOT_FOUND;
@@ -448,25 +447,25 @@ int cvodeInterface::solve (double tStop, double &tReturn, step_mode stepMode)
     if (retval >= 0)
     {
         // get the derivative information
-        CVodeGetDky (solverMem, tStop, 1, dstate_dt);
+        CVodeGetDky(solverMem, tStop, 1, dstate_dt);
     }
     return retval;
 }
 
-void cvodeInterface::getRoots ()
+void cvodeInterface::getRoots()
 {
-    int ret = CVodeGetRootInfo (solverMem, rootsfound.data ());
-    check_flag (&ret, "CVodeGetRootInfo", 1);
+    int ret = CVodeGetRootInfo(solverMem, rootsfound.data());
+    check_flag(&ret, "CVodeGetRootInfo", 1);
 }
 
-void cvodeInterface::loadMaskElements ()
+void cvodeInterface::loadMaskElements()
 {
-    std::vector<double> mStates (svsize, 0.0);
+    std::vector<double> mStates(svsize, 0.0);
     //  sobj->getVoltageStates (mStates.data (), mode);
     //  sobj->getAngleStates (mStates.data (), mode);
-    maskElements = vecFindgt<double, index_t> (mStates, 0.5);
-    tempState.resize (svsize);
-    double *lstate = NV_DATA_S (state);
+    maskElements = vecFindgt<double, index_t>(mStates, 0.5);
+    tempState.resize(svsize);
+    double *lstate = NV_DATA_S(state);
     for (auto &v : maskElements)
     {
         tempState[v] = lstate[v];
@@ -474,25 +473,25 @@ void cvodeInterface::loadMaskElements ()
 }
 
 // CVode C Functions
-int cvodeFunc (realtype time, N_Vector state, N_Vector dstate_dt, void *user_data)
+int cvodeFunc(realtype time, N_Vector state, N_Vector dstate_dt, void *user_data)
 {
-    auto sd = reinterpret_cast<cvodeInterface *> (user_data);
+    auto sd = reinterpret_cast<cvodeInterface *>(user_data);
     sd->funcCallCount++;
     if (sd->mode.pairedOffsetIndex != kNullLocation)
     {
-        int ret = sd->sobj->dynAlgebraicSolve (time, NVECTOR_DATA (sd->use_omp, state),
-                                               NVECTOR_DATA (sd->use_omp, dstate_dt), sd->mode);
+        int ret = sd->sobj->dynAlgebraicSolve(time, NVECTOR_DATA(sd->use_omp, state),
+                                              NVECTOR_DATA(sd->use_omp, dstate_dt), sd->mode);
         if (ret < FUNCTION_EXECUTION_SUCCESS)
         {
             return ret;
         }
     }
-    int ret = sd->sobj->derivativeFunction (time, NVECTOR_DATA (sd->use_omp, state),
-                                            NVECTOR_DATA (sd->use_omp, dstate_dt), sd->mode);
+    int ret = sd->sobj->derivativeFunction(time, NVECTOR_DATA(sd->use_omp, state),
+                                           NVECTOR_DATA(sd->use_omp, dstate_dt), sd->mode);
 
     if (sd->flags[fileCapture_flag])
     {
-        if (!sd->stateFile.empty ())
+        if (!sd->stateFile.empty())
         {
             //   writeVector (time, STATE_INFORMATION, sd->funcCallCount, sd->mode.offsetIndex, sd->svsize,
             //               NVECTOR_DATA (sd->use_omp, state), sd->stateFile, (sd->funcCallCount != 1));
@@ -504,24 +503,24 @@ int cvodeFunc (realtype time, N_Vector state, N_Vector dstate_dt, void *user_dat
     return ret;
 }
 
-int cvodeRootFunc (realtype time, N_Vector state, realtype *gout, void *user_data)
+int cvodeRootFunc(realtype time, N_Vector state, realtype *gout, void *user_data)
 {
-    auto sd = reinterpret_cast<cvodeInterface *> (user_data);
-    sd->sobj->rootFindingFunction (time, NVECTOR_DATA (sd->use_omp, state), sd->deriv_data (), gout, sd->mode);
+    auto sd = reinterpret_cast<cvodeInterface *>(user_data);
+    sd->sobj->rootFindingFunction(time, NVECTOR_DATA(sd->use_omp, state), sd->deriv_data(), gout, sd->mode);
 
     return FUNCTION_EXECUTION_SUCCESS;
 }
 
-int cvodeJac (realtype time,
-              N_Vector state,
-              N_Vector dstate_dt,
-              SUNMatrix J,
-              void *user_data,
-              N_Vector tmp1,
-              N_Vector tmp2,
-              N_Vector /*tmp3*/)
+int cvodeJac(realtype time,
+             N_Vector state,
+             N_Vector dstate_dt,
+             SUNMatrix J,
+             void *user_data,
+             N_Vector tmp1,
+             N_Vector tmp2,
+             N_Vector /*tmp3*/)
 {
-    return sundialsJac (time, 0.0, state, dstate_dt, J, user_data, tmp1, tmp2);
+    return sundialsJac(time, 0.0, state, dstate_dt, J, user_data, tmp1, tmp2);
 }
 
 }  // namespace solvers

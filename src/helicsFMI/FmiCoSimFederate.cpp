@@ -14,28 +14,56 @@
 #include "fmi/fmi_import/fmiObjects.h"
 #include <algorithm>
 
-FmiCoSimFederate::FmiCoSimFederate (std::shared_ptr<fmi2CoSimObject> obj, const helics::FederateInfo &fi)
-    : cs (std::move (obj)), fed (obj->getName (), fi)
+FmiCoSimFederate::FmiCoSimFederate(std::shared_ptr<fmi2CoSimObject> obj, const helics::FederateInfo &fi)
+    : cs(std::move(obj)), fed(obj->getName(), fi)
 {
     if (cs)
     {
-        auto inputNames = cs->getInputNames ();
-        for (auto input : inputNames)
-        {
-            inputs.emplace_back (&fed, input);
-        }
-
-        auto outputs = cs->getOutputNames ();
-        for (auto output : outputs)
-        {
-            pubs.emplace_back (&fed, output, helics::data_type::helics_double);
-        }
+        input_list = cs->getInputNames();
+        output_list = cs->getOutputNames();
     }
 }
 
-void FmiCoSimFederate::run (helics::Time step, helics::Time stop)
+void FmiCoSimFederate::configure(helics::Time step)
 {
-    auto &def = cs->fmuInformation ().getExperiment ();
+    for (auto input : input_list)
+    {
+        inputs.emplace_back(&fed, input);
+    }
+
+    for (auto output : output_list)
+    {
+        pubs.emplace_back(&fed, output, helics::data_type::helics_double);
+    }
+
+    auto &def = cs->fmuInformation().getExperiment();
+
+    if (step <= helics::timeZero)
+    {
+        step = def.stepSize;
+    }
+    if (step <= helics::timeZero)
+    {
+        auto tstep = fed.getTimeProperty(helics_property_time_period);
+        step = (tstep > helics::timeEpsilon) ? tstep : 0.2;
+    }
+    fed.setProperty(helics_property_time_period, step);
+    stepTime = step;
+}
+
+void FmiCoSimFederate::setInputs(std::vector<std::string> input_names) { input_list = std::move(input_names); }
+void FmiCoSimFederate::setOutputs(std::vector<std::string> output_names) { output_list = std::move(output_names); }
+void FmiCoSimFederate::setConnections(std::vector<std::string> conn) { connections = std::move(conn); }
+
+void FmiCoSimFederate::addInput(const std::string &input_name) { input_list.push_back(input_name); }
+
+void FmiCoSimFederate::addOutput(const std::string &output_name) { output_list.push_back(output_name); }
+
+void FmiCoSimFederate::addConnection(const std::string &conn) { connections.push_back(conn); }
+
+void FmiCoSimFederate::run(helics::Time stop)
+{
+    auto &def = cs->fmuInformation().getExperiment();
 
     if (stop <= helics::timeZero)
     {
@@ -46,67 +74,49 @@ void FmiCoSimFederate::run (helics::Time step, helics::Time stop)
         stop = 30.0;
     }
 
-    if (step <= helics::timeZero)
+    fed.enterInitializingMode();
+    cs->setMode(fmuMode::initializationMode);
+    std::vector<fmi2Real> outputs(pubs.size());
+    std::vector<fmi2Real> inp(inputs.size());
+    cs->getOutputs(outputs.data());
+    for (size_t ii = 0; ii < pubs.size(); ++ii)
     {
-        step = def.stepSize;
+        pubs[ii].publish(outputs[ii]);
     }
-    if (step <= helics::timeZero)
+    cs->getCurrentInputs(inp.data());
+    for (size_t ii = 0; ii < inputs.size(); ++ii)
     {
-        auto tstep = fed.getTimeProperty (helics_property_time_period);
-        if (tstep > helics::timeEpsilon)
-        {
-            step = tstep;
-        }
-        else
-        {
-            step = std::min (0.2, static_cast<double> (stop) / 100.0);
-        }
+        inputs[ii].setDefault(inp[ii]);
     }
-    fed.setProperty (helics_property_time_period, step);
-
-    fed.enterInitializingMode ();
-    cs->setMode (fmuMode::initializationMode);
-    std::vector<fmi2Real> outputs (pubs.size ());
-    std::vector<fmi2Real> inp (inputs.size ());
-    cs->getOutputs (outputs.data ());
-    for (size_t ii = 0; ii < pubs.size (); ++ii)
-    {
-        pubs[ii].publish (outputs[ii]);
-    }
-    cs->getCurrentInputs (inp.data ());
-    for (size_t ii = 0; ii < inputs.size (); ++ii)
-    {
-        inputs[ii].setDefault (inp[ii]);
-    }
-    auto result = fed.enterExecutingMode (helics::iteration_request::iterate_if_needed);
+    auto result = fed.enterExecutingMode(helics::iteration_request::iterate_if_needed);
     if (result == helics::iteration_result::iterating)
     {
-        for (size_t ii = 0; ii < inputs.size (); ++ii)
+        for (size_t ii = 0; ii < inputs.size(); ++ii)
         {
-            inp[ii] = inputs[ii].getValue<fmi2Real> ();
+            inp[ii] = inputs[ii].getValue<fmi2Real>();
         }
-        cs->setInputs (inp.data ());
-        fed.enterExecutingMode ();
+        cs->setInputs(inp.data());
+        fed.enterExecutingMode();
     }
-    cs->setMode (fmuMode::stepMode);
+    cs->setMode(fmuMode::stepMode);
 
     helics::Time currentTime = helics::timeZero;
     while (currentTime <= stop)
     {
-        cs->doStep (static_cast<double> (currentTime), static_cast<double> (step), true);
-        currentTime = fed.requestNextStep ();
+        cs->doStep(static_cast<double>(currentTime), static_cast<double>(stepTime), true);
+        currentTime = fed.requestNextStep();
         // get the values to publish
-        cs->getOutputs (outputs.data ());
-        for (size_t ii = 0; ii < pubs.size (); ++ii)
+        cs->getOutputs(outputs.data());
+        for (size_t ii = 0; ii < pubs.size(); ++ii)
         {
-            pubs[ii].publish (outputs[ii]);
+            pubs[ii].publish(outputs[ii]);
         }
         // load the inputs
-        for (size_t ii = 0; ii < inputs.size (); ++ii)
+        for (size_t ii = 0; ii < inputs.size(); ++ii)
         {
-            inp[ii] = inputs[ii].getValue<fmi2Real> ();
+            inp[ii] = inputs[ii].getValue<fmi2Real>();
         }
-        cs->setInputs (inp.data ());
+        cs->setInputs(inp.data());
     }
-    fed.finalize ();
+    fed.finalize();
 }

@@ -59,6 +59,18 @@ int main(int argc, char *argv[])
     app.set_help_flag("-h,-?,--help", "print this help module");
     app.allow_extras();
     app.set_config("--config-file");
+    std::vector<std::string> output_variables;
+    std::vector<std::string> input_variables;
+    std::vector<std::string> connections;
+
+    app.add_option("--output_variables", output_variables, "Specify outputs of the FMU by name")
+      ->ignore_underscore()
+      ->delimiter(',');
+    app.add_option("--input_variables", input_variables, "Specify the input variables of the FMU by name")
+      ->ignore_underscore()
+      ->delimiter(',');
+    app.add_option("--connections", input_variables, "Specify connections this FMU should make")->delimiter(',');
+
     try
     {
         app.parse(argc, argv);
@@ -102,13 +114,15 @@ int main(int argc, char *argv[])
         {
             std::shared_ptr<fmi2CoSimObject> obj = fmi.createCoSimulationObject("obj1");
             auto fed = std::make_unique<FmiCoSimFederate>(obj, fi);
-            fed->run(helics::timeZero, helics::timeZero);
+            fed->configure(stepTime);
+            fed->run(stopTime);
         }
         else
         {
             std::shared_ptr<fmi2ModelExchangeObject> obj = fmi.createModelExchangeObject("obj1");
             auto fed = std::make_unique<FmiModelExchangeFederate>(obj, fi);
-            fed->run(helics::timeZero, helics::timeZero);
+            fed->configure(stepTime);
+            fed->run(stopTime);
         }
     }
     else if ((ext == ".json") || (ext == ".JSON"))
@@ -164,6 +178,7 @@ void runSystem(readerElement &elem, helics::FederateInfo &fi)
         elem.moveToNextSibling();
         core->dataLink(str1, str2);
     }
+
     feds.clear();
     core->disconnect();
 }
