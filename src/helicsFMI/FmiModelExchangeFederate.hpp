@@ -18,14 +18,16 @@
 
 #include "helics/application_api/Inputs.hpp"
 #include "helics/application_api/Publications.hpp"
+#include "solvers/SolvableObject.hpp"
 
 namespace griddyn
 {
 class SolverInterface;
-}
+class SolverMode;
+}  // namespace griddyn
 
 /** class defining a modelExchange federate*/
-class FmiModelExchangeFederate
+class FmiModelExchangeFederate : public griddyn::SolvableObject
 {
   public:
     FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj, const helics::FederateInfo &fi);
@@ -46,6 +48,45 @@ class FmiModelExchangeFederate
     void addConnection(const std::string &conn);
     /** run the cosimulation*/
     void run(helics::Time stop);
+
+    virtual solver_index_type jacobianSize(const griddyn::solverMode &sMode) const override;
+
+    virtual void
+    guessCurrentValue(double time, double state[], double dstate_dt[], const griddyn::solverMode &sMode) override;
+
+    virtual int residualFunction(double time,
+                                 const double state[],
+                                 const double dstate_dt[],
+                                 double resid[],
+                                 const griddyn::solverMode &sMode) noexcept override;
+
+    virtual int derivativeFunction(double time,
+                                   const double state[],
+                                   double dstate_dt[],
+                                   const griddyn::solverMode &sMode) noexcept override;
+
+    virtual int algUpdateFunction(double time,
+                                  const double state[],
+                                  double update[],
+                                  const griddyn::solverMode &sMode,
+                                  double alpha) noexcept override;
+
+    virtual int jacobianFunction(double time,
+                                 const double state[],
+                                 const double dstate_dt[],
+                                 matrixData<double> &md,
+                                 double cj,
+                                 const griddyn::solverMode &sMode) noexcept override;
+    virtual int rootFindingFunction(double time,
+                                    const double state[],
+                                    const double dstate_dt[],
+                                    double roots[],
+                                    const griddyn::solverMode &sMode) noexcept override;
+
+    virtual int dynAlgebraicSolve(double time,
+                                  const double diffState[],
+                                  const double deriv[],
+                                  const griddyn::solverMode &sMode) noexcept override;
 
   private:
     helics::ValueFederate fed;  //!< the federate

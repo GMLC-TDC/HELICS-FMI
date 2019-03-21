@@ -41,8 +41,11 @@ int main(int argc, char *argv[])
     std::string integrator{"cvode"};
     app.add_option("--integrator", integrator, "the type of integrator to use(cvode, arkode, boost)", true)
       ->transform(CLI::IsMember({"cvode", "arkode", "boost"}));
+    auto input_group = app.add_option_group("input files")->required();
+    std::string inputFile;
+    input_group->add_option("inputfile", inputFile, "specify the input files")->check(CLI::ExistingFile);
     std::vector<std::string> inputs;
-    app.add_option("input,--input", inputs, "specify the input files")->check(CLI::ExistingFile);
+    input_group->add_option("-i,--input", inputs, "specify the input files")->check(CLI::ExistingFile);
     std::string integratorArgs;
     app.add_option("--integrator-args", integratorArgs, "arguments to pass to the integrator");
 
@@ -85,9 +88,16 @@ int main(int argc, char *argv[])
     {
         return app.exit(e);
     }
-
-    helics::Time stepTime = helics::loadTimeFromString(stepTimeString);
-    helics::Time stopTime = helics::loadTimeFromString(stopTimeString);
+    helics::Time stepTime = helics::Time::minVal();
+    if (!stepTimeString.empty())
+    {
+        stepTime = helics::loadTimeFromString(stepTimeString);
+    }
+    helics::Time stopTime = helics::Time::minVal();
+    if (!stopTimeString.empty())
+    {
+        stopTime = helics::loadTimeFromString(stopTimeString);
+    }
 
     helics::FederateInfo fi;
     // set the default core type to be local
@@ -102,14 +112,17 @@ int main(int argc, char *argv[])
         fi.autobroker = false;
     }
 
-    std::string filename = inputs.front();
+    if (inputFile.empty())
+    {
+        inputFile = inputs.front();
+    }
 
-    auto ext = filename.substr(filename.find_last_of('.'));
+    auto ext = inputFile.substr(inputFile.find_last_of('.'));
 
     fmiLibrary fmi;
     if ((ext == ".fmu") || (ext == ".FMU"))
     {
-        fmi.loadFMU(filename);
+        fmi.loadFMU(inputFile);
         if (fmi.checkFlag(fmuCapabilityFlags::coSimulationCapable))
         {
             std::shared_ptr<fmi2CoSimObject> obj = fmi.createCoSimulationObject("obj1");
@@ -127,7 +140,7 @@ int main(int argc, char *argv[])
     }
     else if ((ext == ".json") || (ext == ".JSON"))
     {
-        jsonReaderElement system(filename);
+        jsonReaderElement system(inputFile);
         if (system.isValid())
         {
             runSystem(system, fi);
@@ -135,7 +148,7 @@ int main(int argc, char *argv[])
     }
     else if ((ext == ".toml") || (ext == ".TOML"))
     {
-        tomlReaderElement system(filename);
+        tomlReaderElement system(inputFile);
         if (system.isValid())
         {
             runSystem(system, fi);
@@ -143,7 +156,7 @@ int main(int argc, char *argv[])
     }
     else if ((ext == ".xml") || (ext == ".XML"))
     {
-        tinyxml2ReaderElement system(filename);
+        tinyxml2ReaderElement system(inputFile);
         if (system.isValid())
         {
             runSystem(system, fi);
