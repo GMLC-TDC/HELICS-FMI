@@ -53,11 +53,17 @@ ExternalProject_Add(helics
 
 if (MSVC)
 
+if(${CMAKE_VERSION} VERSION_LESS "3.14.0") 
+    set(GENERATOR_ARGS -G ${CMAKE_GENERATOR})
+else()
+	set(GENERATOR_ARGS -G ${CMAKE_GENERATOR} -A ${CMAKE_GENERATOR_PLATFORM})
+endif()
+
 if (NOT BUILD_RELEASE_ONLY)
 	
 	message(STATUS "Configuring HELICS Autobuild for debug logging to ${PROJECT_BINARY_DIR}/logs/helics_autobuild_config_debug.log")
 	execute_process(COMMAND ${CMAKE_COMMAND} -Wno-dev -D CMAKE_CXX_COMPILER=${cxx_compiler_string} -D CMAKE_C_COMPILER=${c_compiler_string} -D CMAKE_LINKER=${linker_string}
-         -D CMAKE_BUILD_TYPE=Debug -G ${CMAKE_GENERATOR} .. 
+         -D CMAKE_BUILD_TYPE=Debug ${GENERATOR_ARGS} .. 
         WORKING_DIRECTORY ${trigger_build_dir}/build
 		OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/helics_autobuild_config_debug.log
         )
@@ -76,7 +82,7 @@ if (NOT BUILD_RELEASE_ONLY)
 	endif()
   message(STATUS "Configuring HELICS Autobuild for ${MSVC_RELEASE_BUILD_TYPE} logging to ${PROJECT_BINARY_DIR}/logs/helics_autobuild_config_release.log")
     execute_process(COMMAND ${CMAKE_COMMAND} -Wno-dev -D CMAKE_CXX_COMPILER=${cxx_compiler_string} -D CMAKE_C_COMPILER=${c_compiler_string} -D CMAKE_LINKER=${linker_string}
-         -D CMAKE_BUILD_TYPE=${MSVC_RELEASE_BUILD_TYPE} -G ${CMAKE_GENERATOR} .. 
+         -D CMAKE_BUILD_TYPE=${MSVC_RELEASE_BUILD_TYPE} ${GENERATOR_ARGS}  .. 
         WORKING_DIRECTORY ${trigger_build_dir}/build
 		OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/helics_autobuild_config_release.log
         )
