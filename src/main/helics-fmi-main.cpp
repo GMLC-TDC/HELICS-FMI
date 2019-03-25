@@ -22,6 +22,7 @@
 #include "helicsFMI/FmiCoSimFederate.hpp"
 #include "helicsFMI/FmiModelExchangeFederate.hpp"
 #include <iostream>
+#include <thread>
 
 void runSystem(readerElement &elem, helics::FederateInfo &fi);
 
@@ -145,6 +146,10 @@ int main(int argc, char *argv[])
         {
             runSystem(system, fi);
         }
+        else if (broker)
+        {
+            broker->forceTerminate();
+        }
     }
     else if ((ext == ".toml") || (ext == ".TOML"))
     {
@@ -152,6 +157,10 @@ int main(int argc, char *argv[])
         if (system.isValid())
         {
             runSystem(system, fi);
+        }
+        else if (broker)
+        {
+            broker->forceTerminate();
         }
     }
     else if ((ext == ".xml") || (ext == ".XML"))
@@ -161,6 +170,10 @@ int main(int argc, char *argv[])
         {
             runSystem(system, fi);
         }
+        else if (broker)
+        {
+            broker->forceTerminate();
+        }
     }
 }
 
@@ -168,8 +181,8 @@ void runSystem(readerElement &elem, helics::FederateInfo &fi)
 {
     fi.coreName = "fmu_core";
     elem.moveToFirstChild("fmus");
-    std::vector<std::unique_ptr<FmiCoSimFederate>> feds;
-
+    std::vector<std::unique_ptr<FmiCoSimFederate>> feds_cs;
+    std::vector<std::unique_ptr<FmiModelExchangeFederate>> feds_me;
     auto core =
       helics::CoreFactory::create(fi.coreType, "--name=fmu_core " + helics::generateFullCoreInitString(fi));
     while (elem.isValid())
@@ -177,9 +190,39 @@ void runSystem(readerElement &elem, helics::FederateInfo &fi)
         fmiLibrary fmi;
         auto str = elem.getAttributeText("fmu");
         fmi.loadFMU(str);
-        std::shared_ptr<fmi2CoSimObject> obj = fmi.createCoSimulationObject(elem.getAttributeText("name"));
-        auto fed = std::make_unique<FmiCoSimFederate>(obj, fi);
-        feds.push_back(std::move(fed));
+        if (fmi.checkFlag(fmuCapabilityFlags::coSimulationCapable))
+        {
+            std::shared_ptr<fmi2CoSimObject> obj = fmi.createCoSimulationObject(elem.getAttributeText("name"));
+            auto fed = std::make_unique<FmiCoSimFederate>(obj, fi);
+            elem.moveToFirstChild("parameters");
+            while (elem.isValid())
+            {
+                auto str1 = elem.getFirstAttribute().getText();
+                auto str2 = elem.getNextAttribute().getText();
+                elem.moveToNextSibling();
+                obj->set(str1, str2);
+            }
+            elem.moveToParent();
+            fed->configure(1.0);
+            feds_cs.push_back(std::move(fed));
+        }
+        else
+        {
+            std::shared_ptr<fmi2ModelExchangeObject> obj = fmi.createModelExchangeObject("obj1");
+            auto fed = std::make_unique<FmiModelExchangeFederate>(obj, fi);
+            elem.moveToFirstChild("parameters");
+            while (elem.isValid())
+            {
+                auto str1 = elem.getFirstAttribute().getText();
+                auto str2 = elem.getNextAttribute().getText();
+                elem.moveToNextSibling();
+                obj->set(str1, str2);
+            }
+            elem.moveToParent();
+            fed->configure(1.0);
+            feds_me.push_back(std::move(fed));
+        }
+
         elem.moveToNextSibling("fmus");
     }
     elem.moveToParent();
@@ -191,7 +234,24 @@ void runSystem(readerElement &elem, helics::FederateInfo &fi)
         elem.moveToNextSibling();
         core->dataLink(str1, str2);
     }
-
-    feds.clear();
+    elem.moveToParent();
+    // load each of the fmu's into its own thread
+    std::vector<std::thread> threads(feds_cs.size() + feds_me.size());
+    for (int ii = 0; ii < feds_cs.size(); ++ii)
+    {
+        auto tfed = feds_cs[ii].get();
+        threads[ii] = std::thread([tfed]() { tfed->run(helics::Time::zeroVal()); });
+    }
+    for (int jj = 0; jj < feds_cs.size(); ++jj)
+    {
+        auto tfed = feds_me[jj].get();
+        threads[jj + feds_cs.size()] = std::thread([tfed]() { tfed->run(helics::Time::zeroVal()); });
+    }
+    for (auto &thread : threads)
+    {
+        thread.join();
+    }
+    feds_cs.clear();
+    feds_me.clear();
     core->disconnect();
 }
