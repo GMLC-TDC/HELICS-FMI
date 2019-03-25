@@ -110,7 +110,7 @@ void cvodeInterface::allocate(count_t stateCount, count_t numRoots)
     {
         CVodeFree(&(solverMem));
     }
-    solverMem = CVodeCreate(CV_ADAMS, CV_FUNCTIONAL);
+    solverMem = CVodeCreate(CV_ADAMS);
     check_flag(solverMem, "CVodeCreate", 0);
 
     sundialsInterface::allocate(stateCount, numRoots);
