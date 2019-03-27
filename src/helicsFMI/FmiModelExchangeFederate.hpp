@@ -33,7 +33,7 @@ class FmiModelExchangeFederate : public griddyn::SolvableObject
     FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj, const helics::FederateInfo &fi);
     ~FmiModelExchangeFederate();
     /** configure the federate using the specified inputs and outputs*/
-    void configure(helics::Time step);
+    void configure(helics::Time step, helics::Time start = helics::timeZero);
     /** set a string list of inputs*/
     void setInputs(std::vector<std::string> input_names);
     /** set a string list of outputs*/
@@ -96,7 +96,7 @@ class FmiModelExchangeFederate : public griddyn::SolvableObject
     std::vector<std::string> output_list;
     std::vector<std::string> connections;
     helics::Time stepTime;  //!< the step time for the Federate
-
+    helics::Time timeBias;  //!< the starting time for the FMU with a bias shift from 0
     std::vector<helics::Publication> pubs;  //!< known publications
     std::vector<helics::Input> inputs;  //!< known subscriptions
     double stepSize = 0.01;  //!< the default step size of the simulation

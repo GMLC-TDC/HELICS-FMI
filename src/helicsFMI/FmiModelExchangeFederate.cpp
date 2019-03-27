@@ -27,8 +27,9 @@ FmiModelExchangeFederate::FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExch
 
 FmiModelExchangeFederate::~FmiModelExchangeFederate() = default;
 
-void FmiModelExchangeFederate::configure(helics::Time step)
+void FmiModelExchangeFederate::configure(helics::Time step, helics::Time startTime)
 {
+    timeBias = startTime;
     for (auto input : input_list)
     {
         inputs.emplace_back(&fed, input);

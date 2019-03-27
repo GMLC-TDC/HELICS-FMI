@@ -24,8 +24,9 @@ FmiCoSimFederate::FmiCoSimFederate(std::shared_ptr<fmi2CoSimObject> obj, const h
     }
 }
 
-void FmiCoSimFederate::configure(helics::Time step)
+void FmiCoSimFederate::configure(helics::Time step, helics::Time startTime)
 {
+    timeBias = startTime;
     for (auto input : input_list)
     {
         inputs.emplace_back(&fed, input);

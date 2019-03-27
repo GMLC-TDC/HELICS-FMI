@@ -203,6 +203,10 @@ void runSystem(readerElement &elem, helics::FederateInfo &fi)
                 obj->set(str1, str2);
             }
             elem.moveToParent();
+            if (elem.hasAttribute("starttime"))
+            {
+                double sval = elem.getAttributeValue("starttime");
+            }
             fed->configure(1.0);
             feds_cs.push_back(std::move(fed));
         }
@@ -242,7 +246,7 @@ void runSystem(readerElement &elem, helics::FederateInfo &fi)
         auto tfed = feds_cs[ii].get();
         threads[ii] = std::thread([tfed]() { tfed->run(helics::Time::zeroVal()); });
     }
-    for (int jj = 0; jj < feds_cs.size(); ++jj)
+    for (int jj = 0; jj < feds_me.size(); ++jj)
     {
         auto tfed = feds_me[jj].get();
         threads[jj + feds_cs.size()] = std::thread([tfed]() { tfed->run(helics::Time::zeroVal()); });
