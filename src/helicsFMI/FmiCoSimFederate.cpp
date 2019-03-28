@@ -76,6 +76,7 @@ void FmiCoSimFederate::run(helics::Time stop)
     }
 
     fed.enterInitializingMode();
+    cs->setupExperiment(false, 0, static_cast<double>(timeBias), 1, static_cast<double>(timeBias + stop));
     cs->setMode(fmuMode::initializationMode);
     std::vector<fmi2Real> outputs(pubs.size());
     std::vector<fmi2Real> inp(inputs.size());
@@ -102,9 +103,9 @@ void FmiCoSimFederate::run(helics::Time stop)
     cs->setMode(fmuMode::stepMode);
 
     helics::Time currentTime = helics::timeZero;
-    while (currentTime <= stop)
+    while (currentTime + timeBias <= stop)
     {
-        cs->doStep(static_cast<double>(currentTime), static_cast<double>(stepTime), true);
+        cs->doStep(static_cast<double>(currentTime + timeBias), static_cast<double>(stepTime), true);
         currentTime = fed.requestNextStep();
         // get the values to publish
         cs->getOutputs(outputs.data());
