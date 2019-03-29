@@ -105,6 +105,7 @@ int main(int argc, char *argv[])
     fi.coreType = helics::core_type::TEST;
     fi.defName = "fmi";
     fi.loadInfoFromArgs(argc, argv);
+    fi.separator = '.';
 
     std::unique_ptr<helics::apps::BrokerApp> broker;
     if (fi.autobroker)
@@ -205,9 +206,19 @@ void runSystem(readerElement &elem, helics::FederateInfo &fi)
             while (elem.isValid())
             {
                 auto str1 = elem.getFirstAttribute().getText();
-                auto str2 = elem.getNextAttribute().getText();
-                elem.moveToNextSibling();
-                obj->set(str1, str2);
+                auto attr = elem.getNextAttribute();
+
+                elem.moveToNextSibling("parameters");
+                double val = attr.getValue();
+                if (val != readerNullVal)
+                {
+                    obj->set(str1, val);
+                }
+                else
+                {
+                    auto str2 = attr.getText();
+                    obj->set(str1, str2);
+                }
             }
             elem.moveToParent();
             if (elem.hasAttribute("starttime"))
@@ -231,7 +242,7 @@ void runSystem(readerElement &elem, helics::FederateInfo &fi)
             {
                 auto str1 = elem.getFirstAttribute().getText();
                 auto str2 = elem.getNextAttribute().getText();
-                elem.moveToNextSibling();
+                elem.moveToNextSibling("parameters");
                 obj->set(str1, str2);
             }
             elem.moveToParent();
@@ -247,7 +258,7 @@ void runSystem(readerElement &elem, helics::FederateInfo &fi)
     {
         auto str1 = elem.getFirstAttribute().getText();
         auto str2 = elem.getNextAttribute().getText();
-        elem.moveToNextSibling();
+        elem.moveToNextSibling("connections");
         core->dataLink(str1, str2);
     }
     elem.moveToParent();

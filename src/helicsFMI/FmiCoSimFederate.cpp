@@ -13,6 +13,7 @@
 #include "FmiCoSimFederate.hpp"
 #include "fmi/fmi_import/fmiObjects.h"
 #include <algorithm>
+#include <fstream>
 
 FmiCoSimFederate::FmiCoSimFederate(std::shared_ptr<fmi2CoSimObject> obj, const helics::FederateInfo &fi)
     : cs(std::move(obj)), fed(obj->getName(), fi)
@@ -75,10 +76,17 @@ void FmiCoSimFederate::run(helics::Time stop)
         stop = 30.0;
     }
 
+    std::ofstream ofile(fed.getName() + "_outfile.txt");
     fed.enterInitializingMode();
     cs->setupExperiment(false, 0, static_cast<double>(timeBias), 1, static_cast<double>(timeBias + stop));
     cs->setMode(fmuMode::initializationMode);
     std::vector<fmi2Real> outputs(pubs.size());
+    ofile << "time,";
+    for (auto &pub : pubs)
+    {
+        ofile << pub.getName() << ",";
+    }
+    ofile << std::endl;
     std::vector<fmi2Real> inp(inputs.size());
     cs->getOutputs(outputs.data());
     for (size_t ii = 0; ii < pubs.size(); ++ii)
@@ -119,6 +127,12 @@ void FmiCoSimFederate::run(helics::Time stop)
             inp[ii] = inputs[ii].getValue<fmi2Real>();
         }
         cs->setInputs(inp.data());
+        ofile << static_cast<double>(currentTime) << ",";
+        for (auto &out : outputs)
+        {
+            ofile << out << ",";
+        }
+        ofile << std::endl;
     }
     fed.finalize();
 }
