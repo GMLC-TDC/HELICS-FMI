@@ -11,12 +11,12 @@
 cmake_minimum_required(VERSION 3.5)
 cmake_policy(VERSION 3.5)
 
-project(HELICS-FMI VERSION 0.5.0)
+project(HELICS-FMI VERSION 0.5.1)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-#set (HELICS-FMI_VERSION_BUILD alpha.1)
-set (HELICS-FMI_DATE "11-30-18")
+#set (HELICS-FMI_VERSION_BUILD )
+set (HELICS-FMI_DATE "5-16-19")
 set(
   HELICS-FMI_VERSION_UNDERSCORE
   "${HELICS-FMI_VERSION_MAJOR}_${HELICS-FMI_VERSION_MINOR}_${HELICS-FMI_VERSION_PATCH}"
@@ -127,7 +127,6 @@ include(GNUInstallDirs)
 # -------------------------------------------------------------
 set(
   BOOST_REQUIRED_LIBRARIES
-  program_options
   unit_test_framework
   filesystem
   system
@@ -214,12 +213,6 @@ INCLUDE_DIRECTORIES(SYSTEM ${Boost_INCLUDE_DIR})
 # load the required subdirectories
 # -------------------------------------------------------------
 
-add_subdirectory(src/formatInterpreters)
-
-add_subdirectory(src/utilities)
-
-add_subdirectory(src/fmi)
-
 # -------------------------------------------------------------
 # Enable HELICS executable
 # -------------------------------------------------------------
@@ -227,6 +220,14 @@ add_subdirectory(src/fmi)
 SHOW_VARIABLE(HELICS_INSTALL_PATH PATH "path to the helics installation" "${PROJECT_BINARY_DIR}/libs")
 
 include(addHELICS)
+
+add_subdirectory(src/formatInterpreters)
+
+add_subdirectory(src/utilities)
+
+add_subdirectory(src/fmi)
+
+
 
 add_subdirectory(src/solvers)
 add_subdirectory(src/helicsFMI)

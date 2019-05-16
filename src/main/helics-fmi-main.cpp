@@ -104,9 +104,21 @@ int main(int argc, char *argv[])
     // set the default core type to be local
     fi.coreType = helics::core_type::TEST;
     fi.defName = "fmi";
-    fi.loadInfoFromArgs(argc, argv);
+    auto remArgs = app.remaining_for_passthrough();
     fi.separator = '.';
-
+    fi.loadInfoFromArgs(remArgs);
+    if (!remArgs.empty())
+    {
+        app.allow_extras(false);
+        try
+        {
+            app.parse(remArgs);
+        }
+        catch (const CLI::ParseError &e)
+        {
+            return app.exit(e);
+        }
+    }
     std::unique_ptr<helics::apps::BrokerApp> broker;
     if (fi.autobroker)
     {

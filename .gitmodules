@@ -1,7 +1,3 @@
 [submodule "extern/sundials"]
 	path = extern/sundials
 	url = https://github.com/LLNL/sundials.git
-[submodule "extern/jsoncpp"]
-	path = extern/jsoncpp
-	url = https://github.com/phlptp/jsoncpp.git
-	branch = fix_jsoncpp_shadow_warnings
