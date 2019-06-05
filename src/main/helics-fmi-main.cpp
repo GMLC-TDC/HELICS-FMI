@@ -10,7 +10,7 @@
  * LLNS Copyright End
  */
 
-#include "CLI11/CLI11.hpp"
+#include "helics/external/CLI11/CLI11.hpp"
 #include "fmi/fmi_import/fmiImport.h"
 #include "formatInterpreters/jsonReaderElement.h"
 #include "formatInterpreters/tinyxml2ReaderElement.h"
