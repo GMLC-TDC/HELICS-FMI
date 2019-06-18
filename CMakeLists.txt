@@ -322,7 +322,7 @@ endif(WIN32)
 	set(CPACK_NSIS_URL_INFO_ABOUT "https://www.github.com/GMLC-TDC/Helics-fmi")
 set(CPACK_NSIS_MENU_LINKS
 	"https://www.github.com/GMLC-TDC/Helics-fmi" "source code"
-	"https://gmlc-tdc.github.io/HELICS-src/" "Helics Documentation"
+	"https://helics.readthedocs.io/en/latest/" "Helics Documentation"
 	"https://www.helics-fmi.org" "Helics FMI Web page"
 	"https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg" "TDC YouTube channel")
 else (WIN32)
