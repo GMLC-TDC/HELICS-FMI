@@ -12,9 +12,9 @@ contributions must be made under this [LICENSE](LICENSE) in accordance with the 
 
 ##  [Code of Conduct](.github/CODE_OF_CONDUCT.md)
 
-If you just have a question about HELICS check out [![Gitter chat](https://badges.gitter.im/GMLC-TDC/HELICS-src.png)](https://gitter.im/GMLC-TDC/HELICS-src)
+If you just have a question about HELICS check out [![Gitter chat](https://badges.gitter.im/GMLC-TDC/HELICS.png)](https://gitter.im/GMLC-TDC/HELICS)
 
-and there are a few questions answered on the github [WIKI](https://github.com/GMLC-TDC/HELICS-src/wiki) page for HELICS.
+and there are a few questions answered on the github [WIKI](https://github.com/GMLC-TDC/HELICS/wiki) page for HELICS.
 
 ## How Can I Contribute?
 

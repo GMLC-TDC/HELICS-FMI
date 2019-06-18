@@ -23,7 +23,7 @@ function (build_helics)
     include(ExternalProject)
 ExternalProject_Add(helics
     SOURCE_DIR ${binary_dir_string}/Download/helics
-    GIT_REPOSITORY  https://github.com/GMLC-TDC/HELICS-src.git
+    GIT_REPOSITORY  https://github.com/GMLC-TDC/HELICS.git
     DOWNLOAD_COMMAND " " 
     UPDATE_COMMAND " " 
     BINARY_DIR ${binary_dir_string}/ThirdParty/helics
