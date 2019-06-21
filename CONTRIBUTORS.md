@@ -22,7 +22,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 ### [BOOST](https://www.boost.org)
   Boost is used throughout the code, The FMI library makes heavy use of boost::DLL and boost::filesystem for loading and interacting with the FMUs
 
-### [helics](https://github.com/GMLC-TDC/HELICS-src)
+### [helics](https://github.com/GMLC-TDC/HELICS)
   The library is based on HELICS and interacts with the libary
 
 ### [jsoncpp](https://github.com/open-source-parsers/jsoncpp)
