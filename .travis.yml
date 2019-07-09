@@ -41,7 +41,7 @@ install:
 
 script:
     # Print the HELICS version and ensure required shared libraries are found
-  - helics-prefix/bin/helics_broker --version || exit 0
+  - helics-prefix/bin/helics_broker --version || true
   
   - mkdir build && cd build
   - cmake .. -DHELICS_INSTALL_PATH=${TRAVIS_BUILD_DIR}/helics-prefix -DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost
