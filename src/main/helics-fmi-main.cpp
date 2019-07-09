@@ -10,7 +10,6 @@
  * LLNS Copyright End
  */
 
-#include "helics/external/CLI11/CLI11.hpp"
 #include "fmi/fmi_import/fmiImport.h"
 #include "formatInterpreters/jsonReaderElement.h"
 #include "formatInterpreters/tinyxml2ReaderElement.h"
@@ -19,6 +18,7 @@
 #include "helics/apps/BrokerApp.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/helicsVersion.hpp"
+#include "helics/external/CLI11/CLI11.hpp"
 #include "helicsFMI/FmiCoSimFederate.hpp"
 #include "helicsFMI/FmiModelExchangeFederate.hpp"
 #include <iostream>
@@ -30,14 +30,13 @@ int main(int argc, char *argv[])
 {
     std::ifstream infile;
     CLI::App app{"HELICS-FMI for loading and executing FMU's with HELICS", "helics-fmi"};
-    app.add_flag_function(
-      "-v,--version",
-      [](size_t) {
-          std::cout << "HELICS VERSION " << helics::versionString << '\n';
-          std::cout << "HELICS_FMI_VERSION " << HELICS_FMI_VERSION_STRING << '\n';
-          throw(CLI::Success());
-      },
-      "specify the versions of helics and helics-fmi");
+    app.add_flag_function("-v,--version",
+                          [](size_t) {
+                              std::cout << "HELICS VERSION " << helics::versionString << '\n';
+                              std::cout << "HELICS_FMI_VERSION " << HELICS_FMI_VERSION_STRING << '\n';
+                              throw(CLI::Success());
+                          },
+                          "specify the versions of helics and helics-fmi");
 
     std::string integrator{"cvode"};
     app.add_option("--integrator", integrator, "the type of integrator to use(cvode, arkode, boost)", true)

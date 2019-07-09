@@ -44,7 +44,7 @@ script:
   - helics-prefix/bin/helics_broker --version
   
   - mkdir build && cd build
-  - cmake .. -DHELICS_INSTALL_PATH=${TRAVIS_BUILD_DIR}/helics-prefix -DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost -DBUILD_RELEASE_ONLY=ON
+  - cmake .. -DHELICS_INSTALL_PATH=${TRAVIS_BUILD_DIR}/helics-prefix -DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost
   - make ${MAKEFLAGS}
 
 notifications:

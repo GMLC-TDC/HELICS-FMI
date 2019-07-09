@@ -49,7 +49,7 @@ void FmiModelExchangeFederate::configure(helics::Time step, helics::Time startTi
     if (step <= helics::timeZero)
     {
         auto tstep = fed.getTimeProperty(helics_property_time_period);
-        step = (tstep > helics::timeEpsilon) ? tstep : 0.2;
+        step = (tstep > helics::timeEpsilon) ? tstep : helics::Time(0.2);
     }
     fed.setProperty(helics_property_time_period, step);
     stepTime = step;

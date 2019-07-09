@@ -71,18 +71,25 @@ ENDIF()
 
 add_library(helics_fmi_base INTERFACE)
 
+if (NOT TARGET compile_flags_target)
+   add_library(compile_flags_target INTERFACE)
+endif()
+
 include(compiler_flags)
-message(STATUS "setting version build options to \"${VERSION_OPTION}\"")
-if(VERSION_OPTION)
-  if(MSVC)
-		target_compile_options(helics_fmi_base INTERFACE ${VERSION_OPTION})
-	else()
-    target_compile_options(
-      helics_fmi_base
-      INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>
-    )
-  endif(MSVC)
-endif(VERSION_OPTION)
+
+if(CXX_STANDARD_FLAG)
+message(STATUS "setting version build options to \"${CXX_STANDARD_FLAG}\"")
+		if(MSVC)
+			target_compile_options(helics_fmi_base INTERFACE ${CXX_STANDARD_FLAG})
+		else()
+			target_compile_options(
+				helics_fmi_base
+				INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${CXX_STANDARD_FLAG}>
+			)
+		endif(MSVC)
+	endif(CXX_STANDARD_FLAG)
+	
+target_link_libraries(helics_fmi_base INTERFACE compile_flags_target)
 
 cmake_dependent_option(
   STATIC_STANDARD_LIB
