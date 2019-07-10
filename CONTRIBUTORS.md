@@ -20,7 +20,7 @@ If you would like to contribute to any of the HELICS related projects see [CONTR
 ## Used Libraries or Code
 
 ### [BOOST](https://www.boost.org)
-  Boost is used throughout the code, The FMI library makes heavy use of boost::DLL and boost::filesystem for loading and interacting with the FMUs
+  Boost is used throughout the code, The FMI library makes heavy use of boost::DLL and boost::filesystem for loading and interacting with the FMUs, boost::spirit is used for some numerical conversions
 
 ### [helics](https://github.com/GMLC-TDC/HELICS)
   The library is based on HELICS and interacts with the libary

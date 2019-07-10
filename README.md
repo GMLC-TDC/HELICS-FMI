@@ -4,6 +4,17 @@
 
 Executable to allow Functional Mockup units to interact with [HELICS](https://github.com/GMLC-TDC/HELICS)
 
+## building
+
+HELICS-FMI uses cmake for build system generation.  It requires HELICS 2.1 or greater to operate.  
+
+### Windows
+For building with visual studio the cmake-gui is recommended.  
+Set the build directory to an empty path for Example HELICS-FMI/build and the source to the HELICS-FMI directory.  
+HELICS-FMI will attempt to locate an existing HELICS installation and use those files,  If one does not exist HELICS will automatically download and build it.
+
+### Linux and others
+The process is the same as for Windows, with the exception that HELICS will not automatically build unless the AUTOBUILD_HELICS option is enabled.  
 
 ## Source Repo
 
