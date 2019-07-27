@@ -11,8 +11,8 @@
  */
 
 #include "jsonReaderElement.h"
+#include "helics/utilities/stringConversion.h"
 #include "jsonElement.h"
-#include "utilities/stringConversion.h"
 #include <cassert>
 #include <fstream>
 #include <iostream>
@@ -135,7 +135,7 @@ double jsonReaderElement::getValue() const
     }
     if (current->getElement().isConvertibleTo(Json::ValueType::stringValue))
     {
-        return numeric_conversionComplete(current->getElement().asString(), readerNullVal);
+        return gmlc::utilities::numeric_conversionComplete(current->getElement().asString(), readerNullVal);
     }
     return readerNullVal;
 }
@@ -281,7 +281,8 @@ double jsonReaderElement::getAttributeValue(const std::string &attributeName) co
         {
             return current->getElement()[attributeName].asDouble();
         }
-        return numeric_conversionComplete(current->getElement()[attributeName].asString(), readerNullVal);
+        return gmlc::utilities::numeric_conversionComplete(current->getElement()[attributeName].asString(),
+                                                           readerNullVal);
     }
     return readerNullVal;
 }

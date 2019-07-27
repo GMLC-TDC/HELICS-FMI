@@ -11,39 +11,27 @@
 #project name
 
 set(utilities_sources
-argParser.cpp
 	gridRandom.cpp
-	stringOps.cpp
-	string_viewOps.cpp
 	matrixOps.cpp
-	stringConversion.cpp
 	units.cpp
 	vectorOps.cpp
 	functionInterpreter.cpp
-	charMapper.cpp
 	workQueue.cpp
 	zipUtilities.cpp
-	base64.cpp
 	matrixCreation.cpp
 	logger.cpp
 	matrixDataSparse.cpp
-	stringToCmdLine.cpp
 	helperObject.cpp
 	)
 
 set(utilities_headers
 	units.h
-	argParser.h
 	dataDictionary.hpp
 	timeSeries.hpp
-	charMapper.h
 	timeSeriesMulti.hpp
 	vectorOps.hpp
-	generic_string_ops.hpp
-	stringOps.h
-	string_viewOps.h
-	string_viewDef.h
 	optionalDef.hpp
+	mapOps.hpp
 	matrixData.hpp
 	matrixOps.h
 	matrixDataCompact.hpp
@@ -60,16 +48,11 @@ set(utilities_headers
 	workQueue.h
 	simpleQueue.hpp
 	zipUtilities.h
-	base64.h
-	stringConversion.h
-	string_viewConversion.h
 	mapOps.hpp
 	valuePredictor.hpp
 	matrixCreation.h
-	timeRepresentation.hpp
 	indexTypes.hpp
 	logger.h
-	stringToCmdLine.h
 	factoryTemplates.hpp
 	helperObject.h
 	)
@@ -99,7 +82,7 @@ build_minizip()
 endif()
 include(${PROJECT_BINARY_DIR}/libs/cmake/minizip-targets.cmake)
 
-target_link_libraries(utilities PUBLIC minizip::minizip zlib::zlib helics_fmi_base)
+target_link_libraries(utilities PUBLIC minizip::minizip zlib::zlib helics_fmi_base HELICS::utilities)
 
 INSTALL(TARGETS utilities
        LIBRARY DESTINATION lib

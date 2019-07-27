@@ -14,7 +14,7 @@
 
 #include "cvodeInterface.h"
 
-#include "utilities/stringOps.h"
+#include "helics/utilities/stringOps.h"
 #include "utilities/vectorOps.hpp"
 
 #include <cvode/cvode.h>

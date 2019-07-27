@@ -1,5 +1,5 @@
 /*
-* LLNS Copyright Start
+ * LLNS Copyright Start
  * Copyright (c) 2017, Lawrence Livermore National Security
  * This work was performed under the auspices of the U.S. Department
  * of Energy by Lawrence Livermore National Laboratory in part under
@@ -12,7 +12,7 @@
 
 #include "units.h"
 
-#include "stringOps.h"
+#include "utilities/stringOps.h"
 
 #include "mapOps.hpp"
 #include <utility>
@@ -64,7 +64,6 @@ week	= 405
 
 namespace gridUnits
 {
-
 static std::map<std::string, units_t> name2Unit{
   {"mw", MW},
   {"mws", MW},
@@ -223,79 +222,79 @@ const static std::map<units_t, std::string> unit2Name{
   {K, "K"},
 };
 
-
 // function to convert a string to a unit enumeration value
 
-std::string to_string (units_t unitType) { return mapFind (unit2Name, unitType, std::string ("unknown")); }
-units_t getUnits (const std::string &unitString, units_t defValue)
+std::string to_string(units_t unitType) { return mapFind(unit2Name, unitType, std::string("unknown")); }
+units_t getUnits(const std::string &unitString, units_t defValue)
 {
-    if (unitString.empty ())
+    if (unitString.empty())
     {
         return defValue;
     }
-    auto unitName = convertToLowerCase (unitString);
-    return mapFind (name2Unit, unitName, defValue);
+    auto unitName = gmlc::utilities::convertToLowerCase(unitString);
+    return mapFind(name2Unit, unitName, defValue);
 }
 
-static const std::map<units_t, units_type_t> unit2Type{std::make_pair (MW, electrical),
-                                                       std::make_pair (MVAR, electrical),
-                                                       std::make_pair (Amp, electrical),
-                                                       std::make_pair (Volt, electrical),
-                                                       std::make_pair (kV, electrical),
-                                                       std::make_pair (kW, electrical),
-                                                       std::make_pair (Watt, electrical),
-                                                       std::make_pair (Ohm, electrical),
-                                                       std::make_pair (Hz, rotation),
-                                                       std::make_pair (rps, rotation),
-                                                       std::make_pair (rpm, rotation),
-                                                       std::make_pair (puMW, electrical),
-                                                       std::make_pair (puHz, rotation),
-                                                       std::make_pair (puOhm, electrical),
-                                                       std::make_pair (MWps, electrical),
-                                                       std::make_pair (MWpmin, electrical),
-                                                       std::make_pair (MWph, electrical),
-                                                       std::make_pair (puMWps, electrical),
-                                                       std::make_pair (puMWpmin, electrical),
-                                                       std::make_pair (puMWph, electrical),
-                                                       std::make_pair (MWps, electrical),
-                                                       std::make_pair (puA, electrical),
-                                                       std::make_pair (puV, electrical),
-                                                       std::make_pair (pu, electrical),
-                                                       std::make_pair (meter, distance),
-                                                       std::make_pair (mile, distance),
-                                                       std::make_pair (ft, distance),
-                                                       std::make_pair (km, distance),
-                                                       std::make_pair (deg, angle),
-                                                       std::make_pair (rad, angle),
-                                                       std::make_pair (sec, time),
-                                                       std::make_pair (min, time),
-                                                       std::make_pair (hour, time),
-                                                       std::make_pair (day, time),
-                                                       std::make_pair (week, time),
-                                                       std::make_pair (defUnit, electrical),
-                                                       std::make_pair (cost, price),
-                                                       std::make_pair (Cph, price),
-                                                       std::make_pair (CpMWh, price),
-                                                       std::make_pair (CpMVARh, price),
-                                                       std::make_pair (CpMW2h, price),
-                                                       std::make_pair (CpMVAR2h, price),
-                                                       std::make_pair (CppuMWh, price),
-                                                       std::make_pair (CppuMVARh, price),
-                                                       std::make_pair (CppuMW2h, price),
-                                                       std::make_pair (CppuMVAR2h, price),
-                                                       std::make_pair (C, temperature),
-                                                       std::make_pair (F, temperature),
-                                                       std::make_pair (K, temperature)};
+static const std::map<units_t, units_type_t> unit2Type{std::make_pair(MW, electrical),
+                                                       std::make_pair(MVAR, electrical),
+                                                       std::make_pair(Amp, electrical),
+                                                       std::make_pair(Volt, electrical),
+                                                       std::make_pair(kV, electrical),
+                                                       std::make_pair(kW, electrical),
+                                                       std::make_pair(Watt, electrical),
+                                                       std::make_pair(Ohm, electrical),
+                                                       std::make_pair(Hz, rotation),
+                                                       std::make_pair(rps, rotation),
+                                                       std::make_pair(rpm, rotation),
+                                                       std::make_pair(puMW, electrical),
+                                                       std::make_pair(puHz, rotation),
+                                                       std::make_pair(puOhm, electrical),
+                                                       std::make_pair(MWps, electrical),
+                                                       std::make_pair(MWpmin, electrical),
+                                                       std::make_pair(MWph, electrical),
+                                                       std::make_pair(puMWps, electrical),
+                                                       std::make_pair(puMWpmin, electrical),
+                                                       std::make_pair(puMWph, electrical),
+                                                       std::make_pair(MWps, electrical),
+                                                       std::make_pair(puA, electrical),
+                                                       std::make_pair(puV, electrical),
+                                                       std::make_pair(pu, electrical),
+                                                       std::make_pair(meter, distance),
+                                                       std::make_pair(mile, distance),
+                                                       std::make_pair(ft, distance),
+                                                       std::make_pair(km, distance),
+                                                       std::make_pair(deg, angle),
+                                                       std::make_pair(rad, angle),
+                                                       std::make_pair(sec, time),
+                                                       std::make_pair(min, time),
+                                                       std::make_pair(hour, time),
+                                                       std::make_pair(day, time),
+                                                       std::make_pair(week, time),
+                                                       std::make_pair(defUnit, electrical),
+                                                       std::make_pair(cost, price),
+                                                       std::make_pair(Cph, price),
+                                                       std::make_pair(CpMWh, price),
+                                                       std::make_pair(CpMVARh, price),
+                                                       std::make_pair(CpMW2h, price),
+                                                       std::make_pair(CpMVAR2h, price),
+                                                       std::make_pair(CppuMWh, price),
+                                                       std::make_pair(CppuMVARh, price),
+                                                       std::make_pair(CppuMW2h, price),
+                                                       std::make_pair(CppuMVAR2h, price),
+                                                       std::make_pair(C, temperature),
+                                                       std::make_pair(F, temperature),
+                                                       std::make_pair(K, temperature)};
 
-inline bool conversionNotNeeded (const units_t in, const units_t out)
+inline bool conversionNotNeeded(const units_t in, const units_t out)
 {
     return ((in == defUnit) || (in == out) || (out == defUnit));
 }
 
-double unitConversionPower (double val, const units_t in, const units_t out, double basePower, double localBaseVoltage)
+double
+unitConversionPower(double val, const units_t in, const units_t out, double basePower, double localBaseVoltage)
 {
     // check if no conversion is needed
-    if (conversionNotNeeded (in, out))
+    if (conversionNotNeeded(in, out))
     {
         return val;
     }
@@ -304,14 +303,14 @@ double unitConversionPower (double val, const units_t in, const units_t out, dou
     {
     case Watt:
         val = val / 1000.0;  // I know this looks funny, there really shouldn't be a break here convert to KW
-		FALLTHROUGH
+        FALLTHROUGH
     case kW:
         val = val / 1000.0;  // then convert to MW
-		FALLTHROUGH
+        FALLTHROUGH
     case MW:
     case MVAR:
         val = val / basePower;  // now convert to puMW
-		FALLTHROUGH
+        FALLTHROUGH
     case puMW:
     case pu:
         switch (out)
@@ -352,10 +351,10 @@ double unitConversionPower (double val, const units_t in, const units_t out, dou
         break;
     case puV:
         val = val * localBaseVoltage;  // convert to kV --localBaseVoltage is defined in kV
-		FALLTHROUGH
+        FALLTHROUGH
     case kV:
         val = val * 1000.0;  // convert to V
-		FALLTHROUGH
+        FALLTHROUGH
     case Volt:
         switch (out)
         {
@@ -374,7 +373,7 @@ double unitConversionPower (double val, const units_t in, const units_t out, dou
         break;
     case Ohm:
         val = val / (basePower * 1000000.0 / localBaseVoltage / localBaseVoltage);  // convert to puOhms
-		FALLTHROUGH
+        FALLTHROUGH
     case puOhm:
 
         switch (out)
@@ -410,7 +409,7 @@ double unitConversionPower (double val, const units_t in, const units_t out, dou
         break;
     case Amp:
         val = val * localBaseVoltage / basePower / 1000.0;  // convert to puA
-		FALLTHROUGH
+        FALLTHROUGH
     case puA:
 
         switch (out)
@@ -434,10 +433,10 @@ double unitConversionPower (double val, const units_t in, const units_t out, dou
         break;
     case MWph:
         val = val / 60.0;
-		FALLTHROUGH
+        FALLTHROUGH
     case MWpmin:
         val = val / 60.0;
-		FALLTHROUGH
+        FALLTHROUGH
     case MWps:
         switch (out)
         {
@@ -465,10 +464,10 @@ double unitConversionPower (double val, const units_t in, const units_t out, dou
         break;
     case puMWph:
         val = val / 60.0;
-		FALLTHROUGH
+        FALLTHROUGH
     case puMWpmin:
         val = val / 60.0;
-		FALLTHROUGH
+        FALLTHROUGH
     case puMWps:
         switch (out)
         {
@@ -500,9 +499,9 @@ double unitConversionPower (double val, const units_t in, const units_t out, dou
     return ret;
 }
 
-double unitConversionTemperature (double val, const units_t in, const units_t out)
+double unitConversionTemperature(double val, const units_t in, const units_t out)
 {
-    if (conversionNotNeeded (in, out))
+    if (conversionNotNeeded(in, out))
     {
         return val;
     }
@@ -545,10 +544,10 @@ double unitConversionTemperature (double val, const units_t in, const units_t ou
     return ret;
 }
 
-double unitConversionTime (double val, const units_t in, const units_t out)
+double unitConversionTime(double val, const units_t in, const units_t out)
 {
     // check if no conversion is needed
-    if (conversionNotNeeded (in, out))
+    if (conversionNotNeeded(in, out))
     {
         return val;
     }
@@ -657,11 +656,11 @@ double unitConversionTime (double val, const units_t in, const units_t out)
     return ret;
 }
 
-double unitConversionAngle (double val, const units_t in, const units_t out)
+double unitConversionAngle(double val, const units_t in, const units_t out)
 {
     // check if no conversion is needed
 
-    if (conversionNotNeeded (in, out))
+    if (conversionNotNeeded(in, out))
     {
         return val;
     }
@@ -683,10 +682,10 @@ double unitConversionAngle (double val, const units_t in, const units_t out)
     }
     return ret;
 }
-double unitConversionDistance (double val, const units_t in, const units_t out)
+double unitConversionDistance(double val, const units_t in, const units_t out)
 {
     // check if no conversion is needed
-    if (conversionNotNeeded (in, out))
+    if (conversionNotNeeded(in, out))
     {
         return val;
     }
@@ -695,7 +694,7 @@ double unitConversionDistance (double val, const units_t in, const units_t out)
     {
     case km:
         val = val * 1000;
-		FALLTHROUGH
+        FALLTHROUGH
     case meter:
         switch (out)
         {
@@ -717,7 +716,7 @@ double unitConversionDistance (double val, const units_t in, const units_t out)
         break;
     case mile:
         ret = val * 5280;
-		FALLTHROUGH
+        FALLTHROUGH
     case ft:
         switch (out)
         {
@@ -734,10 +733,10 @@ double unitConversionDistance (double val, const units_t in, const units_t out)
     return ret;
 }
 
-double unitConversionFreq (double val, const units_t in, const units_t out, double baseFreq)
+double unitConversionFreq(double val, const units_t in, const units_t out, double baseFreq)
 {
     // check if no conversion is needed
-    if (conversionNotNeeded (in, out))
+    if (conversionNotNeeded(in, out))
     {
         return val;
     }
@@ -816,10 +815,10 @@ double unitConversionFreq (double val, const units_t in, const units_t out, doub
     return ret;
 }
 
-double unitConversionCost (double val, const units_t in, const units_t out, double basePower)
+double unitConversionCost(double val, const units_t in, const units_t out, double basePower)
 {
     // check if no conversion is needed
-    if (conversionNotNeeded (in, out))
+    if (conversionNotNeeded(in, out))
     {
         return val;
     }
@@ -880,49 +879,49 @@ double unitConversionCost (double val, const units_t in, const units_t out, doub
     return ret;
 }
 
-double unitConversion (double val, const units_t in, const units_t out, double basePower, double localBaseVoltage)
+double unitConversion(double val, const units_t in, const units_t out, double basePower, double localBaseVoltage)
 {
     // check if no conversion is needed
-    if (conversionNotNeeded (in, out))
+    if (conversionNotNeeded(in, out))
     {
         return val;
     }
     double ret = badConversion;
 
-    units_type_t utype = mapFind (unit2Type, in, deftype);
+    units_type_t utype = mapFind(unit2Type, in, deftype);
 
     // switch over possible conversions
     switch (utype)
     {
     case electrical:
-        ret = unitConversionPower (val, in, out, basePower, localBaseVoltage);
+        ret = unitConversionPower(val, in, out, basePower, localBaseVoltage);
         break;
     case rotation:
         if (basePower == 50.0)
         {
-            ret = unitConversionFreq (val, in, out, 50.0);
+            ret = unitConversionFreq(val, in, out, 50.0);
         }
         else
         {
-            ret = unitConversionFreq (val, in, out, 60.0);
+            ret = unitConversionFreq(val, in, out, 60.0);
         }
         break;
     // distance Units
     case distance:
-        ret = unitConversionDistance (val, in, out);
+        ret = unitConversionDistance(val, in, out);
         break;
     // angle units
     case angle:
-        ret = unitConversionAngle (val, in, out);
+        ret = unitConversionAngle(val, in, out);
         break;
     case time:
-        ret = unitConversionTime (val, in, out);
+        ret = unitConversionTime(val, in, out);
         break;
     case price:
-        ret = unitConversionCost (val, in, out, basePower);
+        ret = unitConversionCost(val, in, out, basePower);
         break;
     case temperature:
-        ret = unitConversionTemperature (val, in, out);
+        ret = unitConversionTemperature(val, in, out);
         break;
     default:
         break;

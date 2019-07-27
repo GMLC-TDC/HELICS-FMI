@@ -12,10 +12,10 @@
 
 #pragma once
 
-#include "utilities/helperObject.h"
+#include "SolvableObject.hpp"
 #include "solverMode.hpp"
 #include "solver_definitions.hpp"
-#include "SolvableObject.hpp"
+#include "utilities/helperObject.h"
 #include <exception>
 #include <memory>
 #include <vector>
@@ -34,13 +34,13 @@ class solverException : public std::exception
   protected:
     int errorCode;  //<!* the actual solver Error Code
   public:
-    explicit solverException (int ecode = 0) : errorCode (ecode){};
-    virtual const char *what () const noexcept override
+    explicit solverException(int ecode = 0) : errorCode(ecode){};
+    virtual const char *what() const noexcept override
     {
-        return (std::string ("solver Exception:error code=") + std::to_string (errorCode)).c_str ();
+        return (std::string("solver Exception:error code=") + std::to_string(errorCode)).c_str();
     }
     /** return the full name of the object that threw the exception*/
-    int code () const noexcept { return errorCode; }
+    int code() const noexcept { return errorCode; }
 };
 
 /** error class for throwing an invalid solver operation exception from a solver
@@ -49,10 +49,10 @@ class InvalidSolverOperation : public solverException
 {
   protected:
   public:
-    explicit InvalidSolverOperation (int ecode = 0) : solverException (ecode){};
-    virtual const char *what () const noexcept override
+    explicit InvalidSolverOperation(int ecode = 0) : solverException(ecode){};
+    virtual const char *what() const noexcept override
     {
-        return (std::string ("invalid solver operation:error code=") + std::to_string (errorCode)).c_str ();
+        return (std::string("invalid solver operation:error code=") + std::to_string(errorCode)).c_str();
     }
 };
 
@@ -149,76 +149,76 @@ class SolverInterface : public helperObject
     /** @brief default constructor
      * @param[in] objName  the name of the solver
      */
-    explicit SolverInterface (const std::string &objName = "");
+    explicit SolverInterface(const std::string &objName = "");
 
     /** @brief alternate constructor
     @param[in] gds  gridDynSimulation to link with
     @param[in] sMode the solverMode associated with the solver
     */
-    SolverInterface (SolvableObject *sobj, const solverMode &sMode);
+    SolverInterface(SolvableObject *sobj, const solverMode &sMode);
 
     /** @brief make a copy of the solver interface
     @param[in] fullCopy set to true to initialize and copy over all data to the new object
     @return a unique ptr to the clones SolverInterface
     */
-    virtual std::unique_ptr<SolverInterface> clone (bool fullCopy = false) const;
+    virtual std::unique_ptr<SolverInterface> clone(bool fullCopy = false) const;
 
     /** @brief make a copy of the solver interface
     @param[in] si a ptr to an existing interface that data should be copied to
     @param[in] fullCopy set to true to initialize and copy over all data to the new object
     */
-    virtual void cloneTo (SolverInterface *si, bool fullCopy = false) const;
+    virtual void cloneTo(SolverInterface *si, bool fullCopy = false) const;
     /** @brief get a pointer to the state data
     @return a pointer to a double array with the state data
     */
-    virtual double *state_data () noexcept;
+    virtual double *state_data() noexcept;
 
     /** @brief get a pointer to the state time derivative information
     @return a pointer to a double array with the state time derivative information
     */
-    virtual double *deriv_data () noexcept;
+    virtual double *deriv_data() noexcept;
 
     /** @brief get a pointer to the type data
     @return a pointer to a double array containing the type data
     */
-    virtual double *type_data () noexcept;
+    virtual double *type_data() noexcept;
 
     /** @brief get a pointer to the const state data
     @return a pointer to a const double array with the state data
     */
-    virtual const double *state_data () const noexcept;
+    virtual const double *state_data() const noexcept;
 
     /** @brief get a pointer to the const state time derivative information
     @return a pointer to a const double array with the state time derivative information
     */
-    virtual const double *deriv_data () const noexcept;
+    virtual const double *deriv_data() const noexcept;
 
     /** @brief get a pointer to the const type data
     @return a pointer to a const double array containing the type data
     */
-    virtual const double *type_data () const noexcept;
+    virtual const double *type_data() const noexcept;
 
     /** @brief allocate the memory for the solver
     @param[in] size  the size of the state vector
     @param[in] numRoots  the number of root functions in the solution
     @return the function status
     */
-    virtual void allocate (solver_index_type size, solver_index_type numRoots = 0);
+    virtual void allocate(solver_index_type size, solver_index_type numRoots = 0);
 
     /** @brief initialize the solver to time t0
     @param[in] t0  the time for the initialization
     @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
     */
-    virtual void initialize (double t0);
+    virtual void initialize(double t0);
 
     /** @brief reinitialize the sparse components
     @param[in] mode the reinitialization mode
     @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
     */
-    virtual void sparseReInit (sparse_reinit_modes mode);
+    virtual void sparseReInit(sparse_reinit_modes mode);
 
     /** @brief load the constraints*/
-    virtual void setConstraints ();
+    virtual void setConstraints();
 
     /** @brief perform an initial condition calculation
     @param[in] t0  the time for the initialization
@@ -227,135 +227,135 @@ class SolverInterface : public helperObject
     @param[in] constraints  flag indicating that constraints should be used
     @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
     */
-    virtual int calcIC (double t0, double tstep0, ic_modes mode, bool constraints);
+    virtual int calcIC(double t0, double tstep0, ic_modes mode, bool constraints);
     /** @brief get the current solution
      usually called after a call to CalcIC to get the calculated conditions
     @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
     */
-    virtual void getCurrentData ();
+    virtual void getCurrentData();
     /** @brief get the locations of any found roots
     @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
     */
-    virtual void getRoots ();
+    virtual void getRoots();
     /** @brief update the number of roots to find
     @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
     */
-    virtual void setRootFinding (solver_index_type numRoots);
+    virtual void setRootFinding(solver_index_type numRoots);
 
     /** @brief get a parameter from the solver
   @param[in] param  a string with the desired name of the parameter or result
   @return the value of the requested parameter
   */
-    virtual double get (const std::string &param) const override;
+    virtual double get(const std::string &param) const override;
     /** @brief set a string parameter in the solver
     @param[in] param  a string with the desired name of the parameter
     @param[in] val the value of the property to set
     */
-    virtual void set (const std::string &param, const std::string &val) override;
+    virtual void set(const std::string &param, const std::string &val) override;
 
     /** @brief set a numerical parameter on a solver
   @param[in] param  a string with the desired name of the parameter
   @param[in] val the value of the property to set
   */
-    virtual void set (const std::string &param, double val) override;
+    virtual void set(const std::string &param, double val) override;
 
     /** @brief set a flag parameter on a solver
     @param[in] flag  a string with the name of the flag to set
     @param[in] val the value of the property to set
     */
-    virtual void setFlag (const std::string &flag, bool val = true) override;
+    virtual void setFlag(const std::string &flag, bool val = true) override;
     /** @brief get a flag parameter from a solver
     @param[in] flag  a string with the name of the flag to set
     */
-    virtual bool getFlag (const std::string &flag) const override;
+    virtual bool getFlag(const std::string &flag) const override;
     /** get the last time the solver was called*/
-    double getSolverTime () const { return solveTime; }
+    double getSolverTime() const { return solveTime; }
     /** @brief perform the solver calculations
   @param[in] tStop  the requested return time   not that useful for algebraic solvers
   @param[out]  tReturn  the actual return time
   @param[in] stepMode  the step mode
   @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
   */
-    virtual int solve (double tStop, double &tReturn, step_mode stepMode = step_mode::normal);
+    virtual int solve(double tStop, double &tReturn, step_mode stepMode = step_mode::normal);
     /** @brief resize the storage array for the Jacobian
     @param[in] nonZeroCount  the number of elements to potentially store
     */
-    virtual void setMaxNonZeros (solver_index_type nonZeroCount);
+    virtual void setMaxNonZeros(solver_index_type nonZeroCount);
     /** @brief check if the SolverInterface has been initialized
     @return true if initialized false if not
     */
-    bool isInitialized () const { return flags[initialized_flag]; }
+    bool isInitialized() const { return flags[initialized_flag]; }
 
     /** @brief helper function to log specific solver stats
     @param[in] logLevel  the level of logging to display
     @param[in] iconly  flag indicating that the logging should be for the initial condition calculation only
     */
-    virtual void logSolverStats (solver_print_level logLevel, bool iconly = false) const;
+    virtual void logSolverStats(solver_print_level logLevel, bool iconly = false) const;
     /** @brief helper function to log error weight information
     @param[in] logLevel  the level of logging to display
     */
-    virtual void logErrorWeights (solver_print_level logLevel) const;
+    virtual void logErrorWeights(solver_print_level logLevel) const;
 
     /** @brief get the state size
     @return the state size
     */
-    solver_index_type size () const { return svsize; }
+    solver_index_type size() const { return svsize; }
 
     /** @brief get the actual number of non-zeros in the Jacobian
     @return the state size
     */
-    solver_index_type nonZeros () const { return nnz; }
+    solver_index_type nonZeros() const { return nnz; }
 
-    const solverMode &getSolverMode () const { return mode; }
+    const solverMode &getSolverMode() const { return mode; }
 
-    void lock () { flags.set (locked_flag); }
+    void lock() { flags.set(locked_flag); }
 
-    void setIndex (solver_index_type newIndex) { mode.offsetIndex = newIndex; }
+    void setIndex(solver_index_type newIndex) { mode.offsetIndex = newIndex; }
     /** @brief print out all the state values
     @param[in] getNames use the actual state names vs some coding
     */
-    void printStates (bool getNames = false);
+    void printStates(bool getNames = false);
     /** @brief input the simulation data to attach to
     @param[in] gds the gridDynSimulationObject to attach to
     @param[in] sMode the solverMode associated with the solver
     */
-    virtual void setSimulationData (SolvableObject *sobj, const solverMode &sMode);
+    virtual void setSimulationData(SolvableObject *sobj, const solverMode &sMode);
     /** @brief input the simulation data to attach to
     @param[in] gds the gridDynSimulationObject to attach to
     */
-    virtual void setSimulationData (SolvableObject *sobj);
+    virtual void setSimulationData(SolvableObject *sobj);
 
     /** @brief input the solverMode associated with the solver
     @param[in] sMode the solverMode to attach to
     */
-    virtual void setSimulationData (const solverMode &sMode);
+    virtual void setSimulationData(const solverMode &sMode);
 
-    void setApproximation (const std::string &approx);
+    void setApproximation(const std::string &approx);
     /** @brief load up masks to the states
       masks isolate specific values and don't let the solver alter them  for newton based solvers this implies
     overriding specific information in the Jacobian calculations and the residual calculations
     @param[in] msk  the indices of the state elements to fix
     */
-    void setMaskElements (std::vector<solver_index_type> msk);
+    void setMaskElements(std::vector<solver_index_type> msk);
 
     /** @brief add an index to the mask
       masks isolate specific values and don't let the solver alter them  for newton based solvers this implies
     overriding specific information in the Jacobian calculations and the residual calculations
     @param[in] newMaskElement the index of the values to mask
     */
-    void addMaskElement (solver_index_type newMaskElement);
+    void addMaskElement(solver_index_type newMaskElement);
 
     /** @brief add several new elements to a mask
       masks isolate specific values and don't let the solver alter them  for newton based solvers this implies
     overriding specific information in the Jacobian calculations and the residual calculations
     @param[in] newMsk  a vector of indices to add to an existing mask
     */
-    void addMaskElements (const std::vector<solver_index_type> &newMsk);
+    void addMaskElements(const std::vector<solver_index_type> &newMsk);
 
-    void logMessage (int errorCode, const std::string &message);
+    void logMessage(int errorCode, const std::string &message);
 
-    int getLastError () const { return lastErrorCode; }
-    const std::string &getLastErrorString () const { return lastErrorString; }
+    int getLastError() const { return lastErrorCode; }
+    const std::string &getLastErrorString() const { return lastErrorString; }
 
   protected:
     /** @brief check the output of actual solver calls for proper results
@@ -364,7 +364,7 @@ class SolverInterface : public helperObject
     @param[in] opt  0 for allocation 1 for other functions
     @param[in] printError  boolean flag indicating whether to print a message on error or not
     */
-    virtual void check_flag (void *flagvalue, const std::string &funcname, int opt, bool printError = true) const;
+    virtual void check_flag(void *flagvalue, const std::string &funcname, int opt, bool printError = true) const;
 };
 
 /** @brief make a solver from a particular mode
@@ -372,11 +372,11 @@ class SolverInterface : public helperObject
 @param[in] sMode the solverMode to construct the SolverInterface from
 @return a unique_ptr to a SolverInterface object
 */
-std::unique_ptr<SolverInterface> makeSolver (SolvableObject *sobj, const solverMode &sMode);
+std::unique_ptr<SolverInterface> makeSolver(SolvableObject *sobj, const solverMode &sMode);
 /** @brief make a solver from a string
 @param[in] type the type of SolverInterface to create
 @return a unique_ptr to a SolverInterface object
 */
-std::unique_ptr<SolverInterface> makeSolver (const std::string &type, const std::string &name = "");
+std::unique_ptr<SolverInterface> makeSolver(const std::string &type, const std::string &name = "");
 
 }  // namespace griddyn

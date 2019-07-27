@@ -53,6 +53,7 @@ void FmiModelExchangeFederate::configure(helics::Time step, helics::Time startTi
     }
     fed.setProperty(helics_property_time_period, step);
     stepTime = step;
+    solver = griddyn::makeSolver("cvode", "cvode");
 }
 
 void FmiModelExchangeFederate::setInputs(std::vector<std::string> input_names)
@@ -113,7 +114,9 @@ void FmiModelExchangeFederate::run(helics::Time stop)
     helics::Time currentTime = helics::timeZero;
     while (currentTime <= stop)
     {
-        // me->cs->doStep(static_cast<double>(currentTime), static_cast<double>(stepTime), true);
+        // me->doStep(static_cast<double>(currentTime), static_cast<double>(stepTime), true);
+        double timeReturn;
+        solver->solve(static_cast<double>(currentTime), timeReturn);
         currentTime = fed.requestNextStep();
         // get the values to publish
         me->getOutputs(outputs.data());
@@ -138,6 +141,15 @@ void FmiModelExchangeFederate::guessCurrentValue(double time,
                                                  double dstate_dt[],
                                                  const griddyn::solverMode &sMode)
 {
+    if (hasDifferential(sMode))
+    {
+        me->getStates(state);
+        me->getDerivatives(dstate_dt);
+    }
+    else if (!isDynamic(sMode))
+    {
+        me->getStates(state);
+    }
 }
 
 int FmiModelExchangeFederate::residualFunction(double time,
@@ -147,6 +159,18 @@ int FmiModelExchangeFederate::residualFunction(double time,
                                                const griddyn::solverMode &sMode) noexcept
 
 {
+    if (hasDifferential(sMode))
+    {
+        derivativeFunction(time, state, resid, sMode);
+        for (index_t ii = 0; ii < solver->size(); ++ii)
+        {
+            resid[ii] -= dstate_dt[ii];
+        }
+    }
+    else if (!isDynamic(sMode))
+    {
+        derivativeFunction(time, state, resid, sMode);
+    }
     return 0;
 }
 
@@ -155,6 +179,9 @@ int FmiModelExchangeFederate::derivativeFunction(double time,
                                                  double dstate_dt[],
                                                  const griddyn::solverMode &sMode) noexcept
 {
+    me->setStates(state);
+    me->getDerivatives(dstate_dt);
+    printf("tt=%f,I=%f, state=%f deriv=%e\n", time, state[0], dstate_dt[0]);
     return 0;
 }
 

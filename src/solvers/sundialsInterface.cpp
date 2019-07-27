@@ -10,11 +10,9 @@
  * LLNS Copyright End
  */
 
-
 #include "cvodeInterface.h"
 
 #include "arkodeInterface.h"
-
 
 #ifdef KLU_ENABLE
 #include <sunlinsol/sunlinsol_klu.h>
@@ -22,85 +20,85 @@
 
 #include "utilities/factoryTemplates.hpp"
 
+#include "helics/utilities/stringOps.h"
 #include "sundialsMatrixData.h"
 #include "utilities/matrixCreation.h"
 #include "utilities/matrixDataFilter.hpp"
-#include "utilities/stringOps.h"
 #include <cassert>
 #include <cstdio>
+
+using namespace gmlc::utilities;
 
 namespace griddyn
 {
 namespace solvers
 {
+static childClassFactory<cvodeInterface, SolverInterface> cvodeFactory(stringVector{"cvode", "dyndiff",
+                                                                                    "differential"});
 
-static childClassFactory<cvodeInterface, SolverInterface>
-  cvodeFactory (stringVector{"cvode", "dyndiff", "differential"});
+static childClassFactory<arkodeInterface, SolverInterface> arkodeFactory(stringVector{"arkode"});
 
-static childClassFactory<arkodeInterface, SolverInterface> arkodeFactory (stringVector{"arkode"});
-
-sundialsInterface::sundialsInterface (const std::string &objName) : SolverInterface (objName) { tolerance = 1e-8; }
-sundialsInterface::sundialsInterface (SolvableObject *sobj, const solverMode &sMode)
-    : SolverInterface (sobj, sMode)
+sundialsInterface::sundialsInterface(const std::string &objName) : SolverInterface(objName) { tolerance = 1e-8; }
+sundialsInterface::sundialsInterface(SolvableObject *sobj, const solverMode &sMode) : SolverInterface(sobj, sMode)
 {
     tolerance = 1e-8;
 }
 
-sundialsInterface::~sundialsInterface ()
+sundialsInterface::~sundialsInterface()
 {
     // clear variables for IDA to use
     if (state != nullptr)
     {
-        NVECTOR_DESTROY (use_omp, state);
+        NVECTOR_DESTROY(use_omp, state);
     }
     if (dstate_dt != nullptr)
     {
-        NVECTOR_DESTROY (use_omp, dstate_dt);
+        NVECTOR_DESTROY(use_omp, dstate_dt);
     }
     if (abstols != nullptr)
     {
-        NVECTOR_DESTROY (use_omp, abstols);
+        NVECTOR_DESTROY(use_omp, abstols);
     }
     if (consData != nullptr)
     {
-        NVECTOR_DESTROY (use_omp, consData);
+        NVECTOR_DESTROY(use_omp, consData);
     }
     if (scale != nullptr)
     {
-        NVECTOR_DESTROY (use_omp, scale);
+        NVECTOR_DESTROY(use_omp, scale);
     }
     if (types != nullptr)
     {
-        NVECTOR_DESTROY (use_omp, types);
+        NVECTOR_DESTROY(use_omp, types);
     }
     if (flags[initialized_flag])
     {
         if (m_sundialsInfoFile != nullptr)
         {
-            fclose (m_sundialsInfoFile);
+            fclose(m_sundialsInfoFile);
         }
         if (LS != nullptr)
         {
-            SUNLinSolFree (LS);
+            SUNLinSolFree(LS);
         }
         if (J != nullptr)
         {
-            SUNMatDestroy (J);
+            SUNMatDestroy(J);
         }
     }
 }
 
-std::unique_ptr<SolverInterface> sundialsInterface::clone (bool fullCopy) const
+std::unique_ptr<SolverInterface> sundialsInterface::clone(bool fullCopy) const
 {
-    std::unique_ptr<SolverInterface> si = std::make_unique<sundialsInterface> ();
-    sundialsInterface::cloneTo (si.get (), fullCopy);
+    std::unique_ptr<SolverInterface> si = std::make_unique<sundialsInterface>();
+    sundialsInterface::cloneTo(si.get(), fullCopy);
     return si;
 }
 
-void sundialsInterface::cloneTo (SolverInterface *si, bool fullCopy) const
+void sundialsInterface::cloneTo(SolverInterface *si, bool fullCopy) const
 {
-    SolverInterface::cloneTo (si, fullCopy);
-    auto ai = dynamic_cast<sundialsInterface *> (si);
+    SolverInterface::cloneTo(si, fullCopy);
+    auto ai = dynamic_cast<sundialsInterface *>(si);
     if (ai == nullptr)
     {
         return;
@@ -108,16 +106,16 @@ void sundialsInterface::cloneTo (SolverInterface *si, bool fullCopy) const
     ai->maxNNZ = maxNNZ;
     if ((fullCopy) && (flags[allocated_flag]))
     {
-        auto tols = NVECTOR_DATA (use_omp, abstols);
-        std::copy (tols, tols + svsize, NVECTOR_DATA (use_omp, ai->abstols));
-        auto cons = NVECTOR_DATA (use_omp, consData);
-        std::copy (cons, cons + svsize, NVECTOR_DATA (use_omp, ai->consData));
-        auto sc = NVECTOR_DATA (use_omp, scale);
-        std::copy (sc, sc + svsize, NVECTOR_DATA (use_omp, ai->scale));
+        auto tols = NVECTOR_DATA(use_omp, abstols);
+        std::copy(tols, tols + svsize, NVECTOR_DATA(use_omp, ai->abstols));
+        auto cons = NVECTOR_DATA(use_omp, consData);
+        std::copy(cons, cons + svsize, NVECTOR_DATA(use_omp, ai->consData));
+        auto sc = NVECTOR_DATA(use_omp, scale);
+        std::copy(sc, sc + svsize, NVECTOR_DATA(use_omp, ai->scale));
     }
 }
 
-void sundialsInterface::allocate (count_t stateCount, count_t /*numRoots*/)
+void sundialsInterface::allocate(count_t stateCount, count_t /*numRoots*/)
 {
     // load the vectors
     if (stateCount == svsize)
@@ -126,112 +124,112 @@ void sundialsInterface::allocate (count_t stateCount, count_t /*numRoots*/)
     }
 
     bool prev_omp = use_omp;
-    _unused (prev_omp);  // looks unused if OPENMP is not available
+    _unused(prev_omp);  // looks unused if OPENMP is not available
     use_omp = flags[use_omp_flag];
-    flags.reset (initialized_flag);
+    flags.reset(initialized_flag);
     if (state != nullptr)
     {
-        NVECTOR_DESTROY (prev_omp, state);
+        NVECTOR_DESTROY(prev_omp, state);
     }
-    state = NVECTOR_NEW (use_omp, stateCount);
-    check_flag (state, "NVECTOR_NEW", 0);
+    state = NVECTOR_NEW(use_omp, stateCount);
+    check_flag(state, "NVECTOR_NEW", 0);
 
-    if (hasDifferential (mode))
+    if (hasDifferential(mode))
     {
         if (dstate_dt != nullptr)
         {
-            NVECTOR_DESTROY (prev_omp, dstate_dt);
+            NVECTOR_DESTROY(prev_omp, dstate_dt);
         }
-        dstate_dt = NVECTOR_NEW (use_omp, stateCount);
-        check_flag (dstate_dt, "NVECTOR_NEW", 0);
+        dstate_dt = NVECTOR_NEW(use_omp, stateCount);
+        check_flag(dstate_dt, "NVECTOR_NEW", 0);
 
-        N_VConst (ZERO, dstate_dt);
+        N_VConst(ZERO, dstate_dt);
     }
     if (abstols != nullptr)
     {
-        NVECTOR_DESTROY (prev_omp, abstols);
+        NVECTOR_DESTROY(prev_omp, abstols);
     }
-    abstols = NVECTOR_NEW (use_omp, stateCount);
-    check_flag (abstols, "NVECTOR_NEW", 0);
+    abstols = NVECTOR_NEW(use_omp, stateCount);
+    check_flag(abstols, "NVECTOR_NEW", 0);
 
     if (consData != nullptr)
     {
-        NVECTOR_DESTROY (prev_omp, consData);
+        NVECTOR_DESTROY(prev_omp, consData);
     }
-    consData = NVECTOR_NEW (use_omp, stateCount);
-    check_flag (consData, "NVECTOR_NEW", 0);
+    consData = NVECTOR_NEW(use_omp, stateCount);
+    check_flag(consData, "NVECTOR_NEW", 0);
 
     if (scale != nullptr)
     {
-        NVECTOR_DESTROY (prev_omp, scale);
+        NVECTOR_DESTROY(prev_omp, scale);
     }
-    scale = NVECTOR_NEW (use_omp, stateCount);
-    check_flag (scale, "NVECTOR_NEW", 0);
+    scale = NVECTOR_NEW(use_omp, stateCount);
+    check_flag(scale, "NVECTOR_NEW", 0);
 
-    N_VConst (ONE, scale);
+    N_VConst(ONE, scale);
 
-    if (isDAE (mode))
+    if (isDAE(mode))
     {
         if (types != nullptr)
         {
-            NVECTOR_DESTROY (prev_omp, types);
+            NVECTOR_DESTROY(prev_omp, types);
         }
-        types = NVECTOR_NEW (use_omp, stateCount);
-        check_flag (types, "NVECTOR_NEW", 0);
+        types = NVECTOR_NEW(use_omp, stateCount);
+        check_flag(types, "NVECTOR_NEW", 0);
 
-        N_VConst (ONE, types);
+        N_VConst(ONE, types);
     }
 
     svsize = stateCount;
 
-    flags.set (allocated_flag);
+    flags.set(allocated_flag);
 }
 
-void sundialsInterface::setMaxNonZeros (count_t nonZeroCount)
+void sundialsInterface::setMaxNonZeros(count_t nonZeroCount)
 {
     maxNNZ = nonZeroCount;
     nnz = nonZeroCount;
 }
 
-double *sundialsInterface::state_data () noexcept
+double *sundialsInterface::state_data() noexcept
 {
-    return (state != nullptr) ? NVECTOR_DATA (use_omp, state) : nullptr;
+    return (state != nullptr) ? NVECTOR_DATA(use_omp, state) : nullptr;
 }
-double *sundialsInterface::deriv_data () noexcept
+double *sundialsInterface::deriv_data() noexcept
 {
-    return (dstate_dt != nullptr) ? NVECTOR_DATA (use_omp, dstate_dt) : nullptr;
-}
-
-const double *sundialsInterface::state_data () const noexcept
-{
-    return (state != nullptr) ? NVECTOR_DATA (use_omp, state) : nullptr;
+    return (dstate_dt != nullptr) ? NVECTOR_DATA(use_omp, dstate_dt) : nullptr;
 }
 
-const double *sundialsInterface::deriv_data () const noexcept
+const double *sundialsInterface::state_data() const noexcept
 {
-    return (dstate_dt != nullptr) ? NVECTOR_DATA (use_omp, dstate_dt) : nullptr;
+    return (state != nullptr) ? NVECTOR_DATA(use_omp, state) : nullptr;
+}
+
+const double *sundialsInterface::deriv_data() const noexcept
+{
+    return (dstate_dt != nullptr) ? NVECTOR_DATA(use_omp, dstate_dt) : nullptr;
 }
 // output solver stats
 
-double *sundialsInterface::type_data () noexcept
+double *sundialsInterface::type_data() noexcept
 {
-    return (types != nullptr) ? NVECTOR_DATA (use_omp, types) : nullptr;
+    return (types != nullptr) ? NVECTOR_DATA(use_omp, types) : nullptr;
 }
-const double *sundialsInterface::type_data () const noexcept
+const double *sundialsInterface::type_data() const noexcept
 {
-    return (types != nullptr) ? NVECTOR_DATA (use_omp, types) : nullptr;
+    return (types != nullptr) ? NVECTOR_DATA(use_omp, types) : nullptr;
 }
 
-double sundialsInterface::get (const std::string &param) const
+double sundialsInterface::get(const std::string &param) const
 {
     if (param == "maxnnz")
     {
-        return static_cast<double> (maxNNZ);
+        return static_cast<double>(maxNNZ);
     }
-    return SolverInterface::get (param);
+    return SolverInterface::get(param);
 }
 
-void sundialsInterface::KLUReInit (sparse_reinit_modes sparseReInitModes)
+void sundialsInterface::KLUReInit(sparse_reinit_modes sparseReInitModes)
 {
 #ifdef KLU_ENABLE
     if (flags[dense_flag])
@@ -242,24 +240,24 @@ void sundialsInterface::KLUReInit (sparse_reinit_modes sparseReInitModes)
     {
     case sparse_reinit_modes::refactor:
     {
-        int retval = SUNKLUReInit (LS, J, maxNNZ, 2);
-        check_flag (&retval, "SUNKLUReInit", 1);
+        int retval = SUNKLUReInit(LS, J, maxNNZ, 2);
+        check_flag(&retval, "SUNKLUReInit", 1);
     }
     break;
     case sparse_reinit_modes::resize:
         /*there is a major bug in sundials with KLU on resize*/
         {
-            if (maxNNZ > SM_NNZ_S (J))
+            if (maxNNZ > SM_NNZ_S(J))
             {
-                SUNMatDestroy (J);
-                J = SUNSparseMatrix (svsize, svsize, maxNNZ, CSR_MAT);
-                int retval = SUNKLUReInit (LS, J, maxNNZ, 2);
-                check_flag (&retval, "SUNKLUReInit", 1);
+                SUNMatDestroy(J);
+                J = SUNSparseMatrix(svsize, svsize, maxNNZ, CSR_MAT);
+                int retval = SUNKLUReInit(LS, J, maxNNZ, 2);
+                check_flag(&retval, "SUNKLUReInit", 1);
             }
             else
             {
-                int retval = SUNKLUReInit (LS, J, maxNNZ, 2);
-                check_flag (&retval, "SUNKLUReInit", 1);
+                int retval = SUNKLUReInit(LS, J, maxNNZ, 2);
+                check_flag(&retval, "SUNKLUReInit", 1);
             }
         }
         break;
@@ -268,12 +266,12 @@ void sundialsInterface::KLUReInit (sparse_reinit_modes sparseReInitModes)
 #endif
 }
 
-bool isSUNMatrixSetup (SUNMatrix J)
+bool isSUNMatrixSetup(SUNMatrix J)
 {
-    int id = SUNMatGetID (J);
+    int id = SUNMatGetID(J);
     if (id == SUNMATRIX_SPARSE)
     {
-        auto M = SM_CONTENT_S (J);
+        auto M = SM_CONTENT_S(J);
         if ((M->indexptrs[0] != 0) || (M->indexptrs[0] > M->NNZ))
         {
             return false;
@@ -286,18 +284,18 @@ bool isSUNMatrixSetup (SUNMatrix J)
     return true;
 }
 
-void matrixDataToSUNMatrix (matrixData<double> &md, SUNMatrix J, count_t svsize)
+void matrixDataToSUNMatrix(matrixData<double> &md, SUNMatrix J, count_t svsize)
 {
-    int id = SUNMatGetID (J);
+    int id = SUNMatGetID(J);
     if (id == SUNMATRIX_SPARSE)
     {
-        auto M = SM_CONTENT_S (J);
+        auto M = SM_CONTENT_S(J);
         count_t indval = 0;
         M->indexptrs[0] = indval;
 
-        md.compact ();
-        assert (M->NNZ >= static_cast<int> (md.size ()));
-        auto sz = static_cast<int> (md.size ());
+        md.compact();
+        assert(M->NNZ >= static_cast<int>(md.size()));
+        auto sz = static_cast<int>(md.size());
         /*
       auto itel = md.begin();
       for (int kk = 0; kk < sz; ++kk)
@@ -318,17 +316,17 @@ void matrixDataToSUNMatrix (matrixData<double> &md, SUNMatrix J, count_t svsize)
     */
         // SlsSetToZero(J);
 
-        md.start ();
+        md.start();
         for (int kk = 0; kk < sz; ++kk)
         {
-            auto tp = md.next ();
+            auto tp = md.next();
             //      printf("kk: %d  dataval: %f  rowind: %d   colind: %d \n ", kk, a1->val(kk), a1->rowIndex(kk),
             // a1->colIndex(kk));
             if (tp.row > indval)
             {
                 indval++;
                 M->indexptrs[indval] = kk;
-                assert (tp.row == indval);
+                assert(tp.row == indval);
             }
 
             M->data[kk] = tp.data;
@@ -337,9 +335,9 @@ void matrixDataToSUNMatrix (matrixData<double> &md, SUNMatrix J, count_t svsize)
 
         if (indval + 1 != svsize)
         {
-            printf ("sz=%d, svsize=%d, colval+1=%d\n", sz, svsize, indval + 1);
+            printf("sz=%d, svsize=%d, colval+1=%d\n", sz, svsize, indval + 1);
         }
-        assert (indval + 1 == svsize);
+        assert(indval + 1 == svsize);
         M->indexptrs[indval + 1] = sz;
     }
     else if (id == SUNMATRIX_DENSE)
@@ -348,122 +346,118 @@ void matrixDataToSUNMatrix (matrixData<double> &md, SUNMatrix J, count_t svsize)
 }
 
 // Error handling function for Sundials
-void sundialsErrorHandlerFunc (int error_code,
-                               const char *module,
-                               const char *function,
-                               char *msg,
-                               void *user_data)
+void sundialsErrorHandlerFunc(int error_code, const char *module, const char *function, char *msg, void *user_data)
 {
     if (error_code == 0)
     {
         return;
     }
-    auto sd = reinterpret_cast<SolverInterface *> (user_data);
-    std::string message = "SUNDIALS ERROR(" + std::to_string (error_code) + ") in Module (" +
-                          std::string (module) + ") function " + std::string (function) + "::" + std::string (msg);
-    sd->logMessage (error_code, message);
+    auto sd = reinterpret_cast<SolverInterface *>(user_data);
+    std::string message = "SUNDIALS ERROR(" + std::to_string(error_code) + ") in Module (" + std::string(module) +
+                          ") function " + std::string(function) + "::" + std::string(msg);
+    sd->logMessage(error_code, message);
 }
 
-bool MatrixNeedsSetup (count_t callCount, SUNMatrix J)
+bool MatrixNeedsSetup(count_t callCount, SUNMatrix J)
 {
-    switch (SUNMatGetID (J))
+    switch (SUNMatGetID(J))
     {
     case SUNMATRIX_DENSE:
         return false;
     case SUNMATRIX_SPARSE:
-        return ((callCount == 0) || (!isSUNMatrixSetup (J)));
+        return ((callCount == 0) || (!isSUNMatrixSetup(J)));
     default:
         return false;
     }
 }
 #define CHECK_JACOBIAN 0
 
-int sundialsJac (realtype time,
-                 realtype cj,
-                 N_Vector state,
-                 N_Vector dstate_dt,
-                 SUNMatrix J,
-                 void *user_data,
-                 N_Vector /*tmp1*/,
-                 N_Vector /*tmp2*/)
+int sundialsJac(realtype time,
+                realtype cj,
+                N_Vector state,
+                N_Vector dstate_dt,
+                SUNMatrix J,
+                void *user_data,
+                N_Vector /*tmp1*/,
+                N_Vector /*tmp2*/)
 {
-    auto sd = reinterpret_cast<sundialsInterface *> (user_data);
+    auto sd = reinterpret_cast<sundialsInterface *>(user_data);
 
-    if (MatrixNeedsSetup (sd->jacCallCount, J))
+    if (MatrixNeedsSetup(sd->jacCallCount, J))
     {
-        auto a1 = makeSparseMatrix (sd->svsize, sd->maxNNZ);
+        auto a1 = makeSparseMatrix(sd->svsize, sd->maxNNZ);
 
-        a1->setRowLimit (sd->svsize);
-        a1->setColLimit (sd->svsize);
+        a1->setRowLimit(sd->svsize);
+        a1->setColLimit(sd->svsize);
 
         if (sd->flags[useMask_flag])
         {
-            matrixDataFilter<double> filterAd (*(a1));
-            filterAd.addFilter (sd->maskElements);
-            sd->sobj->jacobianFunction (time, NVECTOR_DATA (sd->use_omp, state),
-                                         (dstate_dt != nullptr) ? NVECTOR_DATA (sd->use_omp, dstate_dt) : nullptr,
-                                         filterAd, cj, sd->mode);
+            matrixDataFilter<double> filterAd(*(a1));
+            filterAd.addFilter(sd->maskElements);
+            sd->sobj->jacobianFunction(time, NVECTOR_DATA(sd->use_omp, state),
+                                       (dstate_dt != nullptr) ? NVECTOR_DATA(sd->use_omp, dstate_dt) : nullptr,
+                                       filterAd, cj, sd->mode);
             for (auto &v : sd->maskElements)
             {
-                a1->assign (v, v, 1.0);
+                a1->assign(v, v, 1.0);
             }
         }
         else
         {
-            sd->sobj->jacobianFunction (time, NVECTOR_DATA (sd->use_omp, state),
-                                         (dstate_dt != nullptr) ? NVECTOR_DATA (sd->use_omp, dstate_dt) : nullptr,
-                                         *a1, cj, sd->mode);
+            sd->sobj->jacobianFunction(time, NVECTOR_DATA(sd->use_omp, state),
+                                       (dstate_dt != nullptr) ? NVECTOR_DATA(sd->use_omp, dstate_dt) : nullptr,
+                                       *a1, cj, sd->mode);
         }
 
         ++sd->jacCallCount;
 #ifdef _DEBUG
-        if (SM_CONTENT_S (J)->NNZ < static_cast<int> (a1->size ()))
+        if (SM_CONTENT_S(J)->NNZ < static_cast<int>(a1->size()))
         {
-            a1->compact ();
-            if (SM_CONTENT_S (J)->NNZ < static_cast<int> (a1->size ()))
+            a1->compact();
+            if (SM_CONTENT_S(J)->NNZ < static_cast<int>(a1->size()))
             {
-           //     jacobianAnalysis (*a1, sd->sobj, sd->mode, 5);
+                //     jacobianAnalysis (*a1, sd->sobj, sd->mode, 5);
             }
         }
 #endif
-        matrixDataToSUNMatrix (*a1, J, sd->svsize);
-        sd->nnz = a1->size ();
+        matrixDataToSUNMatrix(*a1, J, sd->svsize);
+        sd->nnz = a1->size();
         if (sd->flags[fileCapture_flag])
         {
-            if (!sd->jacFile.empty ())
+            if (!sd->jacFile.empty())
             {
-                auto val = static_cast<long int> (sd->get ("nliterations"));
-             //   writeArray (time, 1, val, sd->mode.offsetIndex, *a1, sd->jacFile);
+                auto val = static_cast<long int>(sd->get("nliterations"));
+                //   writeArray (time, 1, val, sd->mode.offsetIndex, *a1, sd->jacFile);
             }
         }
     }
     else
     {
         // if it isn't the first we can use the SUNDIALS arraySparse object
-        auto a1 = makeSundialsMatrixData (J);
+        auto a1 = makeSundialsMatrixData(J);
         if (sd->flags[useMask_flag])
         {
-            matrixDataFilter<double> filterAd (*a1);
-            filterAd.addFilter (sd->maskElements);
-            sd->sobj->jacobianFunction (time, NVECTOR_DATA (sd->use_omp, state),
-                                         NVECTOR_DATA (sd->use_omp, dstate_dt), filterAd, cj, sd->mode);
+            matrixDataFilter<double> filterAd(*a1);
+            filterAd.addFilter(sd->maskElements);
+            sd->sobj->jacobianFunction(time, NVECTOR_DATA(sd->use_omp, state),
+                                       NVECTOR_DATA(sd->use_omp, dstate_dt), filterAd, cj, sd->mode);
             for (auto &v : sd->maskElements)
             {
-                a1->assign (v, v, 1.0);
+                a1->assign(v, v, 1.0);
             }
         }
         else
         {
-            sd->sobj->jacobianFunction (time, NVECTOR_DATA (sd->use_omp, state),
-                                         NVECTOR_DATA (sd->use_omp, dstate_dt), *a1, cj, sd->mode);
+            sd->sobj->jacobianFunction(time, NVECTOR_DATA(sd->use_omp, state),
+                                       NVECTOR_DATA(sd->use_omp, dstate_dt), *a1, cj, sd->mode);
         }
 
         sd->jacCallCount++;
         if (sd->flags[fileCapture_flag])
         {
-            if (!sd->jacFile.empty ())
+            if (!sd->jacFile.empty())
             {
-            //    writeArray (time, 1, sd->jacCallCount, sd->mode.offsetIndex, *a1, sd->jacFile);
+                //    writeArray (time, 1, sd->jacCallCount, sd->mode.offsetIndex, *a1, sd->jacFile);
             }
         }
     }
@@ -514,10 +508,10 @@ writeArray(sd->solveTime, 1, val, sd->mode.offsetIndex, a1, sd->jacFile);
 }
 */
 #if (CHECK_JACOBIAN > 0)
-    auto mv = findMissing (a1);
+    auto mv = findMissing(a1);
     for (auto &me : mv)
     {
-        printf ("no entries for element %d\n", me);
+        printf("no entries for element %d\n", me);
     }
 #endif
     return FUNCTION_EXECUTION_SUCCESS;
