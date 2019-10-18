@@ -1,22 +1,21 @@
-# LLNS Copyright Start
-# Copyright (c) 2017, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Lawrence Livermore National Laboratory in part under
-# Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
-# Produced at the Lawrence Livermore National Laboratory.
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# National Security, LLC; Alliance for Sustainable Energy, LLC.
+# See the top-level NOTICE for additional details.
 # All rights reserved.
-# For details, see the LICENSE file.
-# LLNS Copyright End
+#
+# SPDX-License-Identifier: BSD-3-Clause
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 cmake_minimum_required(VERSION 3.5)
 cmake_policy(VERSION 3.5)
 
-project(HELICS-FMI VERSION 0.5.2)
+project(HELICS-FMI VERSION 0.6.0)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 #set (HELICS-FMI_VERSION_BUILD )
-set (HELICS-FMI_DATE "7-8-19")
+set (HELICS-FMI_DATE "10-18-19")
 set(
   HELICS-FMI_VERSION_UNDERSCORE
   "${HELICS-FMI_VERSION_MAJOR}_${HELICS-FMI_VERSION_MINOR}_${HELICS-FMI_VERSION_PATCH}"
@@ -33,6 +32,7 @@ set(HELICS-FMI_VERSION_STRING "${HELICS-FMI_VERSION} (${HELICS-FMI_DATE})")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/")
 include(extraMacros)
 include(CMakeDependentOption)
+include(CTest)
 
 FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
 
@@ -54,17 +54,8 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 	endif(WIN32)
 endif()
 
-show_variable(
-  AUTOBUILD_INSTALL_PATH
-  PATH
-  "location to install the autobuild libraries and Headers"
-  "${PROJECT_BINARY_DIR}/libs"
-)
-
-mark_as_advanced(AUTOBUILD_INSTALL_PATH)
-
 # Prohibit in-source build
-IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
+IF(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
   message(FATAL_ERROR "In-source build is not supported. Please, use an empty directory for building the project.")
 ENDIF()
 
@@ -91,15 +82,15 @@ message(STATUS "setting version build options to \"${CXX_STANDARD_FLAG}\"")
 	
 target_link_libraries(helics_fmi_base INTERFACE compile_flags_target)
 
-cmake_dependent_option(
+cmake_dependent_advanced_option(
   STATIC_STANDARD_LIB
   "Link against a static standard lib"
   OFF
   "NOT USE_LIBCXX"
   OFF
 )
+
 include(ucm)
-mark_as_advanced(STATIC_STANDARD_LIB)
 if(STATIC_STANDARD_LIB)
 	ucm_set_runtime(STATIC)
 else()
@@ -241,7 +232,7 @@ add_subdirectory(src/helicsFMI)
 
 option (HELICS_FMI_GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)
 
-IF (HELICS_FMI_GENERATE_DOXYGEN_DOC)
+if (HELICS_FMI_GENERATE_DOXYGEN_DOC)
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
 
@@ -252,7 +243,9 @@ if(DOXYGEN_FOUND)
 	WORKING_DIRECTORY ${DOXYGET_OUTPUT_DIR}
 	COMMENT "Generating API documentation with Doxygen" VERBATIM
 )
-endif(DOXYGEN_FOUND)
+else(DOXYGEN_FOUND)
+	message(FATAL_ERROR "unable to find doxygen for generating documentation")
+endif()
 endif (HELICS_FMI_GENERATE_DOXYGEN_DOC)
 
 
@@ -282,13 +275,11 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/config/helics-fmi-config.h.in ${PROJECT_BIN
 #-----------------------------------------------------------------------------
 # Setup CTEST environment
 #-----------------------------------------------------------------------------
-OPTION(BUILD_HELICS_FMI_TESTS "Enable the test Executables to be built" ON)
+OPTION(HELICS_FMI_BUILD_TESTS "Enable the test Executables to be built" OFF)
 # enable testing
-if (BUILD_HELICS_FMI_TESTS)
-include (CTest)
-enable_testing ()
+if (HELICS_FMI_BUILD_TESTS AND BUILD_TESTING)
 add_subdirectory (tests)
-endif(BUILD_HELICS_FMI_TESTS)
+endif()
 
 
 # -------------------------------------------------------------
@@ -305,9 +296,9 @@ endif(BUILD_HELICS_FMI_TESTS)
 # -------------------------------------------------------------
 # CPack for NSIS Installer
 # -------------------------------------------------------------
-OPTION(ENABLE_PACKAGE_BUILD "Add projects for making packages and installers for HELICS" OFF)
+OPTION(HELICS_FMI_ENABLE_PACKAGE_BUILD "Add projects for making packages and installers for HELICS-FMI" OFF)
 
-IF(ENABLE_PACKAGE_BUILD)
+IF(HELICS_FMI_ENABLE_PACKAGE_BUILD)
 set(CPACK_PACKAGE_NAME "HELICS-fmi")
 set(CPACK_PACKAGE_VENDOR "Lawrence Livermore National Security")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Helics-fmi Installer")
@@ -342,4 +333,4 @@ set(CPACK_SOURCE_IGNORE_FILES  "/Build*/;/build*/;/.git/")
 #THIS LINE MUST BE LAST
 include(CPack)
 
-ENDIF(ENABLE_PACKAGE_BUILD)
+ENDIF(HELICS_FMI_ENABLE_PACKAGE_BUILD)

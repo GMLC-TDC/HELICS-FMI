@@ -1,3 +1,15 @@
 [submodule "extern/sundials"]
 	path = extern/sundials
 	url = https://github.com/LLNL/sundials.git
+[submodule "ThirdParty/units"]
+	path = ThirdParty/units
+	url = https://github.com/LLNL/units.git
+[submodule "ThirdParty/jsoncpp"]
+	path = ThirdParty/jsoncpp
+	url = https://github.com/phlptp/jsoncpp.git
+[submodule "ThirdParty/fmtlib"]
+	path = ThirdParty/fmtlib
+	url = https://github.com/fmtlib/fmt.git
+[submodule "ThirdParty/utilities"]
+	path = ThirdParty/utilities
+	url = https://github.com/GMLC-TDC/utilities.git
