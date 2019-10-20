@@ -19,5 +19,5 @@ set(helicsFMI_headers
 
 add_library(helicsFMI STATIC ${helicsFMI_sources} ${helicsFMI_headers})
 
-target_link_libraries(helicsFMI HELICS::helics_apps fmiLibrary helics_fmi_base solvers )
+target_link_libraries(helicsFMI HELICS::helics-shared fmiLibrary helics_fmi_base solvers )
 

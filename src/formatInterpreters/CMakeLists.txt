@@ -30,8 +30,11 @@ ${PROJECT_SOURCE_DIR}/ThirdParty/tinyxml2/tinyxml2.h
 add_library(formatInterpreter STATIC ${elementReader_files})
 
 target_link_libraries(formatInterpreter PUBLIC helics_fmi_base)
-target_link_libraries(formatInterpreter PRIVATE HELICS::jsoncpp_lib)
-target_include_directories(formatInterpreter PRIVATE ${HELICS_INCLUDE_DIRS})
+
+include (addJsoncpp)
+
+target_link_libraries(formatInterpreter PRIVATE jsoncpp_lib)
+
 INSTALL(TARGETS formatInterpreter
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib)
