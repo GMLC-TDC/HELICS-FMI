@@ -210,6 +210,26 @@ INCLUDE_DIRECTORIES(SYSTEM ${Boost_INCLUDE_DIR})
 # -------------------------------------------------------------
 # load the required subdirectories
 # -------------------------------------------------------------
+include(updateGitSubmodules)
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/fmtlib/CMakeLists.txt")
+    submod_update(ThirdParty/fmtlib)
+endif()
+
+
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/CMakeLists.txt")
+    submod_update(ThirdParty/jsoncpp)
+endif()
+
+
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/stringOps.h")
+    submod_update(ThirdParty/utilities)
+endif()
+
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/units/units/units.hpp")
+    submod_update(ThirdParty/units)
+endif()
+
+include(GNUInstallDirs)
 
 # -------------------------------------------------------------
 # Enable HELICS executable
@@ -218,6 +238,25 @@ INCLUDE_DIRECTORIES(SYSTEM ${Boost_INCLUDE_DIR})
 SHOW_VARIABLE(HELICS_INSTALL_PATH PATH "path to the helics installation" "${PROJECT_BINARY_DIR}/libs")
 
 include(addHELICS)
+
+
+set(GMLC_UTILITIES_OBJECT_LIB OFF CACHE INTERNAL "")
+set(GMLC_UTILITIES_STATIC_LIB ON CACHE INTERNAL "")
+
+add_subdirectory(${PROJECT_SOURCE_DIR}/ThirdParty/utilities ${PROJECT_BINARY_DIR}/ThirdParty/utilities)
+
+hide_variable(GMLC_UTILITIES_GENERATE_DOXYGEN_DOC)
+hide_variable(GMLC_UTILITIES_INCLUDE_BOOST)
+hide_variable(GMLC_UTILITIES_USE_BOOST_SPIRIT)
+hide_variable(GMLC_UTILITIES_WITH_CMAKE_PACKAGE)
+
+    set_target_properties(gmlc_utilities PROPERTIES FOLDER Extern)
+
+        target_include_directories(
+            gmlc_utilities SYSTEM
+            PRIVATE $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>
+        )
+
 
 add_subdirectory(src/formatInterpreters)
 

@@ -20,7 +20,7 @@
 
 #include "utilities/factoryTemplates.hpp"
 
-#include "helics/utilities/stringOps.h"
+#include "gmlc/utilities/stringOps.h"
 #include "sundialsMatrixData.h"
 #include "utilities/matrixCreation.h"
 #include "utilities/matrixDataFilter.hpp"

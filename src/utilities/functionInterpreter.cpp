@@ -20,7 +20,7 @@
 #include "functionInterpreter.h"
 #include "gridRandom.h"
 #include "helics-fmi/helics-fmi-config.h"
-#include "helics/utilities/stringOps.h"
+#include "gmlc/utilities/stringOps.h"
 #include "mapOps.hpp"
 #include "vectorOps.hpp"
 #include <algorithm>

@@ -11,7 +11,7 @@
  */
 
 #include "jsonReaderElement.h"
-#include "helics/utilities/stringConversion.h"
+#include "utilities/gmlc/utilities/stringConversion.h"
 #include "jsonElement.h"
 #include <cassert>
 #include <fstream>

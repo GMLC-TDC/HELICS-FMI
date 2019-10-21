@@ -12,8 +12,8 @@
 
 #include "helperObject.h"
 #include "dataDictionary.h"
-#include "helics/utilities/stringOps.h"
-#include "helics/utilities/string_viewOps.h"
+#include "gmlc/utilities/stringOps.h"
+#include "gmlc/utilities/string_viewOps.h"
 namespace griddyn
 {
 // start at 100 since there are some objects that use low numbers as a check for interface number and the id as

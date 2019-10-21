@@ -13,7 +13,6 @@
 set(utilities_sources
 	gridRandom.cpp
 	matrixOps.cpp
-	units.cpp
 	vectorOps.cpp
 	functionInterpreter.cpp
 	workQueue.cpp
@@ -25,7 +24,6 @@ set(utilities_sources
 	)
 
 set(utilities_headers
-	units.h
 	dataDictionary.hpp
 	timeSeries.hpp
 	timeSeriesMulti.hpp
@@ -82,7 +80,8 @@ build_minizip()
 endif()
 include(${PROJECT_BINARY_DIR}/libs/cmake/minizip-targets.cmake)
 
-target_link_libraries(utilities PUBLIC minizip::minizip zlib::zlib helics_fmi_base HELICS::utilities)
+	
+target_link_libraries(utilities PUBLIC minizip::minizip zlib::zlib helics_fmi_base gmlc_utilities)
 
 INSTALL(TARGETS utilities
        LIBRARY DESTINATION lib

@@ -6,7 +6,7 @@
 	url = https://github.com/LLNL/units.git
 [submodule "ThirdParty/jsoncpp"]
 	path = ThirdParty/jsoncpp
-	url = https://github.com/open-source-parsers/jsoncpp.git
+	url = https://github.com/phlptp/jsoncpp.git
 [submodule "ThirdParty/fmtlib"]
 	path = ThirdParty/fmtlib
 	url = https://github.com/fmtlib/fmt.git

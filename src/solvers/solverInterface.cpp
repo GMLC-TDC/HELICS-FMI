@@ -14,7 +14,7 @@
 
 #include "utilities/factoryTemplates.hpp"
 
-#include "helics/utilities/stringConversion.h"
+#include "gmlc/utilities/stringConversion.h"
 #include "utilities/mapOps.hpp"
 #include <iostream>
 #include <new>

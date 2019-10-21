@@ -15,10 +15,10 @@
 #include "formatInterpreters/tinyxml2ReaderElement.h"
 #include "formatInterpreters/tomlReaderElement.h"
 #include "helics-fmi/helics-fmi-config.h"
-#include "helics/apps/BrokerApp.hpp"
-#include "helics/core/CoreFactory.hpp"
+#include "helics/application_api/BrokerApp.hpp"
+#include "helics/application_api/CoreApp.hpp"
+#include "helics/core/helicsCLI11.hpp"
 #include "helics/core/helicsVersion.hpp"
-#include "helics/external/CLI11/CLI11.hpp"
 #include "helicsFMI/FmiCoSimFederate.hpp"
 #include "helicsFMI/FmiModelExchangeFederate.hpp"
 #include <iostream>
@@ -29,7 +29,7 @@ void runSystem(readerElement &elem, helics::FederateInfo &fi);
 int main(int argc, char *argv[])
 {
     std::ifstream infile;
-    CLI::App app{"HELICS-FMI for loading and executing FMU's with HELICS", "helics-fmi"};
+    helics::helicsCLI11App app{"HELICS-FMI for loading and executing FMU's with HELICS", "helics-fmi"};
     app.add_flag_function("-v,--version",
                           [](size_t) {
                               std::cout << "HELICS VERSION " << helics::versionString << '\n';
@@ -48,13 +48,10 @@ int main(int argc, char *argv[])
     input_group->add_option("-i,--input", inputs, "specify the input files")->check(CLI::ExistingFile);
     std::string integratorArgs;
     app.add_option("--integrator-args", integratorArgs, "arguments to pass to the integrator");
-
-    std::string stepTimeString;
-    std::string stopTimeString;
-
-    app.add_option("--step", stepTimeString,
-                   "the step size to use (specified in seconds or as a time string (10ms)");
-    app.add_option("--stop", stopTimeString,
+    helics::Time stepTime = helics::Time::minVal();
+    helics::Time stopTime = helics::Time::minVal();
+    app.add_option("--step", stepTime, "the step size to use (specified in seconds or as a time string (10ms)");
+    app.add_option("--stop", stopTime,
                    "the time to stop the simulation (specified in seconds or as a time string (10ms)");
 
     std::string brokerArgs;
@@ -74,44 +71,29 @@ int main(int argc, char *argv[])
       ->delimiter(',');
     app.add_option("--connections", input_variables, "Specify connections this FMU should make")->delimiter(',');
 
-    try
+    auto result = app.helics_parse(argc, argv);
+    helics::FederateInfo fi;
+    if (result == helics::helicsCLI11App::parse_output::help_call)
     {
-        app.parse(argc, argv);
+        (void)(fi.loadInfoFromArgs("--help"));
+        return 0;
     }
-    catch (const CLI::CallForHelp &e)
+    else if (result != helics::helicsCLI11App::parse_output::ok)
     {
-        auto ret = app.exit(e);
-        helics::FederateInfo fi(argc, argv);
-        return ret;
-    }
-    catch (const CLI::ParseError &e)
-    {
-        return app.exit(e);
-    }
-    helics::Time stepTime = helics::Time::minVal();
-    if (!stepTimeString.empty())
-    {
-        stepTime = helics::loadTimeFromString(stepTimeString);
-    }
-    helics::Time stopTime = helics::Time::minVal();
-    if (!stopTimeString.empty())
-    {
-        stopTime = helics::loadTimeFromString(stopTimeString);
+        return -1;
     }
 
-    helics::FederateInfo fi;
     // set the default core type to be local
     fi.coreType = helics::core_type::TEST;
     fi.defName = "fmi";
-    auto remArgs = app.remaining_for_passthrough();
     fi.separator = '.';
-    fi.loadInfoFromArgs(remArgs);
-    if (!remArgs.empty())
+    fi.loadInfoFromArgs(app.remainArgs());
+    if (!app.remainArgs().empty())
     {
         app.allow_extras(false);
         try
         {
-            app.parse(remArgs);
+            app.parse(app.remainArgs());
         }
         catch (const CLI::ParseError &e)
         {
@@ -201,8 +183,7 @@ void runSystem(readerElement &elem, helics::FederateInfo &fi)
     elem.moveToFirstChild("fmus");
     std::vector<std::unique_ptr<FmiCoSimFederate>> feds_cs;
     std::vector<std::unique_ptr<FmiModelExchangeFederate>> feds_me;
-    auto core =
-      helics::CoreFactory::create(fi.coreType, "--name=fmu_core " + helics::generateFullCoreInitString(fi));
+    auto core = helics::apps::CoreApp(fi.coreType, "--name=fmu_core " + helics::generateFullCoreInitString(fi));
     std::vector<std::unique_ptr<fmiLibrary>> fmis;
     while (elem.isValid())
     {

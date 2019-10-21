@@ -33,7 +33,7 @@ target_link_libraries(formatInterpreter PUBLIC helics_fmi_base)
 
 include (addJsoncpp)
 
-target_link_libraries(formatInterpreter PRIVATE jsoncpp_lib)
+target_link_libraries(formatInterpreter PRIVATE jsoncpp_lib gmlc_utilities)
 
 INSTALL(TARGETS formatInterpreter
 	LIBRARY DESTINATION lib

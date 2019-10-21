@@ -11,7 +11,7 @@
  */
 
 #include "tomlReaderElement.h"
-#include "helics/utilities/stringConversion.h"
+#include "utilities/gmlc/utilities/stringConversion.h"
 #include "tomlElement.h"
 #include <cassert>
 #include <fstream>

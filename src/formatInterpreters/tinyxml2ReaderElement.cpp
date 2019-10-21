@@ -11,7 +11,7 @@
  */
 
 #include "tinyxml2ReaderElement.h"
-#include "helics/utilities/stringConversion.h"
+#include "utilities/gmlc/utilities/stringConversion.h"
 #include <tinyxml2/tinyxml2.h>
 
 using namespace tinyxml2;

@@ -15,7 +15,7 @@
 #include "helics-fmi/helics-fmi-config.h"
 #include "utilities/zipUtilities.h"
 
-#include "helics/utilities/stringOps.h"
+#include "gmlc/utilities/stringOps.h"
 #include <cstdarg>
 #include <map>
 #include <boost/dll/import.hpp>

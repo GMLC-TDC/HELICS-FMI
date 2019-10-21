@@ -11,7 +11,7 @@
  */
 
 #include "readerElement.h"
-#include "helics/utilities/stringConversion.h"
+#include "utilities/gmlc/utilities/stringConversion.h"
 
 readerAttribute::readerAttribute() {}
 readerAttribute::readerAttribute(std::string attName, std::string attText)

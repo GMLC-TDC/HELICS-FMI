@@ -14,7 +14,7 @@
 
 #include "arkodeInterface.h"
 
-#include "helics/utilities/stringOps.h"
+#include "gmlc/utilities/stringOps.h"
 #include "utilities/vectorOps.hpp"
 
 #include <arkode/arkode.h>
