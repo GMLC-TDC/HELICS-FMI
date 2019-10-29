@@ -183,7 +183,7 @@ void runSystem(readerElement &elem, helics::FederateInfo &fi)
     elem.moveToFirstChild("fmus");
     std::vector<std::unique_ptr<FmiCoSimFederate>> feds_cs;
     std::vector<std::unique_ptr<FmiModelExchangeFederate>> feds_me;
-    auto core = helics::apps::CoreApp(fi.coreType, "--name=fmu_core " + helics::generateFullCoreInitString(fi));
+    auto core = helics::CoreApp(fi.coreType, "--name=fmu_core " + helics::generateFullCoreInitString(fi));
     std::vector<std::unique_ptr<fmiLibrary>> fmis;
     while (elem.isValid())
     {
@@ -251,7 +251,7 @@ void runSystem(readerElement &elem, helics::FederateInfo &fi)
         auto str1 = elem.getFirstAttribute().getText();
         auto str2 = elem.getNextAttribute().getText();
         elem.moveToNextSibling("connections");
-        core->dataLink(str1, str2);
+        core.dataLink(str1, str2);
     }
     elem.moveToParent();
     // load each of the fmu's into its own thread
@@ -272,5 +272,5 @@ void runSystem(readerElement &elem, helics::FederateInfo &fi)
     }
     feds_cs.clear();
     feds_me.clear();
-    core->disconnect();
+    core.forceTerminate();
 }
