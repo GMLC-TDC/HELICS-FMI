@@ -100,10 +100,10 @@ int main(int argc, char *argv[])
             return app.exit(e);
         }
     }
-    std::unique_ptr<helics::apps::BrokerApp> broker;
+    std::unique_ptr<helics::BrokerApp> broker;
     if (fi.autobroker)
     {
-        broker = std::make_unique<helics::apps::BrokerApp>(fi.coreType, brokerArgs);
+        broker = std::make_unique<helics::BrokerApp>(fi.coreType, brokerArgs);
         fi.autobroker = false;
     }
 
