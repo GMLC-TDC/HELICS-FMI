@@ -2,9 +2,10 @@
 Copyright (C) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
-This software was modified by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute;
-the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence
-Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+This software was modified by Pacific Northwest National Laboratory, operated by the Battelle
+Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for
+Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence
+Livermore National Security, LLC.
 */
 /*
  * LLNS Copyright Start
@@ -19,243 +20,242 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
  */
 
 #include "logger.h"
+
 #include <iostream>
 
-namespace utilities
+namespace utilities {
+Logger::Logger()
 {
-Logger::Logger ()
-{
-    logCore = LoggerManager::getLoggerCore ();
-    coreIndex = logCore->addFileProcessor ([this](std::string &&message) { logFunction (std::move (message)); });
+    logCore = LoggerManager::getLoggerCore();
+    coreIndex = logCore->addFileProcessor(
+        [this](std::string&& message) { logFunction(std::move(message)); });
 }
-Logger::Logger (std::shared_ptr<LoggingCore> core) : logCore (std::move (core))
+Logger::Logger(std::shared_ptr<LoggingCore> core): logCore(std::move(core))
 {
-    coreIndex = logCore->addFileProcessor ([this](std::string &&message) { logFunction (std::move (message)); });
+    coreIndex = logCore->addFileProcessor(
+        [this](std::string&& message) { logFunction(std::move(message)); });
 }
 
-Logger::~Logger () { logCore->haltOperations (coreIndex); }
-void Logger::openFile (const std::string &file)
+Logger::~Logger()
 {
-    std::lock_guard<std::mutex> fLock (fileLock);
-    if (outFile.is_open ())
-    {
-        outFile.close ();
+    logCore->haltOperations(coreIndex);
+}
+void Logger::openFile(const std::string& file)
+{
+    std::lock_guard<std::mutex> fLock(fileLock);
+    if (outFile.is_open()) {
+        outFile.close();
     }
-    outFile.open (file.c_str ());
+    outFile.open(file.c_str());
 }
 
-void Logger::startLogging (int cLevel, int fLevel)
+void Logger::startLogging(int cLevel, int fLevel)
 {
     consoleLevel = cLevel;
     fileLevel = fLevel;
-    halted.store (false);
+    halted.store(false);
 }
 
-void Logger::haltLogging ()
+void Logger::haltLogging()
 {
     bool exp = false;
-    if (halted.compare_exchange_strong (exp, true))
-    {
-        logCore->addMessage (coreIndex, "!!>close");
+    if (halted.compare_exchange_strong(exp, true)) {
+        logCore->addMessage(coreIndex, "!!>close");
     }
 }
-void Logger::changeLevels (int cLevel, int fLevel)
+void Logger::changeLevels(int cLevel, int fLevel)
 {
     consoleLevel = cLevel;
     fileLevel = fLevel;
 }
 
-void Logger::log (int level, std::string logMessage)
+void Logger::log(int level, std::string logMessage)
 {
-    if (!halted)
-    {
-        logMessage.push_back ((level <= fileLevel) ? '^' : '~');
-        logMessage.push_back ((level <= consoleLevel) ? '$' : '-');
+    if (!halted) {
+        logMessage.push_back((level <= fileLevel) ? '^' : '~');
+        logMessage.push_back((level <= consoleLevel) ? '$' : '-');
 
-        logCore->addMessage (coreIndex, std::move (logMessage));
+        logCore->addMessage(coreIndex, std::move(logMessage));
     }
 }
 
-void Logger::flush () { logCore->addMessage (coreIndex, "!!>flush"); }
-bool Logger::isRunning () const { return (!halted); }
-
-void Logger::logFunction (std::string &&message)
+void Logger::flush()
 {
-    std::lock_guard<std::mutex> fLock (fileLock);
-    if (message.size () > 3)
-    {
-        if (message.compare (0, 3, "!!>") == 0)
-        {
-            if (message.compare (3, 5, "flush") == 0)
-            {
-                if (outFile.is_open ())
-                {
-                    outFile.flush ();
+    logCore->addMessage(coreIndex, "!!>flush");
+}
+bool Logger::isRunning() const
+{
+    return (!halted);
+}
+
+void Logger::logFunction(std::string&& message)
+{
+    std::lock_guard<std::mutex> fLock(fileLock);
+    if (message.size() > 3) {
+        if (message.compare(0, 3, "!!>") == 0) {
+            if (message.compare(3, 5, "flush") == 0) {
+                if (outFile.is_open()) {
+                    outFile.flush();
                 }
             }
         }
     }
 
-    if (outFile.is_open ())
-    {
+    if (outFile.is_open()) {
         outFile << message << '\n';
     }
 }
 
-LoggerNoThread::LoggerNoThread () = default;
+LoggerNoThread::LoggerNoThread() = default;
 
-LoggerNoThread::LoggerNoThread (const std::shared_ptr<LoggingCore> & /*core*/) {}
+LoggerNoThread::LoggerNoThread(const std::shared_ptr<LoggingCore>& /*core*/) {}
 
-void LoggerNoThread::openFile (const std::string &file) { outFile.open (file.c_str ()); }
-void LoggerNoThread::startLogging (int cLevel, int fLevel)
+void LoggerNoThread::openFile(const std::string& file)
+{
+    outFile.open(file.c_str());
+}
+void LoggerNoThread::startLogging(int cLevel, int fLevel)
 {
     consoleLevel = cLevel;
     fileLevel = fLevel;
 }
 
-void LoggerNoThread::changeLevels (int cLevel, int fLevel)
+void LoggerNoThread::changeLevels(int cLevel, int fLevel)
 {
     consoleLevel = cLevel;
     fileLevel = fLevel;
 }
 
-void LoggerNoThread::log (int level, const std::string &logMessage)
+void LoggerNoThread::log(int level, const std::string& logMessage)
 {
-    if (level < consoleLevel)
-    {
+    if (level < consoleLevel) {
         std::cout << logMessage << '\n';
     }
-    if (level < fileLevel)
-    {
-        if (outFile.is_open ())
-        {
+    if (level < fileLevel) {
+        if (outFile.is_open()) {
             outFile << logMessage << '\n';
         }
     }
 }
 
-void LoggerNoThread::flush ()
+void LoggerNoThread::flush()
 {
-    if (outFile.is_open ())
-    {
-        outFile.flush ();
+    if (outFile.is_open()) {
+        outFile.flush();
     }
-    std::cout.flush ();
+    std::cout.flush();
 }
 
-LoggingCore::LoggingCore () { loggingThread = std::thread (&LoggingCore::processingLoop, this); }
-
-LoggingCore::~LoggingCore ()
+LoggingCore::LoggingCore()
 {
-    loggingQueue.emplace (-1, "!!>close");
-    loggingThread.join ();
+    loggingThread = std::thread(&LoggingCore::processingLoop, this);
 }
 
-void LoggingCore::addMessage (std::string &&message) { loggingQueue.emplace (-1, std::move (message)); }
-
-void LoggingCore::addMessage (const std::string &message) { loggingQueue.emplace (-1, message); }
-
-void LoggingCore::addMessage (int index, std::string &&message)
+LoggingCore::~LoggingCore()
 {
-    loggingQueue.emplace (index, std::move (message));
+    loggingQueue.emplace(-1, "!!>close");
+    loggingThread.join();
 }
 
-void LoggingCore::addMessage (int index, const std::string &message) { loggingQueue.emplace (index, message); }
-int LoggingCore::addFileProcessor (std::function<void(std::string &&message)> newFunction)
+void LoggingCore::addMessage(std::string&& message)
 {
-    std::lock_guard<std::mutex> fLock (functionLock);
-    functions.push_back (std::move (newFunction));
-    return static_cast<int> (functions.size ()) - 1;
+    loggingQueue.emplace(-1, std::move(message));
 }
 
-void LoggingCore::haltOperations (int loggerIndex)
+void LoggingCore::addMessage(const std::string& message)
 {
-    std::lock_guard<std::mutex> fLock (functionLock);
-    if (loggerIndex < static_cast<int> (functions.size ()))
-    {
+    loggingQueue.emplace(-1, message);
+}
+
+void LoggingCore::addMessage(int index, std::string&& message)
+{
+    loggingQueue.emplace(index, std::move(message));
+}
+
+void LoggingCore::addMessage(int index, const std::string& message)
+{
+    loggingQueue.emplace(index, message);
+}
+int LoggingCore::addFileProcessor(std::function<void(std::string&& message)> newFunction)
+{
+    std::lock_guard<std::mutex> fLock(functionLock);
+    functions.push_back(std::move(newFunction));
+    return static_cast<int>(functions.size()) - 1;
+}
+
+void LoggingCore::haltOperations(int loggerIndex)
+{
+    std::lock_guard<std::mutex> fLock(functionLock);
+    if (loggerIndex < static_cast<int>(functions.size())) {
         functions[loggerIndex] = nullptr;
     }
 }
 
 /** update a callback for a particular instance*/
-void LoggingCore::updateProcessingFunction (int index, std::function<void(std::string &&message)> newFunction)
+void LoggingCore::updateProcessingFunction(int index,
+                                           std::function<void(std::string&& message)> newFunction)
 {
-    std::lock_guard<std::mutex> fLock (functionLock);
-    if (index < static_cast<int> (functions.size ()))
-    {
-        functions[index] = std::move (newFunction);
+    std::lock_guard<std::mutex> fLock(functionLock);
+    if (index < static_cast<int>(functions.size())) {
+        functions[index] = std::move(newFunction);
     }
 }
 
-void LoggingCore::processingLoop ()
+void LoggingCore::processingLoop()
 {
     int index;
     std::string msg;
-    while (true)
-    {
-        std::tie (index, msg) = loggingQueue.pop ();
+    while (true) {
+        std::tie(index, msg) = loggingQueue.pop();
 
-        if (msg.size () > 3)
-        {
-            if (msg.compare (0, 3, "!!>") == 0)
-            {
-                if (msg.compare (3, 5, "flush") == 0)
-                {  // any flush command we need flush the console, we may also need to flush a particular file
-                    std::cout.flush ();
-                    if (index == -1)
-                    {
+        if (msg.size() > 3) {
+            if (msg.compare(0, 3, "!!>") == 0) {
+                if (msg.compare(3, 5, "flush") ==
+                    0) {  // any flush command we need flush the console, we may also need to flush
+                          // a particular file
+                    std::cout.flush();
+                    if (index == -1) {
                         continue;
                     }
                 }
-                if (msg.compare (3, 5, "close") == 0)
-                {
-                    if (index == -1)
-                    {
+                if (msg.compare(3, 5, "close") == 0) {
+                    if (index == -1) {
                         break;  // break the loop
                     }
-                    msg.push_back ('$');
+                    msg.push_back('$');
                 }
             }
         }
         // if a the callback should be called there will be a '^' at the end
         bool nosymbol = true;
-        auto f = msg.back ();
-        if ((f == '^') || (f == '~'))
-        {
+        auto f = msg.back();
+        if ((f == '^') || (f == '~')) {
             nosymbol = false;
-            msg.pop_back ();
+            msg.pop_back();
         }
 
         // if a the console should be written there will be a '$' at the end
-        auto c = msg.back ();
-        if ((c == '$') || (c == '-'))
-        {
+        auto c = msg.back();
+        if ((c == '$') || (c == '-')) {
             nosymbol = false;
-            msg.pop_back ();
+            msg.pop_back();
         }
         // in case they were written out of order
-        if ((f == '$') || (f == '-'))
-        {
-            f = msg.back ();
-            if ((f == '^') || (f == '~'))
-            {
-                msg.pop_back ();
+        if ((f == '$') || (f == '-')) {
+            f = msg.back();
+            if ((f == '^') || (f == '~')) {
+                msg.pop_back();
             }
         }
-        if ((c == '$') || (nosymbol))
-        {
+        if ((c == '$') || (nosymbol)) {
             std::cout << msg << '\n';
         }
-        if (index >= 0)
-        {
-            if ((f == '^') || (nosymbol))
-            {
-                std::lock_guard<std::mutex> fLock (functionLock);
-                if (index < static_cast<int> (functions.size ()))
-                {
-                    if (functions[index])
-                    {
-                        functions[index](std::move (msg));
+        if (index >= 0) {
+            if ((f == '^') || (nosymbol)) {
+                std::lock_guard<std::mutex> fLock(functionLock);
+                if (index < static_cast<int>(functions.size())) {
+                    if (functions[index]) {
+                        functions[index](std::move(msg));
                     }
                 }
             }
@@ -263,57 +263,56 @@ void LoggingCore::processingLoop ()
     }
 }
 
-bool LoggerNoThread::isRunning () const { return true; }
+bool LoggerNoThread::isRunning() const
+{
+    return true;
+}
 
 /** a storage system for the available Logger objects allowing references by name to the core
  */
 std::map<std::string, std::shared_ptr<LoggerManager>> LoggerManager::loggers;
 
-/** we expect operations on core object that modify the map to be rare but we absolutely need them to be thread
-safe so we are going to use a lock that is entirely controlled by this file*/
+/** we expect operations on core object that modify the map to be rare but we absolutely need them
+to be thread safe so we are going to use a lock that is entirely controlled by this file*/
 static std::mutex loggerLock;
 
-std::shared_ptr<LoggerManager> LoggerManager::getLoggerManager (const std::string &loggerName)
+std::shared_ptr<LoggerManager> LoggerManager::getLoggerManager(const std::string& loggerName)
 {
-    std::lock_guard<std::mutex> loglock (
-      loggerLock);  // just to ensure that nothing funny happens if you try to get a context
-                    // while it is being constructed
-    auto fnd = loggers.find (loggerName);
-    if (fnd != loggers.end ())
-    {
+    std::lock_guard<std::mutex> loglock(
+        loggerLock);  // just to ensure that nothing funny happens if you try to get a context
+                      // while it is being constructed
+    auto fnd = loggers.find(loggerName);
+    if (fnd != loggers.end()) {
         return fnd->second;
     }
 
-    auto newLogger = std::shared_ptr<LoggerManager> (new LoggerManager (loggerName));
-    loggers.emplace (loggerName, newLogger);
+    auto newLogger = std::shared_ptr<LoggerManager>(new LoggerManager(loggerName));
+    loggers.emplace(loggerName, newLogger);
     return newLogger;
     // if it doesn't make a new one with the appropriate name
 }
 
-std::shared_ptr<LoggingCore> LoggerManager::getLoggerCore (const std::string &loggerName)
+std::shared_ptr<LoggingCore> LoggerManager::getLoggerCore(const std::string& loggerName)
 {
-    return getLoggerManager (loggerName)->loggingControl;
+    return getLoggerManager(loggerName)->loggingControl;
 }
 
-void LoggerManager::closeLogger (const std::string &loggerName)
+void LoggerManager::closeLogger(const std::string& loggerName)
 {
-    std::lock_guard<std::mutex> loglock (loggerLock);
-    auto fnd = loggers.find (loggerName);
-    if (fnd != loggers.end ())
-    {
-        loggers.erase (fnd);
+    std::lock_guard<std::mutex> loglock(loggerLock);
+    auto fnd = loggers.find(loggerName);
+    if (fnd != loggers.end()) {
+        loggers.erase(fnd);
     }
 }
 
-void LoggerManager::logMessage (const std::string &message)
+void LoggerManager::logMessage(const std::string& message)
 {
-    std::lock_guard<std::mutex> loglock (loggerLock);
-    auto fnd = loggers.find ("");
-    if (fnd != loggers.end ())
-    {
-        if (fnd->second->loggingControl)
-        {
-            fnd->second->loggingControl->addMessage (message);
+    std::lock_guard<std::mutex> loglock(loggerLock);
+    auto fnd = loggers.find("");
+    if (fnd != loggers.end()) {
+        if (fnd->second->loggingControl) {
+            fnd->second->loggingControl->addMessage(message);
             return;
         }
     }
@@ -321,10 +320,10 @@ void LoggerManager::logMessage (const std::string &message)
     std::cout << message << std::endl;
 }
 
-LoggerManager::~LoggerManager () = default;
+LoggerManager::~LoggerManager() = default;
 
-LoggerManager::LoggerManager (const std::string &loggerName) : name (loggerName)
+LoggerManager::LoggerManager(const std::string& loggerName): name(loggerName)
 {
-    loggingControl = std::make_shared<LoggingCore> ();
+    loggingControl = std::make_shared<LoggingCore>();
 }
 }  // namespace utilities

@@ -11,15 +11,16 @@
  */
 
 #include "FmiModelExchangeFederate.hpp"
+
 #include "fmi/fmi_import/fmiObjects.h"
 #include "solvers/solverInterface.h"
 
 FmiModelExchangeFederate::FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj,
-                                                   const helics::FederateInfo &fi)
-    : me(std::move(obj)), fed(std::string(), fi)
+                                                   const helics::FederateInfo& fi):
+    me(std::move(obj)),
+    fed(std::string(), fi)
 {
-    if (me)
-    {
+    if (me) {
         input_list = me->getInputNames();
         output_list = me->getOutputNames();
     }
@@ -30,24 +31,20 @@ FmiModelExchangeFederate::~FmiModelExchangeFederate() = default;
 void FmiModelExchangeFederate::configure(helics::Time step, helics::Time startTime)
 {
     timeBias = startTime;
-    for (auto input : input_list)
-    {
+    for (auto input : input_list) {
         inputs.emplace_back(&fed, input);
     }
 
-    for (auto output : output_list)
-    {
+    for (auto output : output_list) {
         pubs.emplace_back(&fed, output, helics::data_type::helics_double);
     }
 
-    auto &def = me->fmuInformation().getExperiment();
+    auto& def = me->fmuInformation().getExperiment();
 
-    if (step <= helics::timeZero)
-    {
+    if (step <= helics::timeZero) {
         step = def.stepSize;
     }
-    if (step <= helics::timeZero)
-    {
+    if (step <= helics::timeZero) {
         auto tstep = fed.getTimeProperty(helics_property_time_period);
         step = (tstep > helics::timeEpsilon) ? tstep : helics::Time(0.2);
     }
@@ -64,24 +61,34 @@ void FmiModelExchangeFederate::setOutputs(std::vector<std::string> output_names)
 {
     output_list = std::move(output_names);
 }
-void FmiModelExchangeFederate::setConnections(std::vector<std::string> conn) { connections = std::move(conn); }
+void FmiModelExchangeFederate::setConnections(std::vector<std::string> conn)
+{
+    connections = std::move(conn);
+}
 
-void FmiModelExchangeFederate::addInput(const std::string &input_name) { input_list.push_back(input_name); }
+void FmiModelExchangeFederate::addInput(const std::string& input_name)
+{
+    input_list.push_back(input_name);
+}
 
-void FmiModelExchangeFederate::addOutput(const std::string &output_name) { output_list.push_back(output_name); }
+void FmiModelExchangeFederate::addOutput(const std::string& output_name)
+{
+    output_list.push_back(output_name);
+}
 
-void FmiModelExchangeFederate::addConnection(const std::string &conn) { connections.push_back(conn); }
+void FmiModelExchangeFederate::addConnection(const std::string& conn)
+{
+    connections.push_back(conn);
+}
 
 void FmiModelExchangeFederate::run(helics::Time stop)
 {
-    auto &def = me->fmuInformation().getExperiment();
+    auto& def = me->fmuInformation().getExperiment();
 
-    if (stop <= helics::timeZero)
-    {
+    if (stop <= helics::timeZero) {
         stop = def.stopTime;
     }
-    if (stop <= helics::timeZero)
-    {
+    if (stop <= helics::timeZero) {
         stop = 30.0;
     }
 
@@ -90,20 +97,16 @@ void FmiModelExchangeFederate::run(helics::Time stop)
     std::vector<fmi2Real> outputs(pubs.size());
     std::vector<fmi2Real> inp(inputs.size());
     me->getOutputs(outputs.data());
-    for (size_t ii = 0; ii < pubs.size(); ++ii)
-    {
+    for (size_t ii = 0; ii < pubs.size(); ++ii) {
         pubs[ii].publish(outputs[ii]);
     }
     me->getCurrentInputs(inp.data());
-    for (size_t ii = 0; ii < inputs.size(); ++ii)
-    {
+    for (size_t ii = 0; ii < inputs.size(); ++ii) {
         inputs[ii].setDefault(inp[ii]);
     }
     auto result = fed.enterExecutingMode(helics::iteration_request::iterate_if_needed);
-    if (result == helics::iteration_result::iterating)
-    {
-        for (size_t ii = 0; ii < inputs.size(); ++ii)
-        {
+    if (result == helics::iteration_result::iterating) {
+        for (size_t ii = 0; ii < inputs.size(); ++ii) {
             inp[ii] = inputs[ii].getValue<fmi2Real>();
         }
         me->setInputs(inp.data());
@@ -112,21 +115,18 @@ void FmiModelExchangeFederate::run(helics::Time stop)
     me->setMode(fmuMode::continuousTimeMode);
 
     helics::Time currentTime = helics::timeZero;
-    while (currentTime <= stop)
-    {
+    while (currentTime <= stop) {
         // me->doStep(static_cast<double>(currentTime), static_cast<double>(stepTime), true);
         double timeReturn;
         solver->solve(static_cast<double>(currentTime), timeReturn);
         currentTime = fed.requestNextStep();
         // get the values to publish
         me->getOutputs(outputs.data());
-        for (size_t ii = 0; ii < pubs.size(); ++ii)
-        {
+        for (size_t ii = 0; ii < pubs.size(); ++ii) {
             pubs[ii].publish(outputs[ii]);
         }
         // load the inputs
-        for (size_t ii = 0; ii < inputs.size(); ++ii)
-        {
+        for (size_t ii = 0; ii < inputs.size(); ++ii) {
             inp[ii] = inputs[ii].getValue<fmi2Real>();
         }
         me->setInputs(inp.data());
@@ -134,20 +134,20 @@ void FmiModelExchangeFederate::run(helics::Time stop)
     fed.finalize();
 }
 
-solver_index_type FmiModelExchangeFederate::jacobianSize(const griddyn::solverMode &sMode) const { return 0; }
+solver_index_type FmiModelExchangeFederate::jacobianSize(const griddyn::solverMode& sMode) const
+{
+    return 0;
+}
 
 void FmiModelExchangeFederate::guessCurrentValue(double time,
                                                  double state[],
                                                  double dstate_dt[],
-                                                 const griddyn::solverMode &sMode)
+                                                 const griddyn::solverMode& sMode)
 {
-    if (hasDifferential(sMode))
-    {
+    if (hasDifferential(sMode)) {
         me->getStates(state);
         me->getDerivatives(dstate_dt);
-    }
-    else if (!isDynamic(sMode))
-    {
+    } else if (!isDynamic(sMode)) {
         me->getStates(state);
     }
 }
@@ -156,19 +156,15 @@ int FmiModelExchangeFederate::residualFunction(double time,
                                                const double state[],
                                                const double dstate_dt[],
                                                double resid[],
-                                               const griddyn::solverMode &sMode) noexcept
+                                               const griddyn::solverMode& sMode) noexcept
 
 {
-    if (hasDifferential(sMode))
-    {
+    if (hasDifferential(sMode)) {
         derivativeFunction(time, state, resid, sMode);
-        for (index_t ii = 0; ii < solver->size(); ++ii)
-        {
+        for (index_t ii = 0; ii < solver->size(); ++ii) {
             resid[ii] -= dstate_dt[ii];
         }
-    }
-    else if (!isDynamic(sMode))
-    {
+    } else if (!isDynamic(sMode)) {
         derivativeFunction(time, state, resid, sMode);
     }
     return 0;
@@ -177,7 +173,7 @@ int FmiModelExchangeFederate::residualFunction(double time,
 int FmiModelExchangeFederate::derivativeFunction(double time,
                                                  const double state[],
                                                  double dstate_dt[],
-                                                 const griddyn::solverMode &sMode) noexcept
+                                                 const griddyn::solverMode& sMode) noexcept
 {
     me->setStates(state);
     me->getDerivatives(dstate_dt);
@@ -188,7 +184,7 @@ int FmiModelExchangeFederate::derivativeFunction(double time,
 int FmiModelExchangeFederate::algUpdateFunction(double time,
                                                 const double state[],
                                                 double update[],
-                                                const griddyn::solverMode &sMode,
+                                                const griddyn::solverMode& sMode,
                                                 double alpha) noexcept
 {
     return 0;
@@ -197,9 +193,9 @@ int FmiModelExchangeFederate::algUpdateFunction(double time,
 int FmiModelExchangeFederate::jacobianFunction(double time,
                                                const double state[],
                                                const double dstate_dt[],
-                                               matrixData<double> &md,
+                                               matrixData<double>& md,
                                                double cj,
-                                               const griddyn::solverMode &sMode) noexcept
+                                               const griddyn::solverMode& sMode) noexcept
 {
     return 0;
 }
@@ -208,7 +204,7 @@ int FmiModelExchangeFederate::rootFindingFunction(double time,
                                                   const double state[],
                                                   const double dstate_dt[],
                                                   double roots[],
-                                                  const griddyn::solverMode &sMode) noexcept
+                                                  const griddyn::solverMode& sMode) noexcept
 {
     return 0;
 }
@@ -216,7 +212,7 @@ int FmiModelExchangeFederate::rootFindingFunction(double time,
 int FmiModelExchangeFederate::dynAlgebraicSolve(double time,
                                                 const double diffState[],
                                                 const double deriv[],
-                                                const griddyn::solverMode &sMode) noexcept
+                                                const griddyn::solverMode& sMode) noexcept
 {
     return 0;
 }

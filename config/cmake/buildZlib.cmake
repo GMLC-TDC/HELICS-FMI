@@ -1,19 +1,19 @@
 # This function is used to force a build on a dependant project at cmake configuration phase.
-# 
+#
 
 function (build_zlib)
 
 if (CMAKE_BUILD_TYPE)
-	list(APPEND valid_btypes "Release" "Debug" "RelWithDebInfo" "MinSizeRel")
-	if (${CMAKE_BUILD_TYPE} IN_LIST valid_btypes)
-		set(LOCAL_BUILD_TYPE ${CMAKE_BUILD_TYPE})
-	else()
-		set(LOCAL_BUILD_TYPE "RelWithDebInfo")
-	endif()
+    list(APPEND valid_btypes "Release" "Debug" "RelWithDebInfo" "MinSizeRel")
+    if (${CMAKE_BUILD_TYPE} IN_LIST valid_btypes)
+        set(LOCAL_BUILD_TYPE ${CMAKE_BUILD_TYPE})
+    else()
+        set(LOCAL_BUILD_TYPE "RelWithDebInfo")
+    endif()
 else ()
-	set(LOCAL_BUILD_TYPE "Release")
+    set(LOCAL_BUILD_TYPE "Release")
 endif()
-	
+
     set(trigger_build_dir ${CMAKE_BINARY_DIR}/autobuild/force_zlib)
 
     #mktemp dir in build tree
@@ -25,18 +25,18 @@ endif()
     include(ExternalProject)
 ExternalProject_Add(zlib
     SOURCE_DIR ${PROJECT_SOURCE_DIR}/ThirdParty/Zlib/zlib-1.2.6
-    DOWNLOAD_COMMAND " " 
-    UPDATE_COMMAND " " 
+    DOWNLOAD_COMMAND " "
+    UPDATE_COMMAND " "
     BINARY_DIR ${PROJECT_BINARY_DIR}/ThirdParty/Zlib
-     
-    CMAKE_ARGS 
+
+    CMAKE_ARGS
         -DCMAKE_INSTALL_PREFIX=${AUTOBUILD_INSTALL_PATH}
         -DCMAKE_BUILD_TYPE=\$\{CMAKE_BUILD_TYPE\}
         -DBUILD_SHARED_LIBS=OFF
         -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
         -DCMAKE_LINKER=${CMAKE_LINKER}
         -DCMAKE_POSITION_INDEPENDENT_CODE=${CMAKE_POSITION_INDEPENDENT_CODE}
-     
+
     INSTALL_DIR ${AUTOBUILD_INSTALL_PATH}
     )")
 
@@ -45,57 +45,57 @@ ExternalProject_Add(zlib
 
 if (MSVC)
 
-if(${CMAKE_VERSION} VERSION_LESS "3.14.0") 
+if(${CMAKE_VERSION} VERSION_LESS "3.14.0")
     set(GENERATOR_ARGS -G ${CMAKE_GENERATOR})
 else()
-	set(GENERATOR_ARGS -G ${CMAKE_GENERATOR} -A ${CMAKE_GENERATOR_PLATFORM})
+    set(GENERATOR_ARGS -G ${CMAKE_GENERATOR} -A ${CMAKE_GENERATOR_PLATFORM})
 endif()
 
 if (NOT BUILD_RELEASE_ONLY)
-	message(STATUS "Configuring zlib Autobuild for Debug: logging to ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_config_debug.log")	
+    message(STATUS "Configuring zlib Autobuild for Debug: logging to ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_config_debug.log")
     execute_process(COMMAND ${CMAKE_COMMAND}  -Wno-dev -D CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER} -D CMAKE_C_COMPILER=${CMAKE_C_COMPILER} -D CMAKE_LINKER=${CMAKE_LINKER}
-        -D CMAKE_BUILD_TYPE=Debug ${GENERATOR_ARGS} .. 
+        -D CMAKE_BUILD_TYPE=Debug ${GENERATOR_ARGS} ..
         WORKING_DIRECTORY ${trigger_build_dir}/build
-		OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_config_debug.log
+        OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_config_debug.log
         )
-		
-	message(STATUS "Building zlib Autobuild for debug: logging to ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_build_debug.log")
+
+    message(STATUS "Building zlib Autobuild for debug: logging to ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_build_debug.log")
     execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Debug
         WORKING_DIRECTORY ${trigger_build_dir}/build
-		OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_build_debug.log
+        OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_build_debug.log
         )
 endif()
-	
+
 if (NOT BUILD_DEBUG_ONLY)
-	if (NOT MSVC_RELEASE_BUILD_TYPE)
-		set(MSVC_RELEASE_BUILD_TYPE "Release")
-	endif()
-	
-message(STATUS "Configuring zlib Autobuild for ${MSVC_RELEASE_BUILD_TYPE}: logging to ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_config_release.log")	
+    if (NOT MSVC_RELEASE_BUILD_TYPE)
+        set(MSVC_RELEASE_BUILD_TYPE "Release")
+    endif()
+
+message(STATUS "Configuring zlib Autobuild for ${MSVC_RELEASE_BUILD_TYPE}: logging to ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_config_release.log")
 execute_process(COMMAND ${CMAKE_COMMAND}  -Wno-dev -D CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER} -D CMAKE_C_COMPILER=${CMAKE_C_COMPILER} -D CMAKE_LINKER=${CMAKE_LINKER}
-        -D CMAKE_BUILD_TYPE=${MSVC_RELEASE_BUILD_TYPE} ${GENERATOR_ARGS} .. 
+        -D CMAKE_BUILD_TYPE=${MSVC_RELEASE_BUILD_TYPE} ${GENERATOR_ARGS} ..
         WORKING_DIRECTORY ${trigger_build_dir}/build
-		OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_config_release.log
+        OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_config_release.log
         )
-		
-	message(STATUS "Building zlib Autobuild for ${MSVC_RELEASE_BUILD_TYPE}: logging to ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_build_release.log")
+
+    message(STATUS "Building zlib Autobuild for ${MSVC_RELEASE_BUILD_TYPE}: logging to ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_build_release.log")
     execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${MSVC_RELEASE_BUILD_TYPE}
         WORKING_DIRECTORY ${trigger_build_dir}/build
-		OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_build_release.log
+        OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_build_release.log
         )
 endif()
 else(MSVC)
-message(STATUS "Configuring zlib Autobuild for ${LOCAL_BUILD_TYPE}: logging to ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_config.log")	
+message(STATUS "Configuring zlib Autobuild for ${LOCAL_BUILD_TYPE}: logging to ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_config.log")
 execute_process(COMMAND ${CMAKE_COMMAND}  -Wno-dev -D CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER} -D CMAKE_C_COMPILER=${CMAKE_C_COMPILER} -D CMAKE_LINKER=${CMAKE_LINKER}
-        -D CMAKE_BUILD_TYPE=${LOCAL_BUILD_TYPE} -G ${CMAKE_GENERATOR} .. 
+        -D CMAKE_BUILD_TYPE=${LOCAL_BUILD_TYPE} -G ${CMAKE_GENERATOR} ..
         WORKING_DIRECTORY ${trigger_build_dir}/build
-		OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_config.log
+        OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_config.log
         )
-		
-	message(STATUS "Building zlib Autobuild for ${LOCAL_BUILD_TYPE}: logging to ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_build.log")
+
+    message(STATUS "Building zlib Autobuild for ${LOCAL_BUILD_TYPE}: logging to ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_build.log")
     execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${LOCAL_BUILD_TYPE}
         WORKING_DIRECTORY ${trigger_build_dir}/build
-		OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_build.log
+        OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/zlib_autobuild_build.log
         )
 endif(MSVC)
 endfunction()

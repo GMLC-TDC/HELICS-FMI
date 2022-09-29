@@ -23,18 +23,18 @@ else()
 
 option(HELICS_SUBPROJECT "use helics as a subproject" OFF)
 
-set(HELICS_CMAKE_SUFFIXES 
+set(HELICS_CMAKE_SUFFIXES
 	lib/cmake/HELICS/
 			cmake/HELICS/)
-	
+
 find_package(HELICS 2.2
-	HINTS 
+	HINTS
 		${HELICS_INSTALL_PATH}
 		$ENV{HELICS_INSTALL_PATH}
 		${HELICS_PATH_HINTS}
 	PATH_SUFFIXES ${HELICS_CMAKE_SUFFIXES}
 	)
-				
+
 if (NOT HELICS_FOUND)
 	if (HELICS_SUBPROJECT)
 		include(addHELICSsubproject)

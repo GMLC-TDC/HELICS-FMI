@@ -14,23 +14,21 @@
 
 static const std::string nullStr;
 
-jsonElement::jsonElement (Json::Value vElement, std::string newName)
-    : name (std::move (newName)), element (std::move (vElement))
+jsonElement::jsonElement(Json::Value vElement, std::string newName):
+    name(std::move(newName)), element(std::move(vElement))
 {
     elementIndex = 0;
 
-    if (element.isArray ())
-    {
+    if (element.isArray()) {
         arraytype = true;
         arrayIndex = 0;
-        while ((arrayIndex < element.size ()) && (element[arrayIndex].empty ()))
-        {
+        while ((arrayIndex < element.size()) && (element[arrayIndex].empty())) {
             ++arrayIndex;
         }
     }
 }
 
-void jsonElement::clear ()
+void jsonElement::clear()
 {
     element = Json::nullValue;
     elementIndex = 0;
