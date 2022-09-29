@@ -1,22 +1,26 @@
-# LLNS Copyright Start
-# Copyright (c) 2017, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Lawrence Livermore National Laboratory in part under
-# Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
-# Produced at the Lawrence Livermore National Laboratory.
+# ~~~
+# Copyright (c) 2017-2022 Lawrence Livermore
+# National Security, LLC;
+# See the top-level NOTICE for additional details.
 # All rights reserved.
-# For details, see the LICENSE file.
-# LLNS Copyright End
+#
+# SPDX-License-Identifier: BSD-3-Clause
+# ~~~
 
-cmake_minimum_required(VERSION 3.5)
-cmake_policy(VERSION 3.5)
+cmake_minimum_required(VERSION 3.17...3.24)
 
-project(HELICS-FMI VERSION 0.5.2)
+# Install dependencies using vcpkg if VCPKG_ROOT is set and no CMake Toolchain file is given vcpkg
+# installation on a system doesn't set VCPKG_ROOT, so setting it should be like an opt-in for users
+option(HELICS-FMI_DISABLE_VCPKG "Force CMake to ignore VCPKG_ROOT even if it is set" OFF)
+mark_as_advanced(HELICS-FMI_DISABLE_VCPKG)
+if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE AND NOT HELICS_DISABLE_VCPKG)
+    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+endif()
 
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+project(HELICS-FMI VERSION 0.7.0)
 
 #set (HELICS-FMI_VERSION_BUILD )
-set (HELICS-FMI_DATE "7-8-19")
+set (HELICS-FMI_DATE "2022-10-01")
 set(
   HELICS-FMI_VERSION_UNDERSCORE
   "${HELICS-FMI_VERSION_MAJOR}_${HELICS-FMI_VERSION_MINOR}_${HELICS-FMI_VERSION_PATCH}"
@@ -30,98 +34,151 @@ set(HELICS-FMI_VERSION_STRING "${HELICS-FMI_VERSION} (${HELICS-FMI_DATE})")
 # -----------------------------------------------------------------------------
 # set the module path and include some common macros
 # -----------------------------------------------------------------------------
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/")
+
+    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/"
+                          "${PROJECT_SOURCE_DIR}/ThirdParty/cmake/"
+    )
+# -----------------------------------------------------------------------------
+# set the module path and include some common macros
+# -----------------------------------------------------------------------------
+
 include(extraMacros)
 include(CMakeDependentOption)
+include(CTest)
+include(ucm)
 
-FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
-
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  if(WIN32)
-    if(MSYS)
-      set(
-        CMAKE_INSTALL_PREFIX "/usr/local/helics-fmi_${HELICS-FMI_VERSION_UNDERSCORE}/"
-        CACHE PATH "default install path"
-        FORCE
-      )
-		else(MSYS)
-      set(
-        CMAKE_INSTALL_PREFIX "C:/local/helics-fmi_${HELICS-FMI_VERSION_UNDERSCORE}/"
-        CACHE PATH "default install path"
-        FORCE
-      )
-		endif(MSYS)
-	endif(WIN32)
+# -----------------------------------------------------------------------------
+# set the install path to a local directory
+# -----------------------------------------------------------------------------
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    if(WIN32)
+        if(MSVC)
+            set(CMAKE_INSTALL_PREFIX "C:/local/helics-fmi_${HELICS_VERSION_UNDERSCORE}/"
+                CACHE PATH "default install path" FORCE
+            )
+        elseif(MINGW AND NOT MSYS)
+            set(CMAKE_INSTALL_PREFIX "C:/local/helics-fmi_${HELICS_VERSION_UNDERSCORE}/"
+                CACHE PATH "default install path" FORCE
+            )
+        elseif(MSYS)
+            # use CMAKE_OBJCOPY here since it is somewhat less likely to be overridden by users
+            # rather than the compiler
+            get_filename_component(path_bin ${CMAKE_OBJCOPY} DIRECTORY)
+            get_filename_component(path_install ${path_bin} DIRECTORY)
+            set(CMAKE_INSTALL_PREFIX ${path_install} CACHE PATH "default install path" FORCE)
+        endif(MSVC)
+    endif(WIN32)
 endif()
 
-show_variable(
-  AUTOBUILD_INSTALL_PATH
-  PATH
-  "location to install the autobuild libraries and Headers"
-  "${PROJECT_BINARY_DIR}/libs"
+# Warning if CMAKE_INSTALL_PREFIX is empty. Likely set by using the wrong environment variable.
+if(NOT CMAKE_INSTALL_PREFIX)
+    message(
+        WARNING
+            "CMAKE_INSTALL_PREFIX is set to nothing. If you are using an environment variable for handling prefix paths, that variable might not have been set before using it with CMake to set the CMAKE_INSTALL_PREFIX option."
+    )
+endif()
+
+# Check to make sure the install prefix isn't the build folder, if it is, build errors will happen
+get_filename_component(tmp_install_prefix "${CMAKE_INSTALL_PREFIX}" REALPATH)
+get_filename_component(tmp_proj_bindir "${PROJECT_BINARY_DIR}" REALPATH)
+# Windows paths are case insensitive
+if(WIN32)
+    string(TOLOWER "${tmp_install_prefix}" tmp_install_prefix)
+    string(TOLOWER "${tmp_proj_bindir}" tmp_proj_bindir)
+endif()
+if(tmp_install_prefix STREQUAL tmp_proj_bindir)
+    message(FATAL_ERROR "CMAKE_INSTALL_PREFIX must not be set to the build folder")
+endif()
+
+if(MSYS
+   OR CYGWIN
+   OR UNIX
+   OR APPLE
 )
+    set(UNIX_LIKE TRUE)
+endif()
 
-mark_as_advanced(AUTOBUILD_INSTALL_PATH)
+# Set the build output paths
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+        set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH
+                                                                           "Archive output dir."
+        )
+    endif()
+    if(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH
+                                                                           "Library output dir."
+        )
+    endif()
+    if(NOT CMAKE_PDB_OUTPUT_DIRECTORY)
+        set(CMAKE_PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+            CACHE PATH "PDB (MSVC debug symbol)output dir."
+        )
+    endif()
+    if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+            CACHE PATH "Executable/dll output dir."
+        )
+    endif()
+endif()
 
-# Prohibit in-source build
-IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
-  message(FATAL_ERROR "In-source build is not supported. Please, use an empty directory for building the project.")
-ENDIF()
+if(NOT TARGET compile_flags_target)
+    add_library(compile_flags_target INTERFACE)
+endif()
 
+if(NOT TARGET build_flags_target)
+    add_library(build_flags_target INTERFACE)
+endif()
 
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    mark_as_advanced(BUILD_TESTING)
+    include(compiler_flags)
+
+endif()
+	
+# add a baseline library for underlying dependencies and flags
 add_library(helics_fmi_base INTERFACE)
 
-if (NOT TARGET compile_flags_target)
-   add_library(compile_flags_target INTERFACE)
-endif()
-
-include(compiler_flags)
-
-if(CXX_STANDARD_FLAG)
-message(STATUS "setting version build options to \"${CXX_STANDARD_FLAG}\"")
-		if(MSVC)
-			target_compile_options(helics_fmi_base INTERFACE ${CXX_STANDARD_FLAG})
-		else()
-			target_compile_options(
-				helics_fmi_base
-				INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${CXX_STANDARD_FLAG}>
-			)
-		endif(MSVC)
-	endif(CXX_STANDARD_FLAG)
-	
 target_link_libraries(helics_fmi_base INTERFACE compile_flags_target)
 
-cmake_dependent_option(
-  STATIC_STANDARD_LIB
-  "Link against a static standard lib"
-  OFF
-  "NOT USE_LIBCXX"
-  OFF
-)
-include(ucm)
-mark_as_advanced(STATIC_STANDARD_LIB)
-if(STATIC_STANDARD_LIB)
-	ucm_set_runtime(STATIC)
-else()
-	ucm_set_runtime(DYNAMIC)
+
+add_library(HELICS-FMI::compile_flags_target ALIAS compile_flags_target)
+add_library(HELICS-FMI::build_flags_target ALIAS build_flags_target)
+
+get_target_property(EXTRA_BUILD_FLAGS build_flags_target INTERFACE_COMPILE_OPTIONS)
+
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    if(NOT USE_LIBCXX)
+        show_variable(STATIC_STANDARD_LIB STRING "Link against a static standard lib" default)
+        set_property(CACHE STATIC_STANDARD_LIB PROPERTY STRINGS default static dynamic)
+    else()
+        hide_variable(STATIC_STANDARD_LIB)
+    endif()
+    if(MSVC)
+        show_variable(HELICS-FMI_EMBEDDED_DEBUG_INFO STRING "embed debug info into lib files" default)
+        set_property(CACHE HELICS-FMI_EMBEDDED_DEBUG_INFO PROPERTY STRINGS default embedded external)
+    else()
+        hide_variable(HELICS-FMI_EMBEDDED_DEBUG_INFO)
+    endif()
 endif()
 
-if(MSVC)
-	option(EMBEDDED_DEBUG_INFO "embed debug info into obj files" OFF)
-	mark_as_advanced(EMBEDDED_DEBUG_INFO)
-  if(EMBEDDED_DEBUG_INFO)
-		ucm_set_embedded_debug(EMBEDDED)
-	else()
-		ucm_set_embedded_debug(EXTERNAL)
-	endif()
-endif(MSVC)
+if(STATIC_STANDARD_LIB STREQUAL "default")
 
-# -------------------------------------------------------------
-# Get some configuration for C++17 as that becomes available
-# -------------------------------------------------------------
-# message(STATUS ${CMAKE_CXX_FLAGS})
-set(CONFIGURE_TARGET_LOCATION ${AUTOBUILD_INSTALL_PATH}/include/helics-fmi/)
-include(configGenerator)
+elseif(STATIC_STANDARD_LIB STREQUAL "static")
+    ucm_set_runtime(STATIC)
+elseif(STATIC_STANDARD_LIB STREQUAL "dynamic")
+    ucm_set_runtime(DYNAMIC)
+endif()
+
+if(HELICS-FMI_EMBEDDED_DEBUG_INFO STREQUAL "default")
+
+elseif(HELICS-FMI_EMBEDDED_DEBUG_INFO STREQUAL "external")
+    ucm_set_embedded_debug(EXTERNAL)
+else()
+    ucm_set_embedded_debug(EMBEDDED)
+endif()
+
 
 #########################################################################################
 
@@ -134,7 +191,6 @@ include(GNUInstallDirs)
 # -------------------------------------------------------------
 set(
   BOOST_REQUIRED_LIBRARIES
-  unit_test_framework
   filesystem
   system
 )
