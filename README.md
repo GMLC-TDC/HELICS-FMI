@@ -7,7 +7,7 @@ Executable to allow Functional Mockup units to interact with [HELICS](https://gi
 
 ## Building
 
-HELICS-FMI uses cmake for build system generation. It requires HELICS 3.3 or greater to operate.  
+HELICS-FMI uses cmake for build system generation. It requires HELICS 3.3 or greater to operate.
 
 ### Windows
 
