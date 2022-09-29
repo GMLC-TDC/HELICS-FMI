@@ -1,12 +1,13 @@
 # HELICS-FMI
 
-[![Build status](https://ci.appveyor.com/api/projects/status/8pt3yp3tveflmj3s/branch/master?svg=true)](https://ci.appveyor.com/project/phlptp/helics-fmi/branch/master) [![Build Status](https://travis-ci.org/GMLC-TDC/HELICS-FMI.svg?branch=master)](https://travis-ci.org/GMLC-TDC/HELICS-FMI)
+[![Build status](https://ci.appveyor.com/api/projects/status/8pt3yp3tveflmj3s/branch/main?svg=true)](https://ci.appveyor.com/project/phlptp/helics-fmi/branch/main)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/GMLC-TDC/HELICS-FMI/main.svg)](https://results.pre-commit.ci/latest/github/GMLC-TDC/HELICS-FMI/main)
 
 Executable to allow Functional Mockup units to interact with [HELICS](https://github.com/GMLC-TDC/HELICS)
 
 ## Building
 
-HELICS-FMI uses cmake for build system generation.  It requires HELICS 2.1 or greater to operate.  
+HELICS-FMI uses cmake for build system generation.  It requires HELICS 3.3 or greater to operate.  
 
 ### Windows
 For building with Visual Studio the cmake-gui is recommended.  
