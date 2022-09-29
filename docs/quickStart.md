@@ -4,7 +4,7 @@ See the [installation guide](installation.md) or the [Users Guide](docs/manuals/
 
 ## Running the tests
 
-There are a few test programs built with GridDyn if enabled. They can be found in the build directory or the installtion directorry in a folder called test. The 4 that exist currently
+There are a few test programs built with GridDyn if enabled. They can be found in the build directory or the installation directorry in a folder called test. The 4 that exist currently
 are testLibrary which tests out functionality in the libraries that GridDyn uses, testComponents which tests out component models, testSystem which test complete system execution.
 There is also testExtra which runs some scaling studies and timing tests and is not used as part of the unit testing system.
 

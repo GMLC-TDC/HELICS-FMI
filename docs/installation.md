@@ -12,7 +12,7 @@ External software packages needing installation prior to compilation of GridDyn 
 
 Boost can be downloaded from [Boost](www.boost.org) many of the features in GridDyn will work with older versions but going forward we will be making use of some features from Boost 1.61 and will use that as the baseline going forward. SUNDIALS can downloaded at [sundial](http://computation.llnl.gov/sundials) the current version is 2.6.2 but will be upgraded to the new version when it is released in the near future. SUNDIALS should be built with KLU support enabled for reasonable performance. KLU is part of SuiteSparse on most Linux type systems it can be installed as a package, on Windows cmake files can be found at [KLU](https://github.com/jlblancoc/suitesparse-metis-for-windows).
 
-GridDyn uses a cmake build system to construct buid files for whatever platform you happen to be on (assuming it is supported by cmake)
+GridDyn uses a cmake build system to construct build files for whatever platform you happen to be on (assuming it is supported by cmake)
 GridDyn uses C++11 extensively and will make use of some C++14 features in the near future. Therefore, required future compilers are
 
 - Visual Studio 2015
@@ -63,7 +63,7 @@ GridDyn on Mac OS X
     8. Configure GridDyn (cd transmission; mkdir build; cd build; ccmake -DKLU\_DIR=$<\hdots>$ -DBoost\_INCLUDE\_DIR=$<\hdots>$ -DBoost\_LIBRARY\_DIRS=$<\hdots>$; ) or use cmake-gui
 
 ##Linux
-Depending on the distribution, Boost or an updated version of it may need to be installed. SUNDIALS and KLU may need to be installed as well. Typically camke is used to generate makefiles thought it has been used to generate Eclipse projects. BOOST_ROOT, SUNDIALS_INSTALLATION_DIR, and KLU_INSTALL_DIR may need to be user specified if they are not in the system directories. This can be done in the cmake-gui or through the command line tools. Them running make will complile the program.
+Depending on the distribution, Boost or an updated version of it may need to be installed. SUNDIALS and KLU may need to be installed as well. Typically camke is used to generate makefiles thought it has been used to generate Eclipse projects. BOOST_ROOT, SUNDIALS_INSTALLATION_DIR, and KLU_INSTALL_DIR may need to be user specified if they are not in the system directories. This can be done in the cmake-gui or through the command line tools. Them running make will compile the program.
 Running make install will copy the executables and libraries to the install directory.
 
 ##Windows

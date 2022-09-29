@@ -29,7 +29,7 @@ Boost is used throughout the code, The FMI library makes heavy use of boost::DLL
 
 ### [helics](https://github.com/GMLC-TDC/HELICS)
 
-The library is based on HELICS and interacts with the libary
+The library is based on HELICS and interacts with the library
 
 ### [jsoncpp](https://github.com/open-source-parsers/jsoncpp)
 

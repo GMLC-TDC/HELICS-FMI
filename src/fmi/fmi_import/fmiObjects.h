@@ -157,7 +157,7 @@ class fmi2Object {
     void getDirectionalDerivative(const fmi2ValueReference vUnknown_ref[],
                                   size_t nUnknown,
                                   const fmi2ValueReference vKnown_ref[],
-                                  size_t nKnown,
+                                  size_t unknown,
                                   const fmi2Real dvKnown[],
                                   fmi2Real dvUnknown[]);
 
@@ -239,12 +239,12 @@ class fmi2ModelExchangeObject: public fmi2Object {
     void getDerivatives(fmi2Real deriv[]) const;
     void getEventIndicators(fmi2Real eventIndicators[]) const;
     /** get the current values for the states
-    @param[out] states the location to store the state data states must have sufficent space
+    @param[out] states the location to store the state data states must have sufficient space
     allocated for the states
     */
     void getStates(fmi2Real states[]) const;
     /** get the nominal expected values for the states
-    @param[out] nominalValues the location to store the state data states must have sufficent space
+    @param[out] nominalValues the location to store the state data states must have sufficient space
     allocated for the states
     */
     void getNominalsOfContinuousStates(fmi2Real nominalValues[]) const;

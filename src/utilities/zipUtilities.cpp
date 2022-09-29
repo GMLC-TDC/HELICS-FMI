@@ -148,7 +148,7 @@ int unzip(const std::string& file, const std::string& directory)
     -l  list files
     -d  directory to extract into
     -o  overwrite files without prompting
-    -p  extract crypted file using password
+    -p  extract encrypted file using password
     */
 
     int argc = 4;

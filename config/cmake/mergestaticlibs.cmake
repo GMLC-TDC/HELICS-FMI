@@ -56,7 +56,7 @@ function(merge_static_libs outlib )
 
 # Now the easy part for MSVC and for MAC
   if(MSVC)
-    # lib.exe does the merging of libraries just need to conver the list into string
+    # lib.exe does the merging of libraries just need to convert the list into string
     foreach(CONFIG_TYPE ${CMAKE_CONFIGURATION_TYPES})
         set(flags "")
         foreach(lib ${libfiles_${CONFIG_TYPE}})

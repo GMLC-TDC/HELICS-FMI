@@ -219,7 +219,7 @@ static const std::map<std::string, gridRandom::dist_type_t> distmap{
     {"gamma", gridRandom::dist_type_t::gamma},
     {"normal", gridRandom::dist_type_t::normal},
     {"gaussian", gridRandom::dist_type_t::normal},
-    {"guassian", gridRandom::dist_type_t::normal},  // common spelling mistake
+    {"gaussian", gridRandom::dist_type_t::normal},  // common spelling mistake
     {"uniform_int", gridRandom::dist_type_t::uniform_int},
 };
 

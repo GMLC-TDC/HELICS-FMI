@@ -1,5 +1,5 @@
 ## CMake file to locate SUNDIALS and its useful composite projects
-## The first developpement of this file was made fro Windows users who
+## The first development of this file was made fro Windows users who
 ## use:
 ##
 ##
@@ -8,7 +8,7 @@
 ##
 ##
 ##
-## Help variables this file handle internaly :
+## Help variables this file handle internally :
 ##   * SUNDIALS_SEARCH_LIB_POSTFIX        Is set in cache (as advanced) to look into the right lib/lib64 dir for libraries (user can change)
 ##
 ##
@@ -25,7 +25,7 @@
 ##   Note: If a component is not found, a SUNDIALS_<UPPPER_CASE_COMPONENT>_DIR cache variable is set to allow user set the search directory.
 ##
 ##
-## Possible componnents to find are (maybe some others can be available):
+## Possible components to find are (maybe some others can be available):
 ##   * IDA
 ##   * IDAS
 ##   * CVODE

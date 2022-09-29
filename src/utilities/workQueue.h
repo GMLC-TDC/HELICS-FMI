@@ -183,7 +183,7 @@ class workBlock<void>: public basicWorkBlock {
 };
 
 /** make a unique pointer to a workBlock object from a functional object
-@param[in] fptr a std::function, std::bind, functionoid, lamda function or anything else
+@param[in] fptr a std::function, std::bind, functionoid, lambda function or anything else
 that could be called with operator()
 @return a unique pointer to a work block function
 */
@@ -223,7 +223,7 @@ auto make_shared_workBlock(std::packaged_task<X()>&& task)
     return std::make_shared<workBlock<X>>(std::move(task));
 }
 
-/** the defualt ratio between med and low priority tasks*/
+/** the default ratio between med and low priority tasks*/
 constexpr int defaultPriorityRatio(4);
 
 /** class defining a work queuing system

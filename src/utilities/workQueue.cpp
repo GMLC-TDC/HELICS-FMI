@@ -185,7 +185,7 @@ void workQueue::workerLoop()
                                    // size if needed
         if ((wb) && (!wb->isFinished())) {
             wb->execute();
-            //    std::cout << std::this_thread::get_id << " excuting\n";
+            //    std::cout << std::this_thread::get_id << " executing\n";
         }
     }
     // std::cout << std::this_thread::get_id << " halting\n";

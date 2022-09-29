@@ -242,12 +242,12 @@ void fmi2Object::deSerializeState(const fmi2Byte serializedState[],
 void fmi2Object::getDirectionalDerivative(const fmi2ValueReference vUnknown_ref[],
                                           size_t nUnknown,
                                           const fmi2ValueReference vKnown_ref[],
-                                          size_t nKnown,
+                                          size_t unknown,
                                           const fmi2Real dvKnown[],
                                           fmi2Real dvUnknown[])
 {
     auto ret = commonFunctions->fmi2GetDirectionalDerivative(
-        comp, vUnknown_ref, nUnknown, vKnown_ref, nKnown, dvKnown, dvUnknown);
+        comp, vUnknown_ref, nUnknown, vKnown_ref, unknown, dvKnown, dvUnknown);
     if (ret != fmi2Status::fmi2OK) {
         handleNonOKReturnValues(ret);
     }

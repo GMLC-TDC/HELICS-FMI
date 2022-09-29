@@ -106,7 +106,7 @@ int fmi2_test(fmi_import_context_t* context, const char* dirPath)
         printf("Model identifier for CS: %s\n", modelIdentifier);
         fmukind = fmi2_fmu_kind_cs;
     } else {
-        printf("Unxepected FMU kind, exiting\n");
+        printf("Unexpected FMU kind, exiting\n");
         return (CTEST_RETURN_FAIL);
     }
     auto mod_desc = fmi2_import_get_description(fmu);

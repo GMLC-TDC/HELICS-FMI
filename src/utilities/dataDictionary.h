@@ -24,7 +24,7 @@ template<typename keyType, typename dataType>
 class dataDictionary {
   private:
     std::unordered_map<keyType, dataType> Vals;  //!< the actual value storage
-    mutable std::mutex datalock;  //!< thread safe mechansim for storage
+    mutable std::mutex datalock;  //!< thread safe mechanism for storage
   public:
     dataDictionary() = default;
     /** update the value associated with a particular key
