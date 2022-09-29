@@ -10,3 +10,6 @@
 [submodule "ThirdParty/utilities"]
 	path = ThirdParty/utilities
 	url = ../../GMLC-TDC/utilities.git
+[submodule "ThirdParty/fmtlib"]
+	path = ThirdParty/fmtlib
+	url = ../../fmtlib/fmt.git
