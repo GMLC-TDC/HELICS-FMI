@@ -1,7 +1,7 @@
 #
 # Copyright (c) 2019, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
-# See the top-level NOTICE for additional details. 
+# See the top-level NOTICE for additional details.
 #All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -12,7 +12,7 @@
 #
 
 
-	
+
 string(TOLOWER "helics" lcName)
 
 if(NOT CMAKE_VERSION VERSION_LESS 3.11)
@@ -41,9 +41,9 @@ git_clone(
              PROJECT_NAME                    ${lcName}
              GIT_URL                         https://github.com/GMLC-TDC/HELICS.git
              GIT_BRANCH                      HELICS_EXPORT_TARGET
-			 DIRECTORY                       ${PROJECT_BINARY_DIR}/_deps
+             DIRECTORY                       ${PROJECT_BINARY_DIR}/_deps
        )
-	   
+
 set(${lcName}_BINARY_DIR ${PROJECT_BINARY_DIR}/_deps/${lcName}-build)
 
 
@@ -59,4 +59,3 @@ endif()
 add_subdirectory(${${lcName}_SOURCE_DIR} ${${lcName}_BINARY_DIR})
 
   #set_target_properties(clang-format clang-format-check clang-format-diff PROPERTIES FOLDER "Extern/zmq_clang_format")
-

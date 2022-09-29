@@ -1,14 +1,14 @@
 /*
-* LLNS Copyright Start
-* Copyright (c) 2017, Lawrence Livermore National Security
-* This work was performed under the auspices of the U.S. Department
-* of Energy by Lawrence Livermore National Laboratory in part under
-* Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
-* Produced at the Lawrence Livermore National Laboratory.
-* All rights reserved.
-* For details, see the LICENSE file.
-* LLNS Copyright End
-*/
+ * LLNS Copyright Start
+ * Copyright (c) 2017, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department
+ * of Energy by Lawrence Livermore National Laboratory in part under
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
+ * Produced at the Lawrence Livermore National Laboratory.
+ * All rights reserved.
+ * For details, see the LICENSE file.
+ * LLNS Copyright End
+ */
 
 #ifndef _MATRIX_DATA_SCALE_H_
 #define _MATRIX_DATA_SCALE_H_
@@ -19,26 +19,25 @@
 /** @brief class implementation for a scaling array data
  all data is multiplied by a factor before being sent to the underlying matrixData object
 */
-template <class ValueT = double, class ScaleT = ValueT>
-class matrixDataScale : public matrixDataContainer<ValueT>
-{
+template<class ValueT = double, class ScaleT = ValueT>
+class matrixDataScale: public matrixDataContainer<ValueT> {
   private:
     ScaleT scalingFactor_;
 
   public:
     /** @brief constructor
-    */
-    matrixDataScale (matrixData<ValueT> &input, ScaleT scaleFactor)
-        : matrixDataContainer<ValueT> (input), scalingFactor_ (scaleFactor){};
+     */
+    matrixDataScale(matrixData<ValueT>& input, ScaleT scaleFactor):
+        matrixDataContainer<ValueT>(input), scalingFactor_(scaleFactor){};
 
-    void assign (index_t row, index_t col, ValueT num) override
+    void assign(index_t row, index_t col, ValueT num) override
     {
-        matrixDataContainer<ValueT>::md->assign (row, col, num * scalingFactor_);
+        matrixDataContainer<ValueT>::md->assign(row, col, num * scalingFactor_);
     };
     /** @brief set the scale factor for the array
     @param[in] scaleFactor  the input row to translate
     */
-    void setScale (ScaleT scaleFactor) { scalingFactor_ = scaleFactor; }
+    void setScale(ScaleT scaleFactor) { scalingFactor_ = scaleFactor; }
 };
 
 #endif

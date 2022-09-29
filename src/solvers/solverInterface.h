@@ -16,26 +16,24 @@
 #include "solverMode.hpp"
 #include "solver_definitions.hpp"
 #include "utilities/helperObject.h"
+
 #include <exception>
 #include <memory>
 #include <vector>
-namespace griddyn
-{
-enum class solver_print_level
-{
+namespace griddyn {
+enum class solver_print_level {
     s_debug_print = 2,
     s_error_log = 1,
     s_error_trap = 0,
 };
 
 /** error class for throwing solver exceptions*/
-class solverException : public std::exception
-{
+class solverException: public std::exception {
   protected:
     int errorCode;  //<!* the actual solver Error Code
   public:
-    explicit solverException(int ecode = 0) : errorCode(ecode){};
-    virtual const char *what() const noexcept override
+    explicit solverException(int ecode = 0): errorCode(ecode){};
+    virtual const char* what() const noexcept override
     {
         return (std::string("solver Exception:error code=") + std::to_string(errorCode)).c_str();
     }
@@ -45,14 +43,14 @@ class solverException : public std::exception
 
 /** error class for throwing an invalid solver operation exception from a solver
  */
-class InvalidSolverOperation : public solverException
-{
+class InvalidSolverOperation: public solverException {
   protected:
   public:
-    explicit InvalidSolverOperation(int ecode = 0) : solverException(ecode){};
-    virtual const char *what() const noexcept override
+    explicit InvalidSolverOperation(int ecode = 0): solverException(ecode){};
+    virtual const char* what() const noexcept override
     {
-        return (std::string("invalid solver operation:error code=") + std::to_string(errorCode)).c_str();
+        return (std::string("invalid solver operation:error code=") + std::to_string(errorCode))
+            .c_str();
     }
 };
 
@@ -62,8 +60,7 @@ class InvalidSolverOperation : public solverException
 #define SOLVER_INITIAL_SETUP_ERROR (-38)
 #define SOLVER_CONVERGENCE_ERROR (-12)
 
-enum solver_flags : int
-{
+enum solver_flags : int {
     dense_flag = 0,  //!< if the solver should use a dense or sparse version
     constantJacobian_flag = 1,  //!< if the solver should just keep a constant Jacobian
     useMask_flag = 2,  //!< if the solver should use a mask to filter out specific states
@@ -73,7 +70,8 @@ enum solver_flags : int
     allocated_flag = 6,  //!< if the solver has been allocated
     initialized_flag = 7,  //!< flag indicating if these vectors have been initialized
     fileCapture_flag = 8,
-    directLogging_flag = 9,  //!< flag telling the SolverInterface to capture a log directly from the solver
+    directLogging_flag =
+        9,  //!< flag telling the SolverInterface to capture a log directly from the solver
     use_newton_flag = 11,
     use_bdf_flag = 12,
     block_mode_only = 13,  //!< flag indicating that the solver only supports block mode
@@ -93,28 +91,24 @@ enum solver_flags : int
 };
 /** @brief class defining the data related to a specific solver
  the SolverInterface class is the base class for solvers for the GridDyn power systems program
-a particular SolverInterface class will contain the interface and calls necessary to implement a particular solver
-methodology
+a particular SolverInterface class will contain the interface and calls necessary to implement a
+particular solver methodology
 */
-class SolverInterface : public helperObject
-{
+class SolverInterface: public helperObject {
   public:
     /** @brief enumeration of solver call modes*/
-    enum class step_mode
-    {
+    enum class step_mode {
         normal,  //!< normal operation
         single_step,  //!< single step operation
         block,  //!< the solver runs in a block mode all at once
     };
     /** @brief enumeration of initiaL condition call modes*/
-    enum class ic_modes
-    {
+    enum class ic_modes {
         fixed_masked_and_deriv,  //!< fixed_algebraic and differential state derivatives
         fixed_diff,  //!< differential states are fixed
     };
     /** @brief enumeration of initiaL condition call modes*/
-    enum class sparse_reinit_modes
-    {
+    enum class sparse_reinit_modes {
         refactor,  //!< refactor the sparse matrix
         resize  //!< destroy and completely reinit the sparse calculations
     };
@@ -131,16 +125,19 @@ class SolverInterface : public helperObject
     int solverPrintLevel = 1;  //!< print level for internal solver logging
     solver_index_type rootCount = 0;  //!< the number of root finding functions
     solver_index_type solverCallCount = 0;  //!< the number of times the solver has been called
-    solver_index_type jacCallCount = 0;  //!< the number of times the Jacobian function has been called
-    solver_index_type funcCallCount = 0;  //!< the number of times the function evaluation has been called
+    solver_index_type jacCallCount =
+        0;  //!< the number of times the Jacobian function has been called
+    solver_index_type funcCallCount =
+        0;  //!< the number of times the function evaluation has been called
     solver_index_type rootCallCount = 0;
-    solver_index_type max_iterations = 10000;  //!< the maximum number of iterations in the solver loop
+    solver_index_type max_iterations =
+        10000;  //!< the maximum number of iterations in the solver loop
     solverMode mode;  //!< to the solverMode
     double tolerance = 1e-8;  //!< the default solver tolerance
     double solveTime = -1e39;  //!< storage for the time the solver is called
     std::string jacFile;  //!< the file to write the Jacobian to
     std::string stateFile;  //!< the file to write the state and residual to
-    SolvableObject *sobj = nullptr;  //!< pointer the gridDynSimulation object used
+    SolvableObject* sobj = nullptr;  //!< pointer the gridDynSimulation object used
     solver_index_type svsize = 0;  //!< the state size
     solver_index_type nnz = 0;  //!< the actual number of non-zeros in a Jacobian
     std::bitset<32> flags;  //!< flags for the solver
@@ -149,13 +146,13 @@ class SolverInterface : public helperObject
     /** @brief default constructor
      * @param[in] objName  the name of the solver
      */
-    explicit SolverInterface(const std::string &objName = "");
+    explicit SolverInterface(const std::string& objName = "");
 
     /** @brief alternate constructor
     @param[in] gds  gridDynSimulation to link with
     @param[in] sMode the solverMode associated with the solver
     */
-    SolverInterface(SolvableObject *sobj, const solverMode &sMode);
+    SolverInterface(SolvableObject* sobj, const solverMode& sMode);
 
     /** @brief make a copy of the solver interface
     @param[in] fullCopy set to true to initialize and copy over all data to the new object
@@ -167,36 +164,36 @@ class SolverInterface : public helperObject
     @param[in] si a ptr to an existing interface that data should be copied to
     @param[in] fullCopy set to true to initialize and copy over all data to the new object
     */
-    virtual void cloneTo(SolverInterface *si, bool fullCopy = false) const;
+    virtual void cloneTo(SolverInterface* si, bool fullCopy = false) const;
     /** @brief get a pointer to the state data
     @return a pointer to a double array with the state data
     */
-    virtual double *state_data() noexcept;
+    virtual double* state_data() noexcept;
 
     /** @brief get a pointer to the state time derivative information
     @return a pointer to a double array with the state time derivative information
     */
-    virtual double *deriv_data() noexcept;
+    virtual double* deriv_data() noexcept;
 
     /** @brief get a pointer to the type data
     @return a pointer to a double array containing the type data
     */
-    virtual double *type_data() noexcept;
+    virtual double* type_data() noexcept;
 
     /** @brief get a pointer to the const state data
     @return a pointer to a const double array with the state data
     */
-    virtual const double *state_data() const noexcept;
+    virtual const double* state_data() const noexcept;
 
     /** @brief get a pointer to the const state time derivative information
     @return a pointer to a const double array with the state time derivative information
     */
-    virtual const double *deriv_data() const noexcept;
+    virtual const double* deriv_data() const noexcept;
 
     /** @brief get a pointer to the const type data
     @return a pointer to a const double array containing the type data
     */
-    virtual const double *type_data() const noexcept;
+    virtual const double* type_data() const noexcept;
 
     /** @brief allocate the memory for the solver
     @param[in] size  the size of the state vector
@@ -246,28 +243,28 @@ class SolverInterface : public helperObject
   @param[in] param  a string with the desired name of the parameter or result
   @return the value of the requested parameter
   */
-    virtual double get(const std::string &param) const override;
+    virtual double get(const std::string& param) const override;
     /** @brief set a string parameter in the solver
     @param[in] param  a string with the desired name of the parameter
     @param[in] val the value of the property to set
     */
-    virtual void set(const std::string &param, const std::string &val) override;
+    virtual void set(const std::string& param, const std::string& val) override;
 
     /** @brief set a numerical parameter on a solver
   @param[in] param  a string with the desired name of the parameter
   @param[in] val the value of the property to set
   */
-    virtual void set(const std::string &param, double val) override;
+    virtual void set(const std::string& param, double val) override;
 
     /** @brief set a flag parameter on a solver
     @param[in] flag  a string with the name of the flag to set
     @param[in] val the value of the property to set
     */
-    virtual void setFlag(const std::string &flag, bool val = true) override;
+    virtual void setFlag(const std::string& flag, bool val = true) override;
     /** @brief get a flag parameter from a solver
     @param[in] flag  a string with the name of the flag to set
     */
-    virtual bool getFlag(const std::string &flag) const override;
+    virtual bool getFlag(const std::string& flag) const override;
     /** get the last time the solver was called*/
     double getSolverTime() const { return solveTime; }
     /** @brief perform the solver calculations
@@ -276,7 +273,7 @@ class SolverInterface : public helperObject
   @param[in] stepMode  the step mode
   @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
   */
-    virtual int solve(double tStop, double &tReturn, step_mode stepMode = step_mode::normal);
+    virtual int solve(double tStop, double& tReturn, step_mode stepMode = step_mode::normal);
     /** @brief resize the storage array for the Jacobian
     @param[in] nonZeroCount  the number of elements to potentially store
     */
@@ -288,7 +285,8 @@ class SolverInterface : public helperObject
 
     /** @brief helper function to log specific solver stats
     @param[in] logLevel  the level of logging to display
-    @param[in] iconly  flag indicating that the logging should be for the initial condition calculation only
+    @param[in] iconly  flag indicating that the logging should be for the initial condition
+    calculation only
     */
     virtual void logSolverStats(solver_print_level logLevel, bool iconly = false) const;
     /** @brief helper function to log error weight information
@@ -306,7 +304,7 @@ class SolverInterface : public helperObject
     */
     solver_index_type nonZeros() const { return nnz; }
 
-    const solverMode &getSolverMode() const { return mode; }
+    const solverMode& getSolverMode() const { return mode; }
 
     void lock() { flags.set(locked_flag); }
 
@@ -319,43 +317,46 @@ class SolverInterface : public helperObject
     @param[in] gds the gridDynSimulationObject to attach to
     @param[in] sMode the solverMode associated with the solver
     */
-    virtual void setSimulationData(SolvableObject *sobj, const solverMode &sMode);
+    virtual void setSimulationData(SolvableObject* sobj, const solverMode& sMode);
     /** @brief input the simulation data to attach to
     @param[in] gds the gridDynSimulationObject to attach to
     */
-    virtual void setSimulationData(SolvableObject *sobj);
+    virtual void setSimulationData(SolvableObject* sobj);
 
     /** @brief input the solverMode associated with the solver
     @param[in] sMode the solverMode to attach to
     */
-    virtual void setSimulationData(const solverMode &sMode);
+    virtual void setSimulationData(const solverMode& sMode);
 
-    void setApproximation(const std::string &approx);
+    void setApproximation(const std::string& approx);
     /** @brief load up masks to the states
-      masks isolate specific values and don't let the solver alter them  for newton based solvers this implies
-    overriding specific information in the Jacobian calculations and the residual calculations
+      masks isolate specific values and don't let the solver alter them  for newton based solvers
+    this implies overriding specific information in the Jacobian calculations and the residual
+    calculations
     @param[in] msk  the indices of the state elements to fix
     */
     void setMaskElements(std::vector<solver_index_type> msk);
 
     /** @brief add an index to the mask
-      masks isolate specific values and don't let the solver alter them  for newton based solvers this implies
-    overriding specific information in the Jacobian calculations and the residual calculations
+      masks isolate specific values and don't let the solver alter them  for newton based solvers
+    this implies overriding specific information in the Jacobian calculations and the residual
+    calculations
     @param[in] newMaskElement the index of the values to mask
     */
     void addMaskElement(solver_index_type newMaskElement);
 
     /** @brief add several new elements to a mask
-      masks isolate specific values and don't let the solver alter them  for newton based solvers this implies
-    overriding specific information in the Jacobian calculations and the residual calculations
+      masks isolate specific values and don't let the solver alter them  for newton based solvers
+    this implies overriding specific information in the Jacobian calculations and the residual
+    calculations
     @param[in] newMsk  a vector of indices to add to an existing mask
     */
-    void addMaskElements(const std::vector<solver_index_type> &newMsk);
+    void addMaskElements(const std::vector<solver_index_type>& newMsk);
 
-    void logMessage(int errorCode, const std::string &message);
+    void logMessage(int errorCode, const std::string& message);
 
     int getLastError() const { return lastErrorCode; }
-    const std::string &getLastErrorString() const { return lastErrorString; }
+    const std::string& getLastErrorString() const { return lastErrorString; }
 
   protected:
     /** @brief check the output of actual solver calls for proper results
@@ -364,7 +365,10 @@ class SolverInterface : public helperObject
     @param[in] opt  0 for allocation 1 for other functions
     @param[in] printError  boolean flag indicating whether to print a message on error or not
     */
-    virtual void check_flag(void *flagvalue, const std::string &funcname, int opt, bool printError = true) const;
+    virtual void check_flag(void* flagvalue,
+                            const std::string& funcname,
+                            int opt,
+                            bool printError = true) const;
 };
 
 /** @brief make a solver from a particular mode
@@ -372,11 +376,11 @@ class SolverInterface : public helperObject
 @param[in] sMode the solverMode to construct the SolverInterface from
 @return a unique_ptr to a SolverInterface object
 */
-std::unique_ptr<SolverInterface> makeSolver(SolvableObject *sobj, const solverMode &sMode);
+std::unique_ptr<SolverInterface> makeSolver(SolvableObject* sobj, const solverMode& sMode);
 /** @brief make a solver from a string
 @param[in] type the type of SolverInterface to create
 @return a unique_ptr to a SolverInterface object
 */
-std::unique_ptr<SolverInterface> makeSolver(const std::string &type, const std::string &name = "");
+std::unique_ptr<SolverInterface> makeSolver(const std::string& type, const std::string& name = "");
 
 }  // namespace griddyn

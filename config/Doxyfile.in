@@ -27,8 +27,8 @@ DOXYFILE_ENCODING      = UTF-8
 
 PROJECT_NAME           = GridDyn
 
-# The PROJECT_NUMBER tag can be used to enter a project or revision number. 
-# This could be handy for archiving the generated documentation or 
+# The PROJECT_NUMBER tag can be used to enter a project or revision number.
+# This could be handy for archiving the generated documentation or
 # if some version control system is used.
 
 PROJECT_NUMBER         = @GRIDDYN_MAJOR@.@GRIDDYN_MINOR@.@GRIDDYN_PATCH@
@@ -40,9 +40,9 @@ PROJECT_NUMBER         = @GRIDDYN_MAJOR@.@GRIDDYN_MINOR@.@GRIDDYN_PATCH@
 
 PROJECT_LOGO           = "@CMAKE_CURRENT_SOURCE_DIR@/docs/images/(64x64).ico"
 
-# The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) 
-# base path where the generated documentation will be put. 
-# If a relative path is entered, it will be relative to the location 
+# The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute)
+# base path where the generated documentation will be put.
+# If a relative path is entered, it will be relative to the location
 # where doxygen was started. If left blank the current directory will be used.
 
 OUTPUT_DIRECTORY       = "@DOXYGEN_OUTPUT_DIR@"

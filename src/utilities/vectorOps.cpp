@@ -12,7 +12,14 @@
 
 #include "vectorOps.hpp"
 
-double solve2x2 (double v11, double v12, double v21, double v22, double y1, double y2, double &x1, double &x2)
+double solve2x2(double v11,
+                double v12,
+                double v21,
+                double v22,
+                double y1,
+                double y2,
+                double& x1,
+                double& x2)
 {
     double det = 1.0 / (v11 * v22 - v12 * v21);
     x1 = det * (v22 * y1 - v12 * y2);
@@ -20,8 +27,8 @@ double solve2x2 (double v11, double v12, double v21, double v22, double y1, doub
     return det;
 }
 
-std::array<double, 3>
-solve3x3 (const std::array<std::array<double, 3>, 3> &input, const std::array<double, 3> &vals)
+std::array<double, 3> solve3x3(const std::array<std::array<double, 3>, 3>& input,
+                               const std::array<double, 3>& vals)
 {
     double a11 = input[0][0];
     double a12 = input[0][1];
@@ -47,49 +54,46 @@ solve3x3 (const std::array<std::array<double, 3>, 3> &input, const std::array<do
 
     double deti = 1.0 / (a11 * i11 + a21 * i12 + a31 * i13);
 
-	std::array<double, 3> Y{{deti * (i11 * vals[0] + i12 * vals[1] + i13 * vals[2]),
-							deti * (i21 * vals[0] + i22 * vals[1] + i23 * vals[2]),
-							deti * (i31 * vals[0] + i32 * vals[1] + i33 * vals[2])} };
+    std::array<double, 3> Y{{deti * (i11 * vals[0] + i12 * vals[1] + i13 * vals[2]),
+                             deti * (i21 * vals[0] + i22 * vals[1] + i23 * vals[2]),
+                             deti * (i31 * vals[0] + i32 * vals[1] + i33 * vals[2])}};
 
     return Y;
 }
 
 // Linear Interpolation function
-std::vector<double> interpolateLinear (const std::vector<double> &timeIn,
-                                       const std::vector<double> &valIn,
-                                       const std::vector<double> &timeOut)
+std::vector<double> interpolateLinear(const std::vector<double>& timeIn,
+                                      const std::vector<double>& valIn,
+                                      const std::vector<double>& timeOut)
 {
-    size_t mx = (std::min) (valIn.size (), timeIn.size ());
-    std::vector<double> out (timeOut.size (), 0);
+    size_t mx = (std::min)(valIn.size(), timeIn.size());
+    std::vector<double> out(timeOut.size(), 0);
     size_t jj = 0;
     size_t kk = 0;
-    while (timeOut[jj] <= timeIn[0])
-    {
-        out[jj] = valIn[0] - (valIn[1] - valIn[0]) / (timeIn[1] - timeIn[0]) * (timeIn[0] - timeOut[jj]);
+    while (timeOut[jj] <= timeIn[0]) {
+        out[jj] =
+            valIn[0] - (valIn[1] - valIn[0]) / (timeIn[1] - timeIn[0]) * (timeIn[0] - timeOut[jj]);
         ++jj;
     }
-    while (jj < timeOut.size ())
-    {
-        while (timeIn[kk + 1] < timeOut[jj])
-        {
+    while (jj < timeOut.size()) {
+        while (timeIn[kk + 1] < timeOut[jj]) {
             ++kk;
-            if (kk + 1 == mx)
-            {
+            if (kk + 1 == mx) {
                 goto breakLoop;  // break out of a double loop
             }
         }
-        out[jj] =
-          valIn[kk] + (valIn[kk + 1] - valIn[kk]) / (timeIn[kk + 1] - timeIn[kk]) * (timeOut[jj] - timeIn[kk]);
-        // out[jj] = std::fma((valIn[kk + 1] - valIn[kk]) / (timeIn[kk + 1] - timeIn[kk]), (timeOut[jj] -
-        // timeIn[kk]), valIn[kk]);
+        out[jj] = valIn[kk] +
+            (valIn[kk + 1] - valIn[kk]) / (timeIn[kk + 1] - timeIn[kk]) *
+                (timeOut[jj] - timeIn[kk]);
+        // out[jj] = std::fma((valIn[kk + 1] - valIn[kk]) / (timeIn[kk + 1] - timeIn[kk]),
+        // (timeOut[jj] - timeIn[kk]), valIn[kk]);
         ++jj;
     }
 breakLoop:
-    while (jj < timeOut.size ())
-    {
-        out[jj] =
-          valIn[mx - 1] +
-          (valIn[mx - 1] - valIn[mx - 2]) / (timeIn[mx - 1] - timeIn[mx - 2]) * (timeOut[jj] - timeIn[mx - 1]);
+    while (jj < timeOut.size()) {
+        out[jj] = valIn[mx - 1] +
+            (valIn[mx - 1] - valIn[mx - 2]) / (timeIn[mx - 1] - timeIn[mx - 2]) *
+                (timeOut[jj] - timeIn[mx - 1]);
         ++jj;
     }
     return out;

@@ -8,17 +8,10 @@
 # For details, see the LICENSE file.
 # LLNS Copyright End
 
-set(helicsFMI_sources
-	FmiCoSimFederate.cpp
-	FmiModelExchangeFederate.cpp
-	)
+set(helicsFMI_sources FmiCoSimFederate.cpp FmiModelExchangeFederate.cpp)
 
-set(helicsFMI_headers
-	FmiCoSimFederate.hpp
-	FmiModelExchangeFederate.hpp
-	)
+set(helicsFMI_headers FmiCoSimFederate.hpp FmiModelExchangeFederate.hpp)
 
 add_library(helicsFMI STATIC ${helicsFMI_sources} ${helicsFMI_headers})
 
-target_link_libraries(helicsFMI HELICS::helics_apps fmiLibrary helics_fmi_base solvers )
-
+target_link_libraries(helicsFMI HELICS::helics_apps fmiLibrary helics_fmi_base solvers)
