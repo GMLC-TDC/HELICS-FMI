@@ -1,3 +1,12 @@
 [submodule "extern/sundials"]
 	path = extern/sundials
 	url = https://github.com/LLNL/sundials.git
+[submodule "ThirdParty/units"]
+	path = ThirdParty/units
+	url = ../../LLNL/units.git
+[submodule "ThirdParty/spdlog"]
+	path = ThirdParty/spdlog
+	url = ../../gabime/spdlog.git
+[submodule "ThirdParty/utilities"]
+	path = ThirdParty/utilities
+	url = ../../GMLC-TDC/utilities.git
