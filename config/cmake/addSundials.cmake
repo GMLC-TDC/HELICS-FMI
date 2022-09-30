@@ -14,11 +14,11 @@ set(SUNDIALS_INDEX_SIZE 32 CACHE INTERNAL "")
     set(ENABLE_KLU ON INTERNAL "")
   endif(ENABLE_KLU)
 
-add_subdirectory(extern/sundials)
+add_subdirectory(ThirdParty/sundials)
 
 add_library(sundials_all INTERFACE)
-target_include_directories(sundials_all INTERFACE extern/sundials/include)
-target_include_directories(sundials_all INTERFACE ${CMAKE_BINARY_DIR}/extern/sundials/include)
+target_include_directories(sundials_all INTERFACE ThirdParty/sundials/include)
+target_include_directories(sundials_all INTERFACE ${CMAKE_BINARY_DIR}/ThirdParty/sundials/include)
 add_library(SUNDIALS::SUNDIALS ALIAS sundials_all)
 
 set(SUNDIALS_LIBRARIES

@@ -15,4 +15,4 @@
 	url = ../../LLNL/sundials.git
 [submodule "ThirdParty/jsoncpp"]
 	path = ThirdParty/jsoncpp
-	url = https://github.com/open-source-parsers/jsoncpp.git
+	url = ../../open-source-parsers/jsoncpp.git

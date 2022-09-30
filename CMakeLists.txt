@@ -197,7 +197,7 @@ include(addBoost)
 
 target_link_libraries(helics_fmi_base INTERFACE Boostlibs::core)
 
-target_compile_definitions(helics_fmi_base PUBLIC BOOST_DLL_USE_STD_FS=1)
+target_compile_definitions(helics_fmi_base INTERFACE BOOST_DLL_USE_STD_FS=1)
 # ------------------------------------------------------------
 # Find (and test) the KLU libraries
 # ------------------------------------------------------------
