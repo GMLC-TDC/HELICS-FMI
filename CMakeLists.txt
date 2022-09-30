@@ -1,11 +1,11 @@
-# ~~~
-# Copyright (c) 2017-2022 Lawrence Livermore
-# National Security, LLC;
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
+# National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
-# ~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 cmake_minimum_required(VERSION 3.17...3.24)
 
@@ -192,11 +192,12 @@ include(GNUInstallDirs)
 # -------------------------------------------------------------
 # BOOST  find the boost libraries
 # -------------------------------------------------------------
-set(BOOST_REQUIRED_LIBRARIES filesystem system)
+#set(BOOST_REQUIRED_LIBRARIES )
 include(addBoost)
 
 target_link_libraries(helics_fmi_base INTERFACE Boostlibs::core)
 
+target_compile_definitions(helics_fmi_base PUBLIC BOOST_DLL_USE_STD_FS=1)
 # ------------------------------------------------------------
 # Find (and test) the KLU libraries
 # ------------------------------------------------------------

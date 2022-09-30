@@ -30,8 +30,10 @@ set(elementReader_files
 add_library(formatInterpreter STATIC ${elementReader_files})
 
 target_link_libraries(formatInterpreter PUBLIC helics_fmi_base)
-target_link_libraries(formatInterpreter PRIVATE HELICS::jsoncpp_lib)
-target_include_directories(formatInterpreter PRIVATE ${HELICS_INCLUDE_DIRS})
+
+include (addJsoncpp)
+
+
 install(TARGETS formatInterpreter LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
 
 set(formatInterpreter_include_directories ${PROJECT_SOURCE_DIR}/src/formatInterpreters PARENT_SCOPE)

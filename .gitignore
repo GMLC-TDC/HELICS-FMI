@@ -59,3 +59,6 @@ fmus
 /test/test_files/fmi_tests/test_fmus/Rectifier
 /test/test_files/zip_tests/rectifier/sources
 /test/test_files/fmi_export_tests/griddyn
+/tests/test_files/rectifier/sources
+/tests/test_files/HELICS_CyDER_Controller
+/tests/test_files/rectifier
