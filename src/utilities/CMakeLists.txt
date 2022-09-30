@@ -12,26 +12,15 @@
 
 set(utilities_sources
     gridRandom.cpp
-    matrixOps.cpp
-    units.cpp
-    vectorOps.cpp
     functionInterpreter.cpp
-    workQueue.cpp
     zipUtilities.cpp
     matrixCreation.cpp
-    logger.cpp
     matrixDataSparse.cpp
     helperObject.cpp
 )
 
 set(utilities_headers
-    units.h
     dataDictionary.hpp
-    timeSeries.hpp
-    timeSeriesMulti.hpp
-    vectorOps.hpp
-    optionalDef.hpp
-    mapOps.hpp
     matrixData.hpp
     matrixOps.h
     matrixDataCompact.hpp
@@ -45,14 +34,10 @@ set(utilities_headers
     matrixDataFilter.hpp
     matrixDataCustomWriteOnly.hpp
     functionInterpreter.h
-    workQueue.h
-    simpleQueue.hpp
     zipUtilities.h
-    mapOps.hpp
     valuePredictor.hpp
     matrixCreation.h
     indexTypes.hpp
-    logger.h
     factoryTemplates.hpp
     helperObject.h
 )
@@ -82,7 +67,7 @@ endif()
 include(${PROJECT_BINARY_DIR}/libs/cmake/minizip-targets.cmake)
 
 target_link_libraries(
-    utilities PUBLIC minizip::minizip zlib::zlib helics_fmi_base HELICS::utilities
+    utilities PUBLIC minizip::minizip zlib::zlib helics_fmi_base
 )
 
 install(TARGETS utilities LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)

@@ -1,5 +1,5 @@
 ##############################################################################
-#Copyright (C) 2017-2018, Battelle Memorial Institute
+#Copyright (C) 2017-2022, Battelle Memorial Institute
 #All rights reserved.
 
 # This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle
@@ -9,7 +9,7 @@
 # ##################################################################################################
 
 # -----------------------------------------------------------------------------
-# helics fmi tests using Boost
+# helics fmi tests
 # -----------------------------------------------------------------------------
 
 set(helics_fmi_test_sources exeTestHelper.cpp exeTestHelper.h fmiLoadTests.cpp helics-fmiTests.cpp)
@@ -18,9 +18,9 @@ add_executable(helics_fmi-tests ${helics_fmi_test_sources})
 
 set_target_properties(helics_fmi-tests PROPERTIES FOLDER tests)
 
-target_link_libraries(helics_fmi-tests HELICS::helics-static)
+target_link_libraries(helics_fmi-tests HELICS::helicscpp)
 
-target_link_libraries(helics_fmi-tests Boostlibs::core Boostlibs::test)
+target_link_libraries(helics_fmi-tests)
 
 include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
 include_directories(${PROJECT_SOURCE_DIR}/src)
@@ -32,17 +32,3 @@ target_compile_definitions(helics_fmi-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT
 target_compile_definitions(
     helics_fmi-tests PRIVATE -DHELICS_BIN_LOC=\"${CMAKE_BINARY_DIR}/src/helics-fmi/\"
 )
-
-if(WIN32)
-    foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-        add_custom_command(
-            TARGET helics_fmi-tests
-            POST_BUILD # Adds a post-build event to core tests
-            COMMAND
-                ${CMAKE_COMMAND} -E copy_if_different # which executes "cmake - E
-                                                      # copy_if_different..."
-                "${keyfile}" # <--this is in-file
-                "$<TARGET_FILE_DIR:helics_fmi-tests>/"
-        ) # <--this is out-file path
-    endforeach(keyfile)
-endif(WIN32)
