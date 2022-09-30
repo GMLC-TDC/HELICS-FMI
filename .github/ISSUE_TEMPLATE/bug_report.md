@@ -1,6 +1,9 @@
 ---
 name: Bug report
 about: Create a report to help us improve
+title: ""
+labels: bug
+assignees: ""
 ---
 
 **Describe the bug**
@@ -21,7 +24,7 @@ Please provide a minimal working example of the bug if possible.
 - what compiler or setup process did you use
 - HELICS version: <!-- 1.3.0 (07-31-18) -->
 
-```
+```bash
 $ helics_app --version
 ```
 

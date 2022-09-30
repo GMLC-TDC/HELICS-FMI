@@ -62,3 +62,4 @@ fmus
 /tests/test_files/rectifier/sources
 /tests/test_files/HELICS_CyDER_Controller
 /tests/test_files/rectifier
+/tests/test_files/HELICS_CyDER_Generator
