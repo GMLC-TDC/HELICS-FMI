@@ -12,7 +12,7 @@
 
 #include "jsonReaderElement.h"
 
-#include "helics/utilities/stringConversion.h"
+#include "gmlc/utilities/stringConversion.h"
 #include "jsonElement.h"
 
 #include <cassert>

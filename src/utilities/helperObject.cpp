@@ -12,9 +12,9 @@
 
 #include "helperObject.h"
 
-#include "dataDictionary.h"
-#include "helics/utilities/stringOps.h"
-#include "helics/utilities/string_viewOps.h"
+#include "dataDictionary.hpp"
+#include "gmlc/utilities/stringOps.h"
+#include "gmlc/utilities/string_viewOps.h"
 namespace griddyn {
 // start at 100 since there are some objects that use low numbers as a check for interface number
 // and the id as secondary
@@ -26,7 +26,7 @@ helperObject::~helperObject() = default;
 helperObject::helperObject(std::string objectName): m_oid(s_obcnt++), um_name(std::move(objectName))
 {
 }
-static dataDictionary<std::uint64_t, std::string> descriptionDictionary;
+static utilities::dataDictionary<std::uint64_t, std::string> descriptionDictionary;
 
 void helperObject::set(const std::string& param, const std::string& val)
 {
@@ -87,9 +87,9 @@ void setMultipleFlags(helperObject* obj, const std::string& flags)
             continue;
         }
         if (flag.front() != '-') {
-            obj->setFlag(flag.to_string(), true);
+            obj->setFlag(std::string(flag), true);
         } else {
-            obj->setFlag(flag.substr(1, gmlc::utilities::string_view::npos).to_string(), false);
+            obj->setFlag(std::string(flag.substr(1, std::string_view::npos)), false);
         }
     }
 }

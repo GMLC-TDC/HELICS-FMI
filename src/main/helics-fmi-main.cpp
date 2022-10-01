@@ -16,7 +16,8 @@
 #include "formatInterpreters/tomlReaderElement.h"
 #include "helics-fmi/helics-fmi-config.h"
 #include "helics/apps/BrokerApp.hpp"
-#include "helics/core/CoreFactory.hpp"
+#include "helics/apps/CoreApp.hpp"
+#include "helics/application_api/timeOperations.hpp"
 #include "helics/core/helicsVersion.hpp"
 #include "helics/external/CLI11/CLI11.hpp"
 #include "helicsFMI/FmiCoSimFederate.hpp"
@@ -43,8 +44,8 @@ int main(int argc, char* argv[])
     std::string integrator{"cvode"};
     app.add_option("--integrator",
                    integrator,
-                   "the type of integrator to use(cvode, arkode, boost)",
-                   true)
+                   "the type of integrator to use(cvode, arkode, boost)"
+                   )->capture_default_str()
         ->transform(CLI::IsMember({"cvode", "arkode", "boost"}));
     auto input_group = app.add_option_group("input files")->required();
     std::string inputFile;
@@ -111,7 +112,7 @@ int main(int argc, char* argv[])
 
     helics::FederateInfo fi;
     // set the default core type to be local
-    fi.coreType = helics::core_type::TEST;
+    fi.coreType = helics::CoreType::INPROC;
     fi.defName = "fmi";
     auto remArgs = app.remaining_for_passthrough();
     fi.separator = '.';
@@ -187,7 +188,7 @@ void runSystem(readerElement& elem, helics::FederateInfo& fi)
     std::vector<std::unique_ptr<FmiCoSimFederate>> feds_cs;
     std::vector<std::unique_ptr<FmiModelExchangeFederate>> feds_me;
     auto core =
-        helics::CoreFactory::create(fi.coreType,
+        helics::CoreApp(fi.coreType,
                                     "--name=fmu_core " + helics::generateFullCoreInitString(fi));
     std::vector<std::unique_ptr<fmiLibrary>> fmis;
     while (elem.isValid()) {
@@ -262,5 +263,5 @@ void runSystem(readerElement& elem, helics::FederateInfo& fi)
     }
     feds_cs.clear();
     feds_me.clear();
-    core->disconnect();
+    core.forceTerminate();
 }

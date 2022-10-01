@@ -29,7 +29,7 @@ set(elementReader_files
 
 add_library(formatInterpreter STATIC ${elementReader_files})
 
-target_link_libraries(formatInterpreter PUBLIC helics_fmi_base)
+target_link_libraries(formatInterpreter PUBLIC helics_fmi_base gmlc_utilities)
 
 include(addJsoncpp)
 

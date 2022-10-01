@@ -12,7 +12,7 @@
 
 #include "readerElement.h"
 
-#include "helics/utilities/stringConversion.h"
+#include "gmlc/utilities/stringConversion.h"
 
 readerAttribute::readerAttribute() {}
 readerAttribute::readerAttribute(std::string attName, std::string attText):

@@ -20,7 +20,6 @@ set(utilities_sources
 )
 
 set(utilities_headers
-    dataDictionary.hpp
     matrixData.hpp
     matrixOps.h
     matrixDataCompact.hpp
@@ -44,27 +43,14 @@ set(utilities_headers
 
 add_library(utilities STATIC ${utilities_sources} ${utilities_headers})
 
-include(buildZlib)
+set(SKIP_INSTALL_LIBRARIES ON)
+add_subdirectory(
+    ${PROJECT_SOURCE_DIR}/ThirdParty/Zlib/zlib-1.2.6 ${PROJECT_BINARY_DIR}/Zlib EXCLUDE_FROM_ALL
+)
 
-include(buildMiniZip)
-# ##################################################################################################
-# building zlib
-# ##################################################################################################
-set(ZLIB_ROOT_DIR ${PROJECT_BINARY_DIR}/libs)
-
-if(NOT EXISTS ${PROJECT_BINARY_DIR}/libs/cmake/zlib-targets.cmake)
-    build_zlib()
-endif()
-include(${PROJECT_BINARY_DIR}/libs/cmake/zlib-targets.cmake)
-
-# ##################################################################################################
-# building minizip
-# ##################################################################################################
-set(ZLIB_INCLUDES ${PROJECT_BINARY_DIR}/libs/include)
-if(NOT EXISTS ${PROJECT_BINARY_DIR}/libs/cmake/minizip-targets.cmake)
-    build_minizip()
-endif()
-include(${PROJECT_BINARY_DIR}/libs/cmake/minizip-targets.cmake)
+add_subdirectory(
+    ${PROJECT_SOURCE_DIR}/ThirdParty/Minizip ${PROJECT_BINARY_DIR}/Minizip EXCLUDE_FROM_ALL
+)
 
 target_link_libraries(
     utilities PUBLIC minizip::minizip zlib::zlib helics_fmi_base

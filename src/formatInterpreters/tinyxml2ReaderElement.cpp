@@ -12,7 +12,7 @@
 
 #include "tinyxml2ReaderElement.h"
 
-#include "helics/utilities/stringConversion.h"
+#include "gmlc/utilities/stringConversion.h"
 
 #include <tinyxml2/tinyxml2.h>
 

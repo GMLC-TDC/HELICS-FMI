@@ -257,10 +257,17 @@ list(APPEND CMAKE_INSTALL_RPATH "./")
 # -------------------------------------------------------------
 # global include directories
 # -------------------------------------------------------------
-include_directories(${PROJECT_SOURCE_DIR}/src)
-include_directories(${PROJECT_BINARY_DIR}/libs/include)
-include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
-include_directories(SYSTEM ${Boost_INCLUDE_DIR})
+target_include_directories(
+    helics_fmi_base
+    INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+              $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/concurrency>
+              $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/utilities>
+              $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
+)
+
+target_include_directories(
+    helics_fmi_base SYSTEM INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
+)
 # -------------------------------------------------------------
 # load the required subdirectories
 # -------------------------------------------------------------
@@ -274,6 +281,33 @@ show_variable(
 )
 
 include(addHELICS)
+include(addUnits)
+
+# -----------------------------------------------------------------------------
+# create utilities target
+# -----------------------------------------------------------------------------
+
+set(GMLC_UTILITIES_INSTALL OFF CACHE INTERNAL "")
+
+add_subdirectory(ThirdParty/utilities)
+
+hide_variable(GMLC_UTILITIES_GENERATE_DOXYGEN_DOC)
+hide_variable(GMLC_UTILITIES_INCLUDE_BOOST)
+hide_variable(GMLC_UTILITIES_USE_BOOST_SPIRIT)
+hide_variable(GMLC_UTILITIES_WITH_CMAKE_PACKAGE)
+hide_variable(GMLC_UTILITIES_OBJECT_LIB)
+hide_variable(GMLC_UTILITIES_STATIC_LIB)
+hide_variable(GMLC_UTILITIES_CLANG_TIDY_OPTIONS)
+
+target_compile_definitions(gmlc_utilities PUBLIC USE_STD_STRING_VIEW=1)
+
+set_target_properties(gmlc_utilities PROPERTIES FOLDER Extern)
+if(NOT HELICS_DISABLE_BOOST)
+    target_include_directories(
+        gmlc_utilities SYSTEM PRIVATE $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>
+    )
+endif()
+
 
 add_subdirectory(src/formatInterpreters)
 
@@ -326,9 +360,16 @@ endif(ENABLE_CLANG_TOOLS)
 
 install(FILES ${KEY_LIBRARY_FILES} DESTINATION bin)
 
+# -----------------------------------------------------------------------------
+# Setup configure.h file for accessing configure options
+# -----------------------------------------------------------------------------
 configure_file(
-    ${PROJECT_SOURCE_DIR}/config/helics-fmi-config.h.in
-    ${PROJECT_BINARY_DIR}/libs/include/helics-fmi/helics-fmi-config.h
+    "config/helics-fmi-config.h.in"
+    "${PROJECT_BINARY_DIR}/helics_fmi_generated_includes/helics-fmi/helics-fmi-config.h"
+)
+
+target_include_directories(
+    helics_fmi_base INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/helics_fmi_generated_includes/>
 )
 
 # -----------------------------------------------------------------------------

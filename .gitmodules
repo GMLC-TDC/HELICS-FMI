@@ -16,3 +16,6 @@
 [submodule "ThirdParty/jsoncpp"]
 	path = ThirdParty/jsoncpp
 	url = ../../open-source-parsers/jsoncpp.git
+[submodule "ThirdParty/concurrency"]
+	path = ThirdParty/concurrency
+	url = ../concurrency.git

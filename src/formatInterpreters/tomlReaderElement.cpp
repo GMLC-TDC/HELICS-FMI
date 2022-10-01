@@ -12,7 +12,7 @@
 
 #include "tomlReaderElement.h"
 
-#include "helics/utilities/stringConversion.h"
+#include "gmlc/utilities/stringConversion.h"
 #include "tomlElement.h"
 
 #include <cassert>
