@@ -19,11 +19,14 @@ add_subdirectory(ThirdParty/sundials)
 add_library(sundials_all INTERFACE)
 target_include_directories(sundials_all INTERFACE ThirdParty/sundials/include)
 target_include_directories(sundials_all INTERFACE ${CMAKE_BINARY_DIR}/ThirdParty/sundials/include)
+target_link_libraries(sundials_all INTERFACE sundials_arkode_static sundials_cvode_static)
 add_library(SUNDIALS::SUNDIALS ALIAS sundials_all)
 
 set(SUNDIALS_LIBRARIES
     sundials_arkode_static
     sundials_cvode_static
+    sundials_arkode_obj_static
+    sundials_cvode_obj_static
     sundials_nvecserial_static
     sundials_sunlinsolband_static
     sundials_sunlinsoldense_static
@@ -37,6 +40,24 @@ set(SUNDIALS_LIBRARIES
     sundials_sunmatrixsparse_static
     sundials_sunnonlinsolfixedpoint_static
     sundials_sunnonlinsolnewton_static
+    sundials_generic_static
+    sundials_generic_obj_static
+    sundials_nvecmanyvector_obj_static
+    sundials_nvecmanyvector_static
+    sundials_nvecserial_obj_static
+    sundials_sunlinsolband_obj_static
+    sundials_sunlinsoldense_obj_static
+    sundials_sunlinsolpcg_obj_static
+    sundials_sunlinsolspbcgs_obj_static
+    sundials_sunlinsolspfgmr_obj_static
+    sundials_sunlinsolspgmr_obj_static
+    sundials_sunlinsolsptfqmr_obj_static
+    sundials_sunmatrixband_obj_static
+    sundials_sunmatrixdense_obj_static
+    sundials_sunmatrixsparse_obj_static
+    sundials_sunmemsys_obj_static
+    sundials_sunnonlinsolfixedpoint_obj_static
+    sundials_sunnonlinsolnewton_obj_static
 )
 set_target_properties ( ${SUNDIALS_LIBRARIES} PROPERTIES FOLDER sundials)
 

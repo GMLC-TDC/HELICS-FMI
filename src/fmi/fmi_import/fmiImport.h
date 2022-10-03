@@ -15,7 +15,7 @@
 #include "../FMI2/fmi2FunctionTypes.h"
 #include "fmiInfo.h"
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <functional>
 #include <memory>
 
@@ -189,14 +189,14 @@ class fmiLibrary {
     void loadInformation();
     int extract();
 
-    boost::filesystem::path findSoPath(fmu_type type = fmu_type::unknown);
+    std::filesystem::path findSoPath(fmu_type type = fmu_type::unknown);
 
     void makeCallbackFunctions();
 
   private:  // private Variables
-    boost::filesystem::path extractDirectory;  //!< the path to the extracted directory
-    boost::filesystem::path fmuName;  //!< the path to the FMU file itself
-    boost::filesystem::path resourceDir;  //!< the path to the resource Directory
+    std::filesystem::path extractDirectory;  //!< the path to the extracted directory
+    std::filesystem::path fmuName;  //!< the path to the FMU file itself
+    std::filesystem::path resourceDir;  //!< the path to the resource Directory
     bool error = false;  //!< flag indicating that the fmuLibrary has an error
     bool xmlLoaded = false;  //!< flag indicating that the FMU information has been loaded
     bool soMeLoaded =

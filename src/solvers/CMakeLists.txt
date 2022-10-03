@@ -36,7 +36,10 @@ set(solver_sources
 
 add_library(solvers STATIC ${solver_sources} ${solver_headers})
 
-target_link_libraries(solvers PUBLIC utilities SUNDIALS::SUNDIALS)
+target_link_libraries(solvers PUBLIC utilities sundials_cvode sundials_arkode)
 if(ENABLE_KLU)
     target_link_libraries(solvers PUBLIC SuiteSparse::klu)
 endif(ENABLE_KLU)
+
+get_target_property(OUT sundials_cvode LINK_LIBRARIES)
+message(STATUS ${OUT})

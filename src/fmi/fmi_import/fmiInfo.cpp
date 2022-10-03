@@ -13,7 +13,7 @@
 #include "fmiInfo.h"
 
 #include "formatInterpreters/tinyxml2ReaderElement.h"
-#include "helics/utilities/stringConversion.h"
+#include "gmlc/utilities/stringConversion.h"
 
 using namespace gmlc::utilities;
 

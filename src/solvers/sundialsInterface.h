@@ -23,12 +23,12 @@
 
 #    include <omp.h>
 #    define NVECTOR_DESTROY(omp, vec) (omp) ? N_VDestroy_OpenMP(vec) : N_VDestroy_Serial(vec)
-#    define NVECTOR_NEW(omp, size)                                                                 \
-        (omp) ? N_VNew_OpenMP(size, omp_get_max_threads()) : N_VNew_Serial(size)
+#    define NVECTOR_NEW(omp, size, ctx)                                                                 \
+        (omp) ? N_VNew_OpenMP(size, omp_get_max_threads(),ctx) : N_VNew_Serial(size,ctx)
 #    define NVECTOR_DATA(omp, vec) (omp) ? NV_DATA_OMP(vec) : NV_DATA_S(vec)
 #else
 #    define NVECTOR_DESTROY(omp, vec) N_VDestroy_Serial(vec)
-#    define NVECTOR_NEW(omp, size) N_VNew_Serial(size)
+#    define NVECTOR_NEW(omp, size, ctx) N_VNew_Serial(size,ctx)
 #    define NVECTOR_DATA(omp, vec) NV_DATA_S(vec)
 #endif
 
@@ -71,6 +71,7 @@ namespace solvers {
     */
     class sundialsInterface: public SolverInterface {
       protected:
+        SUNContext ctx;
         solver_index_type maxNNZ = 0;  //!< the maximum number of non-zeros that might be needed
         bool use_omp = false;  //!< helper variable to handle omp functionality
         N_Vector state = nullptr;  //!< state vector

@@ -12,7 +12,7 @@
 
 #include "basicOdeSolver.h"
 
-#include "utilities/vectorOps.hpp"
+#include "gmlc/utilities/vectorOps.hpp"
 
 #include <algorithm>
 #include <cmath>

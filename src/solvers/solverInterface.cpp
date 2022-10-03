@@ -11,9 +11,9 @@
  */
 
 #include "basicOdeSolver.h"
-#include "helics/utilities/stringConversion.h"
+#include "gmlc/utilities/stringConversion.h"
 #include "utilities/factoryTemplates.hpp"
-#include "utilities/mapOps.hpp"
+#include "gmlc/utilities/mapOps.hpp"
 
 #include <iostream>
 #include <new>

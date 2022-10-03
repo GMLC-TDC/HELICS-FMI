@@ -12,8 +12,8 @@
 
 #include "cvodeInterface.h"
 
-#include "helics/utilities/stringOps.h"
-#include "utilities/vectorOps.hpp"
+#include "gmlc/utilities/stringOps.h"
+#include "gmlc/utilities/vectorOps.hpp"
 
 #include <cstdio>
 #include <cvode/cvode.h>
@@ -103,7 +103,7 @@ namespace solvers {
         if (solverMem != nullptr) {
             CVodeFree(&(solverMem));
         }
-        solverMem = CVodeCreate(CV_ADAMS);
+        solverMem = CVodeCreate(CV_ADAMS,ctx);
         check_flag(solverMem, "CVodeCreate", 0);
 
         sundialsInterface::allocate(stateCount, numRoots);
@@ -230,8 +230,8 @@ namespace solvers {
 
     void cvodeInterface::logErrorWeights(solver_print_level logLevel) const
     {
-        N_Vector eweight = NVECTOR_NEW(use_omp, svsize);
-        N_Vector ele = NVECTOR_NEW(use_omp, svsize);
+        N_Vector eweight = NVECTOR_NEW(use_omp, svsize,ctx);
+        N_Vector ele = NVECTOR_NEW(use_omp, svsize,ctx);
         realtype* eldata = NVECTOR_DATA(use_omp, ele);
         realtype* ewdata = NVECTOR_DATA(use_omp, eweight);
         int retval = CVodeGetErrWeights(solverMem, eweight);
@@ -330,18 +330,18 @@ namespace solvers {
             check_flag(LS, "SUNKLU", 0);
         }
 #else
-        J = SUNDenseMatrix(svsize, svsize);
+        J = SUNDenseMatrix(svsize, svsize,ctx);
         check_flag(J, "SUNSparseMatrix", 0);
-        /* Create KLU solver object */
-        LS = SUNDenseLinearSolver(state, J);
+        /* Create Dense solver object */
+        LS = SUNLinSol_Dense(state, J,ctx);
         check_flag(LS, "SUNDenseLinearSolver", 0);
 #endif
 
-        retval = CVDlsSetLinearSolver(solverMem, LS, J);
+        retval = CVodeSetLinearSolver(solverMem, LS, J);
 
         check_flag(&retval, "IDADlsSetLinearSolver", 1);
 
-        retval = CVDlsSetJacFn(solverMem, cvodeJac);
+        retval = CVodeSetJacFn(solverMem, cvodeJac);
         check_flag(&retval, "IDADlsSetJacFn", 1);
 
         retval = CVodeSetMaxNonlinIters(solverMem, 20);
@@ -428,7 +428,7 @@ namespace solvers {
         std::vector<double> mStates(svsize, 0.0);
         //  sobj->getVoltageStates (mStates.data (), mode);
         //  sobj->getAngleStates (mStates.data (), mode);
-        maskElements = vecFindgt<double, index_t>(mStates, 0.5);
+        maskElements = gmlc::utilities::vecFindgt<double, index_t>(mStates, 0.5);
         tempState.resize(svsize);
         double* lstate = NV_DATA_S(state);
         for (auto& v : maskElements) {

@@ -21,9 +21,9 @@
 
 #include "gridRandom.h"
 #include "helics-fmi/helics-fmi-config.h"
-#include "helics/utilities/stringOps.h"
-#include "mapOps.hpp"
-#include "vectorOps.hpp"
+#include "gmlc/utilities/stringOps.h"
+#include "gmlc/utilities/mapOps.hpp"
+#include "gmlc/utilities/vectorOps.hpp"
 
 #include <algorithm>
 #include <cmath>

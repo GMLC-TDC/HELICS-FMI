@@ -14,7 +14,7 @@
 
 #include "fmiObjects.h"
 #include "helics-fmi/helics-fmi-config.h"
-#include "helics/utilities/stringOps.h"
+#include "gmlc/utilities/stringOps.h"
 #include "utilities/zipUtilities.h"
 
 #include <boost/dll/import.hpp>
@@ -22,7 +22,7 @@
 #include <cstdarg>
 #include <map>
 
-using namespace boost::filesystem;
+using path=std::filesystem::path;
 
 fmiBaseFunctions::fmiBaseFunctions(const std::shared_ptr<boost::dll::shared_library>& slib)
 {
@@ -362,7 +362,7 @@ path fmiLibrary::findSoPath(fmu_type type)
             }
             break;
     }
-    if IF_CONSTEXPR (sizeof(void*) == 8) {
+    if constexpr (sizeof(void*) == 8) {
 #ifdef _WIN32
         sopath /= "win64";
         sopath /= identifier + ".dll";

@@ -23,8 +23,6 @@ set(fmiImport_headers fmi_import/fmiInfo.h fmi_import/fmiImport.h fmi_import/fmi
                       fmi_import/fmiEnumDefinitions.h fmi_import/fmiLibraryManager.h
 )
 
-link_directories(${Boost_LIBRARY_DIRS})
-
 if(UNIX)
     add_compile_options(-fvisibility=hidden)
 else(UNIX)

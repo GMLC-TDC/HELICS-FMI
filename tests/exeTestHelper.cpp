@@ -12,7 +12,7 @@
 
 #include "exeTestHelper.h"
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <cstdlib>
 #include <fstream>
 #include <future>
@@ -47,52 +47,52 @@ exeTestRunner::exeTestRunner(const std::string& baseLocation,
 
 bool exeTestRunner::findFileLocation(const std::string& baseLocation, const std::string& target)
 {
-    boost::filesystem::path sourcePath(baseLocation);
+    std::filesystem::path sourcePath(baseLocation);
 
     auto tryPath1 = sourcePath / target;
-    if (boost::filesystem::exists(tryPath1)) {
+    if (exists(tryPath1)) {
         exeString = tryPath1.string();
         return true;
     }
 
     auto tryPath2 = sourcePath / (target + ".exe");
-    if (boost::filesystem::exists(tryPath2)) {
+    if (exists(tryPath2)) {
         exeString = tryPath2.string();
         return true;
     }
 #ifndef NDEBUG
     auto tryPathD1 = sourcePath / "Debug" / target;
-    if (boost::filesystem::exists(tryPathD1)) {
+    if (exists(tryPathD1)) {
         exeString = tryPathD1.string();
         return true;
     }
 
     auto tryPathD2 = sourcePath / "Debug" / (target + ".exe");
-    if (boost::filesystem::exists(tryPathD2)) {
+    if (exists(tryPathD2)) {
         exeString = tryPathD2.string();
         return true;
     }
 #endif
     auto tryPathR1 = sourcePath / "Release" / target;
-    if (boost::filesystem::exists(tryPathR1)) {
+    if (exists(tryPathR1)) {
         exeString = tryPathR1.string();
         return true;
     }
 
     auto tryPathR2 = sourcePath / "Release" / (target + ".exe");
-    if (boost::filesystem::exists(tryPathR2)) {
+    if (exists(tryPathR2)) {
         exeString = tryPathR2.string();
         return true;
     }
 
-    boost::filesystem::path tryPatht1 = target;
-    if (boost::filesystem::exists(tryPatht1)) {
+    std::filesystem::path tryPatht1 = target;
+    if (exists(tryPatht1)) {
         exeString = tryPatht1.string();
         return true;
     }
 
-    boost::filesystem::path tryPatht2 = (target + ".exe");
-    if (boost::filesystem::exists(tryPatht2)) {
+    std::filesystem::path tryPatht2 = (target + ".exe");
+    if (exists(tryPatht2)) {
         exeString = tryPatht2.string();
         return true;
     }

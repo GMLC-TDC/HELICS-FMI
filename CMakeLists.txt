@@ -11,26 +11,26 @@ cmake_minimum_required(VERSION 3.17...3.24)
 
 # Install dependencies using vcpkg if VCPKG_ROOT is set and no CMake Toolchain file is given vcpkg
 # installation on a system doesn't set VCPKG_ROOT, so setting it should be like an opt-in for users
-option(HELICS-FMI_DISABLE_VCPKG "Force CMake to ignore VCPKG_ROOT even if it is set" OFF)
-mark_as_advanced(HELICS-FMI_DISABLE_VCPKG)
+option(HELICS_FMI_DISABLE_VCPKG "Force CMake to ignore VCPKG_ROOT even if it is set" OFF)
+mark_as_advanced(HELICS_FMI_DISABLE_VCPKG)
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE AND NOT HELICS_DISABLE_VCPKG)
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
-project(HELICS-FMI VERSION 0.7.0)
+project(HELICS_FMI VERSION 0.7.0)
 
-# set (HELICS-FMI_VERSION_BUILD )
-set(HELICS-FMI_DATE "2022-10-01")
-set(HELICS-FMI_VERSION_UNDERSCORE
-    "${HELICS-FMI_VERSION_MAJOR}_${HELICS-FMI_VERSION_MINOR}_${HELICS-FMI_VERSION_PATCH}"
+# set (HELICS_FMI_VERSION_BUILD )
+set(HELICS_FMI_DATE "2022-10-03")
+set(HELICS_FMI_VERSION_UNDERSCORE
+    "${HELICS_FMI_VERSION_MAJOR}_${HELICS_FMI_VERSION_MINOR}_${HELICS_FMI_VERSION_PATCH}"
 )
-if(HELICS-FMI_VERSION_BUILD)
-    set(HELICS-FMI_VERSION "${HELICS-FMI_VERSION}-${HELICS-FMI_VERSION_BUILD}")
-    set(HELICS-FMI_VERSION_UNDERSCORE
-        "${HELICS-FMI_VERSION_UNDERSCORE}-${HELICS-FMI_VERSION_BUILD}"
+if(HELICS_FMI_VERSION_BUILD)
+    set(HELICS_FMI_VERSION "${HELICS_FMI_VERSION}-${HELICS_FMI_VERSION_BUILD}")
+    set(HELICS_FMI_VERSION_UNDERSCORE
+        "${HELICS_FMI_VERSION_UNDERSCORE}-${HELICS_FMI_VERSION_BUILD}"
     )
 endif()
-set(HELICS-FMI_VERSION_STRING "${HELICS-FMI_VERSION} (${HELICS-FMI_DATE})")
+set(HELICS_FMI_VERSION_STRING "${HELICS_FMI_VERSION} (${HELICS_FMI_DATE})")
 
 # -----------------------------------------------------------------------------
 # set the module path and include some common macros
@@ -143,8 +143,8 @@ add_library(helics_fmi_base INTERFACE)
 
 target_link_libraries(helics_fmi_base INTERFACE compile_flags_target)
 
-add_library(HELICS-FMI::compile_flags_target ALIAS compile_flags_target)
-add_library(HELICS-FMI::build_flags_target ALIAS build_flags_target)
+add_library(HELICS_FMI::compile_flags_target ALIAS compile_flags_target)
+add_library(HELICS_FMI::build_flags_target ALIAS build_flags_target)
 
 get_target_property(EXTRA_BUILD_FLAGS build_flags_target INTERFACE_COMPILE_OPTIONS)
 
@@ -157,13 +157,13 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     endif()
     if(MSVC)
         show_variable(
-            HELICS-FMI_EMBEDDED_DEBUG_INFO STRING "embed debug info into lib files" default
+            HELICS_FMI_EMBEDDED_DEBUG_INFO STRING "embed debug info into lib files" default
         )
         set_property(
-            CACHE HELICS-FMI_EMBEDDED_DEBUG_INFO PROPERTY STRINGS default embedded external
+            CACHE HELICS_FMI_EMBEDDED_DEBUG_INFO PROPERTY STRINGS default embedded external
         )
     else()
-        hide_variable(HELICS-FMI_EMBEDDED_DEBUG_INFO)
+        hide_variable(HELICS_FMI_EMBEDDED_DEBUG_INFO)
     endif()
 endif()
 
@@ -175,9 +175,9 @@ elseif(STATIC_STANDARD_LIB STREQUAL "dynamic")
     ucm_set_runtime(DYNAMIC)
 endif()
 
-if(HELICS-FMI_EMBEDDED_DEBUG_INFO STREQUAL "default")
+if(HELICS_FMI_EMBEDDED_DEBUG_INFO STREQUAL "default")
 
-elseif(HELICS-FMI_EMBEDDED_DEBUG_INFO STREQUAL "external")
+elseif(HELICS_FMI_EMBEDDED_DEBUG_INFO STREQUAL "external")
     ucm_set_embedded_debug(EXTERNAL)
 else()
     ucm_set_embedded_debug(EMBEDDED)
@@ -210,6 +210,21 @@ endif()
 # -------------------------------------------------------------
 
 include(addSundials)
+
+
+# -----------------------------------------------------------------------------
+# create the fmt target
+# -----------------------------------------------------------------------------
+include(addfmt)
+
+# --------------------------------------------------------------
+# Create the target for jsoncpp
+# -----------------------------------------------------------
+include(addJsoncpp)
+if(TARGET jsoncpp_static AND NOT TARGET JsonCpp::JsonCpp)
+    add_library(HELICS_FMI::jsoncpp ALIAS jsoncpp_static)
+endif()
+
 
 # -------------------------------------------------------------
 # setting the RPATH
@@ -262,7 +277,7 @@ target_include_directories(
     INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
               $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/concurrency>
               $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/utilities>
-              $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
+              $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/include>
 )
 
 target_include_directories(
@@ -399,10 +414,10 @@ if(ENABLE_PACKAGE_BUILD)
     set(CPACK_PACKAGE_NAME "HELICS-fmi")
     set(CPACK_PACKAGE_VENDOR "Lawrence Livermore National Security")
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Helics-fmi Installer")
-    set(CPACK_PACKAGE_VERSION ${HELICS-FMI_VERSION})
-    set(CPACK_PACKAGE_VERSION_MAJOR ${HELICS-FMI_VERISON_MAJOR})
-    set(CPACK_PACKAGE_VERSION_MINOR ${HELICS-FMI_VERSION_MINOR})
-    set(CPACK_PACKAGE_VERSION_PATCH ${HELICS-FMI_VERSION_PATCH})
+    set(CPACK_PACKAGE_VERSION ${HELICS_FMI_VERSION})
+    set(CPACK_PACKAGE_VERSION_MAJOR ${HELICS_FMI_VERISON_MAJOR})
+    set(CPACK_PACKAGE_VERSION_MINOR ${HELICS_FMI_VERSION_MINOR})
+    set(CPACK_PACKAGE_VERSION_PATCH ${HELICS_FMI_VERSION_PATCH})
 
     if(WIN32)
         set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}\\\\LICENSE")

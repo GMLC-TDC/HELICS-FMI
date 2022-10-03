@@ -17,7 +17,7 @@
 #    include <sunlinsol/sunlinsol_klu.h>
 #endif
 
-#include "helics/utilities/stringOps.h"
+#include "gmlc/utilities/stringOps.h"
 #include "sundialsMatrixData.h"
 #include "utilities/factoryTemplates.hpp"
 #include "utilities/matrixCreation.h"
@@ -38,11 +38,13 @@ namespace solvers {
 
     sundialsInterface::sundialsInterface(const std::string& objName): SolverInterface(objName)
     {
+        SUNContext_Create(nullptr, &ctx);
         tolerance = 1e-8;
     }
     sundialsInterface::sundialsInterface(SolvableObject* sobj, const solverMode& sMode):
         SolverInterface(sobj, sMode)
     {
+        SUNContext_Create(nullptr, &ctx);
         tolerance = 1e-8;
     }
 
@@ -78,6 +80,7 @@ namespace solvers {
                 SUNMatDestroy(J);
             }
         }
+        SUNContext_Free(&ctx);
     }
 
     std::unique_ptr<SolverInterface> sundialsInterface::clone(bool fullCopy) const
@@ -119,14 +122,14 @@ namespace solvers {
         if (state != nullptr) {
             NVECTOR_DESTROY(prev_omp, state);
         }
-        state = NVECTOR_NEW(use_omp, stateCount);
+        state = NVECTOR_NEW(use_omp, stateCount,ctx);
         check_flag(state, "NVECTOR_NEW", 0);
 
         if (hasDifferential(mode)) {
             if (dstate_dt != nullptr) {
                 NVECTOR_DESTROY(prev_omp, dstate_dt);
             }
-            dstate_dt = NVECTOR_NEW(use_omp, stateCount);
+            dstate_dt = NVECTOR_NEW(use_omp, stateCount,ctx);
             check_flag(dstate_dt, "NVECTOR_NEW", 0);
 
             N_VConst(ZERO, dstate_dt);
@@ -134,19 +137,19 @@ namespace solvers {
         if (abstols != nullptr) {
             NVECTOR_DESTROY(prev_omp, abstols);
         }
-        abstols = NVECTOR_NEW(use_omp, stateCount);
+        abstols = NVECTOR_NEW(use_omp, stateCount,ctx);
         check_flag(abstols, "NVECTOR_NEW", 0);
 
         if (consData != nullptr) {
             NVECTOR_DESTROY(prev_omp, consData);
         }
-        consData = NVECTOR_NEW(use_omp, stateCount);
+        consData = NVECTOR_NEW(use_omp, stateCount,ctx);
         check_flag(consData, "NVECTOR_NEW", 0);
 
         if (scale != nullptr) {
             NVECTOR_DESTROY(prev_omp, scale);
         }
-        scale = NVECTOR_NEW(use_omp, stateCount);
+        scale = NVECTOR_NEW(use_omp, stateCount,ctx);
         check_flag(scale, "NVECTOR_NEW", 0);
 
         N_VConst(ONE, scale);
@@ -155,7 +158,7 @@ namespace solvers {
             if (types != nullptr) {
                 NVECTOR_DESTROY(prev_omp, types);
             }
-            types = NVECTOR_NEW(use_omp, stateCount);
+            types = NVECTOR_NEW(use_omp, stateCount,ctx);
             check_flag(types, "NVECTOR_NEW", 0);
 
             N_VConst(ONE, types);

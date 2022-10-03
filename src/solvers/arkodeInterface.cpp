@@ -12,8 +12,8 @@
 
 #include "arkodeInterface.h"
 
-#include "helics/utilities/stringOps.h"
-#include "utilities/vectorOps.hpp"
+#include "gmlc/utilities/stringOps.h"
+#include "gmlc/utilities/vectorOps.hpp"
 
 #include <arkode/arkode.h>
 #include <arkode/arkode_erkstep.h>
@@ -225,8 +225,8 @@ namespace solvers {
 
     void arkodeInterface::logErrorWeights(solver_print_level logLevel) const
     {
-        N_Vector eweight = NVECTOR_NEW(use_omp, svsize);
-        N_Vector ele = NVECTOR_NEW(use_omp, svsize);
+        N_Vector eweight = NVECTOR_NEW(use_omp, svsize,ctx);
+        N_Vector ele = NVECTOR_NEW(use_omp, svsize,ctx);
 
         realtype* eldata = NVECTOR_DATA(use_omp, ele);
         realtype* ewdata = NVECTOR_DATA(use_omp, eweight);
@@ -288,7 +288,7 @@ namespace solvers {
         // guessState an initial condition
         sobj->guessCurrentValue(time0, state_data(), deriv_data(), mode);
 
-        solverMem = ERKStepCreate(arkodeFunc, time0, state);
+        solverMem = ERKStepCreate(arkodeFunc, time0, state,ctx);
         check_flag(solverMem, "ARKStepCreate", 0);
 
         int retval = ERKStepSetUserData(solverMem, this);
@@ -328,10 +328,10 @@ namespace solvers {
             check_flag(LS, "SUNKLU", 0);
         }
 #else
-        J = SUNDenseMatrix(svsize, svsize);
+        J = SUNDenseMatrix(svsize, svsize,ctx);
         check_flag(J, "SUNSparseMatrix", 0);
         /* Create KLU solver object */
-        LS = SUNDenseLinearSolver(state, J);
+        LS = SUNLinSol_Dense(state, J,ctx);
         check_flag(LS, "SUNDenseLinearSolver", 0);
 #endif
 
@@ -421,7 +421,7 @@ namespace solvers {
         std::vector<double> mStates(svsize, 0.0);
         //    sobj->getVoltageStates (mStates.data (), mode);
         //   sobj->getAngleStates (mStates.data (), mode);
-        maskElements = vecFindgt<double, index_t>(mStates, 0.5);
+        maskElements = gmlc::utilities::vecFindgt<double, index_t>(mStates, 0.5);
         tempState.resize(svsize);
         double* lstate = NV_DATA_S(state);
         for (auto& v : maskElements) {

@@ -36,7 +36,7 @@ void FmiModelExchangeFederate::configure(helics::Time step, helics::Time startTi
     }
 
     for (auto output : output_list) {
-        pubs.emplace_back(&fed, output, helics::data_type::helics_double);
+        pubs.emplace_back(&fed, output, helics::DataType::HELICS_DOUBLE);
     }
 
     auto& def = me->fmuInformation().getExperiment();
@@ -45,10 +45,10 @@ void FmiModelExchangeFederate::configure(helics::Time step, helics::Time startTi
         step = def.stepSize;
     }
     if (step <= helics::timeZero) {
-        auto tstep = fed.getTimeProperty(helics_property_time_period);
+        auto tstep = fed.getTimeProperty(HELICS_PROPERTY_TIME_PERIOD);
         step = (tstep > helics::timeEpsilon) ? tstep : helics::Time(0.2);
     }
-    fed.setProperty(helics_property_time_period, step);
+    fed.setProperty(HELICS_PROPERTY_TIME_PERIOD, step);
     stepTime = step;
     solver = griddyn::makeSolver("cvode", "cvode");
 }
@@ -104,8 +104,8 @@ void FmiModelExchangeFederate::run(helics::Time stop)
     for (size_t ii = 0; ii < inputs.size(); ++ii) {
         inputs[ii].setDefault(inp[ii]);
     }
-    auto result = fed.enterExecutingMode(helics::iteration_request::iterate_if_needed);
-    if (result == helics::iteration_result::iterating) {
+    auto result = fed.enterExecutingMode(helics::IterationRequest::ITERATE_IF_NEEDED);
+    if (result == helics::IterationResult::ITERATING) {
         for (size_t ii = 0; ii < inputs.size(); ++ii) {
             inp[ii] = inputs[ii].getValue<fmi2Real>();
         }
@@ -177,7 +177,7 @@ int FmiModelExchangeFederate::derivativeFunction(double time,
 {
     me->setStates(state);
     me->getDerivatives(dstate_dt);
-    printf("tt=%f,I=%f, state=%f deriv=%e\n", time, state[0], dstate_dt[0]);
+    printf("tt=%f, state=%f deriv=%e\n", time, state[0], dstate_dt[0]);
     return 0;
 }
 

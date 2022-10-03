@@ -9,24 +9,6 @@
  * For details, see the LICENSE file.
  * LLNS Copyright End
  */
-#include "helics-fmi/helics-fmi-config.h"
-
-#ifndef BOOST_STATIC
-#    define BOOST_TEST_DYN_LINK
-#endif
-
-#define BOOST_TEST_MODULE helics_fmi_tests
-#define BOOST_TEST_DETECT_MEMORY_LEAK 0
 
 #include "helics/application_api/Federate.hpp"
 
-#include <boost/test/unit_test.hpp>
-
-struct globalTestConfig {
-    globalTestConfig() = default;
-    ~globalTestConfig() { helics::cleanupHelicsLibrary(); }
-};
-
-//____________________________________________________________________________//
-
-BOOST_GLOBAL_FIXTURE(globalTestConfig);

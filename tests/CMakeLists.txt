@@ -8,6 +8,15 @@
 # Livermore National Security, LLC.
 # ##################################################################################################
 
+
+include(AddGoogletest)
+
+# add a baseline library for underlying dependencies and flags for test executables
+add_library(helics_fmi_test_base INTERFACE)
+target_link_libraries(helics_fmi_test_base INTERFACE gtest gtest_main gmock)
+target_link_libraries(helics_fmi_test_base INTERFACE compile_flags_target)
+target_include_directories(helics_fmi_test_base INTERFACE ${PROJECT_SOURCE_DIR}/ThirdParty)
+
 # -----------------------------------------------------------------------------
 # helics fmi tests
 # -----------------------------------------------------------------------------
@@ -18,12 +27,9 @@ add_executable(helics_fmi-tests ${helics_fmi_test_sources})
 
 set_target_properties(helics_fmi-tests PROPERTIES FOLDER tests)
 
-target_link_libraries(helics_fmi-tests HELICS::helicscpp)
+target_link_libraries(helics_fmi-tests PRIVATE HELICS::helicscpp helics_fmi_test_base)
 
 target_link_libraries(helics_fmi-tests)
-
-include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
-include_directories(${PROJECT_SOURCE_DIR}/src)
 
 add_test(NAME helics_fmi-tests COMMAND helics_fmi-tests --log_level=test_suite --report_level=short)
 
