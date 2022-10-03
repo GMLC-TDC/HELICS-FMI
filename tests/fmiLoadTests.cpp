@@ -8,10 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 
 struct globalTestConfig: public ::testing::Environment {
-    virtual void TearDown() override
-    {
-        
-    }
+    virtual void TearDown() override {}
 };
 
 // register the global setup and teardown structure

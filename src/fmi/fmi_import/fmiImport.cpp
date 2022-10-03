@@ -13,8 +13,8 @@
 #include "fmiImport.h"
 
 #include "fmiObjects.h"
-#include "helics-fmi/helics-fmi-config.h"
 #include "gmlc/utilities/stringOps.h"
+#include "helics-fmi/helics-fmi-config.h"
 #include "utilities/zipUtilities.h"
 
 #include <boost/dll/import.hpp>
@@ -22,7 +22,7 @@
 #include <cstdarg>
 #include <map>
 
-using path=std::filesystem::path;
+using path = std::filesystem::path;
 
 fmiBaseFunctions::fmiBaseFunctions(const std::shared_ptr<boost::dll::shared_library>& slib)
 {

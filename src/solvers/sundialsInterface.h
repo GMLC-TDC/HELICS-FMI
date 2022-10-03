@@ -23,12 +23,12 @@
 
 #    include <omp.h>
 #    define NVECTOR_DESTROY(omp, vec) (omp) ? N_VDestroy_OpenMP(vec) : N_VDestroy_Serial(vec)
-#    define NVECTOR_NEW(omp, size, ctx)                                                                 \
-        (omp) ? N_VNew_OpenMP(size, omp_get_max_threads(),ctx) : N_VNew_Serial(size,ctx)
+#    define NVECTOR_NEW(omp, size, ctx)                                                            \
+        (omp) ? N_VNew_OpenMP(size, omp_get_max_threads(), ctx) : N_VNew_Serial(size, ctx)
 #    define NVECTOR_DATA(omp, vec) (omp) ? NV_DATA_OMP(vec) : NV_DATA_S(vec)
 #else
 #    define NVECTOR_DESTROY(omp, vec) N_VDestroy_Serial(vec)
-#    define NVECTOR_NEW(omp, size, ctx) N_VNew_Serial(size,ctx)
+#    define NVECTOR_NEW(omp, size, ctx) N_VNew_Serial(size, ctx)
 #    define NVECTOR_DATA(omp, vec) NV_DATA_S(vec)
 #endif
 

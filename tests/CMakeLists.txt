@@ -8,7 +8,6 @@
 # Livermore National Security, LLC.
 # ##################################################################################################
 
-
 include(AddGoogletest)
 
 # add a baseline library for underlying dependencies and flags for test executables

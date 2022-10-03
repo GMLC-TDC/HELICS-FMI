@@ -11,9 +11,11 @@
  */
 
 #include "helperObject.h"
+
 #include "gmlc/libguarded/guarded.hpp"
 #include "gmlc/utilities/stringOps.h"
 #include "gmlc/utilities/string_viewOps.h"
+
 #include <unordered_map>
 
 namespace griddyn {
@@ -27,7 +29,8 @@ helperObject::~helperObject() = default;
 helperObject::helperObject(std::string objectName): m_oid(s_obcnt++), um_name(std::move(objectName))
 {
 }
-static gmlc::libguarded::guarded<std::unordered_map<std::uint64_t, std::string>> descriptionDictionary;
+static gmlc::libguarded::guarded<std::unordered_map<std::uint64_t, std::string>>
+    descriptionDictionary;
 
 void helperObject::set(const std::string& param, const std::string& val)
 {
@@ -48,15 +51,14 @@ void helperObject::set(const std::string& param, double val)
 }
 void helperObject::setDescription(const std::string& description)
 {
-    descriptionDictionary.lock()->emplace(m_oid,description);
+    descriptionDictionary.lock()->emplace(m_oid, description);
 }
 
 std::string helperObject::getDescription() const
 {
-    auto lk=descriptionDictionary.lock();
-    auto res=lk->find(m_oid);
-    if (res != lk->end())
-    {
+    auto lk = descriptionDictionary.lock();
+    auto res = lk->find(m_oid);
+    if (res != lk->end()) {
         return res->second;
     }
     return std::string{};

@@ -211,7 +211,6 @@ endif()
 
 include(addSundials)
 
-
 # -----------------------------------------------------------------------------
 # create the fmt target
 # -----------------------------------------------------------------------------
@@ -224,7 +223,6 @@ include(addJsoncpp)
 if(TARGET jsoncpp_static AND NOT TARGET JsonCpp::JsonCpp)
     add_library(HELICS_FMI::jsoncpp ALIAS jsoncpp_static)
 endif()
-
 
 # -------------------------------------------------------------
 # setting the RPATH
@@ -323,7 +321,6 @@ if(NOT HELICS_DISABLE_BOOST)
     )
 endif()
 
-
 add_subdirectory(src/formatInterpreters)
 
 add_subdirectory(src/utilities)
@@ -384,7 +381,8 @@ configure_file(
 )
 
 target_include_directories(
-    helics_fmi_base INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/helics_fmi_generated_includes/>
+    helics_fmi_base
+    INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/helics_fmi_generated_includes/>
 )
 
 # -----------------------------------------------------------------------------

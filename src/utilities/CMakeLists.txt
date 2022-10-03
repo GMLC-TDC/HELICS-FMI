@@ -52,9 +52,7 @@ add_subdirectory(
     ${PROJECT_SOURCE_DIR}/ThirdParty/Minizip ${PROJECT_BINARY_DIR}/Minizip EXCLUDE_FROM_ALL
 )
 
-target_link_libraries(
-    utilities PUBLIC minizip::minizip zlib::zlib helics_fmi_base
-)
+target_link_libraries(utilities PUBLIC minizip::minizip zlib::zlib helics_fmi_base)
 
-set_target_properties ( zlib minizip PROPERTIES FOLDER Extern)
+set_target_properties(zlib minizip PROPERTIES FOLDER Extern)
 install(TARGETS utilities LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)

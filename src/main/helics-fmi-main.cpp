@@ -15,9 +15,9 @@
 #include "formatInterpreters/tinyxml2ReaderElement.h"
 #include "formatInterpreters/tomlReaderElement.h"
 #include "helics-fmi/helics-fmi-config.h"
+#include "helics/application_api/timeOperations.hpp"
 #include "helics/apps/BrokerApp.hpp"
 #include "helics/apps/CoreApp.hpp"
-#include "helics/application_api/timeOperations.hpp"
 #include "helics/core/helicsVersion.hpp"
 #include "helics/external/CLI11/CLI11.hpp"
 #include "helicsFMI/FmiCoSimFederate.hpp"
@@ -44,8 +44,8 @@ int main(int argc, char* argv[])
     std::string integrator{"cvode"};
     app.add_option("--integrator",
                    integrator,
-                   "the type of integrator to use(cvode, arkode, boost)"
-                   )->capture_default_str()
+                   "the type of integrator to use(cvode, arkode, boost)")
+        ->capture_default_str()
         ->transform(CLI::IsMember({"cvode", "arkode", "boost"}));
     auto input_group = app.add_option_group("input files")->required();
     std::string inputFile;
@@ -188,8 +188,7 @@ void runSystem(readerElement& elem, helics::FederateInfo& fi)
     std::vector<std::unique_ptr<FmiCoSimFederate>> feds_cs;
     std::vector<std::unique_ptr<FmiModelExchangeFederate>> feds_me;
     auto core =
-        helics::CoreApp(fi.coreType,
-                                    "--name=fmu_core " + helics::generateFullCoreInitString(fi));
+        helics::CoreApp(fi.coreType, "--name=fmu_core " + helics::generateFullCoreInitString(fi));
     std::vector<std::unique_ptr<fmiLibrary>> fmis;
     while (elem.isValid()) {
         auto fmilib = std::make_unique<fmiLibrary>();
