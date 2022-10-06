@@ -23,7 +23,7 @@ static constexpr const char* ziparg_append = "-a";
 static constexpr const char* ziparg2 = "-3";
 static constexpr const char* ziparg3 = "-j";
 
-using path=std::filesystem::path;
+using path = std::filesystem::path;
 
 int zip(const std::string& file, const std::vector<std::string>& filesToZip, zipMode mode)
 {
@@ -45,10 +45,10 @@ int zip(const std::string& file, const std::vector<std::string>& filesToZip, zip
     -j  exclude path. store only the file name.
     */
     std::vector<const char*> argv{zipname,
-                            (mode == zipMode::overwrite) ? ziparg_overwrite : ziparg_append,
-                            ziparg2,
-                            ziparg3,
-                            fileV.data()};
+                                  (mode == zipMode::overwrite) ? ziparg_overwrite : ziparg_append,
+                                  ziparg2,
+                                  ziparg3,
+                                  fileV.data()};
     std::vector<std::vector<char>> filez(filesToZip.size());
     size_t argc = NUMBER_FIXED_ARGS + filesToZip.size();
     argv.resize(argc + 1, nullptr);
@@ -108,9 +108,9 @@ int zipFolder(const std::string& file, const std::string& folderLoc, zipMode mod
                             file.c_str() + file.size() + 1u);  // 1u for /0 at end of string
 
     std::vector<const char*> argv{zipname,
-                            (mode == zipMode::overwrite) ? ziparg_overwrite : ziparg_append,
-                            ziparg2,
-                            fileV.data()};
+                                  (mode == zipMode::overwrite) ? ziparg_overwrite : ziparg_append,
+                                  ziparg2,
+                                  fileV.data()};
     std::vector<std::vector<char>> filez(zfiles.size());
     size_t argc = 4 + zfiles.size();
     argv.resize(argc + 1, nullptr);

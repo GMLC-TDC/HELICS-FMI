@@ -122,14 +122,14 @@ namespace solvers {
         if (state != nullptr) {
             NVECTOR_DESTROY(prev_omp, state);
         }
-        state = NVECTOR_NEW(use_omp, stateCount,ctx);
+        state = NVECTOR_NEW(use_omp, stateCount, ctx);
         check_flag(state, "NVECTOR_NEW", 0);
 
         if (hasDifferential(mode)) {
             if (dstate_dt != nullptr) {
                 NVECTOR_DESTROY(prev_omp, dstate_dt);
             }
-            dstate_dt = NVECTOR_NEW(use_omp, stateCount,ctx);
+            dstate_dt = NVECTOR_NEW(use_omp, stateCount, ctx);
             check_flag(dstate_dt, "NVECTOR_NEW", 0);
 
             N_VConst(ZERO, dstate_dt);
@@ -137,19 +137,19 @@ namespace solvers {
         if (abstols != nullptr) {
             NVECTOR_DESTROY(prev_omp, abstols);
         }
-        abstols = NVECTOR_NEW(use_omp, stateCount,ctx);
+        abstols = NVECTOR_NEW(use_omp, stateCount, ctx);
         check_flag(abstols, "NVECTOR_NEW", 0);
 
         if (consData != nullptr) {
             NVECTOR_DESTROY(prev_omp, consData);
         }
-        consData = NVECTOR_NEW(use_omp, stateCount,ctx);
+        consData = NVECTOR_NEW(use_omp, stateCount, ctx);
         check_flag(consData, "NVECTOR_NEW", 0);
 
         if (scale != nullptr) {
             NVECTOR_DESTROY(prev_omp, scale);
         }
-        scale = NVECTOR_NEW(use_omp, stateCount,ctx);
+        scale = NVECTOR_NEW(use_omp, stateCount, ctx);
         check_flag(scale, "NVECTOR_NEW", 0);
 
         N_VConst(ONE, scale);
@@ -158,7 +158,7 @@ namespace solvers {
             if (types != nullptr) {
                 NVECTOR_DESTROY(prev_omp, types);
             }
-            types = NVECTOR_NEW(use_omp, stateCount,ctx);
+            types = NVECTOR_NEW(use_omp, stateCount, ctx);
             check_flag(types, "NVECTOR_NEW", 0);
 
             N_VConst(ONE, types);

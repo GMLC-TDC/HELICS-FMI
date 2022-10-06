@@ -11,4 +11,3 @@
  */
 
 #include "helics/application_api/Federate.hpp"
-

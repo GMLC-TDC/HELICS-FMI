@@ -103,7 +103,7 @@ namespace solvers {
         if (solverMem != nullptr) {
             CVodeFree(&(solverMem));
         }
-        solverMem = CVodeCreate(CV_ADAMS,ctx);
+        solverMem = CVodeCreate(CV_ADAMS, ctx);
         check_flag(solverMem, "CVodeCreate", 0);
 
         sundialsInterface::allocate(stateCount, numRoots);
@@ -230,8 +230,8 @@ namespace solvers {
 
     void cvodeInterface::logErrorWeights(solver_print_level logLevel) const
     {
-        N_Vector eweight = NVECTOR_NEW(use_omp, svsize,ctx);
-        N_Vector ele = NVECTOR_NEW(use_omp, svsize,ctx);
+        N_Vector eweight = NVECTOR_NEW(use_omp, svsize, ctx);
+        N_Vector ele = NVECTOR_NEW(use_omp, svsize, ctx);
         realtype* eldata = NVECTOR_DATA(use_omp, ele);
         realtype* ewdata = NVECTOR_DATA(use_omp, eweight);
         int retval = CVodeGetErrWeights(solverMem, eweight);
@@ -330,10 +330,10 @@ namespace solvers {
             check_flag(LS, "SUNKLU", 0);
         }
 #else
-        J = SUNDenseMatrix(svsize, svsize,ctx);
+        J = SUNDenseMatrix(svsize, svsize, ctx);
         check_flag(J, "SUNSparseMatrix", 0);
         /* Create Dense solver object */
-        LS = SUNLinSol_Dense(state, J,ctx);
+        LS = SUNLinSol_Dense(state, J, ctx);
         check_flag(LS, "SUNDenseLinearSolver", 0);
 #endif
 

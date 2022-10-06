@@ -19,11 +19,11 @@
 
 #include "functionInterpreter.h"
 
+#include "gmlc/utilities/mapOps.hpp"
+#include "gmlc/utilities/stringOps.h"
+#include "gmlc/utilities/vectorOps.hpp"
 #include "gridRandom.h"
 #include "helics-fmi/helics-fmi-config.h"
-#include "gmlc/utilities/stringOps.h"
-#include "gmlc/utilities/mapOps.hpp"
-#include "gmlc/utilities/vectorOps.hpp"
 
 #include <algorithm>
 #include <cmath>
