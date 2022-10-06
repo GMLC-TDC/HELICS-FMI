@@ -1,7 +1,7 @@
 version: 2
 aliases:
-  - &setup_helics
-    name: setup_helics
+  - &setup_helics_fmi
+    name: setup_helics_fmi
     environment:
     command: |
       mkdir -p build
@@ -9,8 +9,8 @@ aliases:
       eval cmake .. ${CMAKE_FLAGS}
       make -j 4
 
-  - &setup_helics_low_mem
-    name: setup_helics
+  - &setup_helics_fmi_low_mem
+    name: setup_helics_fmi_low_mem
     environment:
     command: |
       mkdir -p build
@@ -18,24 +18,8 @@ aliases:
       eval cmake .. ${CMAKE_FLAGS}
       make -j 2
 
-  - &run_octave_tests
-    name: run_octave_tests
-    command: |
-      cd build
-      make install
-      cd ${OCTAVETEST}
-      # this return the write error code in RESULT
-      res=$(octave -W -V --eval "source('runTestsCIRCLECI.m');")
-      echo "$res"
-      if [[ "$res" == *"failed"* ]]; then
-         echo "*** Octave tests FAILED: "
-         exit -1
-      fi
-      echo "*** Octave tests PASSED "
-      exit 0
-
-  - &run_helics_tests
-    name: run_helics_tests
+  - &run_helics_fmi_tests
+    name: run_helics_fmi_tests
     command: |
       /root/project/scripts/run-circleci-tests.sh
       RESULT=$?
@@ -48,58 +32,32 @@ aliases:
       RESULT=$?
       exit $RESULT
 
-  - &run_installer_tests
-    name: run_installer_tests
-    command: |
-      cd build
-      make install
-      ctest -V -R find-package-tests
-      ctest -V -R package-config-tests
-
-  - &run_benchmarks
-    name: run_benchmarks
-    command: |
-      mkdir /tmp/bm_results
-      cd build
-      make RUN_KEY_BENCHMARKS
-
 jobs:
-  helicsoctave:
-    docker:
-      - image: helics/buildenv:octave
-    environment:
-      OCTAVETEST: '/root/project/tests/octave'
-      CMAKE_FLAGS: '-DHELICS_BUILD_OCTAVE_INTERFACE=ON -DHELICS_BUILD_TESTS=ON'
-    steps:
-      - checkout
-      - run: *setup_helics
-      - run: *run_octave_tests
-
-  helicsgccTSan:
+  helicsFMIgccTSan:
     docker:
       - image: helics/buildenv:gcc12-builder
     environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-fsanitize=thread -g -O1 "  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON'
+      CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-fsanitize=thread -g -O1 "  -DHELICS_FMI_BUILD_TESTS=ON'
       TSAN_OPTIONS: 'second_deadlock_stack=1 suppressions=/root/project/.circleci/tsan_suppression.txt history_size=4'
 
     steps:
       - checkout
-      - run: *setup_helics_low_mem
-      - run: *run_helics_sanitizer_tests
+      - run: *setup_helics_fmi_low_mem
+      - run: *run_helics_fmi_sanitizer_tests
 
-  helicsgccASan:
+  helicsFMIgccASan:
     docker:
       - image: helics/buildenv:gcc12-builder
     environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-ggdb -fsanitize=address -fno-omit-frame-pointer -static-libstdc++ -static-libasan -lrt -g -O1 "  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON'
+      CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-ggdb -fsanitize=address -fno-omit-frame-pointer -static-libstdc++ -static-libasan -lrt -g -O1 "  -DHELICS_FMI_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON'
       ASAN_OPTIONS: 'alloc_dealloc_mismatch=0'
       LSAN_OPTIONS: 'suppressions=/root/project/.circleci/leak_suppression_gcc.txt'
     steps:
       - checkout
-      - run: *setup_helics
-      - run: *run_helics_sanitizer_tests
+      - run: *setup_helics_fmi
+      - run: *run_helics_fmi_sanitizer_tests
 
-  helicsASan:
+  helicsFMIASan:
     docker:
       - image: helics/buildenv:sanitizers-14
     environment:
@@ -109,10 +67,10 @@ jobs:
       ASAN_OPTIONS: 'alloc_dealloc_mismatch=0'
     steps:
       - checkout
-      - run: *setup_helics
-      - run: *run_helics_sanitizer_tests
+      - run: *setup_helics_fmi
+      - run: *run_helics_fmi_sanitizer_tests
 
-  helicsMSan:
+  helicsFMIMSan:
     docker:
       - image: helics/buildenv:sanitizers-14
     environment:
@@ -120,10 +78,10 @@ jobs:
 
     steps:
       - checkout
-      - run: *setup_helics
-      - run: *run_helics_sanitizer_tests
+      - run: *setup_helics_fmi
+      - run: *run_helics_fmi_sanitizer_tests
 
-  helicsTSan:
+  helicsFMITSan:
     docker:
       - image: helics/buildenv:sanitizers-14
     environment:
@@ -131,47 +89,8 @@ jobs:
       TSAN_OPTIONS: 'suppressions=/root/project/.circleci/tsan_suppression.txt'
     steps:
       - checkout
-      - run: *setup_helics
-      - run: *run_helics_sanitizer_tests
-
-  helicsInstall1:
-    docker:
-      - image: helics/buildenv:builder
-    environment:
-      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_BENCHMARKS=ON -DHELICS_INSTALL_PACKAGE_TESTS=ON'
-    steps:
-      - checkout
-      - run: *setup_helics
-      - run: *run_installer_tests
-
-  helicsNoZmq:
-    docker:
-      - image: helics/buildenv:gcc10-builder
-    environment:
-      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_ZMQ_CORE=OFF -DHELICS_ENABLE_IPC_CORE=OFF -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=17'
-    steps:
-      - checkout
-      - run: *setup_helics
-      - run: *run_helics_tests
-
-  helicsTumbleweed:
-    docker:
-      - image: helics/buildenv:tumbleweed-builder
-    environment:
-      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_ZMQ_CORE=OFF -DHELICS_ENABLE_IPC_CORE=OFF -DHELICS_ENABLE_UDP_CORE=OFF -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=20'
-    steps:
-      - checkout
-      - run: *setup_helics
-
-  helicsInstall2:
-    docker:
-      - image: helics/buildenv:builder
-    environment:
-      CMAKE_FLAGS: '-DHELICS_BUILD_TESTS=ON -DHELICS_INSTALL_PACKAGE_TESTS=ON'
-    steps:
-      - checkout
-      - run: *setup_helics
-      - run: *run_installer_tests
+      - run: *setup_helics_fmi
+      - run: *run_helics_fmi_sanitizer_tests
 
   gcc12:
     docker:
@@ -180,8 +99,8 @@ jobs:
       CMAKE_FLAGS: '-DHELICS_EXTRA_COMPILE_FLAGS=-Wredundant-tags -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON'
     steps:
       - checkout
-      - run: *setup_helics
-      - run: *run_helics_tests
+      - run: *setup_helics_fmi
+      - run: *run_helics_fmi_tests
 
   clang14:
     docker:
@@ -190,8 +109,8 @@ jobs:
       CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=20'
     steps:
       - checkout
-      - run: *setup_helics
-      - run: *run_helics_tests
+      - run: *setup_helics_fmi
+      - run: *run_helics_fmi_tests
 
   clang14_cxx23:
     docker:
@@ -200,33 +119,12 @@ jobs:
       CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON -DCMAKE_CXX_STANDARD=23'
     steps:
       - checkout
-      - run: *setup_helics
-
-  benchmarkjob:
-    docker:
-      - image: helics/buildenv:builder
-    environment:
-      CMAKE_FLAGS: '-DHELICS_BUILD_BENCHMARKS=ON -DBM_RESULT_DIR=/tmp/bm_results/ -DHELICS_DISABLE_C_SHARED_LIB=ON'
-    steps:
-      - checkout
-      - run: *setup_helics
-      - run: *run_benchmarks
-
-      - store_artifacts:
-          path: /tmp/bm_results
+      - run: *setup_helics_fmi
 
 workflows:
   version: 2
   helics_test:
     jobs:
-      - helicsInstall1:
-          filters:
-            branches:
-              ignore: /pre-commit\/.*/
-      - helicsInstall2:
-          filters:
-            branches:
-              ignore: /pre-commit\/.*/
       - gcc12:
           filters:
             branches:
@@ -241,48 +139,31 @@ workflows:
               ignore: /pre-commit\/.*/
   sanitizers:
     jobs:
-      - helicsTSan:
+      - helicsFMITSan:
           filters:
             branches:
               only:
                 - sanitizer_tests
-      - helicsASan:
+      - helicsFMIASan:
           filters:
             branches:
               only:
                 - sanitizer_tests
-      - helicsgccASan:
+      - helicsFMIgccASan:
           filters:
             branches:
               only:
                 - sanitizer_tests
-      - helicsgccTSan:
+      - helicsFMIgccTSan:
           filters:
             branches:
               only:
                 - sanitizer_tests
-      - helicsMSan:
+      - helicsFMIMSan:
           filters:
             branches:
               only:
                 - sanitizer_tests
-  dailies:
-    jobs:
-      - helicsTumbleweed:
-          filters:
-            branches:
-              only:
-                - dailies_tests
-      - helicsoctave:
-          filters:
-            branches:
-              only:
-                - dailies_tests
-      - helicsNoZmq:
-          filters:
-            branches:
-              only:
-                - dailies_tests
   nightly:
     triggers:
       - schedule:
@@ -290,23 +171,10 @@ workflows:
           filters:
             branches:
               only:
-                - develop
+                - main
     jobs:
-      - helicsTumbleweed
-      - helicsNoZmq
-      - helicsoctave
-      - helicsTSan
-      - helicsASan
-      - helicsgccASan
-      - helicsgccTSan
-      - helicsMSan
-  benchmark:
-    triggers:
-      - schedule:
-          cron: '17 9 * * 0,2,5'
-          filters:
-            branches:
-              only:
-                - develop
-    jobs:
-      - benchmarkjob
+      - helicsFMITSan
+      - helicsFMIASan
+      - helicsFMIgccASan
+      - helicsFMIgccTSan
+      - helicsFMIMSan

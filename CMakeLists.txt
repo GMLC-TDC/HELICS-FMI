@@ -195,7 +195,7 @@ include(GNUInstallDirs)
 # set(BOOST_REQUIRED_LIBRARIES )
 include(addBoost)
 
-target_link_libraries(helics_fmi_base INTERFACE Boostlibs::core)
+target_include_directories(helics_fmi_base SYSTEM INTERFACE $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>)
 
 target_compile_definitions(helics_fmi_base INTERFACE BOOST_DLL_USE_STD_FS=1)
 # ------------------------------------------------------------
