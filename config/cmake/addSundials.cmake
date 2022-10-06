@@ -17,11 +17,10 @@ set(SUNDIALS_INDEX_SIZE 32 CACHE INTERNAL "")
 
 add_subdirectory(ThirdParty/sundials )
 
-add_library(sundials_all INTERFACE)
-target_include_directories(sundials_all INTERFACE ThirdParty/sundials/include)
-target_include_directories(sundials_all INTERFACE ${CMAKE_BINARY_DIR}/ThirdParty/sundials/include)
-target_link_libraries(sundials_all INTERFACE sundials_arkode_static sundials_cvode_static)
-add_library(SUNDIALS::SUNDIALS ALIAS sundials_all)
+add_library(sundials_headers INTERFACE)
+target_include_directories(sundials_headers INTERFACE ThirdParty/sundials/include)
+target_include_directories(sundials_headers INTERFACE ${CMAKE_BINARY_DIR}/ThirdParty/sundials/include)
+add_library(HELICS_FMI::sundials_headers ALIAS sundials_headers)
 
 set(SUNDIALS_LIBRARIES
     sundials_arkode_static
@@ -66,3 +65,16 @@ if (MSVC)
 target_compile_options(sundials_cvode_static PRIVATE "/sdl-")
 target_compile_options(sundials_cvode_static PRIVATE "/W3")
 endif()
+
+get_target_property(cvode_target_debug SUNDIALS::cvode OUTPUT_NAME)
+get_target_property(cvode_dir_debug SUNDIALS::cvode LIBRARY_OUTPUT_DIRECTORY)
+
+get_target_property(cvode_target_release SUNDIALS::cvode LIBRARY_OUTPUT_NAME_RELEASE)
+get_target_property(cvode_dir_release SUNDIALS::cvode LIBRARY_OUTPUT_DIRECTORY_RELEASE)
+
+add_library(sundials_import_cvode STATIC IMPORTED)
+message(STATUS "linking to ${cvode_dir_debug}/${cvode_target_debug}${CMAKE_STATIC_LIBRARY_SUFFIX}")
+set_property(TARGET sundials_import_cvode PROPERTY IMPORTED_LOCATION "${cvode_dir_debug}/${cvode_target_debug}${CMAKE_STATIC_LIBRARY_SUFFIX}") 
+#set_property(TARGET sundials_import_cvode PROPERTY IMPORTED_LOCATION_RELEASE "${cvode_dir_release}/${cvode_target_release}${CMAKE_STATIC_LIBRARY_SUFFIX}")
+
+add_library(HELICS_FMI::cvode ALIAS sundials_import_cvode)
