@@ -74,7 +74,7 @@ get_target_property(cvode_dir_release SUNDIALS::cvode LIBRARY_OUTPUT_DIRECTORY_R
 
 add_library(sundials_import_cvode STATIC IMPORTED)
 message(STATUS "linking to ${cvode_dir_debug}/${cvode_target_debug}${CMAKE_STATIC_LIBRARY_SUFFIX}")
-set_property(TARGET sundials_import_cvode PROPERTY IMPORTED_LOCATION "${cvode_dir_debug}/${cvode_target_debug}${CMAKE_STATIC_LIBRARY_SUFFIX}") 
+set_property(TARGET sundials_import_cvode PROPERTY IMPORTED_LOCATION "${cvode_dir_debug}/${cvode_target_debug}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 #set_property(TARGET sundials_import_cvode PROPERTY IMPORTED_LOCATION_RELEASE "${cvode_dir_release}/${cvode_target_release}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
 add_library(HELICS_FMI::cvode ALIAS sundials_import_cvode)
