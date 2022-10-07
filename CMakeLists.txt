@@ -183,6 +183,48 @@ else()
     ucm_set_embedded_debug(EMBEDDED)
 endif()
 
+
+# -------------------------------------------------------------
+# Update git submodules
+# -------------------------------------------------------------
+if(NOT HELICS_DISABLE_GIT_OPERATIONS)
+    include(updateGitSubmodules)
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/fmtlib/CMakeLists.txt")
+        submod_update(ThirdParty/fmtlib)
+    endif()
+
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/CMakeLists.txt")
+        submod_update(ThirdParty/jsoncpp)
+    endif()
+
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/sundials/CMakeLists.txt")
+        submod_update(ThirdParty/sundials)
+    endif()
+
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/concurrency/gmlc/concurrency/Barrier.hpp")
+        submod_update(ThirdParty/concurrency)
+    endif()
+
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/stringOps.h")
+        submod_update(ThirdParty/utilities)
+    endif()
+
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/units/units/units.hpp")
+        submod_update(ThirdParty/units)
+    endif()
+
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/toml/toml/value.hpp")
+        submod_update(ThirdParty/toml)
+    endif()
+
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/spdlog/CMakeLists.txt")
+        submod_update(ThirdParty/spdlog)
+    endif()
+    check_submodule_status()
+
+endif() # NOT HELICS_DISABLE_GIT_OPERATIONS
+include(GNUInstallDirs)
+
 # ##################################################################################################
 
 # include(mergestaticlibs)
