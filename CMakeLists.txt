@@ -296,11 +296,9 @@ show_variable(
 )
 include(addHELICS)
 
-
 # -------------------------------------------------------------
 # load the required subdirectories
 # -------------------------------------------------------------
-
 
 add_subdirectory(src/formatInterpreters)
 
