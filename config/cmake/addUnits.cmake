@@ -7,6 +7,8 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+if (NOT TARGET units::units)
+
 option(${PROJECT_NAME}_USE_EXTERNAL_UNITS "Use external copy of LLNL Units" OFF)
 mark_as_advanced(${PROJECT_NAME}_USE_EXTERNAL_UNITS)
 
@@ -37,4 +39,5 @@ else()
     hide_variable(UNITS_HEADER_ONLY)
     hide_variable(UNITS_BUILD_OBJECT_LIBRARY)
     hide_variable(UNITS_NAMESPACE)
+endif()
 endif()

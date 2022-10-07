@@ -21,7 +21,7 @@ include(FetchContent)
 FetchContent_Declare(
   helics
   GIT_REPOSITORY https://github.com/GMLC-TDC/HELICS.git
-  GIT_TAG       v3.3.0
+  GIT_TAG       external_subprojects
 )
 
 FetchContent_GetProperties(helics)
@@ -41,9 +41,9 @@ endif()
   set(fmt_FOUND ON CACHE BOOL "" FORCE)
   set(fmt_DIR ON CACHE BOOL "" FORCE)
   set(HELICS_USE_EXTERNAL_JSONCPP ON CACHE BOOL "" FORCE)
-  set(HELICS_USE_EXTERNAL_UNITS ON CACHE BOOL "" FORCE)
   set(HELICS_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
   set(HELICS_DISABLE_C_SHARED_LIB ON CACHE BOOL "" FORCE)
+  set(HELICS_BUILD_CXX_SHARED_LIB ON CACHE BOOL "" FORCE)
 add_subdirectory(${${lcName}_SOURCE_DIR} ${${lcName}_BINARY_DIR})
 
   #set_target_properties(clang-format clang-format-check clang-format-diff PROPERTIES FOLDER "Extern/zmq_clang_format")

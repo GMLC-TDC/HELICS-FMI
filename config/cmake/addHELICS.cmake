@@ -18,13 +18,13 @@ include(GNUInstallDirs)
 
 SHOW_VARIABLE(HELICS_INSTALL_PATH PATH "path to the helics installation" "${PROJECT_BINARY_DIR}/libs")
 
-option(FORCE_HELICS_SUBPROJECT "Force a helics subproject" OFF)
+option(HELICS_FMI_FORCE_HELICS_SUBPROJECT "Force a helics subproject" OFF)
 
-if (FORCE_HELICS_SUBPROJECT)
+if (HELICS_FMI_FORCE_HELICS_SUBPROJECT)
 include(addHELICSsubproject)
 else()
 
-option(HELICS_SUBPROJECT "use helics as a subproject" OFF)
+option(HELICS_FMI_HELICS_SUBPROJECT "use helics as a subproject" OFF)
 
 set(HELICS_CMAKE_SUFFIXES
     lib/cmake/HELICS/

@@ -220,9 +220,6 @@ include(addfmt)
 # Create the target for jsoncpp
 # -----------------------------------------------------------
 include(addJsoncpp)
-if(TARGET jsoncpp_static AND NOT TARGET JsonCpp::JsonCpp)
-    add_library(HELICS_FMI::jsoncpp ALIAS jsoncpp_static)
-endif()
 
 # -------------------------------------------------------------
 # setting the RPATH
@@ -281,9 +278,14 @@ target_include_directories(
 target_include_directories(
     helics_fmi_base SYSTEM INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
 )
-# -------------------------------------------------------------
-# load the required subdirectories
-# -------------------------------------------------------------
+
+include(addUnits)
+
+# -----------------------------------------------------------------------------
+# create utilities target
+# -----------------------------------------------------------------------------
+
+include(addUtilities)
 
 # -------------------------------------------------------------
 # Enable HELICS executable
@@ -292,34 +294,13 @@ target_include_directories(
 show_variable(
     HELICS_INSTALL_PATH PATH "path to the helics installation" "${PROJECT_BINARY_DIR}/libs"
 )
-
 include(addHELICS)
-include(addUnits)
 
-# -----------------------------------------------------------------------------
-# create utilities target
-# -----------------------------------------------------------------------------
 
-set(GMLC_UTILITIES_INSTALL OFF CACHE INTERNAL "")
+# -------------------------------------------------------------
+# load the required subdirectories
+# -------------------------------------------------------------
 
-add_subdirectory(ThirdParty/utilities)
-
-hide_variable(GMLC_UTILITIES_GENERATE_DOXYGEN_DOC)
-hide_variable(GMLC_UTILITIES_INCLUDE_BOOST)
-hide_variable(GMLC_UTILITIES_USE_BOOST_SPIRIT)
-hide_variable(GMLC_UTILITIES_WITH_CMAKE_PACKAGE)
-hide_variable(GMLC_UTILITIES_OBJECT_LIB)
-hide_variable(GMLC_UTILITIES_STATIC_LIB)
-hide_variable(GMLC_UTILITIES_CLANG_TIDY_OPTIONS)
-
-target_compile_definitions(gmlc_utilities PUBLIC USE_STD_STRING_VIEW=1)
-
-set_target_properties(gmlc_utilities PROPERTIES FOLDER Extern)
-if(NOT HELICS_DISABLE_BOOST)
-    target_include_directories(
-        gmlc_utilities SYSTEM PRIVATE $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>
-    )
-endif()
 
 add_subdirectory(src/formatInterpreters)
 
