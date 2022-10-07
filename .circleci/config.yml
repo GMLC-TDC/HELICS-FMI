@@ -96,7 +96,7 @@ jobs:
     docker:
       - image: helics/buildenv:gcc12-builder
     environment:
-      CMAKE_FLAGS: '-DHELICS_EXTRA_COMPILE_FLAGS=-Wredundant-tags -DHELICS_FMI_HELICS_SUBPROJECT=ON -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON'
+      CMAKE_FLAGS: '-DHELICS_FMI_EXTRA_COMPILE_FLAGS=-Wredundant-tags -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON'
     steps:
       - checkout
       - run: *setup_helics_fmi

@@ -13,8 +13,8 @@
 #include "zipUtilities.h"
 
 #include <filesystem>
-#include <minizip/miniunz.h>
-#include <minizip/minizip.h>
+#include <Minizip/miniunz.h>
+#include <Minizip/minizip.h>
 
 namespace utilities {
 static constexpr const char* zipname = "minizip";
