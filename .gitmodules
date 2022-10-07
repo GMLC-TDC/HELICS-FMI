@@ -19,3 +19,6 @@
 [submodule "ThirdParty/concurrency"]
 	path = ThirdParty/concurrency
 	url = ../concurrency.git
+[submodule "ThirdParty/toml"]
+	path = ThirdParty/toml
+	url = ../../ToruNiina/toml11
