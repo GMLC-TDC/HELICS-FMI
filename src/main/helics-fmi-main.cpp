@@ -23,6 +23,8 @@
 #include "helicsFMI/FmiCoSimFederate.hpp"
 #include "helicsFMI/FmiModelExchangeFederate.hpp"
 
+#include "gmlc/utilities/timeStringOps.hpp"
+
 #include <iostream>
 #include <thread>
 
@@ -103,11 +105,11 @@ int main(int argc, char* argv[])
     }
     helics::Time stepTime = helics::Time::minVal();
     if (!stepTimeString.empty()) {
-        stepTime = helics::loadTimeFromString(stepTimeString);
+        stepTime = gmlc::utilities::loadTimeFromString<helics::Time>(stepTimeString);
     }
     helics::Time stopTime = helics::Time::minVal();
     if (!stopTimeString.empty()) {
-        stopTime = helics::loadTimeFromString(stopTimeString);
+        stopTime = gmlc::utilities::loadTimeFromString<helics::Time>(stopTimeString);
     }
 
     helics::FederateInfo fi;
@@ -244,7 +246,7 @@ void runSystem(readerElement& elem, helics::FederateInfo& fi)
         auto str1 = elem.getFirstAttribute().getText();
         auto str2 = elem.getNextAttribute().getText();
         elem.moveToNextSibling("connections");
-        core->dataLink(str1, str2);
+        core.dataLink(str1, str2);
     }
     elem.moveToParent();
     // load each of the fmu's into its own thread
