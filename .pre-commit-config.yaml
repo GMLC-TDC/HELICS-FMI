@@ -1,4 +1,4 @@
-exclude: ^(ThirdParty/|interfaces/java/interface/|interfaces/matlab/interface/|.github/workflows/|docs/img/)
+exclude: ^(ThirdParty/|.github/workflows/|docs/img/)
 ci:
   autoupdate_branch: "develop"
 repos:
@@ -60,7 +60,7 @@ repos:
     rev: v0.6.13
     hooks:
       - id: cmake-format
-        exclude: "cmake+"
+        exclude: "cmake_+"
   - repo: https://github.com/codespell-project/codespell
     rev: v2.2.1
     hooks:
