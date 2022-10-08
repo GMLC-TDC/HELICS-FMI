@@ -39,8 +39,13 @@ find_package(HELICS 3.3
     )
 
 if (NOT HELICS_FOUND)
-    if (HELICS_SUBPROJECT)
+    if (HELICS_FMI_HELICS_SUBPROJECT)
         include(addHELICSsubproject)
     endif()
-endif()
+else()
+set(HELICS_FMI_HELICS_TARGET HELICS::helicscpp)
+set(HELICS_FMI_HELICS_TARGET_APPS HELICS::helicscpp-apps)
+end()
+
+
 endif()
