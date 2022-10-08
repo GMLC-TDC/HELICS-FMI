@@ -102,6 +102,16 @@ jobs:
       - run: *setup_helics_fmi
       - run: *run_helics_fmi_tests
 
+  builder:
+    docker:
+      - image: helics/helics:builder
+    environment:
+      CMAKE_FLAGS: ''
+    steps:
+      - checkout
+      - run: *setup_helics_fmi
+      - run: *run_helics_fmi_tests
+
   clang14:
     docker:
       - image: helics/buildenv:clang14-builder
@@ -125,18 +135,10 @@ workflows:
   version: 2
   helics_test:
     jobs:
-      - gcc12:
-          filters:
-            branches:
-              ignore: /pre-commit\/.*/
-      - clang14:
-          filters:
-            branches:
-              ignore: /pre-commit\/.*/
-      - clang14_cxx23:
-          filters:
-            branches:
-              ignore: /pre-commit\/.*/
+      - gcc12
+      - clang14
+      - clang14_cxx23
+      - builder
   sanitizers:
     jobs:
       - helicsFMITSan:
