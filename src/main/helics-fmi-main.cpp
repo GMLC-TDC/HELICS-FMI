@@ -14,6 +14,7 @@
 #include "formatInterpreters/jsonReaderElement.h"
 #include "formatInterpreters/tinyxml2ReaderElement.h"
 #include "formatInterpreters/tomlReaderElement.h"
+#include "gmlc/utilities/timeStringOps.hpp"
 #include "helics-fmi/helics-fmi-config.h"
 #include "helics/application_api/timeOperations.hpp"
 #include "helics/apps/BrokerApp.hpp"
@@ -22,8 +23,6 @@
 #include "helics/external/CLI11/CLI11.hpp"
 #include "helicsFMI/FmiCoSimFederate.hpp"
 #include "helicsFMI/FmiModelExchangeFederate.hpp"
-
-#include "gmlc/utilities/timeStringOps.hpp"
 
 #include <iostream>
 #include <thread>
