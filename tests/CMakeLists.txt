@@ -26,7 +26,7 @@ add_executable(helics_fmi-tests ${helics_fmi_test_sources})
 
 set_target_properties(helics_fmi-tests PROPERTIES FOLDER tests)
 
-target_link_libraries(helics_fmi-tests PRIVATE HELICS::helicscpp helics_fmi_test_base)
+target_link_libraries(helics_fmi-tests PRIVATE ${HELICS_FMI_HELICS_TARGET_APPS} helics_fmi_test_base)
 
 target_link_libraries(helics_fmi-tests)
 

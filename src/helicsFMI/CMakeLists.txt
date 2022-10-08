@@ -13,4 +13,4 @@ set(helicsFMI_headers FmiCoSimFederate.hpp FmiModelExchangeFederate.hpp)
 
 add_library(helicsFMI STATIC ${helicsFMI_sources} ${helicsFMI_headers})
 
-target_link_libraries(helicsFMI PUBLIC HELICS::helicscpp-apps fmiLibrary helics_fmi_base solvers)
+target_link_libraries(helicsFMI PUBLIC ${HELICS_FMI_HELICS_TARGET_APPS} fmiLibrary helics_fmi_base solvers)

@@ -45,7 +45,7 @@ if (NOT HELICS_FOUND)
 else()
 set(HELICS_FMI_HELICS_TARGET HELICS::helicscpp)
 set(HELICS_FMI_HELICS_TARGET_APPS HELICS::helicscpp-apps)
-end()
+endif()
 
 
 endif()
