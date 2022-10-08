@@ -278,45 +278,41 @@ include(addJsoncpp)
 # -------------------------------------------------------------
 # setting the RPATH
 # -------------------------------------------------------------
-# use, i.e. don't skip the full RPATH for the build tree
-set(CMAKE_SKIP_BUILD_RPATH FALSE)
-
-# when building, don't use the install RPATH already (but later on when installing)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-
-set(CMAKE_MACOSX_RPATH ON)
-set(CMAKE_BUILD_RPATH
-    "./;${AUTOBUILD_INSTALL_PATH}/bin;${AUTOBUILD_INSTALL_PATH}/lib;${AUTOBUILD_INSTALL_PATH}/lib64"
-)
+if(NOT DEFINED CMAKE_MACOSX_RPATH)
+    set(CMAKE_MACOSX_RPATH ON)
+endif()
 
 # add the automatically determined parts of the RPATH which point to directories outside the build
 # tree to the install RPATH
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+if(NOT DEFINED CMAKE_INSTALL_RPATH_USE_LINK_PATH)
+    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+endif()
+
+# Add the local directory to the rpath
+if(NOT APPLE)
+    list(APPEND CMAKE_INSTALL_RPATH $ORIGIN)
+    list(APPEND CMAKE_INSTALL_RPATH "\$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
+else()
+    list(APPEND CMAKE_INSTALL_RPATH "@loader_path")
+    list(APPEND CMAKE_INSTALL_RPATH "@loader_path/../${CMAKE_INSTALL_LIBDIR}")
+    list(APPEND CMAKE_INSTALL_RPATH "@executable_path")
+    list(APPEND CMAKE_INSTALL_RPATH "@executable_path/../${CMAKE_INSTALL_LIBDIR}")
+endif()
 
 # the RPATH to be used when installing, but only if it's not a system directory
 list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
      "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}" isSystemDir
 )
-if("${isSystemDir}" STREQUAL "-1")
-    list(APPEND CMAKE_INSTALL_RPATH CMAKE_INSTALL_RPATH
-         "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}"
-    )
+if(isSystemDir STREQUAL "-1")
+    list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
 endif()
 
 list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
      "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" isSystemDir
 )
-if("${isSystemDir}" STREQUAL "-1")
+if(isSystemDir STREQUAL "-1")
     list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
-
-if(NOT Boost_USE_STATIC_LIBS)
-    list(APPEND CMAKE_INSTALL_RPATH ${Boost_LIBRARY_DIRS})
-    list(APPEND CMAKE_BUILD_RPATH ${Boost_LIBRARY_DIRS})
-endif()
-
-# add the local directory to the rpath
-list(APPEND CMAKE_INSTALL_RPATH "./")
 
 # -------------------------------------------------------------
 # global include directories
