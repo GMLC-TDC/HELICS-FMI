@@ -1,4 +1,3 @@
-
 set(BUILD_CVODES OFF CACHE INTERNAL "")
 set(BUILD_IDAS OFF CACHE INTERNAL "")
 set(BUILD_IDA OFF CACHE INTERNAL "")
@@ -10,16 +9,17 @@ set(EXAMPLES_ENABLE_CXX OFF CACHE INTERNAL "")
 set(EXAMPLES_INSTALL OFF CACHE INTERNAL "")
 set(SUNDIALS_INDEX_SIZE 32 CACHE INTERNAL "")
 
-
-  if (ENABLE_KLU)
+if(ENABLE_KLU)
     set(ENABLE_KLU ON INTERNAL "")
-  endif(ENABLE_KLU)
+endif(ENABLE_KLU)
 
-add_subdirectory(ThirdParty/sundials )
+add_subdirectory(ThirdParty/sundials)
 
 add_library(sundials_headers INTERFACE)
 target_include_directories(sundials_headers INTERFACE ThirdParty/sundials/include)
-target_include_directories(sundials_headers INTERFACE ${CMAKE_BINARY_DIR}/ThirdParty/sundials/include)
+target_include_directories(
+    sundials_headers INTERFACE ${CMAKE_BINARY_DIR}/ThirdParty/sundials/include
+)
 add_library(HELICS_FMI::sundials_headers ALIAS sundials_headers)
 
 set(SUNDIALS_LIBRARIES
@@ -59,11 +59,11 @@ set(SUNDIALS_LIBRARIES
     sundials_sunnonlinsolfixedpoint_obj_static
     sundials_sunnonlinsolnewton_obj_static
 )
-set_target_properties ( ${SUNDIALS_LIBRARIES} PROPERTIES FOLDER sundials)
+set_target_properties(${SUNDIALS_LIBRARIES} PROPERTIES FOLDER sundials)
 
-if (MSVC)
-target_compile_options(sundials_cvode_static PRIVATE "/sdl-")
-target_compile_options(sundials_cvode_static PRIVATE "/W3")
+if(MSVC)
+    target_compile_options(sundials_cvode_static PRIVATE "/sdl-")
+    target_compile_options(sundials_cvode_static PRIVATE "/W3")
 endif()
 
 get_target_property(cvode_target_debug SUNDIALS::cvode OUTPUT_NAME)
@@ -74,7 +74,12 @@ get_target_property(cvode_dir_release SUNDIALS::cvode LIBRARY_OUTPUT_DIRECTORY_R
 
 add_library(sundials_import_cvode STATIC IMPORTED)
 message(STATUS "linking to ${cvode_dir_debug}/${cvode_target_debug}${CMAKE_STATIC_LIBRARY_SUFFIX}")
-set_property(TARGET sundials_import_cvode PROPERTY IMPORTED_LOCATION "${cvode_dir_debug}/${cvode_target_debug}${CMAKE_STATIC_LIBRARY_SUFFIX}")
-#set_property(TARGET sundials_import_cvode PROPERTY IMPORTED_LOCATION_RELEASE "${cvode_dir_release}/${cvode_target_release}${CMAKE_STATIC_LIBRARY_SUFFIX}")
+set_property(
+    TARGET sundials_import_cvode
+    PROPERTY IMPORTED_LOCATION
+             "${cvode_dir_debug}/${cvode_target_debug}${CMAKE_STATIC_LIBRARY_SUFFIX}"
+)
+# set_property(TARGET sundials_import_cvode PROPERTY IMPORTED_LOCATION_RELEASE
+# "${cvode_dir_release}/${cvode_target_release}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
 add_library(HELICS_FMI::cvode ALIAS sundials_import_cvode)
