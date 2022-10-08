@@ -14,16 +14,16 @@
 
 static const std::string nullStr{};
 
-tomlElement::tomlElement(toml::Value vElement, std::string newName):
+tomlElement::tomlElement(toml::value vElement, std::string newName):
     name(std::move(newName)), element(std::move(vElement))
 {
     elementIndex = 0;
 
-    if (element.type() == toml::Value::ARRAY_TYPE) {
+    if (element.is_array()) {
         arraytype = true;
         arrayIndex = 0;
         while ((arrayIndex < static_cast<int>(element.size())) &&
-               (element.find(arrayIndex)->empty())) {
+               (!element[arrayIndex].is_uninitialized())) {
             ++arrayIndex;
         }
     }
@@ -31,7 +31,7 @@ tomlElement::tomlElement(toml::Value vElement, std::string newName):
 
 void tomlElement::clear()
 {
-    element = toml::Value();
+    element = toml::value();
     elementIndex = 0;
     arrayIndex = 0;
     arraytype = false;

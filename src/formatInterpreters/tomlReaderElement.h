@@ -16,11 +16,6 @@
 #include <memory>
 #include <vector>
 
-namespace toml {
-class Value;
-struct ParseResult;
-}  // namespace toml
-
 class tomlElement;
 
 /** @brief class defines a reader element around the toml reader*/
@@ -72,7 +67,7 @@ class tomlReaderElement: public readerElement {
     void clear();
 
   private:
-    std::shared_ptr<toml::ParseResult> doc;  //!< document root
+    std::shared_ptr<tomlElement> doc;  //!< document root
     std::vector<std::shared_ptr<tomlElement>> parents;
     std::shared_ptr<tomlElement> current;
     int iteratorCount = 0;

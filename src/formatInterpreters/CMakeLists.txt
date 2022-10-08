@@ -23,13 +23,17 @@ set(elementReader_files
     tomlElement.h
     tomlReaderElement.cpp
     tomlReaderElement.h
+    TomlProcessingFunctions.cpp
+    TomlProcessingFunctions.hpp
+    JsonProcessingFunctions.hpp
+    JsonProcessingFunctions.cpp
     ${PROJECT_SOURCE_DIR}/ThirdParty/tinyxml2/tinyxml2.cpp
     ${PROJECT_SOURCE_DIR}/ThirdParty/tinyxml2/tinyxml2.h
 )
 
 add_library(formatInterpreter STATIC ${elementReader_files})
 
-target_link_libraries(formatInterpreter PUBLIC gmlc_utilities JsonCpp::JsonCpp helics_fmi_base)
+target_link_libraries(formatInterpreter PUBLIC gmlc_utilities JsonCpp::JsonCpp toml11::toml11 helics_fmi_base)
 
 install(TARGETS formatInterpreter LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
 

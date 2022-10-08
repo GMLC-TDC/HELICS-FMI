@@ -240,6 +240,19 @@ include(addBoost)
 target_include_directories(helics_fmi_base SYSTEM INTERFACE $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>)
 
 target_compile_definitions(helics_fmi_base INTERFACE BOOST_DLL_USE_STD_FS=1)
+
+# -------------------------------------------------------------
+# TOML11  add the TOML interpreter
+# -------------------------------------------------------------
+
+if (NOT TARGET toml11::toml11)
+set(toml11_BUILD_TEST OFF CACHE INTERNAL "")
+set(toml11_TEST_WITH_ASAN OFF CACHE INTERNAL "")
+set(toml11_TEST_WITH_UBSAN OFF CACHE INTERNAL "")
+set(toml11_INSTALL OFF CACHE INTERNAL "")
+add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL)
+endif()
+
 # ------------------------------------------------------------
 # Find (and test) the KLU libraries
 # ------------------------------------------------------------
