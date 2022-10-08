@@ -28,7 +28,6 @@ Json::Value loadJson(const std::string& jsonString);
  */
 Json::Value loadJsonStr(std::string_view jsonString);
 
-
 /** get a name or key from the element*/
 std::string getName(const Json::Value& element);
 
@@ -60,7 +59,6 @@ inline int64_t getOrDefault(const Json::Value& element, const std::string& key, 
 {
     return (element.isMember(key)) ? element[key].asInt64() : defVal;
 }
-
 
 inline bool callIfMember(const Json::Value& element,
                          const std::string& key,

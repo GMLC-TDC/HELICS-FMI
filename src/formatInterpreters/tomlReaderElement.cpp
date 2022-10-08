@@ -11,8 +11,8 @@
  */
 
 #include "tomlReaderElement.h"
-#include "TomlProcessingFunctions.hpp"
 
+#include "TomlProcessingFunctions.hpp"
 #include "gmlc/utilities/stringConversion.h"
 #include "tomlElement.h"
 
@@ -65,35 +65,30 @@ std::shared_ptr<readerElement> tomlReaderElement::clone() const
 
 bool tomlReaderElement::loadFile(const std::string& fileName)
 {
-    try
-    {
-        auto vres=helics_fmi::fileops::loadToml(fileName);
-        doc = std::make_shared<tomlElement>(vres,fileName);
-        current=doc;
+    try {
+        auto vres = helics_fmi::fileops::loadToml(fileName);
+        doc = std::make_shared<tomlElement>(vres, fileName);
+        current = doc;
         clear();
         return true;
     }
-    catch (const std::invalid_argument&e)
-    {
-        std::cerr<<e.what()<<std::endl;
+    catch (const std::invalid_argument& e) {
+        std::cerr << e.what() << std::endl;
         return false;
     }
-    
 }
 
 bool tomlReaderElement::parse(const std::string& inputString)
 {
-    try
-    {
-        auto vres=helics_fmi::fileops::loadTomlStr(inputString);
-        doc = std::make_shared<tomlElement>(vres,inputString);
-        current=doc;
+    try {
+        auto vres = helics_fmi::fileops::loadTomlStr(inputString);
+        doc = std::make_shared<tomlElement>(vres, inputString);
+        current = doc;
         clear();
         return true;
     }
-    catch (const std::invalid_argument&e)
-    {
-        std::cerr<<e.what()<<std::endl;
+    catch (const std::invalid_argument& e) {
+        std::cerr << e.what() << std::endl;
         return false;
     }
 }
@@ -111,7 +106,7 @@ double tomlReaderElement::getValue() const
     if (current->getElement().is_floating()) {
         return current->getElement().as_floating();
     }
-    if (current->getElement().is_string()){
+    if (current->getElement().is_string()) {
         return gmlc::utilities::numeric_conversionComplete(current->getElement().as_string(),
                                                            readerNullVal);
     }
@@ -149,17 +144,17 @@ bool tomlReaderElement::hasAttribute(const std::string& attributeName) const
     }
 
     toml::value uval;
-    auto val = toml::find_or(current->getElement(),attributeName, uval);
+    auto val = toml::find_or(current->getElement(), attributeName, uval);
     if (!val.is_uninitialized()) {
         return false;
     }
-    return (! (val.is_array() || val.is_table()));
+    return (!(val.is_array() || val.is_table()));
 }
 
 bool tomlReaderElement::hasElement(const std::string& elementName) const
 {
     toml::value uval;
-    auto val = toml::find_or(current->getElement(),elementName, uval);
+    auto val = toml::find_or(current->getElement(), elementName, uval);
     if (!val.is_uninitialized()) {
         return false;
     }
@@ -221,8 +216,8 @@ readerAttribute tomlReaderElement::getNextAttribute()
 readerAttribute tomlReaderElement::getAttribute(const std::string& attributeName) const
 {
     std::string vs;
-    helics_fmi::fileops::replaceIfMember(current->getElement(),attributeName,vs);
-    
+    helics_fmi::fileops::replaceIfMember(current->getElement(), attributeName, vs);
+
     if (!vs.empty()) {
         return readerAttribute(attributeName, vs);
     }
@@ -231,12 +226,12 @@ readerAttribute tomlReaderElement::getAttribute(const std::string& attributeName
 
 std::string tomlReaderElement::getAttributeText(const std::string& attributeName) const
 {
-   return helics_fmi::fileops::getOrDefault(current->getElement(),attributeName,nullStr);
+    return helics_fmi::fileops::getOrDefault(current->getElement(), attributeName, nullStr);
 }
 
 double tomlReaderElement::getAttributeValue(const std::string& attributeName) const
 {
-    return helics_fmi::fileops::getOrDefault(current->getElement(),attributeName,readerNullVal);
+    return helics_fmi::fileops::getOrDefault(current->getElement(), attributeName, readerNullVal);
 }
 
 std::shared_ptr<readerElement> tomlReaderElement::firstChild() const
@@ -288,7 +283,7 @@ void tomlReaderElement::moveToFirstChild(const std::string& childName)
         return;
     }
     toml::value uval;
-    auto val = toml::find_or(current->getElement(),childName, uval);
+    auto val = toml::find_or(current->getElement(), childName, uval);
     if (!val.is_uninitialized()) {
         current = std::make_shared<tomlElement>(uval, childName);
     }
@@ -353,9 +348,8 @@ void tomlReaderElement::moveToNextSibling(const std::string& siblingName)
         }
         current->clear();
     } else {
-
         toml::value uval;
-        auto val = toml::find_or(current->getElement(),siblingName, uval);
+        auto val = toml::find_or(current->getElement(), siblingName, uval);
         if (!val.is_uninitialized()) {
             current = std::make_shared<tomlElement>(uval, siblingName);
         }
@@ -408,7 +402,7 @@ bool isAttribute(const toml::value& testValue)
     if (testValue.type() == toml::value_t::array) {
         return false;
     }
-    if (testValue.type() ==  toml::value_t::table) {
+    if (testValue.type() == toml::value_t::table) {
         return false;
     }
     return true;

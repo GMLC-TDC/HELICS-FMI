@@ -30,10 +30,7 @@ class tomlElement {
     tomlElement(toml::value vElement, std::string newName);
 
     void clear();
-    const toml::value& getElement() const
-    {
-        return (arraytype) ? element[arrayIndex] : element;
-    }
+    const toml::value& getElement() const { return (arraytype) ? element[arrayIndex] : element; }
     int count() const { return (arraytype) ? static_cast<int>(element.size()) : 1; }
     bool isNull() const
     {

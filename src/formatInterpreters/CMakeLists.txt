@@ -33,7 +33,9 @@ set(elementReader_files
 
 add_library(formatInterpreter STATIC ${elementReader_files})
 
-target_link_libraries(formatInterpreter PUBLIC gmlc_utilities JsonCpp::JsonCpp toml11::toml11 helics_fmi_base)
+target_link_libraries(
+    formatInterpreter PUBLIC gmlc_utilities JsonCpp::JsonCpp toml11::toml11 helics_fmi_base
+)
 
 install(TARGETS formatInterpreter LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
 

@@ -59,7 +59,6 @@ Json::Value loadJsonStr(std::string_view jsonString)
     return doc;
 }
 
-
 std::string getName(const Json::Value& element)
 {
     return (element.isMember("key")) ?

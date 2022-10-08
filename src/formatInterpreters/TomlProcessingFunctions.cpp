@@ -55,7 +55,6 @@ toml::value loadTomlStr(const std::string& tomlString)
 // NOLINTNEXTLINE
 static const std::string emptyString;
 
-
 std::string getName(const toml::value& element)
 {
     std::string retval = toml::find_or(element, "key", emptyString);
@@ -81,4 +80,4 @@ std::string tomlAsString(const toml::value& element)
         }
     }
 }
-}  // namespace helics::fileops
+}  // namespace helics_fmi::fileops

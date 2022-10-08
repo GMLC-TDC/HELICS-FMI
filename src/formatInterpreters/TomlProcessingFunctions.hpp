@@ -40,7 +40,6 @@ toml::value loadTomlStr(const std::string& tomlString);
 /** get a toml value as a string*/
 std::string tomlAsString(const toml::value& element);
 
-
 /** get a name or key from the element*/
 std::string getName(const toml::value& element);
 
@@ -100,7 +99,6 @@ inline bool callIfMember(const toml::value& element,
     return false;
 }
 
-
 inline void replaceIfMember(const toml::value& element, const std::string& key, std::string& loc)
 {
     toml::value uval;
@@ -131,4 +129,4 @@ inline bool isMember(const toml::value& element, const std::string& key)
     return (!val.is_uninitialized());
 }
 
-}  // namespace helics::fileops
+}  // namespace helics_fmi::fileops
