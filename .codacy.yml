@@ -13,9 +13,6 @@ languages:
 exclude_paths:
   - 'ThirdParty/**/*'
   - 'ThirdParty/*'
-  - 'interfaces/**/*'
   - 'scripts/**/*'
   - 'scripts/*'
-  - 'tests/csharp/*'
   - '**.md'
-  - 'docs/user-guide/examples/**/*'

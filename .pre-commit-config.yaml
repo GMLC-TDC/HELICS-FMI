@@ -49,7 +49,6 @@ repos:
     hooks:
       - id: markdownlint
         args: [-s, ./config/.markdownlintrc]
-        exclude: "mac.md"
       - id: script-must-have-extension
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.8.0.4
