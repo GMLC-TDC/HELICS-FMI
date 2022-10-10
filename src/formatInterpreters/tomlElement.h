@@ -10,24 +10,34 @@
  * LLNS Copyright End
  */
 #pragma once
+#ifdef __GNUC__
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wshadow"
+#endif
+#include <string_view>
+#define TOML11_USING_STRING_VIEW 1
+#include "toml.hpp"
+#ifdef __GNUC__
+#    pragma GCC diagnostic pop
+#endif
 
-#include "toml/toml.h"
-
-class tomlElement
-{
+class tomlElement {
   public:
     int elementIndex = 0;
     std::string name;
     int arrayIndex = 0;
-    tomlElement () = default;
-    tomlElement (toml::Value vElement, std::string newName);
+    tomlElement() = default;
+    tomlElement(toml::value vElement, std::string newName);
 
-    void clear ();
-    const toml::Value &getElement () const { return (arraytype) ? *element.find (arrayIndex) : element; }
-    int count () const { return (arraytype) ? static_cast<int> (element.size ()) : 1; }
-    bool isNull () const { return (arraytype) ? element.find (arrayIndex) != nullptr : element.empty (); }
+    void clear();
+    const toml::value& getElement() const { return (arraytype) ? element[arrayIndex] : element; }
+    int count() const { return (arraytype) ? static_cast<int>(element.size()) : 1; }
+    bool isNull() const
+    {
+        return (arraytype) ? element[arrayIndex].is_uninitialized() : element.is_uninitialized();
+    }
 
   private:
-    toml::Value element;
+    toml::value element;
     bool arraytype = false;
 };

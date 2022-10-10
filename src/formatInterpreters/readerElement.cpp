@@ -11,20 +11,27 @@
  */
 
 #include "readerElement.h"
-#include "helics/utilities/stringConversion.h"
+
+#include "gmlc/utilities/stringConversion.h"
 
 readerAttribute::readerAttribute() {}
-readerAttribute::readerAttribute(std::string attName, std::string attText)
-    : name(std::move(attName)), text(std::move(attText))
+readerAttribute::readerAttribute(std::string attName, std::string attText):
+    name(std::move(attName)), text(std::move(attText))
 {
 }
-void readerAttribute::set(const std::string &attName, const std::string &attText)
+void readerAttribute::set(const std::string& attName, const std::string& attText)
 {
     name = attName;
     text = attText;
 }
 using namespace gmlc::utilities;
-double readerAttribute::getValue() const { return numeric_conversion<double>(text, readerNullVal); }
+double readerAttribute::getValue() const
+{
+    return numeric_conversion<double>(text, readerNullVal);
+}
 constexpr int64_t nullLong = int64_t(0x8000'0000'0000'0000);
-int64_t readerAttribute::getInt() const { return numeric_conversion<int64_t>(text, nullLong); }
+int64_t readerAttribute::getInt() const
+{
+    return numeric_conversion<int64_t>(text, nullLong);
+}
 readerElement::~readerElement() = default;

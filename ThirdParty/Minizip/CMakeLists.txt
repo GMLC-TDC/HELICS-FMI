@@ -1,18 +1,58 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5)
 
-project(minizip C)
+project(minizip LANGUAGES C VERSION 2.0)
 
 set(BUILD_SHARED_LIBS OFF)
 
 cmake_minimum_required(VERSION 3.5)
 cmake_policy(VERSION 3.5)
 
-if (EXISTS ${ZLIB_LOCATION}/cmake/zlib-targets.cmake)
-include (${ZLIB_LOCATION}/cmake/zlib-targets.cmake)
+if (TARGET zlib::zlib)
+	set(ZLIB_LINK zlib::zlib)
+elseif (EXISTS ${ZLIB_LOCATION}/cmake/zlib-targets.cmake)
+    include (${ZLIB_LOCATION}/cmake/zlib-targets.cmake)
+	set(ZLIB_LINK zlib::zlib)
 
 else()
-find_package(ZLIB)
+    find_package(ZLIB)
+    set(ZLIB_LINK zlib::zlib)
 endif()
+
+set(SOURCES
+  argv.c
+  ioapi.c
+  miniunz.c
+  minizip.c
+  unzip.c
+  zip.c
+)
+
+if(WIN32)
+    set(SOURCES ${SOURCES} iowin32.c)
+endif(WIN32)
+
+set(HEADERS
+  crypt.h
+  ioapi.h
+  miniunz.h
+  minizip.h
+  unzip.h
+)
+
+set(INTERNAL_HEADERS
+  argv.h
+ )
+
+if(WIN32)
+    set(HEADERS ${HEADERS} iowin32.h)
+endif(WIN32)
+
+if (NOT CMAKE_DEBUG_POSTFIX)
+set(CMAKE_DEBUG_POSTFIX d)
+endif()
+
+add_library(minizip ${SOURCES} ${HEADERS})
+add_library(minizip::minizip ALIAS minizip)
 
 if(CMAKE_HOST_APPLE)
 set(PLATFORM __APPLE__)
@@ -24,54 +64,24 @@ else(CMAKE_HOST_APPLE)
 message(FATAL_ERROR "Not supported Platform")
 endif(CMAKE_HOST_APPLE)
 
-add_definitions(-D${PLATFORM})
+target_compile_definitions(minizip PRIVATE ${PLATFORM})
 
 if(CMAKE_COMPILER_IS_GNUCC)
-  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
+  target_compile_options(minizip PRIVATE "-std=c99")
 endif()
 
 if(MSVC)
-  add_definitions(/wd4131 /wd4013 /wd4127 /wd4100 /wd4189 /wd4456 -D_CRT_SECURE_NO_WARNINGS)
+ target_compile_options(minizip PRIVATE /wd4131 /wd4013 /wd4127 /wd4100 /wd4189 /wd4456 -D_CRT_SECURE_NO_WARNINGS)
 endif(MSVC)
 
-include_directories(${ZLIB_LOCATION}/include)
-set(SOURCES
-  ioapi.c
-  miniunz.c
-  minizip.c
-  #mztools.c
-  unzip.c
-  zip.c
-)
+target_link_libraries(minizip PRIVATE ${ZLIB_LINK})
 
-if(WIN32)
-    set(SOURCES ${SOURCES} iowin32.c)
-endif(WIN32)
-
-set(HEADERS
-  crypt.h
-  ioapi.h  
-  miniunz.h
-  minizip.h
-  #mztools.h
-  unzip.h
-)
-
-if(WIN32)
-    set(HEADERS ${HEADERS} iowin32.h)
-endif(WIN32)
-
-if (NOT CMAKE_DEBUG_POSTFIX)
-set(CMAKE_DEBUG_POSTFIX d)
-endif()
-
-add_library(minizip ${SOURCES} ${HEADERS})
-
-
+if (NOT SKIP_INSTALL_LIBRARIES)
 	install(TARGETS minizip EXPORT minizip-targets
        LIBRARY DESTINATION lib
        ARCHIVE DESTINATION lib
 	)
 
-install (EXPORT minizip-targets NAMESPACE minizip:: DESTINATION cmake/)
-INSTALL(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/minizip)
+	install (EXPORT minizip-targets NAMESPACE minizip:: DESTINATION cmake/)
+	INSTALL(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/minizip)
+endif()

@@ -1,16 +1,16 @@
 /*
-* LLNS Copyright Start
-* Copyright (c) 2018, Lawrence Livermore National Security
-* This work was performed under the auspices of the U.S. Department
-* of Energy by Lawrence Livermore National Laboratory in part under
-* Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
-* Produced at the Lawrence Livermore National Laboratory.
-* All rights reserved.
-* For details, see the LICENSE file.
-* LLNS Copyright End
+Copyright (c) 2017-2022,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
-#include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_SUITE (fmi_load_tests)
+#include "gtest/gtest.h"
 
-BOOST_AUTO_TEST_SUITE_END ()
+struct globalTestConfig: public ::testing::Environment {
+    virtual void TearDown() override {}
+};
+
+// register the global setup and teardown structure
+::testing::Environment* const foo_env = ::testing::AddGlobalTestEnvironment(new globalTestConfig);
+//____________________________________________________________________________//

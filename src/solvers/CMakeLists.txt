@@ -8,21 +8,19 @@
 # For details, see the LICENSE file.
 # LLNS Copyright End
 
-set(
-    solver_headers
-   solverInterface.h
+set(solver_headers
+    solverInterface.h
     sundialsInterface.h
     sundialsMatrixData.h
     basicOdeSolver.h
     solverMode.hpp
-	cvodeInterface.h
-	arkodeInterface.h
-	solver_definitions.hpp
-	SolvableObject.hpp
+    cvodeInterface.h
+    arkodeInterface.h
+    solver_definitions.hpp
+    SolvableObject.hpp
 )
 
-set(
-    solver_sources
+set(solver_sources
     ${solver_headers}
     solverInterface.cpp
     sundialsMatrixData.cpp
@@ -31,15 +29,17 @@ set(
     sundialsMatrixDataSparseColumn.cpp
     sundialsInterface.cpp
     basicOdeSolver.cpp
-	cvodeInterface.cpp
-	arkodeInterface.cpp
-	solverMode.cpp
+    cvodeInterface.cpp
+    arkodeInterface.cpp
+    solverMode.cpp
 )
 
 add_library(solvers STATIC ${solver_sources} ${solver_headers})
 
-target_link_libraries(solvers PUBLIC utilities SUNDIALS::SUNDIALS)
+target_link_libraries(solvers PUBLIC utilities SUNDIALS::cvode SUNDIALS::arkode)
 if(ENABLE_KLU)
     target_link_libraries(solvers PUBLIC SuiteSparse::klu)
 endif(ENABLE_KLU)
 
+get_target_property(OUT Boostlibs::core INTERFACE_LINK_LIBRARIES)
+message(STATUS "out=${OUT}")

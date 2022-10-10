@@ -15,11 +15,11 @@
 #include "fmi/fmi_import/fmiImport.h"
 #include "fmi/fmi_import/fmiObjects.h"
 #include "helics/ValueFederates.hpp"
+
 #include <memory>
 
 /** class defining a co-simulation federate*/
-class FmiCoSimFederate
-{
+class FmiCoSimFederate {
   private:
     helics::ValueFederate fed;  //!< the federate
     std::shared_ptr<fmi2CoSimObject> cs;  //!< the co-simulation object
@@ -31,7 +31,7 @@ class FmiCoSimFederate
     helics::Time stepTime;  //!< the step time for the Federate
     helics::Time timeBias = helics::timeZero;  //!< time shift for the federate
   public:
-    FmiCoSimFederate(std::shared_ptr<fmi2CoSimObject> obj, const helics::FederateInfo &fi);
+    FmiCoSimFederate(std::shared_ptr<fmi2CoSimObject> obj, const helics::FederateInfo& fi);
     /** configure the federate using the specified inputs and outputs*/
     void configure(helics::Time step, helics::Time start = helics::timeZero);
     /** set a string list of inputs*/
@@ -41,11 +41,11 @@ class FmiCoSimFederate
     /** set a list of connections*/
     void setConnections(std::vector<std::string> conn);
     /** add an input*/
-    void addInput(const std::string &input_name);
+    void addInput(const std::string& input_name);
     /** add an output*/
-    void addOutput(const std::string &output_name);
+    void addOutput(const std::string& output_name);
     /** add a connection*/
-    void addConnection(const std::string &conn);
+    void addConnection(const std::string& conn);
     /** run the cosimulation*/
     void run(helics::Time stop);
 };

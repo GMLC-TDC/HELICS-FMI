@@ -1,4 +1,3 @@
-
 #--------------------------------------------------------------------------------
 # Copyright (c) 2012-2013, Lars Baehren <lbaehren@gmail.com>
 # All rights reserved.
@@ -24,80 +23,76 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #--------------------------------------------------------------------------------
 
-# - Check for the presence of ZLIB
+# * Check for the presence of ZLIB
 #
-# The following variables are set when ZLIB is found:
-#  ZLIB_FOUND      = Set to true, if all components of ZLIB have been found.
-#  ZLIB_INCLUDES   = Include path for the header files of ZLIB
-#  ZLIB_LIBRARIES  = Link these to use ZLIB
-#  ZLIB_LFLAGS     = Linker flags (optional)
+# The following variables are set when ZLIB is found: ZLIB_FOUND      = Set to true, if all
+# components of ZLIB have been found. ZLIB_INCLUDES   = Include path for the header files of ZLIB
+# ZLIB_LIBRARIES  = Link these to use ZLIB ZLIB_LFLAGS     = Linker flags (optional)
 
-if (NOT ZLIB_FOUND)
+if(NOT ZLIB_FOUND)
 
-  if (NOT ZLIB_ROOT_DIR)
-    set (ZLIB_ROOT_DIR ${CMAKE_INSTALL_PREFIX})
-  endif (NOT ZLIB_ROOT_DIR)
+    if(NOT ZLIB_ROOT_DIR)
+        set(ZLIB_ROOT_DIR ${CMAKE_INSTALL_PREFIX})
+    endif(NOT ZLIB_ROOT_DIR)
 
-  ##_____________________________________________________________________________
-  ## Check for the header files
+    # _____________________________________________________________________________ Check for the
+    # header files
 
-  find_path (ZLIB_INCLUDES
-    NAMES zlib.h
-    HINTS ${ZLIB_ROOT_DIR} ${CMAKE_INSTALL_PREFIX}
-    PATH_SUFFIXES include
+    find_path(
+        ZLIB_INCLUDES
+        NAMES zlib.h
+        HINTS ${ZLIB_ROOT_DIR} ${CMAKE_INSTALL_PREFIX}
+        PATH_SUFFIXES include
     )
 
-  ##_____________________________________________________________________________
-  ## Check for the library
+    # _____________________________________________________________________________ Check for the
+    # library
 
-set(lib_names libzlib zlib)
-if(UNIX)
-list(APPEND lib_names libz z)
-endif(UNIX)
+    set(lib_names libzlib zlib)
+    if(UNIX)
+        list(APPEND lib_names libz z)
+    endif(UNIX)
 
-  find_library (ZLIB_LIBRARIES
-    NAMES ${lib_names}
-    HINTS ${ZLIB_ROOT_DIR} ${CMAKE_INSTALL_PREFIX}
-    PATH_SUFFIXES lib
+    find_library(
+        ZLIB_LIBRARIES
+        NAMES ${lib_names}
+        HINTS ${ZLIB_ROOT_DIR} ${CMAKE_INSTALL_PREFIX}
+        PATH_SUFFIXES lib
     )
 
-  ##_____________________________________________________________________________
-  ## Actions taken when all components have been found
+    # _____________________________________________________________________________ Actions taken
+    # when all components have been found
 
-  if (ZLIB_INCLUDES AND ZLIB_LIBRARIES)
-    set (ZLIB_FOUND TRUE)
-  else (ZLIB_INCLUDES AND ZLIB_LIBRARIES)
-    set (ZLIB_FOUND FALSE)
-    if (NOT ZLIB_FIND_QUIETLY)
-      if (NOT ZLIB_INCLUDES)
-	message (STATUS "Unable to find ZLIB header files!")
-      endif (NOT ZLIB_INCLUDES)
-      if (NOT ZLIB_LIBRARIES)
-	message (STATUS "Unable to find ZLIB library files!")
-      endif (NOT ZLIB_LIBRARIES)
-    endif (NOT ZLIB_FIND_QUIETLY)
-  endif (ZLIB_INCLUDES AND ZLIB_LIBRARIES)
+    if(ZLIB_INCLUDES AND ZLIB_LIBRARIES)
+        set(ZLIB_FOUND TRUE)
+    else(ZLIB_INCLUDES AND ZLIB_LIBRARIES)
+        set(ZLIB_FOUND FALSE)
+        if(NOT ZLIB_FIND_QUIETLY)
+            if(NOT ZLIB_INCLUDES)
+                message(STATUS "Unable to find ZLIB header files!")
+            endif(NOT ZLIB_INCLUDES)
+            if(NOT ZLIB_LIBRARIES)
+                message(STATUS "Unable to find ZLIB library files!")
+            endif(NOT ZLIB_LIBRARIES)
+        endif(NOT ZLIB_FIND_QUIETLY)
+    endif(ZLIB_INCLUDES AND ZLIB_LIBRARIES)
 
-  if (ZLIB_FOUND)
-    if (NOT ZLIB_FIND_QUIETLY)
-      message (STATUS "Found components for ZLIB")
-      message (STATUS "ZLIB_ROOT_DIR  = ${ZLIB_ROOT_DIR}")
-      message (STATUS "ZLIB_INCLUDES  = ${ZLIB_INCLUDES}")
-      message (STATUS "ZLIB_LIBRARIES = ${ZLIB_LIBRARIES}")
-    endif (NOT ZLIB_FIND_QUIETLY)
-  else (ZLIB_FOUND)
-    if (ZLIB_FIND_REQUIRED)
-      message (FATAL_ERROR "Could not find ZLIB!")
-    endif (ZLIB_FIND_REQUIRED)
-  endif (ZLIB_FOUND)
+    if(ZLIB_FOUND)
+        if(NOT ZLIB_FIND_QUIETLY)
+            message(STATUS "Found components for ZLIB")
+            message(STATUS "ZLIB_ROOT_DIR  = ${ZLIB_ROOT_DIR}")
+            message(STATUS "ZLIB_INCLUDES  = ${ZLIB_INCLUDES}")
+            message(STATUS "ZLIB_LIBRARIES = ${ZLIB_LIBRARIES}")
+        endif(NOT ZLIB_FIND_QUIETLY)
+    else(ZLIB_FOUND)
+        if(ZLIB_FIND_REQUIRED)
+            message(FATAL_ERROR "Could not find ZLIB!")
+        endif(ZLIB_FIND_REQUIRED)
+    endif(ZLIB_FOUND)
 
-  ##_____________________________________________________________________________
-  ## Mark advanced variables
+    # _____________________________________________________________________________ Mark advanced
+    # variables
 
-  mark_as_advanced (
-    ZLIB_ROOT_DIR
-    ZLIB_INCLUDES
-    ZLIB_LIBRARIES
-    )
+    mark_as_advanced(ZLIB_ROOT_DIR ZLIB_INCLUDES ZLIB_LIBRARIES)
 
-endif (NOT ZLIB_FOUND)
+endif(NOT ZLIB_FOUND)

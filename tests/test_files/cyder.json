@@ -1,15 +1,15 @@
 //test json script for small test case
 {
-	"fmus": [{
-		"fmu": "C:/Users/phlpt/Documents/HELICS-FMI/tests/test_files/HELICS_CyDER_Generator.fmu",
-		"name": "generator"
-	}, {
-		"fmu": "C:/Users/phlpt/Documents/HELICS-FMI/tests/test_files/HELICS_CyDER_Controller.fmu",
-		"name": "controller"
-	}],
+  "fmus": [
+    {
+      "fmu": "C:/Users/phlpt/Documents/HELICS-FMI/tests/test_files/HELICS_CyDER_Generator.fmu",
+      "name": "generator"
+    },
+    {
+      "fmu": "C:/Users/phlpt/Documents/HELICS-FMI/tests/test_files/HELICS_CyDER_Controller.fmu",
+      "name": "controller"
+    }
+  ],
 
-	"connections": [
-		["generator.y", "controller.u"]
-	]
+  "connections": [["generator.y", "controller.u"]]
 }
-	
