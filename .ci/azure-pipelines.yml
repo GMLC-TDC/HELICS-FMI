@@ -35,13 +35,13 @@ jobs:
         env:
           MAKEFLAGS: '-j 4'
           CMAKE_GENERATOR: 'Unix Makefiles'
-        displayName: 'Build HELICS'
+        displayName: 'Build HELICS_FMI'
 
       - bash: ../scripts/run-ci-tests.sh "$TEST_CONFIG"
         env:
           TEST_CONFIG: $[variables['test_config']]
         workingDirectory: 'build'
-        displayName: 'Test HELICS'
+        displayName: 'Test HELICS_FMI'
 
   - job: macOS
     strategy:
@@ -70,13 +70,13 @@ jobs:
         env:
           MAKEFLAGS: '-j 4'
           CMAKE_GENERATOR: 'Unix Makefiles'
-        displayName: 'Build HELICS'
+        displayName: 'Build HELICS_FMI'
 
       - bash: ../scripts/run-ci-tests.sh "$TEST_CONFIG"
         env:
           TEST_CONFIG: $[variables['test_config']]
         workingDirectory: 'build'
-        displayName: 'Test HELICS'
+        displayName: 'Test HELICS_FMI'
 
   - job: Windows
     strategy:
@@ -123,7 +123,7 @@ jobs:
         displayName: Install Boost
 
       # -----------------------
-      # Configure HELICS-FMI
+      # Configure HELICS_FMI
       # -----------------------
       - bash: |
           echo "BOOST_ROOT=$BOOST_ROOT"
@@ -132,21 +132,21 @@ jobs:
       - task: CMake@1
         inputs:
           cmakeArgs: -A $(vsArch) -DHELICS_FMI_BUILD_TESTS=ON -DHELICS_ZMQ_FORCE_SUBPROJECT=ON  -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON -DHELICS_DISABLE_VCPKG=ON $(extraFlags) ..
-        displayName: 'Configure HELICS'
+        displayName: 'Configure HELICS_FMI'
         condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
       # -----------------------
-      # Build HELICS-FMI
+      # Build HELICS_FMI
       # -----------------------
       - bash: cmake --build . --config Release
-        displayName: 'Build HELICS'
+        displayName: 'Build HELICS_FMI'
         workingDirectory: build
 
       # -----------------------
-      # Test HELICS-FMI
+      # Test HELICS_FMI
       # -----------------------
       - bash: ctest --output-on-failure --timeout 480 -C Release
-        displayName: 'Test HELICS-FMI'
+        displayName: 'Test HELICS_FMI'
         workingDirectory: build
 
       # For debugging, can get build folder contents by adding PublishBuildArtifacts task and set pathtoPublish: '$(Build.SourcesDirectory)/build'
