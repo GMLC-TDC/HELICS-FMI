@@ -18,6 +18,7 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE AND NOT HELICS_D
 endif()
 
 project(HELICS_FMI VERSION 0.7.0)
+project(HELICS_FMI VERSION 0.7.0)
 
 # set (HELICS_FMI_VERSION_BUILD )
 set(HELICS_FMI_DATE "2022-10-03")
@@ -122,6 +123,13 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
             CACHE PATH "Executable/dll output dir."
         )
     endif()
+endif()
+
+# -----------------------------------------------------------------------------
+# General project wide configuration for debug postfix
+# -----------------------------------------------------------------------------
+if(NOT NO_DEBUG_POSFIX AND NOT CMAKE_DEBUG_POSTFIX)
+    set(CMAKE_DEBUG_POSTFIX d)
 endif()
 
 if(NOT TARGET compile_flags_target)
