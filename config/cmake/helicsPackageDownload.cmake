@@ -9,7 +9,7 @@
 
 if (NOT HELICS_CURRENT_VERSION)
 set(HELICS_CURRENT_VERSION 3.3.0)
-endif 
+endif()
 
 set(HELICS_DOWNLOAD_BASE "https://github.com/GMLC-TDC/HELICS/releases/download/v${HELICS_CURRENT_VERSION}/")
 

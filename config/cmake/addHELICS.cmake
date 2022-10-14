@@ -42,8 +42,10 @@ else()
 
     if(NOT HELICS_FOUND)
         if(HELICS_FMI_HELICS_SUBPROJECT)
+        
             include(addHELICSsubproject)
-        elseif(HELICS_DOWNLOAD)
+        elseif(HELICS_FMI_HELICS_PACKAGE_DOWNLOAD)
+        message(STATUS "HELICS FMI helics package download")
             include(helicsPackageDownload)
             if (helicscpp_POPULATED)
 
@@ -53,8 +55,10 @@ else()
         HINTS
         ${helicscpp_SOURCE_DIR}
     )
+    set(HELICS_FMI_HELICS_TARGET HELICS::helicscpp)
+        set(HELICS_FMI_HELICS_TARGET_APPS HELICS::helicscpp-apps)
     endif()
-        endif()
+        endif() 
     else()
         set(HELICS_FMI_HELICS_TARGET HELICS::helicscpp)
         set(HELICS_FMI_HELICS_TARGET_APPS HELICS::helicscpp-apps)
