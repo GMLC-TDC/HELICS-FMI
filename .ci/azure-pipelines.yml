@@ -11,16 +11,16 @@ jobs:
       matrix:
         ubuntuDefault:
           containerImage: 'helics/buildenv:ubuntu20.04-default-builder'
-          test_config: 'ci'
+          xtraFlags: '-DHELICS_DISABLE_WEBSERVER=ON -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON'
         gcc8:
           containerImage: 'helics/buildenv:gcc8-builder'
-          test_config: 'ci'
+          xtraFlags: '-DHELICS_DISABLE_WEBSERVER=ON -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON'
         clang13:
           containerImage: 'helics/buildenv:clang13-builder'
-          test_config: 'ci'
+          xtraFlags: '-DHELICS_DISABLE_WEBSERVER=ON -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON'
         clang7:
           containerImage: 'helics/buildenv:clang7-builder'
-          test_config: 'ci'
+          xtraFlags: '-DHELICS_DISABLE_WEBSERVER=ON -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON'
 
     pool:
       vmImage: 'ubuntu-latest'
@@ -28,29 +28,33 @@ jobs:
     timeoutInMinutes: 60
 
     steps:
-      - bash: |
-          unset VCPKG_ROOT
-          mkdir -p build && cd build
-          ../scripts/ci-build.sh
-        env:
-          MAKEFLAGS: '-j 4'
-          CMAKE_GENERATOR: 'Unix Makefiles'
-        displayName: 'Build HELICS_FMI'
+      - task: CMake@1
+        inputs:
+          cmakeArgs: -DHELICS_FMI_BUILD_TESTS=ON  -DHELICS_DISABLE_VCPKG=ON $(extraFlags) ..
+        displayName: 'Configure HELICS_FMI'
 
-      - bash: ../scripts/run-ci-tests.sh "$TEST_CONFIG"
-        env:
-          TEST_CONFIG: $[variables['test_config']]
-        workingDirectory: 'build'
+      # -----------------------
+      # Build HELICS_FMI
+      # -----------------------
+      - bash: cmake --build . --config Release
+        displayName: 'Build HELICS_FMI'
+        workingDirectory: build
+
+      # -----------------------
+      # Test HELICS_FMI
+      # -----------------------
+      - bash: ctest --output-on-failure --timeout 480 -C Release
         displayName: 'Test HELICS_FMI'
+        workingDirectory: build
 
   - job: macOS
     strategy:
       matrix:
         XCode-latest:
-          test_config: 'ci'
+          xtraFlags: '-DHELICS_DISABLE_WEBSERVER=ON -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON'
           vmImage: 'macOS-12'
         XCode-oldest:
-          test_config: 'ci'
+          xtraFlags: '-DHELICS_DISABLE_WEBSERVER=ON -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON'
           vmImage: 'macOS-11'
           xcode_path: '/Applications/Xcode_11.7.app'
     pool:
@@ -63,20 +67,25 @@ jobs:
           XCODE_PATH: $[variables['xcode_path']]
         displayName: 'Set XCode Path'
         condition: ne(variables['xcode_path'],'')
-      - bash: |
-          unset VCPKG_ROOT
-          mkdir -p build && cd build
-          ../scripts/ci-build.sh
-        env:
-          MAKEFLAGS: '-j 4'
-          CMAKE_GENERATOR: 'Unix Makefiles'
-        displayName: 'Build HELICS_FMI'
+      - task: CMake@1
+        inputs:
+          cmakeArgs: -DHELICS_FMI_BUILD_TESTS=ON -DHELICS_DISABLE_VCPKG=ON $(extraFlags) ..
+        displayName: 'Configure HELICS_FMI'
+        condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
-      - bash: ../scripts/run-ci-tests.sh "$TEST_CONFIG"
-        env:
-          TEST_CONFIG: $[variables['test_config']]
-        workingDirectory: 'build'
+      # -----------------------
+      # Build HELICS_FMI
+      # -----------------------
+      - bash: cmake --build . --config Release
+        displayName: 'Build HELICS_FMI'
+        workingDirectory: build
+
+      # -----------------------
+      # Test HELICS_FMI
+      # -----------------------
+      - bash: ctest --output-on-failure --timeout 480 -C Release
         displayName: 'Test HELICS_FMI'
+        workingDirectory: build
 
   - job: Windows
     strategy:
@@ -85,17 +94,17 @@ jobs:
           imageName: 'windows-2019'
           langArch: 'x86'
           vsArch: 'Win32'
-          extraFlags: '-DHELICS_DISABLE_WEBSERVER=ON'
+          extraFlags: '-DHELICS_DISABLE_WEBSERVER=ON -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON'
         VS2019-64bit:
           imageName: 'windows-2019'
           langArch: 'x64'
           vsArch: 'x64'
-          extraFlags: ''
+          extraFlags: '-DHELICS_FMI_HELICS_PACKAGE_DOWNLOAD=ON'
         VS2022-64bit:
           imageName: 'windows-2022'
           langArch: 'x64'
           vsArch: 'x64'
-          extraFlags: '-DCMAKE_CXX_STANDARD=20'
+          extraFlags: '-DCMAKE_CXX_STANDARD=20 -DHELICS_FMI_HELICS_PACKAGE_DOWNLOAD=ON'
 
     pool:
       vmImage: $(imageName)
@@ -131,7 +140,7 @@ jobs:
         displayName: Show environment info
       - task: CMake@1
         inputs:
-          cmakeArgs: -A $(vsArch) -DHELICS_FMI_BUILD_TESTS=ON -DHELICS_ZMQ_FORCE_SUBPROJECT=ON  -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON -DHELICS_DISABLE_VCPKG=ON $(extraFlags) ..
+          cmakeArgs: -A $(vsArch) -DHELICS_FMI_BUILD_TESTS=ON -DHELICS_ZMQ_FORCE_SUBPROJECT=ON   -DHELICS_DISABLE_VCPKG=ON $(extraFlags) ..
         displayName: 'Configure HELICS_FMI'
         condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
