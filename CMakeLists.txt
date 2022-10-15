@@ -248,6 +248,21 @@ target_include_directories(helics_fmi_base SYSTEM INTERFACE $<BUILD_INTERFACE:${
 
 target_compile_definitions(helics_fmi_base INTERFACE BOOST_DLL_USE_STD_FS=1)
 
+
+# -------------------------------------------------------------
+# add threading support
+# -------------------------------------------------------------
+if(MSYS OR CYGWIN OR NOT WIN32)
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+endif()
+find_package(Threads REQUIRED)
+
+target_link_libraries(helics_fmi_base INTERFACE Threads::Threads)
+
+if(UNIX AND NOT APPLE)
+    target_link_libraries(helics_fmi_base INTERFACE rt)
+endif()
+
 # -------------------------------------------------------------
 # TOML11  add the TOML interpreter
 # -------------------------------------------------------------
