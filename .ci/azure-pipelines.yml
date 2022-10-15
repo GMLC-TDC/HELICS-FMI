@@ -71,7 +71,6 @@ jobs:
         inputs:
           cmakeArgs: -DHELICS_FMI_BUILD_TESTS=ON -DHELICS_DISABLE_VCPKG=ON $(extraFlags) ..
         displayName: 'Configure HELICS_FMI'
-        condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
       # -----------------------
       # Build HELICS_FMI
