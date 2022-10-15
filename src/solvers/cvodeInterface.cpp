@@ -50,8 +50,8 @@ namespace solvers {
         mode.algebraic = false;
     }
 
-    cvodeInterface::cvodeInterface(SolvableObject* sobj, const solverMode& sMode):
-        sundialsInterface(sobj, sMode)
+    cvodeInterface::cvodeInterface(SolvableObject* solveObj, const solverMode& sMode):
+        sundialsInterface(solveObj, sMode)
     {
         mode.dynamic = true;
         mode.differential = true;
@@ -171,7 +171,7 @@ namespace solvers {
     }
 
     // output solver stats
-    void cvodeInterface::logSolverStats(solver_print_level logLevel, bool /*iconly*/) const
+    void cvodeInterface::logSolverStats([[maybe_unused]] solver_print_level logLevel, bool /*iconly*/) const
     {
         if (!flags[initialized_flag]) {
             return;
@@ -228,7 +228,7 @@ namespace solvers {
         }
     }
 
-    void cvodeInterface::logErrorWeights(solver_print_level logLevel) const
+    void cvodeInterface::logErrorWeights([[maybe_unused]] solver_print_level logLevel) const
     {
         N_Vector eweight = NVECTOR_NEW(use_omp, svsize, ctx);
         N_Vector ele = NVECTOR_NEW(use_omp, svsize, ctx);

@@ -19,8 +19,8 @@
 
 FmiCoSimFederate::FmiCoSimFederate(std::shared_ptr<fmi2CoSimObject> obj,
                                    const helics::FederateInfo& fi):
-    cs(std::move(obj)),
-    fed(obj->getName(), fi)
+    fed(obj->getName(), fi),
+    cs(std::move(obj))
 {
     if (cs) {
         input_list = cs->getInputNames();

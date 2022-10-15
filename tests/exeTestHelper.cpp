@@ -50,49 +50,49 @@ bool exeTestRunner::findFileLocation(const std::string& baseLocation, const std:
     std::filesystem::path sourcePath(baseLocation);
 
     auto tryPath1 = sourcePath / target;
-    if (exists(tryPath1)) {
+    if (std::filesystem::exists(tryPath1)) {
         exeString = tryPath1.string();
         return true;
     }
 
     auto tryPath2 = sourcePath / (target + ".exe");
-    if (exists(tryPath2)) {
+    if (std::filesystem::exists(tryPath2)) {
         exeString = tryPath2.string();
         return true;
     }
 #ifndef NDEBUG
     auto tryPathD1 = sourcePath / "Debug" / target;
-    if (exists(tryPathD1)) {
+    if (std::filesystem::exists(tryPathD1)) {
         exeString = tryPathD1.string();
         return true;
     }
 
     auto tryPathD2 = sourcePath / "Debug" / (target + ".exe");
-    if (exists(tryPathD2)) {
+    if (std::filesystem::exists(tryPathD2)) {
         exeString = tryPathD2.string();
         return true;
     }
 #endif
     auto tryPathR1 = sourcePath / "Release" / target;
-    if (exists(tryPathR1)) {
+    if (std::filesystem::exists(tryPathR1)) {
         exeString = tryPathR1.string();
         return true;
     }
 
     auto tryPathR2 = sourcePath / "Release" / (target + ".exe");
-    if (exists(tryPathR2)) {
+    if (std::filesystem::exists(tryPathR2)) {
         exeString = tryPathR2.string();
         return true;
     }
 
     std::filesystem::path tryPatht1 = target;
-    if (exists(tryPatht1)) {
+    if (std::filesystem::exists(tryPatht1)) {
         exeString = tryPatht1.string();
         return true;
     }
 
     std::filesystem::path tryPatht2 = (target + ".exe");
-    if (exists(tryPatht2)) {
+    if (std::filesystem::exists(tryPatht2)) {
         exeString = tryPatht2.string();
         return true;
     }
@@ -125,12 +125,15 @@ std::string exeTestRunner::runCaptureOutput(const std::string& args) const
     if (!active) {
         return "invalid executable";
     }
-    std::string rstr = exeString + " " + args + " > " + outFile;
-    system(rstr.c_str());
+    std::string rstr = exeString + " " + args + " > " + outFile + " 2>&1";
+    int ret = system(rstr.c_str());
 
     std::ifstream t(outFile);
     std::string str((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
 
+    str.append(exeString);
+    str.append(" returned ");
+    str.append(std::to_string(ret) + "\n");
     remove(outFile.c_str());
     return str;
 }
@@ -143,13 +146,14 @@ std::future<std::string> exeTestRunner::runCaptureOutputAsync(const std::string&
         prom.set_value("invalid executable");
         return fut;
     }
-    std::string rstr = exeString + " " + args + " > " + outFile;
+    std::string rstr = exeString + " " + args + " > " + outFile + " 2>&1";
     std::string oFile = outFile;
     return std::async(std::launch::async, [rstr, oFile]() {
-        system(rstr.c_str());
+        int ret = system(rstr.c_str());
         std::ifstream t(oFile);
         std::string str((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
-
+        str.append("execution returned ");
+        str.append(std::to_string(ret) + "\n");
         remove(oFile.c_str());
         return str;
     });

@@ -25,8 +25,8 @@ namespace solvers {
         mode.differential = true;
         mode.algebraic = false;
     }
-    basicOdeSolver::basicOdeSolver(SolvableObject* sobj, const solverMode& sMode):
-        SolverInterface(sobj, sMode)
+    basicOdeSolver::basicOdeSolver(SolvableObject* solveObj, const solverMode& sMode):
+        SolverInterface(solveObj, sMode)
     {
     }
     std::unique_ptr<SolverInterface> basicOdeSolver::clone(bool fullCopy) const

@@ -58,6 +58,8 @@ void fmi2Object::setMode(fmuMode mode)
     switch (currentMode) {
         case fmuMode::instantiatedMode:
             switch (mode) {
+            case fmuMode::instantiatedMode:
+                break;
                 case fmuMode::initializationMode:
                     if (inputSize() == 0) {
                         setDefaultInputs();

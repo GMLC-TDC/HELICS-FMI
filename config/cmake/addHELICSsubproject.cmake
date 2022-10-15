@@ -16,7 +16,7 @@ string(TOLOWER "helics" lcName)
 include(FetchContent)
 
 fetchcontent_declare(
-    helics GIT_REPOSITORY https://github.com/GMLC-TDC/HELICS.git GIT_TAG external_subprojects
+    helics GIT_REPOSITORY https://github.com/GMLC-TDC/HELICS.git GIT_TAG develop
 )
 
 fetchcontent_getproperties(helics)

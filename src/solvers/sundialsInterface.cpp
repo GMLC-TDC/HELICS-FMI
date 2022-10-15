@@ -41,8 +41,8 @@ namespace solvers {
         SUNContext_Create(nullptr, &ctx);
         tolerance = 1e-8;
     }
-    sundialsInterface::sundialsInterface(SolvableObject* sobj, const solverMode& sMode):
-        SolverInterface(sobj, sMode)
+    sundialsInterface::sundialsInterface(SolvableObject* solveObj, const solverMode& sMode):
+        SolverInterface(solveObj, sMode)
     {
         SUNContext_Create(nullptr, &ctx);
         tolerance = 1e-8;
