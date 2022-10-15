@@ -4,14 +4,10 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - develop
       - main
-      - helics2
   pull_request:
     branches:
-      - develop
       - main
-      - helics2
 
 jobs:
   cpplint:
@@ -21,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run cpplint
-      run: cpplint --counting=detailed --recursive examples benchmarks src tests
+      run: cpplint --counting=detailed --recursive src tests
 
   clang-tidy:
     if: github.event_name == 'pull_request'
