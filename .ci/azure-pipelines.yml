@@ -12,14 +12,14 @@ jobs:
         ubuntuDefault:
           containerImage: 'helics/buildenv:ubuntu20.04-default-builder'
           extraFlags: '-DHELICS_DISABLE_WEBSERVER=ON -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON'
-        gcc8:
-          containerImage: 'helics/buildenv:gcc8-builder'
+        gcc9:
+          containerImage: 'helics/buildenv:gcc9-builder'
           extraFlags: '-DHELICS_DISABLE_WEBSERVER=ON -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON'
         clang13:
           containerImage: 'helics/buildenv:clang13-builder'
           extraFlags: '-DHELICS_DISABLE_WEBSERVER=ON -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON'
-        clang7:
-          containerImage: 'helics/buildenv:clang7-builder'
+        clang8:
+          containerImage: 'helics/buildenv:clang8-builder'
           extraFlags: '-DHELICS_DISABLE_WEBSERVER=ON -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON'
 
     pool:
@@ -67,6 +67,9 @@ jobs:
           XCODE_PATH: $[variables['xcode_path']]
         displayName: 'Set XCode Path'
         condition: ne(variables['xcode_path'],'')
+      - bash: |
+          brew install zeromq boost
+        displayName: 'Install dependencies'
       - task: CMake@1
         inputs:
           cmakeArgs: -DHELICS_FMI_BUILD_TESTS=ON -DHELICS_DISABLE_VCPKG=ON $(extraFlags) ..
