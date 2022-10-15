@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-cmake_minimum_required(VERSION 3.17...3.24)
+cmake_minimum_required(VERSION 3.16...3.24)
 
 # Install dependencies using vcpkg if VCPKG_ROOT is set and no CMake Toolchain file is given vcpkg
 # installation on a system doesn't set VCPKG_ROOT, so setting it should be like an opt-in for users
@@ -17,6 +17,7 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE AND NOT HELICS_D
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
+project(HELICS_FMI VERSION 0.7.0)
 project(HELICS_FMI VERSION 0.7.0)
 
 # set (HELICS_FMI_VERSION_BUILD )
@@ -122,6 +123,13 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
             CACHE PATH "Executable/dll output dir."
         )
     endif()
+endif()
+
+# -----------------------------------------------------------------------------
+# General project wide configuration for debug postfix
+# -----------------------------------------------------------------------------
+if(NOT NO_DEBUG_POSFIX AND NOT CMAKE_DEBUG_POSTFIX)
+    set(CMAKE_DEBUG_POSTFIX d)
 endif()
 
 if(NOT TARGET compile_flags_target)
@@ -239,6 +247,20 @@ include(addBoost)
 target_include_directories(helics_fmi_base SYSTEM INTERFACE $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>)
 
 target_compile_definitions(helics_fmi_base INTERFACE BOOST_DLL_USE_STD_FS=1)
+
+# -------------------------------------------------------------
+# add threading support
+# -------------------------------------------------------------
+if(MSYS OR CYGWIN OR NOT WIN32)
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+endif()
+find_package(Threads REQUIRED)
+
+target_link_libraries(helics_fmi_base INTERFACE Threads::Threads)
+
+if(UNIX AND NOT APPLE)
+    target_link_libraries(helics_fmi_base INTERFACE rt)
+endif()
 
 # -------------------------------------------------------------
 # TOML11  add the TOML interpreter

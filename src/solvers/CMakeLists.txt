@@ -40,6 +40,3 @@ target_link_libraries(solvers PUBLIC utilities SUNDIALS::cvode SUNDIALS::arkode)
 if(ENABLE_KLU)
     target_link_libraries(solvers PUBLIC SuiteSparse::klu)
 endif(ENABLE_KLU)
-
-get_target_property(OUT Boostlibs::core INTERFACE_LINK_LIBRARIES)
-message(STATUS "out=${OUT}")

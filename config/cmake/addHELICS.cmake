@@ -7,6 +7,8 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+set(HELICS_CURRENT_VERSION 3.3.0)
+
 if(MSVC)
     set(HELICS_PATH_HINTS C:/local/helics_3_3_0)
 endif(MSVC)
@@ -40,7 +42,17 @@ else()
 
     if(NOT HELICS_FOUND)
         if(HELICS_FMI_HELICS_SUBPROJECT)
+
             include(addHELICSsubproject)
+        elseif(HELICS_FMI_HELICS_PACKAGE_DOWNLOAD)
+            message(STATUS "HELICS FMI helics package download")
+            include(helicsPackageDownload)
+            if(helicscpp_POPULATED)
+
+                find_package(HELICS 3.3 HINTS ${helicscpp_SOURCE_DIR})
+                set(HELICS_FMI_HELICS_TARGET HELICS::helicscpp)
+                set(HELICS_FMI_HELICS_TARGET_APPS HELICS::helicscpp-apps)
+            endif()
         endif()
     else()
         set(HELICS_FMI_HELICS_TARGET HELICS::helicscpp)

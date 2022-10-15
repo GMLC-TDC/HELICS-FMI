@@ -65,21 +65,3 @@ if(MSVC)
     target_compile_options(sundials_cvode_static PRIVATE "/sdl-")
     target_compile_options(sundials_cvode_static PRIVATE "/W3")
 endif()
-
-get_target_property(cvode_target_debug SUNDIALS::cvode OUTPUT_NAME)
-get_target_property(cvode_dir_debug SUNDIALS::cvode LIBRARY_OUTPUT_DIRECTORY)
-
-get_target_property(cvode_target_release SUNDIALS::cvode LIBRARY_OUTPUT_NAME_RELEASE)
-get_target_property(cvode_dir_release SUNDIALS::cvode LIBRARY_OUTPUT_DIRECTORY_RELEASE)
-
-add_library(sundials_import_cvode STATIC IMPORTED)
-message(STATUS "linking to ${cvode_dir_debug}/${cvode_target_debug}${CMAKE_STATIC_LIBRARY_SUFFIX}")
-set_property(
-    TARGET sundials_import_cvode
-    PROPERTY IMPORTED_LOCATION
-             "${cvode_dir_debug}/${cvode_target_debug}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-)
-# set_property(TARGET sundials_import_cvode PROPERTY IMPORTED_LOCATION_RELEASE
-# "${cvode_dir_release}/${cvode_target_release}${CMAKE_STATIC_LIBRARY_SUFFIX}")
-
-add_library(HELICS_FMI::cvode ALIAS sundials_import_cvode)

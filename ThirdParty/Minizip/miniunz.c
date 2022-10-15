@@ -55,6 +55,9 @@
 # include <utime.h>
 #endif
 
+#if defined(unix) || defined(__APPLE__)
+#include <sys/stat.h>
+#endif
 
 #include "unzip.h"
 

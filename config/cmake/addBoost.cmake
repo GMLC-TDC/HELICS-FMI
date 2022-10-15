@@ -80,7 +80,7 @@ if(NOT BOOST_REQUIRED_LIBRARIES)
 endif()
 
 # Minimum version of Boost required for building a project
-set(BOOST_MINIMUM_VERSION 1.74)
+set(BOOST_MINIMUM_VERSION 1.69)
 
 if(BOOST_REQUIRED_LIBRARIES)
     find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS ${BOOST_REQUIRED_LIBRARIES} REQUIRED)
