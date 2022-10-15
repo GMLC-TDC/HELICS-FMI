@@ -248,7 +248,6 @@ target_include_directories(helics_fmi_base SYSTEM INTERFACE $<BUILD_INTERFACE:${
 
 target_compile_definitions(helics_fmi_base INTERFACE BOOST_DLL_USE_STD_FS=1)
 
-
 # -------------------------------------------------------------
 # add threading support
 # -------------------------------------------------------------

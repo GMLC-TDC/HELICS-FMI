@@ -65,5 +65,3 @@ if(MSVC)
     target_compile_options(sundials_cvode_static PRIVATE "/sdl-")
     target_compile_options(sundials_cvode_static PRIVATE "/W3")
 endif()
-
-
