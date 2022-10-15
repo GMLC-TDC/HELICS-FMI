@@ -140,7 +140,7 @@ solver_index_type FmiModelExchangeFederate::jacobianSize([[maybe_unused]] const 
     return 0;
 }
 
-void FmiModelExchangeFederate::guessCurrentValue(double time,
+void FmiModelExchangeFederate::guessCurrentValue([[maybe_unused]] double time,
                                                  double state[],
                                                  double dstate_dt[],
     [[maybe_unused]] const griddyn::solverMode& sMode)

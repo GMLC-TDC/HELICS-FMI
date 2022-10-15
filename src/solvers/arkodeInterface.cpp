@@ -223,7 +223,7 @@ namespace solvers {
         }
     }
 
-    void arkodeInterface::logErrorWeights(solver_print_level logLevel) const
+    void arkodeInterface::logErrorWeights([[maybe_unused]] solver_print_level logLevel) const
     {
         N_Vector eweight = NVECTOR_NEW(use_omp, svsize, ctx);
         N_Vector ele = NVECTOR_NEW(use_omp, svsize, ctx);

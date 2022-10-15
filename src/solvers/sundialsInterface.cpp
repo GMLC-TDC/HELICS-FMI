@@ -212,7 +212,7 @@ namespace solvers {
         return SolverInterface::get(param);
     }
 
-    void sundialsInterface::KLUReInit(sparse_reinit_modes sparseReInitModes)
+    void sundialsInterface::KLUReInit([[maybe_unused]] sparse_reinit_modes sparseReInitModes)
     {
 #ifdef KLU_ENABLE
         if (flags[dense_flag]) {
@@ -396,7 +396,7 @@ namespace solvers {
             sd->nnz = a1->size();
             if (sd->flags[fileCapture_flag]) {
                 if (!sd->jacFile.empty()) {
-                    auto val = static_cast<long int>(sd->get("nliterations"));
+                    //auto val = static_cast<long int>(sd->get("nliterations"));
                     //   writeArray (time, 1, val, sd->mode.offsetIndex, *a1, sd->jacFile);
                 }
             }

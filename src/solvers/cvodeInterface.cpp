@@ -286,7 +286,7 @@ namespace solvers {
             throw(InvalidSolverOperation());
         }
 
-        auto jsize = sobj->jacobianSize(mode);
+        //auto jsize = sobj->jacobianSize(mode);
 
         // dynInitializeB CVode - Sundials
 

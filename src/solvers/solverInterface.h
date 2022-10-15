@@ -31,11 +31,20 @@ enum class solver_print_level {
 class solverException: public std::exception {
   protected:
     int errorCode;  //<!* the actual solver Error Code
+    std::string message;
   public:
-    explicit solverException(int ecode = 0): errorCode(ecode){};
+    explicit solverException(int ecode = 0): errorCode(ecode)
+    {
+        message=std::string("solver Exception:error code=") + std::to_string(errorCode);
+    }
+
+    explicit solverException(int ecode, const std::string &errorMessage): errorCode(ecode),message(errorMessage)
+    {
+       
+    }
     virtual const char* what() const noexcept override
     {
-        return (std::string("solver Exception:error code=") + std::to_string(errorCode)).c_str();
+        return message.c_str();
     }
     /** return the full name of the object that threw the exception*/
     int code() const noexcept { return errorCode; }
@@ -46,12 +55,7 @@ class solverException: public std::exception {
 class InvalidSolverOperation: public solverException {
   protected:
   public:
-    explicit InvalidSolverOperation(int ecode = 0): solverException(ecode){};
-    virtual const char* what() const noexcept override
-    {
-        return (std::string("invalid solver operation:error code=") + std::to_string(errorCode))
-            .c_str();
-    }
+    explicit InvalidSolverOperation(int ecode = 0): solverException(ecode,std::string("invalid solver operation:error code=") + std::to_string(errorCode)){};
 };
 
 // solver return codes from the solve and initIC functions
