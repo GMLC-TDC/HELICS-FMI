@@ -37,6 +37,7 @@ set(HELICS_HIDE_CMAKE_VARIABLES ON CACHE BOOL "" FORCE)
 
 add_subdirectory(${${lcName}_SOURCE_DIR} ${${lcName}_BINARY_DIR})
 
-set(HELICS_FMI_HELICS_TARGET_APPS HELICS::apps)
+set(${PROJECT_NAME}_HELICS_TARGET_APPS HELICS::apps)
+set(${PROJECT_NAME}_HELICS_TARGET HELICS::helicscpp)
 # set_target_properties(clang-format clang-format-check clang-format-diff PROPERTIES FOLDER
 # "Extern/zmq_clang_format")

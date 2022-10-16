@@ -52,7 +52,7 @@ class readerElement {
   public:
     virtual ~readerElement() = 0;
     /** @brief load a file into the element
-    @param[in] fileName
+    @param[in] fileName the name of the file to load
     @return true if the file was loaded successfully
     */
     virtual bool loadFile(const std::string& fileName) = 0;

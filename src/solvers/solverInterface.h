@@ -208,13 +208,11 @@ class SolverInterface: public helperObject {
 
     /** @brief initialize the solver to time t0
     @param[in] t0  the time for the initialization
-    @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
     */
     virtual void initialize(double t0);
 
     /** @brief reinitialize the sparse components
     @param[in] mode the reinitialization mode
-    @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
     */
     virtual void sparseReInit(sparse_reinit_modes mode);
 
@@ -223,7 +221,7 @@ class SolverInterface: public helperObject {
 
     /** @brief perform an initial condition calculation
     @param[in] t0  the time for the initialization
-    @param[in]  tstep0  the size of the first desired step
+    @param[in] tstep0  the size of the first desired step
     @param[in] mode  the step mode
     @param[in] constraints  flag indicating that constraints should be used
     @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
@@ -231,15 +229,12 @@ class SolverInterface: public helperObject {
     virtual int calcIC(double t0, double tstep0, ic_modes mode, bool constraints);
     /** @brief get the current solution
      usually called after a call to CalcIC to get the calculated conditions
-    @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
     */
     virtual void getCurrentData();
     /** @brief get the locations of any found roots
-    @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
     */
     virtual void getRoots();
     /** @brief update the number of roots to find
-    @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
     */
     virtual void setRootFinding(solver_index_type numRoots);
 
@@ -323,7 +318,7 @@ class SolverInterface: public helperObject {
     */
     virtual void setSimulationData(SolvableObject* sobj, const solverMode& sMode);
     /** @brief input the simulation data to attach to
-    @param[in] gds the gridDynSimulationObject to attach to
+    @param[in] SolvableObject the solvableObject to attach to
     */
     virtual void setSimulationData(SolvableObject* sobj);
 
@@ -376,7 +371,7 @@ class SolverInterface: public helperObject {
 };
 
 /** @brief make a solver from a particular mode
-@param[in] gds  the gridDynSimulation to link to
+@param[in] sobj  the SolvableObject to link to
 @param[in] sMode the solverMode to construct the SolverInterface from
 @return a unique_ptr to a SolverInterface object
 */

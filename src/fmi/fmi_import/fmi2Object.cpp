@@ -60,6 +60,7 @@ void fmi2Object::setMode(fmuMode mode)
             switch (mode) {
             case fmuMode::instantiatedMode:
             case fmuMode::continuousTimeMode:
+            case fmuMode::terminated:
                 break;
                 case fmuMode::initializationMode:
                     if (inputSize() == 0) {

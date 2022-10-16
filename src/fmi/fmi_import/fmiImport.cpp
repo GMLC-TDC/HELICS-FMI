@@ -123,13 +123,13 @@ fmiLibrary::fmiLibrary()
     information = std::make_shared<fmiInfo>();
 }
 
-fmiLibrary::fmiLibrary(const std::string& fmupath): fmiLibrary()
+fmiLibrary::fmiLibrary(const std::string& fmuPath): fmiLibrary()
 {
-    loadFMU(fmupath);
+    loadFMU(fmuPath);
 }
 
-fmiLibrary::fmiLibrary(const std::string& fmupath, const std::string& extractPath):
-    extractDirectory(extractPath), fmuName(fmupath)
+fmiLibrary::fmiLibrary(const std::string& fmuPath, const std::string& extractPath):
+    extractDirectory(extractPath), fmuName(fmuPath)
 {
     information = std::make_shared<fmiInfo>();
     if (!exists(extractDirectory)) {
@@ -164,9 +164,9 @@ bool fmiLibrary::isSoLoaded(fmu_type type) const
     }
 }
 
-void fmiLibrary::loadFMU(const std::string& fmupath)
+void fmiLibrary::loadFMU(const std::string& fmuPath)
 {
-    path ipath(fmupath);
+    path ipath(fmuPath);
     if (is_directory(ipath)) {
         extractDirectory = ipath;
     } else {
@@ -176,10 +176,10 @@ void fmiLibrary::loadFMU(const std::string& fmupath)
     loadInformation();
 }
 
-void fmiLibrary::loadFMU(const std::string& fmupath, const std::string& extractLoc)
+void fmiLibrary::loadFMU(const std::string& fmuPath, const std::string& extractLoc)
 {
     extractDirectory = extractLoc;
-    fmuName = fmupath;
+    fmuName = fmuPath;
     loadInformation();
 }
 

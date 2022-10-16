@@ -363,9 +363,6 @@ include(addUtilities)
 # Enable HELICS executable
 # -------------------------------------------------------------
 
-show_variable(
-    HELICS_INSTALL_PATH PATH "path to the helics installation" "${PROJECT_BINARY_DIR}/libs"
-)
 include(addHELICS)
 
 # -------------------------------------------------------------
@@ -439,13 +436,13 @@ target_include_directories(
 # -----------------------------------------------------------------------------
 # Setup CTEST environment
 # -----------------------------------------------------------------------------
-option(BUILD_HELICS_FMI_TESTS "Enable the test Executables to be built" ON)
+option(HELICS_FMI_BUILD_TESTS "Enable the test Executables to be built" ON)
 # enable testing
-if(BUILD_HELICS_FMI_TESTS)
+if(HELICS_FMI_BUILD_TESTS)
     include(CTest)
     enable_testing()
     add_subdirectory(tests)
-endif(BUILD_HELICS_FMI_TESTS)
+endif(HELICS_FMI_BUILD_TESTS)
 
 # -------------------------------------------------------------
 # Future Additions
@@ -457,9 +454,9 @@ endif(BUILD_HELICS_FMI_TESTS)
 # -------------------------------------------------------------
 # CPack for NSIS Installer
 # -------------------------------------------------------------
-option(ENABLE_PACKAGE_BUILD "Add projects for making packages and installers for HELICS" OFF)
+option(HELICS_FMI_ENABLE_PACKAGE_BUILD "Add projects for making packages and installers for HELICS" OFF)
 
-if(ENABLE_PACKAGE_BUILD)
+if(HELICS_FMI_ENABLE_PACKAGE_BUILD)
     set(CPACK_PACKAGE_NAME "HELICS-fmi")
     set(CPACK_PACKAGE_VENDOR "Lawrence Livermore National Security")
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Helics-fmi Installer")
@@ -498,4 +495,4 @@ if(ENABLE_PACKAGE_BUILD)
     # THIS LINE MUST BE LAST
     include(CPack)
 
-endif(ENABLE_PACKAGE_BUILD)
+endif(HELICS_FMI_ENABLE_PACKAGE_BUILD)
