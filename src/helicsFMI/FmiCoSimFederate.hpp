@@ -29,7 +29,7 @@ class FmiCoSimFederate {
     std::vector<helics::Publication> pubs;  //!< known publications
     std::vector<helics::Input> inputs;  //!< known inputs
     helics::Time stepTime{helics::timeEpsilon};  //!< the step time for the Federate
-    helics::Time timeBias{ helics::timeZero };  //!< time shift for the federate
+    helics::Time timeBias{helics::timeZero};  //!< time shift for the federate
   public:
     FmiCoSimFederate(std::shared_ptr<fmi2CoSimObject> obj, const helics::FederateInfo& fi);
     /** configure the federate using the specified inputs and outputs*/

@@ -298,8 +298,8 @@ class fmi2CoSimObject: public fmi2Object {
     @param[in] noSetFMUStatePriorToCurrentPoint flag to indicate that the fmu cannot rollback
     */
     void doStep(fmi2Real currentCommunicationPoint,
-        fmi2Real communicationStepSize,
-        fmi2Boolean noSetFMUStatePriorToCurrentPoint);
+                fmi2Real communicationStepSize,
+                fmi2Boolean noSetFMUStatePriorToCurrentPoint);
     /** cancel a pending time step*/
     void cancelStep();
     fmi2Real getLastStepTime() const;

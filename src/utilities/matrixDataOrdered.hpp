@@ -23,9 +23,8 @@
 template<sparse_ordering M = sparse_ordering::row_ordered, class ValueT = double>
 class matrixDataOrdered: public matrixData<ValueT> {
   private:
-      /// vector of data vectors for each Row
-    std::vector<std::vector<std::pair<index_t, ValueT>>>
-        dVec;  
+    /// vector of data vectors for each Row
+    std::vector<std::vector<std::pair<index_t, ValueT>>> dVec;
 
     decltype(dVec[0].cbegin()) cptr;  //!< ptr to the beginning of the sequence;
     decltype(dVec[0].cend()) iend;  //!< ptr to the end of the current sequence;

@@ -396,8 +396,8 @@ namespace solvers {
             sd->nnz = a1->size();
             if (sd->flags[fileCapture_flag]) {
                 if (!sd->jacFile.empty()) {
-                    //auto val = static_cast<long int>(sd->get("nliterations"));
-                    //   writeArray (time, 1, val, sd->mode.offsetIndex, *a1, sd->jacFile);
+                    // auto val = static_cast<long int>(sd->get("nliterations"));
+                    //    writeArray (time, 1, val, sd->mode.offsetIndex, *a1, sd->jacFile);
                 }
             }
         } else {

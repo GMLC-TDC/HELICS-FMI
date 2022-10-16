@@ -416,9 +416,9 @@ void fmiLibrary::makeCallbackFunctions()
 
 #define STRING_BUFFER_SIZE 1000
 void loggerFunc([[maybe_unused]] fmi2ComponentEnvironment compEnv,
-    [[maybe_unused]] fmi2String instanceName,
-    [[maybe_unused]] fmi2Status status,
-    [[maybe_unused]] fmi2String category,
+                [[maybe_unused]] fmi2String instanceName,
+                [[maybe_unused]] fmi2Status status,
+                [[maybe_unused]] fmi2String category,
                 fmi2String message,
                 ...)
 {

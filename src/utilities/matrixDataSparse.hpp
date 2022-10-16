@@ -232,4 +232,3 @@ std::vector<index_t> findMissing(matrixDataSparse<ValueT>& md);
 
 template<class ValueT>
 std::vector<std::vector<index_t>> findRank(matrixDataSparse<ValueT>& md);
-
