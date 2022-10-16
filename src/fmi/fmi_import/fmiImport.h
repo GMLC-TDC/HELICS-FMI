@@ -222,7 +222,7 @@ class fmiLibrary {
 @param[in] compEnv the environment of the logger
 @param[in] instanceName the name of the object
 @param[in] status the status of the message
-@param[in] message
+@param[in] message the string to add to the log
 */
 void loggerFunc(fmi2ComponentEnvironment compEnv,
                 fmi2String instanceName,

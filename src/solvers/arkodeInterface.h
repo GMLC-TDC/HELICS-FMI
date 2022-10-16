@@ -34,7 +34,7 @@ namespace solvers {
         /** @brief constructor*/
         explicit arkodeInterface(const std::string& objName = "arkode");
         /** @brief alternate constructor
-        @param[in] gds  the gridDynSimulation object to connect to
+        @param[in] sobj  the Solvable object to connect to
         @param[in] sMode the solverMode to solve For
         */
         arkodeInterface(SolvableObject* sobj, const solverMode& sMode);

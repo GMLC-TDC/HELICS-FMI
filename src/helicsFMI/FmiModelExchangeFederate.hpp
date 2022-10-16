@@ -30,7 +30,7 @@ class FmiModelExchangeFederate: public griddyn::SolvableObject {
   public:
     FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj,
                              const helics::FederateInfo& fi);
-    ~FmiModelExchangeFederate();
+    virtual ~FmiModelExchangeFederate();
     /** configure the federate using the specified inputs and outputs*/
     void configure(helics::Time step, helics::Time start = helics::timeZero);
     /** set a string list of inputs*/

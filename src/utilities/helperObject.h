@@ -51,7 +51,6 @@ class helperObject {
     /** @brief get flags
     @param flag -the name of the flag to be queried
     @param val the value to the set the flag ;
-    @return int a value representing whether the set operation was successful or not
     */
     virtual void setFlag(const std::string& flag, bool val = true);
     /** @brief get flags

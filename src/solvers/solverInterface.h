@@ -30,7 +30,7 @@ enum class solver_print_level {
 /** error class for throwing solver exceptions*/
 class solverException: public std::exception {
   protected:
-    int errorCode;  //<!* the actual solver Error Code
+    int errorCode;  ///< the actual solver Error Code
     std::string message;
   public:
     explicit solverException(int ecode = 0): errorCode(ecode)
@@ -141,7 +141,7 @@ class SolverInterface: public helperObject {
     double solveTime = -1e39;  //!< storage for the time the solver is called
     std::string jacFile;  //!< the file to write the Jacobian to
     std::string stateFile;  //!< the file to write the state and residual to
-    SolvableObject* sobj = nullptr;  //!< pointer the gridDynSimulation object used
+    SolvableObject* sobj = nullptr;  //!< pointer the solvableObject object used
     solver_index_type svsize = 0;  //!< the state size
     solver_index_type nnz = 0;  //!< the actual number of non-zeros in a Jacobian
     std::bitset<32> flags;  //!< flags for the solver
@@ -153,7 +153,7 @@ class SolverInterface: public helperObject {
     explicit SolverInterface(const std::string& objName = "");
 
     /** @brief alternate constructor
-    @param[in] gds  gridDynSimulation to link with
+    @param[in] sobj  SolvableObject to link with
     @param[in] sMode the solverMode associated with the solver
     */
     SolverInterface(SolvableObject* sobj, const solverMode& sMode);
@@ -202,7 +202,6 @@ class SolverInterface: public helperObject {
     /** @brief allocate the memory for the solver
     @param[in] size  the size of the state vector
     @param[in] numRoots  the number of root functions in the solution
-    @return the function status
     */
     virtual void allocate(solver_index_type size, solver_index_type numRoots = 0);
 
@@ -313,7 +312,7 @@ class SolverInterface: public helperObject {
     */
     void printStates(bool getNames = false);
     /** @brief input the simulation data to attach to
-    @param[in] gds the gridDynSimulationObject to attach to
+    @param[in] sobj the solvableObject to attach to
     @param[in] sMode the solverMode associated with the solver
     */
     virtual void setSimulationData(SolvableObject* sobj, const solverMode& sMode);

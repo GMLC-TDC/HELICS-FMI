@@ -32,7 +32,7 @@ namespace solvers {
         /** @brief constructor*/
         explicit cvodeInterface(const std::string& objName = "cvode");
         /** @brief alternate constructor
-        @param[in] gds  the gridDynSimulation object to connect to
+        @param[in] sobj  the solvable object to connect to
         @param[in] sMode the solverMode to solve For
         */
         cvodeInterface(SolvableObject* sobj, const solverMode& sMode);
