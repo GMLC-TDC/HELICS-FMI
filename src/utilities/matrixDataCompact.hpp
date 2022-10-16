@@ -10,8 +10,6 @@
  * LLNS Copyright End
  */
 
-#ifndef _MATRIX_DATA_COMPACT_H_
-#define _MATRIX_DATA_COMPACT_H_
 #pragma once
 
 #include "utilities/matrixData.hpp"
@@ -113,5 +111,3 @@ class matrixDataCompact: public matrixData<ValueT> {
         index_t counter;
     };
 };
-
-#endif

@@ -10,8 +10,6 @@
  * LLNS Copyright End
  */
 
-#ifndef _MATRIX_DATA_ORDERING_H_
-#define _MATRIX_DATA_ORDERING_H_
 #pragma once
 
 #include <utility>
@@ -40,5 +38,3 @@ class keyOrder<Y, sparse_ordering::column_ordered> {
     static Y secondary(Y rowIndex, Y /*colIndex*/) { return rowIndex; }
     static std::pair<Y, Y> order(Y row, Y col) { return std::make_pair(col, row); }
 };
-
-#endif

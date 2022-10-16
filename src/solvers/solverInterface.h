@@ -55,7 +55,7 @@ class solverException: public std::exception {
 class InvalidSolverOperation: public solverException {
   protected:
   public:
-    explicit InvalidSolverOperation(int ecode = 0): solverException(ecode,std::string("invalid solver operation:error code=") + std::to_string(errorCode)){};
+    explicit InvalidSolverOperation(int ecode = 0): solverException(ecode,std::string("invalid solver operation:error code=") + std::to_string(ecode)){};
 };
 
 // solver return codes from the solve and initIC functions

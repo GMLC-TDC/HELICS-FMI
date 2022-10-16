@@ -10,8 +10,7 @@
  * LLNS Copyright End
  */
 
-#ifndef UTILITY_RANDOM_H_
-#define UTILITY_RANDOM_H_
+#pragma once
 
 #include <memory>
 #include <random>
@@ -94,7 +93,7 @@ class gridRandom {
     /** generate a random vector with a specified number of values*/
     std::vector<double> getNewValues(size_t count);
     /** fill a vector with new random values
-    @param[out] the vector to fill with new random numbers
+    @param[out] rvec the vector to fill with new random numbers
     @param count the number of random values to generate
     */
     void getNewValues(std::vector<double>& rvec, size_t count);
@@ -157,4 +156,3 @@ class randomDistributionObject1<void>: public distributionObject {
 gridRandom::dist_type_t getDist(const std::string& dist_name);
 
 }  // namespace utilities
-#endif

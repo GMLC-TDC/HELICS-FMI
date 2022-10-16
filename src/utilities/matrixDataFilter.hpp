@@ -10,8 +10,6 @@
  * LLNS Copyright End
  */
 
-#ifndef _MATRIX_DATA_FILTER_H_
-#define _MATRIX_DATA_FILTER_H_
 #pragma once
 
 #include "matrixDataContainer.hpp"
@@ -69,5 +67,3 @@ class matrixDataFilter: public matrixDataContainer<ValueT> {
         std::sort(rowFilter.begin(), rowFilter.end());
     }
 };
-
-#endif

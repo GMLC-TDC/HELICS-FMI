@@ -10,8 +10,6 @@
  * LLNS Copyright End
  */
 
-#ifndef _MATRIX_DATA_TRANSLATE_H_
-#define _MATRIX_DATA_TRANSLATE_H_
 #pragma once
 
 #include "matrixDataContainer.hpp"
@@ -76,4 +74,3 @@ class matrixDataTranslate: public matrixDataContainer<ValueT> {
     }
 };
 
-#endif

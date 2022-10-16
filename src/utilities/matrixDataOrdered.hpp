@@ -10,8 +10,6 @@
  * LLNS Copyright End
  */
 
-#ifndef _MATRIX_DATA_ORDERED_H_
-#define _MATRIX_DATA_ORDERED_H_
 #pragma once
 
 #include "matrixDataOrdering.hpp"
@@ -169,5 +167,3 @@ class matrixDataOrdered: public matrixData<ValueT> {
 
     const std::vector<std::pair<index_t, ValueT>>& getSet(index_t N) const { return dVec[N]; }
 };
-
-#endif

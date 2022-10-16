@@ -10,8 +10,6 @@
  * LLNS Copyright End
  */
 
-#ifndef _MATRIX_DATA_CONTAINER_H_
-#define _MATRIX_DATA_CONTAINER_H_
 #pragma once
 
 #include "utilities/matrixData.hpp"
@@ -56,5 +54,3 @@ class matrixDataContainer: public matrixData<ValueT> {
     */
     virtual void setArray(matrixData<ValueT>& newAd) { setArray(&newAd); }
 };
-
-#endif

@@ -36,6 +36,7 @@ set(utilities_headers
     indexTypes.hpp
     factoryTemplates.hpp
     helperObject.h
+    gridRandom.h
 )
 
 add_library(utilities STATIC ${utilities_sources} ${utilities_headers})
