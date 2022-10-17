@@ -56,7 +56,7 @@ std::unique_ptr<fmi2CoSimObject>
 
 void fmiLibraryManager::loadBookMarkFile(const std::string& /*bookmarksFile*/)
 {
-    // TODO:: loading a bookmarks file
+    // TODO(PT):: loading a bookmarks file
 }
 
 void fmiLibraryManager::addShortCut(const std::string& name, const std::string& fmuLocation)

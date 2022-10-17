@@ -19,13 +19,15 @@
 
 #include <iostream>
 #include <new>
+#include <algorithm>
+#include <map>
+#include <utility>
 
 namespace griddyn {
 namespace solvers {
-    using namespace gmlc::utilities;
     // if cvode is not available this becomes the default differential solver
     static childClassFactory<basicOdeSolver, SolverInterface>
-        basicOdeFactory(stringVector{"basicode", "dyndiff", "differential"});
+        basicOdeFactory(gmlc::utilities::stringVector{"basicode", "dyndiff", "differential"});
 
 }  // namespace solvers
 SolverInterface::SolverInterface(const std::string& objName): helperObject(objName) {}

@@ -17,6 +17,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <string>
 
 namespace tinyxml2 {
 class XMLDocument;

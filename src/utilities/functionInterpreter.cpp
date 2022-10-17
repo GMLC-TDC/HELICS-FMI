@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <cmath>
 #include <map>
+#include <utility>
 
 static constexpr double local_pi = 3.141592653589793;
 static const double local_nan = std::nan("0");

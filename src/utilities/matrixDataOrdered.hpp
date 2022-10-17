@@ -38,14 +38,14 @@ class matrixDataOrdered: public matrixData<ValueT> {
     @param[in] rowCount  the number of rows and columns in the matrix
     */
     explicit matrixDataOrdered(index_t rowCount):
-        matrixData<ValueT>(rowCount, rowCount), dVec(rowCount){};
+        matrixData<ValueT>(rowCount, rowCount), dVec(rowCount){}
     void clear() override
     {
         count = 0;
         for (auto& dvk : dVec) {
             dvk.clear();
         }
-    };
+    }
 
     void assign(index_t row, index_t col, ValueT num) override
     {
