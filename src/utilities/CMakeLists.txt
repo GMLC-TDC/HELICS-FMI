@@ -29,6 +29,7 @@ set(utilities_headers
     matrixDataOrdering.hpp
     matrixDataFilter.hpp
     matrixDataCustomWriteOnly.hpp
+    matrixDataBoost.hpp
     functionInterpreter.h
     zipUtilities.h
     valuePredictor.hpp

@@ -10,8 +10,7 @@
  * LLNS Copyright End
  */
 
-#ifndef _SPARSE_VECTOR_DATA_H_
-#define _SPARSE_VECTOR_DATA_H_
+#pragma once
 
 #include "indexTypes.hpp"
 
@@ -149,5 +148,3 @@ class vectData {
         }
     }
 };
-
-#endif

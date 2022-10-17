@@ -58,7 +58,7 @@ class matrixDataFilter: public matrixDataContainer<ValueT> {
     }
 
     /** add a vector of filters
-    @param[in] row  the row to filter out
+    @param[in] rows  the vector of rows to filter out
     */
     void addFilter(std::vector<index_t>& rows)
     {

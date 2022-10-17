@@ -10,8 +10,7 @@
  * LLNS Copyright End
  */
 
-#ifndef _FMI_LIBRARY_MANAGER_H_
-#define _FMI_LIBRARY_MANAGER_H_
+#pragma once
 
 #include <map>
 #include <memory>
@@ -42,5 +41,3 @@ class fmiLibraryManager {
   private:
     fmiLibraryManager();
 };
-
-#endif

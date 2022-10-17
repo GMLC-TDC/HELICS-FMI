@@ -10,13 +10,6 @@
  * LLNS Copyright End
  */
 
-// disable a funny warning (bug in visual studio 2015)
-#ifdef _MSC_VER
-#    if _MSC_VER >= 1900
-#        pragma warning(disable : 4592)
-#    endif
-#endif
-
 #include "functionInterpreter.h"
 
 #include "gmlc/utilities/mapOps.hpp"
@@ -27,6 +20,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <map>
 
 static constexpr double local_pi = 3.141592653589793;
 static const double local_nan = std::nan("0");
@@ -34,8 +28,8 @@ static constexpr double local_inf = 1e48;
 static const double log2val = log(2.0);
 static const double log10val = log(10.0);
 
-using namespace gmlc::utilities;
-using namespace utilities;
+using gmlc::utilities::convertToLowerCase;
+using utilities::gridRandom;
 
 static const std::map<std::string, std::function<double()>> FuncList0{
     std::make_pair("inf", []() { return local_inf; }),
@@ -208,17 +202,11 @@ static const std::map<std::string, std::function<double(double, double)>> FuncLi
 };
 
 static const std::map<std::string, std::function<double(double, double, double)>> FuncList3{
-#ifdef HAVE_CLAMP
     std::make_pair("clamp",
                    [](double val, double valLow, double valHigh) {
                        return std::clamp(val, valLow, valHigh);
                    }),
-#else
-  std::make_pair ("clamp",
-                  [](double val, double valLow, double valHigh) {
-                      return (val < valLow) ? valLow : ((val > valHigh) ? valHigh : val);
-                  }),
-#endif
+
     std::make_pair("max",
                    [](double val1, double val2, double val3) {
                        return (val1 > val2) ? std::max(val1, val3) : std::max(val2, val3);
@@ -227,7 +215,6 @@ static const std::map<std::string, std::function<double(double, double, double)>
                    [](double val1, double val2, double val3) {
                        return (val1 > val2) ? std::min(val2, val3) : std::min(val1, val3);
                    }),
-#ifdef HAVE_HYPOT3
     std::make_pair("hypot",
                    [](double val1, double val2, double val3) {
                        return std::hypot(val1, val2, val3);
@@ -236,17 +223,6 @@ static const std::map<std::string, std::function<double(double, double, double)>
                    [](double val1, double val2, double val3) {
                        return std::hypot(val1, val2, val3);
                    }),
-#else
-  std::make_pair ("hypot",
-                  [](double val1, double val2, double val3) {
-                      return sqrt (val1 * val1 + val2 * val2 + val3 * val3);
-                  }),
-
-  std::make_pair ("mag",
-                  [](double val1, double val2, double val3) {
-                      return sqrt (val1 * val1 + val2 * val2 + val3 * val3);
-                  }),
-#endif
     std::make_pair("sum", [](double val1, double val2, double val3) { return val1 + val2 + val3; }),
     std::make_pair("product",
                    [](double val1, double val2, double val3) { return val1 * val2 * val3; }),
@@ -257,8 +233,8 @@ static const std::map<std::string, std::function<double(double, double, double)>
 };
 
 static std::map<std::string, std::function<double(const std::vector<double>&)>> ArrFuncList1{
-    std::make_pair("sum", [](const std::vector<double>& ar1) { return sum(ar1); }),
-    std::make_pair("absmax", [](const std::vector<double>& ar1) { return absMax(ar1); }),
+    std::make_pair("sum", [](const std::vector<double>& ar1) { return gmlc::utilities::sum(ar1); }),
+    std::make_pair("absmax", [](const std::vector<double>& ar1) { return gmlc::utilities::absMax(ar1); }),
     std::make_pair("max",
                    [](const std::vector<double>& ar1) {
                        return *std::max_element(ar1.cbegin(), ar1.cend());
@@ -267,14 +243,14 @@ static std::map<std::string, std::function<double(const std::vector<double>&)>> 
                    [](const std::vector<double>& ar1) {
                        return *std::min_element(ar1.cbegin(), ar1.cend());
                    }),
-    std::make_pair("absmin", [](const std::vector<double>& ar1) { return absMin(ar1); }),
-    std::make_pair("product", [](const std::vector<double>& ar1) { return product(ar1); }),
+    std::make_pair("absmin", [](const std::vector<double>& ar1) { return gmlc::utilities::absMin(ar1); }),
+    std::make_pair("product", [](const std::vector<double>& ar1) { return gmlc::utilities::product(ar1); }),
     std::make_pair("avg",
                    [](const std::vector<double>& ar1) {
-                       return (sum(ar1) / static_cast<double>(ar1.size()));
+                       return (gmlc::utilities::sum(ar1) / static_cast<double>(ar1.size()));
                    }),
-    std::make_pair("stdev", [](const std::vector<double>& ar1) { return stdev(ar1); }),
-    std::make_pair("median", [](const std::vector<double>& ar1) { return median(ar1); }),
+    std::make_pair("stdev", [](const std::vector<double>& ar1) { return gmlc::utilities::stdev(ar1); }),
+    std::make_pair("median", [](const std::vector<double>& ar1) { return gmlc::utilities::median(ar1); }),
 };
 
 static const std::map<std::string,
@@ -282,7 +258,7 @@ static const std::map<std::string,
     ArrFuncList2{
         std::make_pair("vecprod",
                        [](const std::vector<double>& ar1, const std::vector<double>& ar2) {
-                           return mult_sum(ar1, ar2);
+                           return gmlc::utilities::mult_sum(ar1, ar2);
                        }),
     };
 

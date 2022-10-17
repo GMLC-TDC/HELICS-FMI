@@ -14,6 +14,10 @@
 
 #include "solverInterface.h"
 
+#include <vector>
+#include <memory>
+#include <string>
+
 namespace griddyn {
 namespace solvers {
     /** @brief class implementing a Gauss Seidel solver for algebraic variables in a power system

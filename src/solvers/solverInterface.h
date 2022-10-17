@@ -317,7 +317,7 @@ class SolverInterface: public helperObject {
     */
     virtual void setSimulationData(SolvableObject* sobj, const solverMode& sMode);
     /** @brief input the simulation data to attach to
-    @param[in] SolvableObject the solvableObject to attach to
+    @param[in] sobj the solvableObject to attach to
     */
     virtual void setSimulationData(SolvableObject* sobj);
 

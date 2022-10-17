@@ -16,6 +16,7 @@
 
 #include <cassert>
 #include <functional>
+#include <utility>
 
 /** @brief matrix data wrapper around an insert function for matrix elements
 none of the other read or assign functions are operation and all will assert false

@@ -31,6 +31,8 @@
 #include <bitset>
 #include <map>
 #include <memory>
+#include <string>
+#include <vector>
 
 /** data class containing the default experiment information*/
 class fmuDefaultExpirement {

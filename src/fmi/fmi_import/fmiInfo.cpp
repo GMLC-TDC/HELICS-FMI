@@ -15,7 +15,7 @@
 #include "formatInterpreters/tinyxml2ReaderElement.h"
 #include "gmlc/utilities/stringConversion.h"
 
-using namespace gmlc::utilities;
+using gmlc::utilities::convertToLowerCase;
 
 fmiInfo::fmiInfo() {}
 
@@ -96,7 +96,7 @@ int fmiInfo::getCounts(const std::string& countType) const
     return static_cast<int>(cnt);
 }
 
-const std::string emptyString = "";
+static const std::string emptyString{};
 
 const std::string& fmiInfo::getString(const std::string& field) const
 {
@@ -564,10 +564,10 @@ void loadDependencies(std::shared_ptr<readerElement>& rd,
         auto attDep = rd->getAttribute(depString);
         auto attDepKind = rd->getAttribute(depKindString);
         index_t row = static_cast<index_t>(att.getValue());
-        auto dep = str2vector<int>(attDep.getText(), 0, " ");
+        auto dep = gmlc::utilities::str2vector<int>(attDep.getText(), 0, " ");
         auto depknd = (attDepKind.isValid()) ?
-            stringOps::splitline(attDepKind.getText(), " ", stringOps::delimiter_compression::on) :
-            stringVector();
+            gmlc::utilities::stringOps::splitline(attDepKind.getText(), " ", gmlc::utilities::stringOps::delimiter_compression::on) :
+            gmlc::utilities::stringVector();
         store.push_back(row - 1);
         auto validdepkind = (depknd.size() > 0);
         for (size_t kk = 0; kk < dep.size(); ++kk) {

@@ -17,6 +17,8 @@
 #include "helics/ValueFederates.hpp"
 
 #include <memory>
+#include <vector>
+#include <string>
 
 /** class defining a co-simulation federate*/
 class FmiCoSimFederate {
