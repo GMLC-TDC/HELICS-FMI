@@ -25,9 +25,9 @@
 #include "utilities/matrixCreation.h"
 #include "utilities/matrixDataFilter.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <cstdio>
-#include <algorithm>
 
 namespace griddyn {
 namespace solvers {

@@ -15,8 +15,8 @@
 #include <memory>
 #include <random>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 /** abstract class defining a random distribution*/
 
