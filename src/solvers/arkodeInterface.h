@@ -12,6 +12,8 @@
 #pragma once
 
 #include "sundialsInterface.h"
+#include <memory>
+#include <string>
 
 namespace griddyn {
 namespace solvers {

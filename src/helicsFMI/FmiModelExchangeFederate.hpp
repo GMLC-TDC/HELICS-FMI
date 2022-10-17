@@ -19,6 +19,8 @@
 #include "solvers/SolvableObject.hpp"
 
 #include <memory>
+#include <string>
+#include <vector>
 
 namespace griddyn {
 class SolverInterface;

@@ -15,7 +15,6 @@
 #include "gmlc/utilities/stringOps.h"
 #include "gmlc/utilities/vectorOps.hpp"
 
-#include <cstdio>
 #include <cvode/cvode.h>
 #include <cvode/cvode_direct.h>
 

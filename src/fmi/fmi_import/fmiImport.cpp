@@ -22,7 +22,6 @@
 #include <cstdarg>
 #include <map>
 #include <utility>
-#include <string>
 #include <algorithm>
 
 using path = std::filesystem::path;

@@ -25,6 +25,7 @@
 
 #include <cassert>
 #include <map>
+#include <vector>
 #include <sunlinsol/sunlinsol_dense.h>
 
 namespace griddyn {
