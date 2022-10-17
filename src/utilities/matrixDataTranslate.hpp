@@ -31,7 +31,7 @@ class matrixDataTranslate: public matrixDataContainer<ValueT> {
   public:
     /** @brief constructor
      */
-    matrixDataTranslate() { Trow.fill(kNullLocation); };
+    matrixDataTranslate() { Trow.fill(kNullLocation); }
     explicit matrixDataTranslate(matrixData<ValueT>& input): matrixDataContainer<ValueT>(input)
     {
         Trow.fill(kNullLocation);

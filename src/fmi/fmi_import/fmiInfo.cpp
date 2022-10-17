@@ -15,6 +15,8 @@
 #include "formatInterpreters/tinyxml2ReaderElement.h"
 #include "gmlc/utilities/stringConversion.h"
 
+#include <utility>
+
 using gmlc::utilities::convertToLowerCase;
 
 fmiInfo::fmiInfo() {}

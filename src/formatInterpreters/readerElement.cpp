@@ -14,6 +14,8 @@
 
 #include "gmlc/utilities/stringConversion.h"
 
+#include <utility>
+
 readerAttribute::readerAttribute() {}
 readerAttribute::readerAttribute(std::string attName, std::string attText):
     name(std::move(attName)), text(std::move(attText))
