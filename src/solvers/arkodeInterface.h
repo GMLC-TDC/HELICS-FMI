@@ -14,6 +14,7 @@
 #include "sundialsInterface.h"
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace griddyn {
 namespace solvers {

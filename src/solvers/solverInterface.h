@@ -20,6 +20,7 @@
 #include <exception>
 #include <memory>
 #include <vector>
+
 namespace griddyn {
 enum class solver_print_level {
     s_debug_print = 2,
@@ -56,7 +57,7 @@ class InvalidSolverOperation: public solverException {
     explicit InvalidSolverOperation(int ecode = 0):
         solverException(ecode,
                         std::string("invalid solver operation:error code=") +
-                            std::to_string(ecode)){};
+                            std::to_string(ecode)){}
 };
 
 // solver return codes from the solve and initIC functions

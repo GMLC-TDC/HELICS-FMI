@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <ctime>
+#include <map>
 
 namespace utilities {
 std::mt19937 gridRandom::s_gen;

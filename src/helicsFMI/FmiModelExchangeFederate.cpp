@@ -10,6 +10,8 @@
  * LLNS Copyright End
  */
 
+#include <utility>
+
 #include "FmiModelExchangeFederate.hpp"
 
 #include "fmi/fmi_import/fmiObjects.h"

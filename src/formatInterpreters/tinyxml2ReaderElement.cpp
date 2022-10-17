@@ -16,7 +16,7 @@
 
 #include <tinyxml2/tinyxml2.h>
 
-using namespace tinyxml2;
+using tinyxml2::XMLElement;
 
 tinyxml2ReaderElement::tinyxml2ReaderElement() noexcept {}
 tinyxml2ReaderElement::tinyxml2ReaderElement(const std::string& fileName)
@@ -62,10 +62,10 @@ std::shared_ptr<readerElement> tinyxml2ReaderElement::clone() const
 
 bool tinyxml2ReaderElement::loadFile(const std::string& fileName)
 {
-    doc = std::make_shared<XMLDocument>(true, COLLAPSE_WHITESPACE);
-    XMLError res = doc->LoadFile(fileName.c_str());
+    doc = std::make_shared<tinyxml2::XMLDocument>(true, tinyxml2::COLLAPSE_WHITESPACE);
+    tinyxml2::XMLError res = doc->LoadFile(fileName.c_str());
     clear();
-    if (res == XML_SUCCESS) {
+    if (res == tinyxml2::XML_SUCCESS) {
         element = doc->FirstChildElement();
         return true;
     }
@@ -76,10 +76,10 @@ bool tinyxml2ReaderElement::loadFile(const std::string& fileName)
 
 bool tinyxml2ReaderElement::parse(const std::string& inputString)
 {
-    doc = std::make_shared<XMLDocument>(true, COLLAPSE_WHITESPACE);
-    XMLError res = doc->Parse(inputString.data(), inputString.length());
+    doc = std::make_shared<tinyxml2::XMLDocument>(true, tinyxml2::COLLAPSE_WHITESPACE);
+    tinyxml2::XMLError res = doc->Parse(inputString.data(), inputString.length());
     clear();
-    if (res == XML_SUCCESS) {
+    if (res == tinyxml2::XML_SUCCESS) {
         element = doc->FirstChildElement();
         return true;
     }

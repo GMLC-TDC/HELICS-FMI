@@ -35,7 +35,7 @@ class matrixDataTranslate: public matrixDataContainer<ValueT> {
     explicit matrixDataTranslate(matrixData<ValueT>& input): matrixDataContainer<ValueT>(input)
     {
         Trow.fill(kNullLocation);
-    };
+    }
     inline bool isValidRow(index_t row) const
     {
 #ifdef UNSIGNED_INDEXING
@@ -52,7 +52,7 @@ class matrixDataTranslate: public matrixDataContainer<ValueT> {
         if (isValidRow(row)) {
             matrixDataContainer<ValueT>::md->assign(Trow[row], col, num);
         }
-    };
+    }
 
     ValueT at(index_t rowN, index_t colN) const override
     {
