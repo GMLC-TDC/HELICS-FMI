@@ -176,7 +176,7 @@ double SolverInterface::get(const std::string& param) const
 
 void SolverInterface::set(const std::string& param, const std::string& val)
 {
-    using namespace gmlc::utilities;
+    using gmlc::utilities::convertToLowerCase;
 
     if ((param == "approx") || (param == "approximation")) {
         setApproximation(convertToLowerCase(val));
@@ -210,7 +210,7 @@ void SolverInterface::set(const std::string& param, const std::string& val)
             // mode.pairedOffsetIndex = nsmode.offsetIndex;
         }
     } else if (param == "mask") {
-        auto sep = str2vector<int>(val, -1, ",;");
+        auto sep = gmlc::utilities::str2vector<int>(val, -1, ",;");
         maskElements.resize(sep.size());
         for (size_t kk = 0; kk < sep.size(); ++kk) {
             maskElements[kk] = sep[kk];
