@@ -88,8 +88,8 @@ coreObject* helperObject::getOwner() const
 
 void setMultipleFlags(helperObject* obj, const std::string& flags)
 {
-    auto lcflags =  gmlc::utilities::convertToLowerCase(flags);
-    auto flgs =  gmlc::utilities::string_viewOps::split(lcflags);
+    auto lcflags = gmlc::utilities::convertToLowerCase(flags);
+    auto flgs = gmlc::utilities::string_viewOps::split(lcflags);
     gmlc::utilities::string_viewOps::trim(flgs);
     for (const auto& flag : flgs) {
         if (flag.empty()) {

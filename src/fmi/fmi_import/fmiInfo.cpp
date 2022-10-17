@@ -566,7 +566,8 @@ void loadDependencies(std::shared_ptr<readerElement>& rd,
         index_t row = static_cast<index_t>(att.getValue());
         auto dep = gmlc::utilities::str2vector<int>(attDep.getText(), 0, " ");
         auto depknd = (attDepKind.isValid()) ?
-            gmlc::utilities::stringOps::splitline(attDepKind.getText(), " ", gmlc::utilities::stringOps::delimiter_compression::on) :
+            gmlc::utilities::stringOps::splitline(
+                attDepKind.getText(), " ", gmlc::utilities::stringOps::delimiter_compression::on) :
             gmlc::utilities::stringVector();
         store.push_back(row - 1);
         auto validdepkind = (depknd.size() > 0);

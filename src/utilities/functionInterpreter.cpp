@@ -234,7 +234,8 @@ static const std::map<std::string, std::function<double(double, double, double)>
 
 static std::map<std::string, std::function<double(const std::vector<double>&)>> ArrFuncList1{
     std::make_pair("sum", [](const std::vector<double>& ar1) { return gmlc::utilities::sum(ar1); }),
-    std::make_pair("absmax", [](const std::vector<double>& ar1) { return gmlc::utilities::absMax(ar1); }),
+    std::make_pair("absmax",
+                   [](const std::vector<double>& ar1) { return gmlc::utilities::absMax(ar1); }),
     std::make_pair("max",
                    [](const std::vector<double>& ar1) {
                        return *std::max_element(ar1.cbegin(), ar1.cend());
@@ -243,14 +244,18 @@ static std::map<std::string, std::function<double(const std::vector<double>&)>> 
                    [](const std::vector<double>& ar1) {
                        return *std::min_element(ar1.cbegin(), ar1.cend());
                    }),
-    std::make_pair("absmin", [](const std::vector<double>& ar1) { return gmlc::utilities::absMin(ar1); }),
-    std::make_pair("product", [](const std::vector<double>& ar1) { return gmlc::utilities::product(ar1); }),
+    std::make_pair("absmin",
+                   [](const std::vector<double>& ar1) { return gmlc::utilities::absMin(ar1); }),
+    std::make_pair("product",
+                   [](const std::vector<double>& ar1) { return gmlc::utilities::product(ar1); }),
     std::make_pair("avg",
                    [](const std::vector<double>& ar1) {
                        return (gmlc::utilities::sum(ar1) / static_cast<double>(ar1.size()));
                    }),
-    std::make_pair("stdev", [](const std::vector<double>& ar1) { return gmlc::utilities::stdev(ar1); }),
-    std::make_pair("median", [](const std::vector<double>& ar1) { return gmlc::utilities::median(ar1); }),
+    std::make_pair("stdev",
+                   [](const std::vector<double>& ar1) { return gmlc::utilities::stdev(ar1); }),
+    std::make_pair("median",
+                   [](const std::vector<double>& ar1) { return gmlc::utilities::median(ar1); }),
 };
 
 static const std::map<std::string,

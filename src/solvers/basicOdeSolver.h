@@ -14,9 +14,9 @@
 
 #include "solverInterface.h"
 
-#include <vector>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace griddyn {
 namespace solvers {

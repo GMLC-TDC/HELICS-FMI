@@ -18,8 +18,8 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
-#include <vector>
 #include <limits>
+#include <vector>
 
 /**
  * class for storing data from the Jacobian computation
