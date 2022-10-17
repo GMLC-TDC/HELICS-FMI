@@ -49,4 +49,3 @@ int zipFolder(const std::string& file,
 */
 int unzip(const std::string& file, const std::string& directory = "");
 }  // namespace utilities
-
