@@ -17,10 +17,10 @@
 #include "gmlc/utilities/stringConversion.h"
 #include "utilities/factoryTemplates.hpp"
 
-#include <iostream>
-#include <new>
 #include <algorithm>
+#include <iostream>
 #include <map>
+#include <new>
 #include <utility>
 
 namespace griddyn {

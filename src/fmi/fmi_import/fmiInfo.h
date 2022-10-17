@@ -32,8 +32,8 @@
 #include <map>
 #include <memory>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 /** data class containing the default experiment information*/
 class fmuDefaultExpirement {
