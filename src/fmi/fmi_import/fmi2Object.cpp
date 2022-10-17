@@ -301,7 +301,7 @@ void fmi2Object::setOutputVariables(const std::vector<std::string>& outNames)
             activeOutputs.push(vI.valueRef);
             activeOutputIndices.push_back(vI.index);
         }
-        // TODO:: what to do if this condition is not valid?
+        // TODO(PT):: what to do if this condition is not valid?
     }
 }
 
