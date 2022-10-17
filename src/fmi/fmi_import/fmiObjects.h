@@ -15,9 +15,9 @@
 #include "fmiImport.h"
 
 #include <exception>
-#include <type_traits>
-#include <string>
 #include <memory>
+#include <string>
+#include <type_traits>
 #include <vector>
 
 /** base fmiException*/
