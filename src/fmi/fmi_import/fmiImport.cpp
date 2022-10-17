@@ -17,12 +17,13 @@
 #include "helics-fmi/helics-fmi-config.h"
 #include "utilities/zipUtilities.h"
 
+#include <algorithm>
 #include <boost/dll/import.hpp>
 #include <boost/dll/shared_library.hpp>
 #include <cstdarg>
 #include <map>
+#include <string>
 #include <utility>
-#include <algorithm>
 
 using path = std::filesystem::path;
 
