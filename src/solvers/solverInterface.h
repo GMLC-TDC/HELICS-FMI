@@ -19,8 +19,8 @@
 
 #include <exception>
 #include <memory>
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace griddyn {
 enum class solver_print_level {
