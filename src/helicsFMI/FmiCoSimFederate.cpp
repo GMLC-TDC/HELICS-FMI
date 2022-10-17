@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <utility>
 
 FmiCoSimFederate::FmiCoSimFederate(std::shared_ptr<fmi2CoSimObject> obj,
                                    const helics::FederateInfo& fi):

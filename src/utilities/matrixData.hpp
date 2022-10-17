@@ -15,6 +15,7 @@
 #include "indexTypes.hpp"
 
 #include <iterator>
+#include <utility>
 
 /** @brief convenience structure for returning data
  */
@@ -130,12 +131,12 @@ class matrixData {
      *  @brief get the maximum row number
      *  @return the max row value
      */
-    count_t rowLimit() const { return rowLim; };
+    count_t rowLimit() const { return rowLim; }
     /**
      *  @brief get the maximum row number
      *  @return the max col value
      */
-    count_t colLimit() const { return colLim; };
+    count_t colLimit() const { return colLim; }
 
   private:
     /**
@@ -181,7 +182,7 @@ class matrixData {
     /**
      *  @brief reserve space in the array for
      */
-    virtual void reserve(count_t /*maxNonZeros*/){};
+    virtual void reserve(count_t /*maxNonZeros*/){}
 
     /**
      *  @brief get the value at a specific location

@@ -21,6 +21,7 @@ set(utilities_headers
     matrixOps.h
     matrixDataCompact.hpp
     matrixDataSparse.hpp
+    matrixDataSparseSM.hpp
     matrixDataSparse_impl.hpp
     matrixDataTranslate.hpp
     matrixDataContainer.hpp
