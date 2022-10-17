@@ -13,9 +13,9 @@
 #pragma once
 #include "sundialsInterface.h"
 
-#include <vector>
-#include <string>
 #include <memory>
+#include <string>
+#include <vector>
 
 namespace griddyn {
 namespace solvers {
