@@ -430,7 +430,7 @@ void SolverInterface::printStates(bool getNames)
 }
 
 void SolverInterface::check_flag(void* flagvalue,
-    [[maybe_unused]] const std::string& funcname,
+                                 [[maybe_unused]] const std::string& funcname,
                                  int opt,
                                  bool printError) const
 {

@@ -73,4 +73,3 @@ class matrixDataTranslate: public matrixDataContainer<ValueT> {
         }
     }
 };
-

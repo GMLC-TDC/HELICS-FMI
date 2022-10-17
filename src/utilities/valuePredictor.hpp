@@ -76,4 +76,3 @@ class valuePredictor {
     SlopeType getSlope() const { return slope_; }
 };
 }  // namespace utilities
-

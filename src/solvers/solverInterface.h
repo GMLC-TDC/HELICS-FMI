@@ -32,20 +32,18 @@ class solverException: public std::exception {
   protected:
     int errorCode;  ///< the actual solver Error Code
     std::string message;
+
   public:
     explicit solverException(int ecode = 0): errorCode(ecode)
     {
-        message=std::string("solver Exception:error code=") + std::to_string(errorCode);
+        message = std::string("solver Exception:error code=") + std::to_string(errorCode);
     }
 
-    explicit solverException(int ecode, const std::string &errorMessage): errorCode(ecode),message(errorMessage)
+    explicit solverException(int ecode, const std::string& errorMessage):
+        errorCode(ecode), message(errorMessage)
     {
-       
     }
-    virtual const char* what() const noexcept override
-    {
-        return message.c_str();
-    }
+    virtual const char* what() const noexcept override { return message.c_str(); }
     /** return the full name of the object that threw the exception*/
     int code() const noexcept { return errorCode; }
 };
@@ -55,7 +53,10 @@ class solverException: public std::exception {
 class InvalidSolverOperation: public solverException {
   protected:
   public:
-    explicit InvalidSolverOperation(int ecode = 0): solverException(ecode,std::string("invalid solver operation:error code=") + std::to_string(ecode)){};
+    explicit InvalidSolverOperation(int ecode = 0):
+        solverException(ecode,
+                        std::string("invalid solver operation:error code=") +
+                            std::to_string(ecode)){};
 };
 
 // solver return codes from the solve and initIC functions
@@ -231,10 +232,10 @@ class SolverInterface: public helperObject {
     */
     virtual void getCurrentData();
     /** @brief get the locations of any found roots
-    */
+     */
     virtual void getRoots();
     /** @brief update the number of roots to find
-    */
+     */
     virtual void setRootFinding(solver_index_type numRoots);
 
     /** @brief get a parameter from the solver

@@ -171,7 +171,8 @@ namespace solvers {
     }
 
     // output solver stats
-    void cvodeInterface::logSolverStats([[maybe_unused]] solver_print_level logLevel, bool /*iconly*/) const
+    void cvodeInterface::logSolverStats([[maybe_unused]] solver_print_level logLevel,
+                                        bool /*iconly*/) const
     {
         if (!flags[initialized_flag]) {
             return;
@@ -286,7 +287,7 @@ namespace solvers {
             throw(InvalidSolverOperation());
         }
 
-        //auto jsize = sobj->jacobianSize(mode);
+        // auto jsize = sobj->jacobianSize(mode);
 
         // dynInitializeB CVode - Sundials
 

@@ -454,7 +454,9 @@ endif(HELICS_FMI_BUILD_TESTS)
 # -------------------------------------------------------------
 # CPack for NSIS Installer
 # -------------------------------------------------------------
-option(HELICS_FMI_ENABLE_PACKAGE_BUILD "Add projects for making packages and installers for HELICS" OFF)
+option(HELICS_FMI_ENABLE_PACKAGE_BUILD "Add projects for making packages and installers for HELICS"
+       OFF
+)
 
 if(HELICS_FMI_ENABLE_PACKAGE_BUILD)
     set(CPACK_PACKAGE_NAME "HELICS-fmi")
