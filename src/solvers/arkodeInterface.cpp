@@ -25,8 +25,8 @@
 
 #include <cassert>
 #include <map>
-#include <vector>
 #include <sunlinsol/sunlinsol_dense.h>
+#include <vector>
 
 namespace griddyn {
 namespace solvers {
