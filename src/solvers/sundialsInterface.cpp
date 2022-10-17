@@ -27,6 +27,7 @@
 
 #include <cassert>
 #include <cstdio>
+#include <algorithm>
 
 namespace griddyn {
 namespace solvers {

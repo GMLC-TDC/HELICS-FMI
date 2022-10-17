@@ -16,6 +16,7 @@
 #include "utilities/matrixData.hpp"
 
 #include <vector>
+#include <utility>
 
 /** @brief class implementing an expandable sparse matrix with an expandable data vector for each
  *row also adding a function to get all the data in a particular row.

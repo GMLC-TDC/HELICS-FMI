@@ -15,6 +15,8 @@
 #include "utilities/matrixDataSparse.hpp"
 
 #include <cstdio>
+#include <memory>
+#include <string>
 // SUNDIALS libraries
 
 #include "nvector/nvector_serial.h"
