@@ -401,7 +401,8 @@ description="Constant output value"
 variability="tunable"
 */
 
-const std::string ScalarVString("ScalarVariable");
+static const std::string ScalarVString("ScalarVariable");
+
 void fmiInfo::loadVariables(std::shared_ptr<readerElement>& rd)
 {
     rd->bookmark();
@@ -550,9 +551,9 @@ auto depkindNum(const std::string& depknd)
     return 6;
 }
 
-const std::string unknownString("Unknown");
-const std::string depString("dependencies");
-const std::string depKindString("dependenciesKind");
+static const std::string unknownString("Unknown");
+static const std::string depString("dependencies");
+static const std::string depKindString("dependenciesKind");
 
 void loadDependencies(std::shared_ptr<readerElement>& rd,
                       std::vector<int>& store,

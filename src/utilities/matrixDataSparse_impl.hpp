@@ -10,7 +10,11 @@
  * LLNS Copyright End
  */
 
+#pragma once
+
 #include "matrixDataSparse.hpp"
+#include <algorithm>
+#include <vector>
 
 template<typename ValueT>
 void matrixDataSparse<ValueT>::assign(index_t row, index_t col, ValueT num)

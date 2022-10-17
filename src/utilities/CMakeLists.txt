@@ -30,6 +30,7 @@ set(utilities_headers
     matrixDataOrdering.hpp
     matrixDataFilter.hpp
     matrixDataCustomWriteOnly.hpp
+    matrixDataSparseSM.hpp
     matrixDataBoost.hpp
     functionInterpreter.h
     zipUtilities.h

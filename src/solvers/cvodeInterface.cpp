@@ -27,6 +27,9 @@
 #include <cstdio>
 #include <map>
 #include <sunlinsol/sunlinsol_dense.h>
+#include <vector>
+#include <memory>
+#include <string>
 
 namespace griddyn {
 namespace solvers {
@@ -156,7 +159,7 @@ namespace solvers {
 
     double cvodeInterface::get(const std::string& param) const
     {
-        long int val = -1;
+        long val = -1;
         if ((param == "resevals") || (param == "iterationcount")) {
             //    CVodeGetNumResEvals(solverMem, &val);
         } else if (param == "iccount") {
@@ -177,9 +180,9 @@ namespace solvers {
         if (!flags[initialized_flag]) {
             return;
         }
-        long int nni = 0;
+        long nni = 0;
         int klast, kcur;
-        long int nst, nre, netf, ncfn, nge;
+        long nst, nre, netf, ncfn, nge;
         realtype tolsfac, hlast, hcur;
 
         int retval = CVodeGetNumRhsEvals(solverMem, &nre);

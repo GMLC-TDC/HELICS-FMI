@@ -10,6 +10,7 @@
  * LLNS Copyright End
  */
 
+#include "solverInterface.h"
 #include "basicOdeSolver.h"
 #include "gmlc/utilities/mapOps.hpp"
 #include "gmlc/utilities/stringConversion.h"
@@ -434,7 +435,7 @@ void SolverInterface::check_flag(void* flagvalue,
                                  int opt,
                                  bool printError) const
 {
-    // TODO delete either this or optimizerInterface::check_flag
+    // TODO(PT) delete either this or optimizerInterface::check_flag
     // Check if SUNDIALS function returned nullptr pointer - no memory allocated
     if (opt == 0 && flagvalue == nullptr) {
         if (printError) {
@@ -454,7 +455,7 @@ void SolverInterface::check_flag(void* flagvalue,
             throw(solverException(*errflag));
         }
     }
-    // TODO missing if (opt == 2 and flagvalue == nullptr)?
+    // TODO(PT) missing if (opt == 2 and flagvalue == nullptr)?
 }
 
 int SolverInterface::solve(double /*tStop*/, double& /*tReturn*/, step_mode /* stepMode */)
@@ -482,7 +483,7 @@ void SolverInterface::setMaxNonZeros(solver_index_type nonZeroCount)
     nnz = nonZeroCount;
 }
 
-// TODO:: change this function so the defaults can be something other than sundials solvers
+// TODO(PT):: change this function so the defaults can be something other than sundials solvers
 std::unique_ptr<SolverInterface> makeSolver(SolvableObject* sobj, const solverMode& sMode)
 {
     std::unique_ptr<SolverInterface> sd = nullptr;

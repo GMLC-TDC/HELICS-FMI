@@ -26,15 +26,13 @@
 #include <cassert>
 #include <cstdio>
 
-using namespace gmlc::utilities;
-
 namespace griddyn {
 namespace solvers {
     static childClassFactory<cvodeInterface, SolverInterface>
-        cvodeFactory(stringVector{"cvode", "dyndiff", "differential"});
+        cvodeFactory(gmlc::utilities::stringVector{"cvode", "dyndiff", "differential"});
 
     static childClassFactory<arkodeInterface, SolverInterface>
-        arkodeFactory(stringVector{"arkode"});
+        arkodeFactory(gmlc::utilities::stringVector{"arkode"});
 
     sundialsInterface::sundialsInterface(const std::string& objName): SolverInterface(objName)
     {

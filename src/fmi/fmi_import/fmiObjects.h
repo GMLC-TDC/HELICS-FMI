@@ -16,6 +16,9 @@
 
 #include <exception>
 #include <type_traits>
+#include <string>
+#include <memory>
+#include <vector>
 
 /** base fmiException*/
 class fmiException: public std::exception {
