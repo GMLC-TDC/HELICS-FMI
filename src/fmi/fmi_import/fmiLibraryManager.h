@@ -10,12 +10,12 @@
  * LLNS Copyright End
  */
 
-#ifndef _FMI_LIBRARY_MANAGER_H_
-#define _FMI_LIBRARY_MANAGER_H_
+#pragma once
 
 #include <map>
 #include <memory>
 #include <mutex>
+#include <string>
 
 class fmiLibrary;
 class fmi2ModelExchangeObject;
@@ -42,5 +42,3 @@ class fmiLibraryManager {
   private:
     fmiLibraryManager();
 };
-
-#endif

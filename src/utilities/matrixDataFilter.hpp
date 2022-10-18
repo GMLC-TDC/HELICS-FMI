@@ -10,8 +10,6 @@
  * LLNS Copyright End
  */
 
-#ifndef _MATRIX_DATA_FILTER_H_
-#define _MATRIX_DATA_FILTER_H_
 #pragma once
 
 #include "matrixDataContainer.hpp"
@@ -33,10 +31,7 @@ class matrixDataFilter: public matrixDataContainer<ValueT> {
      */
     matrixDataFilter() = default;
 
-    explicit matrixDataFilter(matrixData<ValueT>& input):
-        matrixDataContainer<ValueT>(input){
-
-        };
+    explicit matrixDataFilter(matrixData<ValueT>& input): matrixDataContainer<ValueT>(input) {}
 
     void assign(index_t row, index_t col, ValueT num) override
     {
@@ -44,7 +39,7 @@ class matrixDataFilter: public matrixDataContainer<ValueT> {
         if (!found) {
             matrixDataContainer<ValueT>::md->assign(row, col, num);
         }
-    };
+    }
 
     /** add a filter
     @param[in] row  the row to filter out
@@ -60,7 +55,7 @@ class matrixDataFilter: public matrixDataContainer<ValueT> {
     }
 
     /** add a vector of filters
-    @param[in] row  the row to filter out
+    @param[in] rows  the vector of rows to filter out
     */
     void addFilter(std::vector<index_t>& rows)
     {
@@ -69,5 +64,3 @@ class matrixDataFilter: public matrixDataContainer<ValueT> {
         std::sort(rowFilter.begin(), rowFilter.end());
     }
 };
-
-#endif

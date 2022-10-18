@@ -1,6 +1,6 @@
 /*
  * LLNS Copyright Start
- * Copyright (c) 2014-2018, Lawrence Livermore National Security
+ * Copyright (c) 2014-2022, Lawrence Livermore National Security
  * This work was performed under the auspices of the U.S. Department
  * of Energy by Lawrence Livermore National Laboratory in part under
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
@@ -9,6 +9,8 @@
  * For details, see the LICENSE file.
  * LLNS Copyright End
  */
+
+#include "sundialsInterface.h"
 
 #include "arkodeInterface.h"
 #include "cvodeInterface.h"
@@ -23,26 +25,25 @@
 #include "utilities/matrixCreation.h"
 #include "utilities/matrixDataFilter.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <cstdio>
-
-using namespace gmlc::utilities;
 
 namespace griddyn {
 namespace solvers {
     static childClassFactory<cvodeInterface, SolverInterface>
-        cvodeFactory(stringVector{"cvode", "dyndiff", "differential"});
+        cvodeFactory(gmlc::utilities::stringVector{"cvode", "dyndiff", "differential"});
 
     static childClassFactory<arkodeInterface, SolverInterface>
-        arkodeFactory(stringVector{"arkode"});
+        arkodeFactory(gmlc::utilities::stringVector{"arkode"});
 
     sundialsInterface::sundialsInterface(const std::string& objName): SolverInterface(objName)
     {
         SUNContext_Create(nullptr, &ctx);
         tolerance = 1e-8;
     }
-    sundialsInterface::sundialsInterface(SolvableObject* sobj, const solverMode& sMode):
-        SolverInterface(sobj, sMode)
+    sundialsInterface::sundialsInterface(SolvableObject* solveObj, const solverMode& sMode):
+        SolverInterface(solveObj, sMode)
     {
         SUNContext_Create(nullptr, &ctx);
         tolerance = 1e-8;
@@ -212,7 +213,7 @@ namespace solvers {
         return SolverInterface::get(param);
     }
 
-    void sundialsInterface::KLUReInit(sparse_reinit_modes sparseReInitModes)
+    void sundialsInterface::KLUReInit([[maybe_unused]] sparse_reinit_modes sparseReInitModes)
     {
 #ifdef KLU_ENABLE
         if (flags[dense_flag]) {
@@ -396,8 +397,8 @@ namespace solvers {
             sd->nnz = a1->size();
             if (sd->flags[fileCapture_flag]) {
                 if (!sd->jacFile.empty()) {
-                    auto val = static_cast<long int>(sd->get("nliterations"));
-                    //   writeArray (time, 1, val, sd->mode.offsetIndex, *a1, sd->jacFile);
+                    // auto val = static_cast<long int>(sd->get("nliterations"));
+                    //    writeArray (time, 1, val, sd->mode.offsetIndex, *a1, sd->jacFile);
                 }
             }
         } else {

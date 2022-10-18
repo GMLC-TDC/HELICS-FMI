@@ -10,14 +10,13 @@
  * LLNS Copyright End
  */
 
-#ifndef _MATRIX_DATA_CUSTOM_WRITE_ONLY_H_
-#define _MATRIX_DATA_CUSTOM_WRITE_ONLY_H_
 #pragma once
 
 #include "utilities/matrixData.hpp"
 
 #include <cassert>
 #include <functional>
+#include <utility>
 
 /** @brief matrix data wrapper around an insert function for matrix elements
 none of the other read or assign functions are operation and all will assert false
@@ -48,5 +47,3 @@ class matrixDataCustomWriteOnly: public matrixData<ValueT> {
         insertFunction = std::move(func);
     }
 };
-
-#endif  // _MATRIX_DATA_CUSTOM_WRITE_ONLY_H_

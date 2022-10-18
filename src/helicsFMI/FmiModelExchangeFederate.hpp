@@ -19,6 +19,8 @@
 #include "solvers/SolvableObject.hpp"
 
 #include <memory>
+#include <string>
+#include <vector>
 
 namespace griddyn {
 class SolverInterface;
@@ -30,7 +32,7 @@ class FmiModelExchangeFederate: public griddyn::SolvableObject {
   public:
     FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj,
                              const helics::FederateInfo& fi);
-    ~FmiModelExchangeFederate();
+    virtual ~FmiModelExchangeFederate();
     /** configure the federate using the specified inputs and outputs*/
     void configure(helics::Time step, helics::Time start = helics::timeZero);
     /** set a string list of inputs*/
@@ -96,10 +98,11 @@ class FmiModelExchangeFederate: public griddyn::SolvableObject {
     std::vector<std::string> input_list;
     std::vector<std::string> output_list;
     std::vector<std::string> connections;
-    helics::Time stepTime;  //!< the step time for the Federate
-    helics::Time timeBias;  //!< the starting time for the FMU with a bias shift from 0
+    helics::Time stepTime{helics::timeEpsilon};  //!< the step time for the Federate
+    helics::Time timeBias{
+        helics::timeZero};  //!< the starting time for the FMU with a bias shift from 0
     std::vector<helics::Publication> pubs;  //!< known publications
     std::vector<helics::Input> inputs;  //!< known subscriptions
-    double stepSize = 0.01;  //!< the default step size of the simulation
+    double stepSize{0.01};  //!< the default step size of the simulation
     std::unique_ptr<griddyn::SolverInterface> solver;
 };

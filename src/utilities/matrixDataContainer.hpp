@@ -10,8 +10,6 @@
  * LLNS Copyright End
  */
 
-#ifndef _MATRIX_DATA_CONTAINER_H_
-#define _MATRIX_DATA_CONTAINER_H_
 #pragma once
 
 #include "utilities/matrixData.hpp"
@@ -29,19 +27,19 @@ class matrixDataContainer: public matrixData<ValueT> {
     matrixDataContainer() noexcept = default;
     /** @brief constructor
      */
-    explicit matrixDataContainer(matrixData<ValueT>& input) { setArray(&input); };
-    void clear() override { md->clear(); };
+    explicit matrixDataContainer(matrixData<ValueT>& input) { setArray(&input); }
+    void clear() override { md->clear(); }
     void assign(index_t row, index_t col, ValueT num) override = 0;
 
-    count_t size() const override { return md->size(); };
+    count_t size() const override { return md->size(); }
     void reserve(count_t maxNonZeros) override { md->reserve(maxNonZeros); }
-    count_t capacity() const override { return md->capacity(); };
+    count_t capacity() const override { return md->capacity(); }
     matrixElement<ValueT> element(index_t N) const override { return md->element(N); }
     void compact() override { md->compact(); }
     void start() override { md->start(); }
     matrixElement<ValueT> next() override { return md->next(); }
     bool moreData() override { return md->moreData(); }
-    ValueT at(index_t rowN, index_t colN) const override { return md->at(rowN, colN); };
+    ValueT at(index_t rowN, index_t colN) const override { return md->at(rowN, colN); }
     /** set the matrixData object to translate to
     @param[in] newAd  the new matrixData object
     */
@@ -56,5 +54,3 @@ class matrixDataContainer: public matrixData<ValueT> {
     */
     virtual void setArray(matrixData<ValueT>& newAd) { setArray(&newAd); }
 };
-
-#endif

@@ -10,8 +10,6 @@
  * LLNS Copyright End
  */
 
-#ifndef _MATRIX_DATA_SPARSE_H_
-#define _MATRIX_DATA_SPARSE_H_
 #pragma once
 
 #include "matrixData.hpp"
@@ -20,6 +18,8 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <limits>
+#include <utility>
 #include <vector>
 
 /**
@@ -84,10 +84,9 @@ class matrixDataSparse: public matrixData<ValueT> {
 
     /** @brief scale a subset of the elements
         @param[in] factor the scaling factor
-        @param[in] start the starting index
+        @param[in] startIndex the starting index
         @param[in] count the number of elements to scale
     */
-
     void scale(ValueT factor,
                index_t startIndex = 0,
                count_t count = (std::numeric_limits<count_t>::max)());
@@ -194,7 +193,7 @@ class matrixDataSparse: public matrixData<ValueT> {
                        std::vector<ValueT> mult);
 
     /** @brief remove invalid rows or those given by the testrow
-        @param[in] rowTest,  the row index to remove*/
+        @param[in] rowTest  the row index to remove*/
     void filter(index_t rowTest = kNullLocation);
 
     void cascade(matrixDataSparse<ValueT>& a2, index_t element);
@@ -235,5 +234,3 @@ std::vector<index_t> findMissing(matrixDataSparse<ValueT>& md);
 
 template<class ValueT>
 std::vector<std::vector<index_t>> findRank(matrixDataSparse<ValueT>& md);
-
-#endif

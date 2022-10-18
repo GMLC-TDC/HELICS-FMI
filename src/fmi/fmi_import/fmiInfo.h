@@ -31,6 +31,9 @@
 #include <bitset>
 #include <map>
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 /** data class containing the default experiment information*/
 class fmuDefaultExpirement {
@@ -138,7 +141,7 @@ class fmiInfo {
   private:
     std::map<std::string, std::string> headerInfo;  //!< the header information contained in strings
     double fmiVersion;  //!< the fmi version used
-    int numberOfEvents;  //!< the number of defined events
+    // int numberOfEvents;  //!< the number of defined events
     int maxOrder;  //!< the maximum derivative order for CoSimulation FMU's
     std::bitset<32> capabilities;  //!< bitset containing the capabilities of the FMU
     std::vector<variableInformation> variables;  //!< information all the defined variables
@@ -171,7 +174,6 @@ class fmiInfo {
 
     const fmuDefaultExpirement& getExperiment() const { return defaultExpirement; }
     /** get the counts for various items in a fmu
-    @details
     @param[in] countType the type of counts to get
     @return the count*/
     int getCounts(const std::string& countType) const;

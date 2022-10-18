@@ -15,10 +15,13 @@
 #include "fmi/fmi_import/fmiObjects.h"
 #include "solvers/solverInterface.h"
 
+#include <utility>
+
 FmiModelExchangeFederate::FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj,
                                                    const helics::FederateInfo& fi):
-    me(std::move(obj)),
-    fed(std::string(), fi)
+    fed(std::string(), fi),
+    me(std::move(obj))
+
 {
     if (me) {
         input_list = me->getInputNames();
@@ -134,15 +137,16 @@ void FmiModelExchangeFederate::run(helics::Time stop)
     fed.finalize();
 }
 
-solver_index_type FmiModelExchangeFederate::jacobianSize(const griddyn::solverMode& sMode) const
+solver_index_type
+    FmiModelExchangeFederate::jacobianSize([[maybe_unused]] const griddyn::solverMode& sMode) const
 {
     return 0;
 }
 
-void FmiModelExchangeFederate::guessCurrentValue(double time,
+void FmiModelExchangeFederate::guessCurrentValue([[maybe_unused]] double time,
                                                  double state[],
                                                  double dstate_dt[],
-                                                 const griddyn::solverMode& sMode)
+                                                 [[maybe_unused]] const griddyn::solverMode& sMode)
 {
     if (hasDifferential(sMode)) {
         me->getStates(state);
@@ -170,10 +174,11 @@ int FmiModelExchangeFederate::residualFunction(double time,
     return 0;
 }
 
-int FmiModelExchangeFederate::derivativeFunction(double time,
-                                                 const double state[],
-                                                 double dstate_dt[],
-                                                 const griddyn::solverMode& sMode) noexcept
+int FmiModelExchangeFederate::derivativeFunction(
+    double time,
+    const double state[],
+    double dstate_dt[],
+    [[maybe_unused]] const griddyn::solverMode& sMode) noexcept
 {
     me->setStates(state);
     me->getDerivatives(dstate_dt);
@@ -181,38 +186,41 @@ int FmiModelExchangeFederate::derivativeFunction(double time,
     return 0;
 }
 
-int FmiModelExchangeFederate::algUpdateFunction(double time,
-                                                const double state[],
-                                                double update[],
-                                                const griddyn::solverMode& sMode,
-                                                double alpha) noexcept
+int FmiModelExchangeFederate::algUpdateFunction([[maybe_unused]] double time,
+                                                [[maybe_unused]] const double state[],
+                                                [[maybe_unused]] double update[],
+                                                [[maybe_unused]] const griddyn::solverMode& sMode,
+                                                [[maybe_unused]] double alpha) noexcept
 {
     return 0;
 }
 
-int FmiModelExchangeFederate::jacobianFunction(double time,
-                                               const double state[],
-                                               const double dstate_dt[],
-                                               matrixData<double>& md,
-                                               double cj,
-                                               const griddyn::solverMode& sMode) noexcept
+int FmiModelExchangeFederate::jacobianFunction(
+    [[maybe_unused]] double time,
+    [[maybe_unused]] const double state[],
+    [[maybe_unused]] const double dstate_dt[],
+    [[maybe_unused]] matrixData<double>& md,
+    [[maybe_unused]] double cj,
+    [[maybe_unused]] const griddyn::solverMode& sMode) noexcept
 {
     return 0;
 }
 
-int FmiModelExchangeFederate::rootFindingFunction(double time,
-                                                  const double state[],
-                                                  const double dstate_dt[],
-                                                  double roots[],
-                                                  const griddyn::solverMode& sMode) noexcept
+int FmiModelExchangeFederate::rootFindingFunction(
+    [[maybe_unused]] double time,
+    [[maybe_unused]] const double state[],
+    [[maybe_unused]] const double dstate_dt[],
+    [[maybe_unused]] double roots[],
+    [[maybe_unused]] const griddyn::solverMode& sMode) noexcept
 {
     return 0;
 }
 
-int FmiModelExchangeFederate::dynAlgebraicSolve(double time,
-                                                const double diffState[],
-                                                const double deriv[],
-                                                const griddyn::solverMode& sMode) noexcept
+int FmiModelExchangeFederate::dynAlgebraicSolve(
+    [[maybe_unused]] double time,
+    [[maybe_unused]] const double diffState[],
+    [[maybe_unused]] const double deriv[],
+    [[maybe_unused]] const griddyn::solverMode& sMode) noexcept
 {
     return 0;
 }

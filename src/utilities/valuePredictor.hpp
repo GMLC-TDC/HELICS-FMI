@@ -10,8 +10,6 @@
  * LLNS Copyright End
  */
 
-#ifndef VALUE_PREDICTOR_H_
-#define VALUE_PREDICTOR_H_
 #pragma once
 
 namespace utilities {
@@ -78,4 +76,3 @@ class valuePredictor {
     SlopeType getSlope() const { return slope_; }
 };
 }  // namespace utilities
-#endif

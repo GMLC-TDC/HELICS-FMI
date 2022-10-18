@@ -10,13 +10,9 @@
  * LLNS Copyright End
  */
 
-#ifndef _MATRIX_CREATION_H_
-#define _MATRIX_CREATION_H_
 #pragma once
 #include "matrixData.hpp"
 
 #include <memory>
 
 std::unique_ptr<matrixData<double>> makeSparseMatrix(count_t size, count_t maxElements);
-
-#endif

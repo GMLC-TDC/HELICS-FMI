@@ -10,20 +10,24 @@
  * LLNS Copyright End
  */
 
+#include "solverInterface.h"
+
 #include "basicOdeSolver.h"
 #include "gmlc/utilities/mapOps.hpp"
 #include "gmlc/utilities/stringConversion.h"
 #include "utilities/factoryTemplates.hpp"
 
+#include <algorithm>
 #include <iostream>
+#include <map>
 #include <new>
+#include <utility>
 
 namespace griddyn {
 namespace solvers {
-    using namespace gmlc::utilities;
     // if cvode is not available this becomes the default differential solver
     static childClassFactory<basicOdeSolver, SolverInterface>
-        basicOdeFactory(stringVector{"basicode", "dyndiff", "differential"});
+        basicOdeFactory(gmlc::utilities::stringVector{"basicode", "dyndiff", "differential"});
 
 }  // namespace solvers
 SolverInterface::SolverInterface(const std::string& objName): helperObject(objName) {}
@@ -172,7 +176,7 @@ double SolverInterface::get(const std::string& param) const
 
 void SolverInterface::set(const std::string& param, const std::string& val)
 {
-    using namespace gmlc::utilities;
+    using gmlc::utilities::convertToLowerCase;
 
     if ((param == "approx") || (param == "approximation")) {
         setApproximation(convertToLowerCase(val));
@@ -206,7 +210,7 @@ void SolverInterface::set(const std::string& param, const std::string& val)
             // mode.pairedOffsetIndex = nsmode.offsetIndex;
         }
     } else if (param == "mask") {
-        auto sep = str2vector<int>(val, -1, ",;");
+        auto sep = gmlc::utilities::str2vector<int>(val, -1, ",;");
         maskElements.resize(sep.size());
         for (size_t kk = 0; kk < sep.size(); ++kk) {
             maskElements[kk] = sep[kk];
@@ -430,11 +434,11 @@ void SolverInterface::printStates(bool getNames)
 }
 
 void SolverInterface::check_flag(void* flagvalue,
-                                 const std::string& funcname,
+                                 [[maybe_unused]] const std::string& funcname,
                                  int opt,
                                  bool printError) const
 {
-    // TODO delete either this or optimizerInterface::check_flag
+    // TODO(PT) delete either this or optimizerInterface::check_flag
     // Check if SUNDIALS function returned nullptr pointer - no memory allocated
     if (opt == 0 && flagvalue == nullptr) {
         if (printError) {
@@ -454,7 +458,7 @@ void SolverInterface::check_flag(void* flagvalue,
             throw(solverException(*errflag));
         }
     }
-    // TODO missing if (opt == 2 and flagvalue == nullptr)?
+    // TODO(PT) missing if (opt == 2 and flagvalue == nullptr)?
 }
 
 int SolverInterface::solve(double /*tStop*/, double& /*tReturn*/, step_mode /* stepMode */)
@@ -482,7 +486,7 @@ void SolverInterface::setMaxNonZeros(solver_index_type nonZeroCount)
     nnz = nonZeroCount;
 }
 
-// TODO:: change this function so the defaults can be something other than sundials solvers
+// TODO(PT):: change this function so the defaults can be something other than sundials solvers
 std::unique_ptr<SolverInterface> makeSolver(SolvableObject* sobj, const solverMode& sMode)
 {
     std::unique_ptr<SolverInterface> sd = nullptr;

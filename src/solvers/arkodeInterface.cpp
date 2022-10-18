@@ -26,6 +26,7 @@
 #include <cassert>
 #include <map>
 #include <sunlinsol/sunlinsol_dense.h>
+#include <vector>
 
 namespace griddyn {
 namespace solvers {
@@ -48,8 +49,8 @@ namespace solvers {
         mode.algebraic = false;
     }
 
-    arkodeInterface::arkodeInterface(SolvableObject* sobj, const solverMode& sMode):
-        sundialsInterface(sobj, sMode)
+    arkodeInterface::arkodeInterface(SolvableObject* solveObj, const solverMode& sMode):
+        sundialsInterface(solveObj, sMode)
     {
         mode.dynamic = true;
         mode.differential = true;
@@ -172,13 +173,14 @@ namespace solvers {
     }
 
     // output solver stats
-    void arkodeInterface::logSolverStats(solver_print_level logLevel, bool /*iconly*/) const
+    void arkodeInterface::logSolverStats([[maybe_unused]] solver_print_level logLevel,
+                                         bool /*iconly*/) const
     {
         if (!flags[initialized_flag]) {
             return;
         }
-        long int nni = 0;
-        long int nst, nre, nfi = 0, netf, ncfn, nge;
+        // long int nni = 0;
+        long int nst, nre, nfi = 0, netf, /*ncfn,*/ nge;
         realtype tolsfac, hlast, hcur;
 
         int retval = ERKStepGetNumRhsEvals(solverMem, &nre);
@@ -223,7 +225,7 @@ namespace solvers {
         }
     }
 
-    void arkodeInterface::logErrorWeights(solver_print_level logLevel) const
+    void arkodeInterface::logErrorWeights([[maybe_unused]] solver_print_level logLevel) const
     {
         N_Vector eweight = NVECTOR_NEW(use_omp, svsize, ctx);
         N_Vector ele = NVECTOR_NEW(use_omp, svsize, ctx);
@@ -282,7 +284,7 @@ namespace solvers {
         if (!flags[allocated_flag]) {
             throw(InvalidSolverOperation());
         }
-        auto jsize = sobj->jacobianSize(mode);
+        // auto jsize = sobj->jacobianSize(mode);
 
         // dynInitializeB CVode - Sundials
         // guessState an initial condition

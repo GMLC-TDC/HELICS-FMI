@@ -10,8 +10,6 @@
  * LLNS Copyright End
  */
 
-#ifndef _MATRIX_DATA_SPARSESM_H_
-#define _MATRIX_DATA_SPARSESM_H_
 #pragma once
 
 #include "matrixData.hpp"
@@ -22,6 +20,7 @@
 #include <cassert>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 /** @brief simple class for compute the keyIndex from a row and column and inverting it*/
@@ -409,8 +408,8 @@ class matrixDataSparseSMB<0, X, ValueT, M>: public matrixData<ValueT> {
       the actual storage space used is approx 2x startCount due to expected unevenness in the array
     @param[in] startCount  the number of elements to reserve
     */
-    explicit matrixDataSparseSMB(index_t startCount = 1000) { dVec.reserve(startCount); };
-    void clear() override { dVec.clear(); };
+    explicit matrixDataSparseSMB(index_t startCount = 1000) { dVec.reserve(startCount); }
+    void clear() override { dVec.clear(); }
     void assign(index_t row, index_t col, ValueT num) override
     {
         dVec.emplace_back(key_computer.keyGen(row, col), num);
@@ -752,4 +751,3 @@ class matrixDataSparseSMB<1, X, ValueT, M>: public matrixData<ValueT> {
         int ci = 0;  //!< indicator of which vector of the array we are sequencing on;
     };
 };
-#endif

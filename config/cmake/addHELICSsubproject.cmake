@@ -15,9 +15,7 @@ string(TOLOWER "helics" lcName)
 
 include(FetchContent)
 
-fetchcontent_declare(
-    helics GIT_REPOSITORY https://github.com/GMLC-TDC/HELICS.git GIT_TAG external_subprojects
-)
+fetchcontent_declare(helics GIT_REPOSITORY https://github.com/GMLC-TDC/HELICS.git GIT_TAG develop)
 
 fetchcontent_getproperties(helics)
 
@@ -37,6 +35,7 @@ set(HELICS_HIDE_CMAKE_VARIABLES ON CACHE BOOL "" FORCE)
 
 add_subdirectory(${${lcName}_SOURCE_DIR} ${${lcName}_BINARY_DIR})
 
-set(HELICS_FMI_HELICS_TARGET_APPS HELICS::apps)
+set(${PROJECT_NAME}_HELICS_TARGET_APPS HELICS::apps)
+set(${PROJECT_NAME}_HELICS_TARGET HELICS::helicscpp)
 # set_target_properties(clang-format clang-format-check clang-format-diff PROPERTIES FOLDER
 # "Extern/zmq_clang_format")

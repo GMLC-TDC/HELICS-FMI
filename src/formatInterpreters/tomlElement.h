@@ -21,6 +21,9 @@
 #    pragma GCC diagnostic pop
 #endif
 
+#include <string>
+#include <utility>
+
 class tomlElement {
   public:
     int elementIndex = 0;

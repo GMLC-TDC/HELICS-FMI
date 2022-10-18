@@ -18,6 +18,7 @@
 #include <filesystem>
 #include <functional>
 #include <memory>
+#include <string>
 
 class readerElement;
 
@@ -150,14 +151,14 @@ class fmiLibrary {
     fmiLibrary();
     ~fmiLibrary();
     /** construct an fmilibrary object from the fmu path
-    @param[in] the path to the fmu
+    @param[in] fmuPath the path to the fmu object
     */
-    explicit fmiLibrary(const std::string& fmupath);
+    explicit fmiLibrary(const std::string& fmuPath);
     /** construct an fmilibrary object from the fmu path
-    @param[in] the path to the fmu
-    @param[in] the extraction path for the fmu
+    @param[in] fmuPath the path to the fmu
+    @param[in] extractLoc the folder location to extract the FMU
     */
-    fmiLibrary(const std::string& fmupath, const std::string& extractLoc);
+    fmiLibrary(const std::string& fmuPath, const std::string& extractLoc);
     /** check if the xml file for the fmu has been loaded
     @return true if loaded false if not*/
     bool isXmlLoaded() const { return xmlLoaded; }
@@ -165,13 +166,13 @@ class fmiLibrary {
     @return true if loaded false if not*/
     bool isSoLoaded(fmu_type type = fmu_type::unknown) const;
     /** load the FMU from the fmu path
-    @param[in] path the fmu*/
-    void loadFMU(const std::string& fmupath);
+    @param[in] fmuPath the file location of the fmu*/
+    void loadFMU(const std::string& fmuPath);
     /** load the FMU from the fmu path
-    @param[in] fmupath the fmu
+    @param[in] fmuPath the file location of the fmu
     @param[in] extractLoc the path to extract the fmu to
     */
-    void loadFMU(const std::string& fmupath, const std::string& extractLoc);
+    void loadFMU(const std::string& fmuPath, const std::string& extractLoc);
     std::shared_ptr<fmiInfo> getInfo() const { return information; }
     void close();
     const std::string& getName() const { return modelName; }
@@ -222,7 +223,7 @@ class fmiLibrary {
 @param[in] compEnv the environment of the logger
 @param[in] instanceName the name of the object
 @param[in] status the status of the message
-@param[in] message
+@param[in] message the string to add to the log
 */
 void loggerFunc(fmi2ComponentEnvironment compEnv,
                 fmi2String instanceName,

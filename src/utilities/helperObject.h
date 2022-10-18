@@ -16,13 +16,6 @@
 #include <stdexcept>
 #include <string>
 
-// disable a funny warning (bug in visual studio 2015)
-#ifdef _MSC_VER
-#    if _MSC_VER >= 1900
-#        pragma warning(disable : 4592)
-#    endif
-#endif
-
 namespace griddyn {
 class coreObject;
 /** @brief      base class for helper objects
@@ -58,18 +51,16 @@ class helperObject {
     /** @brief get flags
     @param flag -the name of the flag to be queried
     @param val the value to the set the flag ;
-    @return int a value representing whether the set operation was successful or not
     */
     virtual void setFlag(const std::string& flag, bool val = true);
     /** @brief get flags
-    @param param the name of the flag to query.
+    @param flag the name of the flag to query.
     @return the value of the flag queried
     */
     virtual bool getFlag(const std::string& flag) const;
     /**
      * @brief get a parameter from the object
      * @param[in] param the name of the parameter to get
-     * @param[in] unitType a type indicating the units of the val a defUnit default value
      * @return val the value of the parameter returns kNullVal if no property is found
      */
     virtual double get(const std::string& param) const;
@@ -129,16 +120,20 @@ void setMultipleFlags(helperObject* obj, const std::string& flags);
 /** exception classes */
 class unrecognizedParameter: public std::invalid_argument {
   public:
-    unrecognizedParameter() noexcept: std::invalid_argument("unrecognized parameter"){};
+    unrecognizedParameter() noexcept: std::invalid_argument("unrecognized parameter") {}
     unrecognizedParameter(const std::string& param):
-        std::invalid_argument(std::string("unrecognized Parameter:") + param){};
+        std::invalid_argument(std::string("unrecognized Parameter:") + param)
+    {
+    }
 };
 
 class invalidParameterValue: public std::invalid_argument {
   public:
-    invalidParameterValue() noexcept: std::invalid_argument("invalid parameter entry"){};
+    invalidParameterValue() noexcept: std::invalid_argument("invalid parameter entry") {}
     invalidParameterValue(const std::string& param):
-        std::invalid_argument(std::string("invalid parameter value for ") + param){};
+        std::invalid_argument(std::string("invalid parameter value for ") + param)
+    {
+    }
 };
 
 }  // namespace griddyn

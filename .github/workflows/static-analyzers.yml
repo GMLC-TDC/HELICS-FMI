@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run cpplint
-      run: cpplint --counting=detailed --recursive src tests
+      run: cpplint --exclude=src/fmi/FMI2 --counting=detailed --recursive src tests 
 
   clang-tidy:
     if: github.event_name == 'pull_request'

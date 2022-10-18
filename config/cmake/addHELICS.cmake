@@ -7,6 +7,10 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+show_variable(
+    HELICS_INSTALL_PATH PATH "path to the helics installation" "${PROJECT_BINARY_DIR}/libs"
+)
+
 set(HELICS_CURRENT_VERSION 3.3.0)
 
 if(MSVC)
@@ -19,13 +23,13 @@ show_variable(
     HELICS_INSTALL_PATH PATH "path to the helics installation" "${PROJECT_BINARY_DIR}/libs"
 )
 
-option(HELICS_FMI_FORCE_HELICS_SUBPROJECT "Force a helics subproject" OFF)
+option(${PROJECT_NAME}_FORCE_HELICS_SUBPROJECT "Force a helics subproject" OFF)
 
-if(HELICS_FMI_FORCE_HELICS_SUBPROJECT)
+if(${PROJECT_NAME}_FORCE_HELICS_SUBPROJECT)
     include(addHELICSsubproject)
 else()
 
-    option(HELICS_FMI_HELICS_SUBPROJECT "use helics as a subproject" OFF)
+    option(${PROJECT_NAME}_HELICS_SUBPROJECT "use helics as a subproject" OFF)
 
     set(HELICS_CMAKE_SUFFIXES lib/cmake/HELICS/ cmake/HELICS/)
 
@@ -41,22 +45,22 @@ else()
     )
 
     if(NOT HELICS_FOUND)
-        if(HELICS_FMI_HELICS_SUBPROJECT)
+        if(${PROJECT_NAME}_HELICS_SUBPROJECT)
 
             include(addHELICSsubproject)
-        elseif(HELICS_FMI_HELICS_PACKAGE_DOWNLOAD)
+        elseif(${PROJECT_NAME}_HELICS_PACKAGE_DOWNLOAD)
             message(STATUS "HELICS FMI helics package download")
             include(helicsPackageDownload)
             if(helicscpp_POPULATED)
 
                 find_package(HELICS 3.3 HINTS ${helicscpp_SOURCE_DIR})
-                set(HELICS_FMI_HELICS_TARGET HELICS::helicscpp)
-                set(HELICS_FMI_HELICS_TARGET_APPS HELICS::helicscpp-apps)
+                set(${PROJECT_NAME}_HELICS_TARGET HELICS::helicscpp)
+                set(${PROJECT_NAME}_HELICS_TARGET_APPS HELICS::helicscpp-apps)
             endif()
         endif()
     else()
-        set(HELICS_FMI_HELICS_TARGET HELICS::helicscpp)
-        set(HELICS_FMI_HELICS_TARGET_APPS HELICS::helicscpp-apps)
+        set(${PROJECT_NAME}_HELICS_TARGET HELICS::helicscpp)
+        set(${PROJECT_NAME}_HELICS_TARGET_APPS HELICS::helicscpp-apps)
     endif()
 
 endif()

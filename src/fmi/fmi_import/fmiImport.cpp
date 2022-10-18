@@ -17,10 +17,13 @@
 #include "helics-fmi/helics-fmi-config.h"
 #include "utilities/zipUtilities.h"
 
+#include <algorithm>
 #include <boost/dll/import.hpp>
 #include <boost/dll/shared_library.hpp>
 #include <cstdarg>
 #include <map>
+#include <string>
+#include <utility>
 
 using path = std::filesystem::path;
 
@@ -123,13 +126,13 @@ fmiLibrary::fmiLibrary()
     information = std::make_shared<fmiInfo>();
 }
 
-fmiLibrary::fmiLibrary(const std::string& fmupath): fmiLibrary()
+fmiLibrary::fmiLibrary(const std::string& fmuPath): fmiLibrary()
 {
-    loadFMU(fmupath);
+    loadFMU(fmuPath);
 }
 
-fmiLibrary::fmiLibrary(const std::string& fmupath, const std::string& extractPath):
-    extractDirectory(extractPath), fmuName(fmupath)
+fmiLibrary::fmiLibrary(const std::string& fmuPath, const std::string& extractPath):
+    extractDirectory(extractPath), fmuName(fmuPath)
 {
     information = std::make_shared<fmiInfo>();
     if (!exists(extractDirectory)) {
@@ -164,9 +167,9 @@ bool fmiLibrary::isSoLoaded(fmu_type type) const
     }
 }
 
-void fmiLibrary::loadFMU(const std::string& fmupath)
+void fmiLibrary::loadFMU(const std::string& fmuPath)
 {
-    path ipath(fmupath);
+    path ipath(fmuPath);
     if (is_directory(ipath)) {
         extractDirectory = ipath;
     } else {
@@ -176,10 +179,10 @@ void fmiLibrary::loadFMU(const std::string& fmupath)
     loadInformation();
 }
 
-void fmiLibrary::loadFMU(const std::string& fmupath, const std::string& extractLoc)
+void fmiLibrary::loadFMU(const std::string& fmuPath, const std::string& extractLoc)
 {
     extractDirectory = extractLoc;
-    fmuName = fmupath;
+    fmuName = fmuPath;
     loadInformation();
 }
 
@@ -415,10 +418,10 @@ void fmiLibrary::makeCallbackFunctions()
 }
 
 #define STRING_BUFFER_SIZE 1000
-void loggerFunc(fmi2ComponentEnvironment compEnv,
-                fmi2String instanceName,
-                fmi2Status status,
-                fmi2String category,
+void loggerFunc([[maybe_unused]] fmi2ComponentEnvironment compEnv,
+                [[maybe_unused]] fmi2String instanceName,
+                [[maybe_unused]] fmi2Status status,
+                [[maybe_unused]] fmi2String category,
                 fmi2String message,
                 ...)
 {

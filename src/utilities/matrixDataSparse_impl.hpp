@@ -10,10 +10,12 @@
  * LLNS Copyright End
  */
 
-#ifndef _MATRIX_DATA_SPARSE_IMPL_HPP_
-#define _MATRIX_DATA_SPARSE_IMPL_HPP_
+#pragma once
 
 #include "matrixDataSparse.hpp"
+
+#include <algorithm>
+#include <vector>
 
 template<typename ValueT>
 void matrixDataSparse<ValueT>::assign(index_t row, index_t col, ValueT num)
@@ -326,5 +328,3 @@ std::vector<std::vector<index_t>> findRank(matrixDataSparse<ValueT>& md)
     }
     return mrows;
 }
-
-#endif /* _MATRIX_DATA_SPARSE_IMPL_HPP_ */

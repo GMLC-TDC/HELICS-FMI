@@ -10,13 +10,12 @@
  * LLNS Copyright End
  */
 
-#ifndef _MATRIX_DATA_H_
-#define _MATRIX_DATA_H_
 #pragma once
 
 #include "indexTypes.hpp"
 
 #include <iterator>
+#include <utility>
 
 /** @brief convenience structure for returning data
  */
@@ -79,14 +78,16 @@ class matrixData {
 
     /**
      *  @brief add a new Jacobian element
-     *  @param[in] row,col the row  and column of the element
+     *  @param[in] row the row index of the element
+     *  @param[in] col the column index of the element
      *  @param[in] num the value of the element
      */
     virtual void assign(index_t row, index_t col, value_t num) = 0;
 
     /** @brief assign with a check on the row
      *  add a new Jacobian element if the arguments are valid (row<rowNum)
-     *  @param[in] row,col the row and column of the element
+     *  @param[in] row the row index of the element
+     *  @param[in] col the column index of the element
      *  @param[in] num the value of the element
      */
     void assignCheckRow(index_t row, index_t col, value_t num)
@@ -98,7 +99,8 @@ class matrixData {
 
     /** @brief assign with a check on the col
      *  add a new Jacobian element if the arguments are valid (col<colLim)
-     *  @param[in] row,col the row  and column of the element
+     *  @param[in] row the row index of the element
+     *  @param[in] col the column index of the element
      *  @param[in] num the value of the element
      */
     void assignCheckCol(index_t row, index_t col, value_t num)
@@ -129,18 +131,18 @@ class matrixData {
      *  @brief get the maximum row number
      *  @return the max row value
      */
-    count_t rowLimit() const { return rowLim; };
+    count_t rowLimit() const { return rowLim; }
     /**
      *  @brief get the maximum row number
      *  @return the max col value
      */
-    count_t colLimit() const { return colLim; };
+    count_t colLimit() const { return colLim; }
 
   private:
     /**
      *  @brief private function for derived classes to notify of a limitUpdate
-     *  @param[rowLimit] the new rowLimit
-     * @param[colLimit] the new colLimit
+     *  @param newRowLimit the new rowLimit
+     * @param newColLimit the new colLimit
      */
     virtual void limitUpdate(index_t newRowLimit, index_t newColLimit)
     {
@@ -180,7 +182,7 @@ class matrixData {
     /**
      *  @brief reserve space in the array for
      */
-    virtual void reserve(count_t /*maxNonZeros*/){};
+    virtual void reserve(count_t /*maxNonZeros*/) {}
 
     /**
      *  @brief get the value at a specific location
@@ -285,5 +287,3 @@ class matrixData {
 #endif
     }
 };
-
-#endif

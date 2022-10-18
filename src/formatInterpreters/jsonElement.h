@@ -13,6 +13,8 @@
 #pragma once
 
 #include "json/json.h"
+#include <string>
+#include <utility>
 
 class jsonElement {
   public:

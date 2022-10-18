@@ -15,7 +15,6 @@
 #include "gmlc/utilities/stringOps.h"
 #include "gmlc/utilities/vectorOps.hpp"
 
-#include <cstdio>
 #include <cvode/cvode.h>
 #include <cvode/cvode_direct.h>
 
@@ -26,7 +25,10 @@
 #include <cassert>
 #include <cstdio>
 #include <map>
+#include <memory>
+#include <string>
 #include <sunlinsol/sunlinsol_dense.h>
+#include <vector>
 
 namespace griddyn {
 namespace solvers {
@@ -50,8 +52,8 @@ namespace solvers {
         mode.algebraic = false;
     }
 
-    cvodeInterface::cvodeInterface(SolvableObject* sobj, const solverMode& sMode):
-        sundialsInterface(sobj, sMode)
+    cvodeInterface::cvodeInterface(SolvableObject* solveObj, const solverMode& sMode):
+        sundialsInterface(solveObj, sMode)
     {
         mode.dynamic = true;
         mode.differential = true;
@@ -156,7 +158,7 @@ namespace solvers {
 
     double cvodeInterface::get(const std::string& param) const
     {
-        long int val = -1;
+        long val = -1;
         if ((param == "resevals") || (param == "iterationcount")) {
             //    CVodeGetNumResEvals(solverMem, &val);
         } else if (param == "iccount") {
@@ -171,14 +173,15 @@ namespace solvers {
     }
 
     // output solver stats
-    void cvodeInterface::logSolverStats(solver_print_level logLevel, bool /*iconly*/) const
+    void cvodeInterface::logSolverStats([[maybe_unused]] solver_print_level logLevel,
+                                        bool /*iconly*/) const
     {
         if (!flags[initialized_flag]) {
             return;
         }
-        long int nni = 0;
+        long nni = 0;
         int klast, kcur;
-        long int nst, nre, netf, ncfn, nge;
+        long nst, nre, netf, ncfn, nge;
         realtype tolsfac, hlast, hcur;
 
         int retval = CVodeGetNumRhsEvals(solverMem, &nre);
@@ -228,7 +231,7 @@ namespace solvers {
         }
     }
 
-    void cvodeInterface::logErrorWeights(solver_print_level logLevel) const
+    void cvodeInterface::logErrorWeights([[maybe_unused]] solver_print_level logLevel) const
     {
         N_Vector eweight = NVECTOR_NEW(use_omp, svsize, ctx);
         N_Vector ele = NVECTOR_NEW(use_omp, svsize, ctx);
@@ -286,7 +289,7 @@ namespace solvers {
             throw(InvalidSolverOperation());
         }
 
-        auto jsize = sobj->jacobianSize(mode);
+        // auto jsize = sobj->jacobianSize(mode);
 
         // dynInitializeB CVode - Sundials
 

@@ -17,6 +17,7 @@
 #include "gmlc/utilities/string_viewOps.h"
 
 #include <unordered_map>
+#include <utility>
 
 namespace griddyn {
 // start at 100 since there are some objects that use low numbers as a check for interface number
@@ -85,12 +86,11 @@ coreObject* helperObject::getOwner() const
     return nullptr;
 }
 
-using namespace gmlc::utilities;
 void setMultipleFlags(helperObject* obj, const std::string& flags)
 {
-    auto lcflags = convertToLowerCase(flags);
-    auto flgs = string_viewOps::split(lcflags);
-    string_viewOps::trim(flgs);
+    auto lcflags = gmlc::utilities::convertToLowerCase(flags);
+    auto flgs = gmlc::utilities::string_viewOps::split(lcflags);
+    gmlc::utilities::string_viewOps::trim(flgs);
     for (const auto& flag : flgs) {
         if (flag.empty()) {
             continue;

@@ -10,11 +10,14 @@
  * LLNS Copyright End
  */
 
-#ifndef UTILITY_RANDOM_H_
-#define UTILITY_RANDOM_H_
+#pragma once
 
 #include <memory>
 #include <random>
+#include <string>
+#include <utility>
+#include <vector>
+
 /** abstract class defining a random distribution*/
 
 namespace utilities {
@@ -38,7 +41,7 @@ class distributionObject {
         updateParameter(param1);
     };
 };
-// TODO: rework this so it functions across threads as the current generator is not thread safe
+// TODO(PT): rework this so it functions across threads as the current generator is not thread safe
 
 /** class defining random number generation*/
 class gridRandom {
@@ -94,12 +97,12 @@ class gridRandom {
     /** generate a random vector with a specified number of values*/
     std::vector<double> getNewValues(size_t count);
     /** fill a vector with new random values
-    @param[out] the vector to fill with new random numbers
+    @param[out] rvec the vector to fill with new random numbers
     @param count the number of random values to generate
     */
     void getNewValues(std::vector<double>& rvec, size_t count);
 
-    static auto& getEngine() { return s_gen; };
+    static auto& getEngine() { return s_gen; }
 
   private:
     std::unique_ptr<distributionObject> dobj;
@@ -157,4 +160,3 @@ class randomDistributionObject1<void>: public distributionObject {
 gridRandom::dist_type_t getDist(const std::string& dist_name);
 
 }  // namespace utilities
-#endif

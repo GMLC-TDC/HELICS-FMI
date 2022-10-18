@@ -19,7 +19,9 @@
 
 #include <exception>
 #include <memory>
+#include <string>
 #include <vector>
+
 namespace griddyn {
 enum class solver_print_level {
     s_debug_print = 2,
@@ -30,13 +32,20 @@ enum class solver_print_level {
 /** error class for throwing solver exceptions*/
 class solverException: public std::exception {
   protected:
-    int errorCode;  //<!* the actual solver Error Code
+    int errorCode;  ///< the actual solver Error Code
+    std::string message;
+
   public:
-    explicit solverException(int ecode = 0): errorCode(ecode){};
-    virtual const char* what() const noexcept override
+    explicit solverException(int ecode = 0): errorCode(ecode)
     {
-        return (std::string("solver Exception:error code=") + std::to_string(errorCode)).c_str();
+        message = std::string("solver Exception:error code=") + std::to_string(errorCode);
     }
+
+    explicit solverException(int ecode, const std::string& errorMessage):
+        errorCode(ecode), message(errorMessage)
+    {
+    }
+    virtual const char* what() const noexcept override { return message.c_str(); }
     /** return the full name of the object that threw the exception*/
     int code() const noexcept { return errorCode; }
 };
@@ -46,11 +55,10 @@ class solverException: public std::exception {
 class InvalidSolverOperation: public solverException {
   protected:
   public:
-    explicit InvalidSolverOperation(int ecode = 0): solverException(ecode){};
-    virtual const char* what() const noexcept override
+    explicit InvalidSolverOperation(int ecode = 0):
+        solverException(ecode,
+                        std::string("invalid solver operation:error code=") + std::to_string(ecode))
     {
-        return (std::string("invalid solver operation:error code=") + std::to_string(errorCode))
-            .c_str();
     }
 };
 
@@ -137,7 +145,7 @@ class SolverInterface: public helperObject {
     double solveTime = -1e39;  //!< storage for the time the solver is called
     std::string jacFile;  //!< the file to write the Jacobian to
     std::string stateFile;  //!< the file to write the state and residual to
-    SolvableObject* sobj = nullptr;  //!< pointer the gridDynSimulation object used
+    SolvableObject* sobj = nullptr;  //!< pointer the solvableObject object used
     solver_index_type svsize = 0;  //!< the state size
     solver_index_type nnz = 0;  //!< the actual number of non-zeros in a Jacobian
     std::bitset<32> flags;  //!< flags for the solver
@@ -149,7 +157,7 @@ class SolverInterface: public helperObject {
     explicit SolverInterface(const std::string& objName = "");
 
     /** @brief alternate constructor
-    @param[in] gds  gridDynSimulation to link with
+    @param[in] sobj  SolvableObject to link with
     @param[in] sMode the solverMode associated with the solver
     */
     SolverInterface(SolvableObject* sobj, const solverMode& sMode);
@@ -198,19 +206,16 @@ class SolverInterface: public helperObject {
     /** @brief allocate the memory for the solver
     @param[in] size  the size of the state vector
     @param[in] numRoots  the number of root functions in the solution
-    @return the function status
     */
     virtual void allocate(solver_index_type size, solver_index_type numRoots = 0);
 
     /** @brief initialize the solver to time t0
     @param[in] t0  the time for the initialization
-    @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
     */
     virtual void initialize(double t0);
 
     /** @brief reinitialize the sparse components
     @param[in] mode the reinitialization mode
-    @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
     */
     virtual void sparseReInit(sparse_reinit_modes mode);
 
@@ -219,7 +224,7 @@ class SolverInterface: public helperObject {
 
     /** @brief perform an initial condition calculation
     @param[in] t0  the time for the initialization
-    @param[in]  tstep0  the size of the first desired step
+    @param[in] tstep0  the size of the first desired step
     @param[in] mode  the step mode
     @param[in] constraints  flag indicating that constraints should be used
     @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
@@ -227,16 +232,13 @@ class SolverInterface: public helperObject {
     virtual int calcIC(double t0, double tstep0, ic_modes mode, bool constraints);
     /** @brief get the current solution
      usually called after a call to CalcIC to get the calculated conditions
-    @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
     */
     virtual void getCurrentData();
     /** @brief get the locations of any found roots
-    @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
-    */
+     */
     virtual void getRoots();
     /** @brief update the number of roots to find
-    @return the function success status  FUNCTION_EXECUTION_SUCCESS on success
-    */
+     */
     virtual void setRootFinding(solver_index_type numRoots);
 
     /** @brief get a parameter from the solver
@@ -314,12 +316,12 @@ class SolverInterface: public helperObject {
     */
     void printStates(bool getNames = false);
     /** @brief input the simulation data to attach to
-    @param[in] gds the gridDynSimulationObject to attach to
+    @param[in] sobj the solvableObject to attach to
     @param[in] sMode the solverMode associated with the solver
     */
     virtual void setSimulationData(SolvableObject* sobj, const solverMode& sMode);
     /** @brief input the simulation data to attach to
-    @param[in] gds the gridDynSimulationObject to attach to
+    @param[in] sobj the solvableObject to attach to
     */
     virtual void setSimulationData(SolvableObject* sobj);
 
@@ -372,7 +374,7 @@ class SolverInterface: public helperObject {
 };
 
 /** @brief make a solver from a particular mode
-@param[in] gds  the gridDynSimulation to link to
+@param[in] sobj  the SolvableObject to link to
 @param[in] sMode the solverMode to construct the SolverInterface from
 @return a unique_ptr to a SolverInterface object
 */

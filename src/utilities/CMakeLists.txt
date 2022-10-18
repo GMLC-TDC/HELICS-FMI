@@ -21,6 +21,7 @@ set(utilities_headers
     matrixOps.h
     matrixDataCompact.hpp
     matrixDataSparse.hpp
+    matrixDataSparseSM.hpp
     matrixDataSparse_impl.hpp
     matrixDataTranslate.hpp
     matrixDataContainer.hpp
@@ -29,6 +30,8 @@ set(utilities_headers
     matrixDataOrdering.hpp
     matrixDataFilter.hpp
     matrixDataCustomWriteOnly.hpp
+    matrixDataSparseSM.hpp
+    matrixDataBoost.hpp
     functionInterpreter.h
     zipUtilities.h
     valuePredictor.hpp
@@ -36,6 +39,7 @@ set(utilities_headers
     indexTypes.hpp
     factoryTemplates.hpp
     helperObject.h
+    gridRandom.h
 )
 
 add_library(utilities STATIC ${utilities_sources} ${utilities_headers})

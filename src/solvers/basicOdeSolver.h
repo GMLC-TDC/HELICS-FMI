@@ -14,6 +14,10 @@
 
 #include "solverInterface.h"
 
+#include <memory>
+#include <string>
+#include <vector>
+
 namespace griddyn {
 namespace solvers {
     /** @brief class implementing a Gauss Seidel solver for algebraic variables in a power system
@@ -29,7 +33,7 @@ namespace solvers {
         /** @brief default constructor*/
         explicit basicOdeSolver(const std::string& objName = "basicOde");
         /** alternate constructor to feed to SolverInterface
-        @param[in] gds  the gridDynSimulation to link to
+        @param[in] sobj  the solvableObject to link to
         @param[in] sMode the solverMode to solve with
         */
         basicOdeSolver(SolvableObject* sobj, const solverMode& sMode);

@@ -9,3 +9,5 @@
  * For details, see the LICENSE file.
  * LLNS Copyright End
  */
+
+#include "fmiEnumDefinitions.h"

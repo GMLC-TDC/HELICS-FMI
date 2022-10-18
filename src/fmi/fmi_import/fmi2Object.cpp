@@ -58,6 +58,11 @@ void fmi2Object::setMode(fmuMode mode)
     switch (currentMode) {
         case fmuMode::instantiatedMode:
             switch (mode) {
+                case fmuMode::instantiatedMode:
+                case fmuMode::continuousTimeMode:
+                case fmuMode::terminated:
+                case fmuMode::error:
+                    break;
                 case fmuMode::initializationMode:
                     if (inputSize() == 0) {
                         setDefaultInputs();
@@ -296,7 +301,7 @@ void fmi2Object::setOutputVariables(const std::vector<std::string>& outNames)
             activeOutputs.push(vI.valueRef);
             activeOutputIndices.push_back(vI.index);
         }
-        // TODO:: what to do if this condition is not valid?
+        // TODO(PT):: what to do if this condition is not valid?
     }
 }
 

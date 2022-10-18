@@ -15,6 +15,8 @@
 #include "utilities/matrixDataSparse.hpp"
 
 #include <cstdio>
+#include <memory>
+#include <string>
 // SUNDIALS libraries
 
 #include "nvector/nvector_serial.h"
@@ -88,7 +90,7 @@ namespace solvers {
       public:
         explicit sundialsInterface(const std::string& objName = "sundials");
         /** @brief constructor loading the SolverInterface structure*
-        @param[in] gds  the gridDynSimulation to link with
+        @param[in] sobj  the solvableObject to link with
         @param[in] sMode the solverMode for the solver
         */
         sundialsInterface(SolvableObject* sobj, const solverMode& sMode);

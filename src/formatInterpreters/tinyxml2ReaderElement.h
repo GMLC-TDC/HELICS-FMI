@@ -10,12 +10,12 @@
  * LLNS Copyright End
  */
 
-#ifndef TINYXML2READERELEMENT_H_
-#define TINYXML2READERELEMENT_H_
+#pragma once
 
 #include "readerElement.h"
 
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -87,5 +87,3 @@ class tinyxml2ReaderElement: public readerElement {
   private:
     void clear();
 };
-
-#endif
