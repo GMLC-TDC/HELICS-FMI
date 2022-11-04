@@ -11,10 +11,10 @@ show_variable(
     HELICS_INSTALL_PATH PATH "path to the helics installation" "${PROJECT_BINARY_DIR}/libs"
 )
 
-set(HELICS_CURRENT_VERSION 3.3.0)
+set(HELICS_CURRENT_VERSION 3.3.1)
 
 if(MSVC)
-    set(HELICS_PATH_HINTS C:/local/helics_3_3_0)
+    set(HELICS_PATH_HINTS C:/local/helics_3_3_0 C:/local/helics_3_3_1)
 endif(MSVC)
 
 include(GNUInstallDirs)
