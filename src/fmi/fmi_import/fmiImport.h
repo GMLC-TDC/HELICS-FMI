@@ -146,19 +146,19 @@ class fmi2CoSimObject;
 /** @brief class for loading an fmu file information
  *@details class extracts and FMU if needed then searches for the xml file and loads the information
  */
-class fmiLibrary {
+class FmiLibrary {
   public:
-    fmiLibrary();
-    ~fmiLibrary();
+    FmiLibrary();
+    ~FmiLibrary();
     /** construct an fmilibrary object from the fmu path
     @param[in] fmuPath the path to the fmu object
     */
-    explicit fmiLibrary(const std::string& fmuPath);
+    explicit FmiLibrary(const std::string& fmuPath);
     /** construct an fmilibrary object from the fmu path
     @param[in] fmuPath the path to the fmu
     @param[in] extractLoc the folder location to extract the FMU
     */
-    fmiLibrary(const std::string& fmuPath, const std::string& extractLoc);
+    FmiLibrary(const std::string& fmuPath, const std::string& extractLoc);
     /** check if the xml file for the fmu has been loaded
     @return true if loaded false if not*/
     bool isXmlLoaded() const { return xmlLoaded; }
@@ -176,7 +176,7 @@ class fmiLibrary {
     std::shared_ptr<fmiInfo> getInfo() const { return information; }
     void close();
     const std::string& getName() const { return modelName; }
-    int getCounts(const std::string& countType) const;
+    int getCounts(fmiVariableType countType) const;
     void loadSharedLibrary(fmu_type type = fmu_type::unknown);
 
     bool checkFlag(fmuCapabilityFlags flag) const;
@@ -185,7 +185,10 @@ class fmiLibrary {
     std::unique_ptr<fmi2CoSimObject> createCoSimulationObject(const std::string& name);
     std::string getTypes();
     std::string getVersion();
-
+    /** remove the FMU extraction directory on close*/
+    void deleteFMUdirectory(bool deleteDir=true){deleteDirectory=deleteDir;}
+    /** get the current status of the delete Directory modifier*/
+    bool getDeleteFMUDirectory() const {return deleteDirectory;}
   private:  // private functions
     void loadInformation();
     int extract();
@@ -210,6 +213,8 @@ class fmiLibrary {
     std::shared_ptr<fmiInfo>
         information;  //!< an object containing information derived from the FMU XML file
 
+    bool deleteDirectory{false}; //!< indicator that on close the fmiInfoshould delete the directory
+    bool extracted{false}; //!< set to true if the FMU was extracted
     std::shared_ptr<boost::dll::shared_library> lib;
     std::shared_ptr<fmi2CallbackFunctions_nc> callbacks;
     fmiBaseFunctions baseFunctions;

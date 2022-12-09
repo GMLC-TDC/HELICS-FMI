@@ -34,6 +34,26 @@ BETTER_ENUM(fmi_causality,
             unknown,
             any)
 
+/** enumeration of fmi variable types*/
+enum class fmiVariableType
+{
+    local,
+    any,
+    input,
+    output,
+    parameter,
+    calculatedParameter,
+    independent,
+    unknown,
+    derivative,
+    state,
+    units,
+    nonZero,
+    event,
+    meObject,
+    csObject
+};
+
 BETTER_ENUM(fmi_variable_type,
             int,
             real = 0,
@@ -68,6 +88,14 @@ enum fmuCapabilityFlags : int {
     canBeInstantiatedOnlyOncePerProcess,
     canNotUseMemoryManagementFunctions,
 
+};
+
+/** enumeration of platform support types*/
+enum fmuPlatformSupport : int {
+    win32,
+    win64,
+    macos,
+    linux,
 };
 
 #endif

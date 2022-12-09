@@ -70,28 +70,54 @@ bool fmiInfo::checkFlag(fmuCapabilityFlags flag) const
     return capabilities[flag];
 }
 
-int fmiInfo::getCounts(const std::string& countType) const
+int fmiInfo::getCounts(fmiVariableType countType) const
 {
     size_t cnt = size_t(-1);
-    if (countType == "variables") {
-        cnt = variables.size();
-    } else if ((countType == "states") || (countType == "derivatives") || (countType == "state")) {
-        cnt = states.size();
-    } else if ((countType == "units") || (countType == "unit")) {
-        cnt = units.size();
-    } else if ((countType == "parameters") || (countType == "parameter")) {
-        cnt = parameters.size();
-    } else if ((countType == "local") || (countType == "locals")) {
+    switch (countType)
+    {
+    case fmiVariableType::meObject:
+        cnt=checkFlag(modelExchangeCapable)?1:0;
+        break;
+    case fmiVariableType::csObject:
+        cnt=checkFlag(coSimulationCapable)?1:0;
+        break;
+    case fmiVariableType::local:
         cnt = local.size();
-    } else if ((countType == "initialunknowns") || (countType == "unknown")) {
-        cnt = initUnknown.size();
-    } else if ((countType == "outputs") || (countType == "output")) {
-        cnt = outputs.size();
-    } else if ((countType == "inputs") || (countType == "input")) {
+        break;
+    case fmiVariableType::any:
+        cnt = variables.size();
+        break;
+    case fmiVariableType::input:
         cnt = inputs.size();
-    } else if (countType == "nonzeros") {
-        cnt = derivDep.size();
+        break;
+    case fmiVariableType::output:
+        cnt = outputs.size();
+        break;
+    case fmiVariableType::parameter:
+    case fmiVariableType::calculatedParameter:
+                cnt = parameters.size();
+                break;
+            
+            case fmiVariableType::independent:
+            case fmiVariableType::unknown:
+                cnt = initUnknown.size();
+                break;
+            case fmiVariableType::derivative:
+            case fmiVariableType::state:
+                cnt = states.size();
+                break;
+            case fmiVariableType::units:
+                cnt = units.size();
+                break;
+            case fmiVariableType::nonZero:
+                cnt = derivDep.size();
+                break;
+            case fmiVariableType::event:
+                cnt= eventIndicators;
+            default:
+                break;
     }
+    
     if (cnt == size_t(-1)) {
         return (-1);
     }

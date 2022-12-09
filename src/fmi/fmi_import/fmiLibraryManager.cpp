@@ -15,7 +15,7 @@
 #include "fmiImport.h"
 #include "fmiObjects.h"
 
-std::shared_ptr<fmiLibrary> fmiLibraryManager::getLibrary(const std::string& libFile)
+std::shared_ptr<FmiLibrary> fmiLibraryManager::getLibrary(const std::string& libFile)
 {
     std::unique_lock<std::mutex> lock(libraryLock);
     auto fnd = quickReferenceLibraries.find(libFile);
@@ -31,7 +31,7 @@ std::shared_ptr<fmiLibrary> fmiLibraryManager::getLibrary(const std::string& lib
     } else {
         lock.unlock();
         // this can be a big operation so free the lock while it is occurring
-        auto newLib = std::make_shared<fmiLibrary>(libFile);
+        auto newLib = std::make_shared<FmiLibrary>(libFile);
         lock.lock();
         libraries.emplace(fmilib, newLib);
         return newLib;

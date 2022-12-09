@@ -121,17 +121,17 @@ fmiCoSimFunctions::fmiCoSimFunctions(std::shared_ptr<boost::dll::shared_library>
     fmi2GetStringStatus = lib->get<fmi2GetStringStatusTYPE>("fmi2GetStringStatus");
 }
 
-fmiLibrary::fmiLibrary()
+FmiLibrary::FmiLibrary()
 {
     information = std::make_shared<fmiInfo>();
 }
 
-fmiLibrary::fmiLibrary(const std::string& fmuPath): fmiLibrary()
+FmiLibrary::FmiLibrary(const std::string& fmuPath): FmiLibrary()
 {
     loadFMU(fmuPath);
 }
 
-fmiLibrary::fmiLibrary(const std::string& fmuPath, const std::string& extractPath):
+FmiLibrary::FmiLibrary(const std::string& fmuPath, const std::string& extractPath):
     extractDirectory(extractPath), fmuName(fmuPath)
 {
     information = std::make_shared<fmiInfo>();
@@ -141,21 +141,28 @@ fmiLibrary::fmiLibrary(const std::string& fmuPath, const std::string& extractPat
     loadInformation();
 }
 
-fmiLibrary::~fmiLibrary() = default;
-
-void fmiLibrary::close()
+FmiLibrary::~FmiLibrary()
 {
+    if (deleteDirectory && extracted)
+    {
+        std::filesystem::remove_all(extractDirectory);
+    }
+}
+
+void FmiLibrary::close()
+{
+    
     soMeLoaded = false;
     soCoSimLoaded = false;
     lib = nullptr;
 }
 
-bool fmiLibrary::checkFlag(fmuCapabilityFlags flag) const
+bool FmiLibrary::checkFlag(fmuCapabilityFlags flag) const
 {
     return information->checkFlag(flag);
 }
 
-bool fmiLibrary::isSoLoaded(fmu_type type) const
+bool FmiLibrary::isSoLoaded(fmu_type type) const
 {
     switch (type) {
         case fmu_type::modelExchange:
@@ -167,7 +174,7 @@ bool fmiLibrary::isSoLoaded(fmu_type type) const
     }
 }
 
-void fmiLibrary::loadFMU(const std::string& fmuPath)
+void FmiLibrary::loadFMU(const std::string& fmuPath)
 {
     path ipath(fmuPath);
     if (is_directory(ipath)) {
@@ -179,31 +186,35 @@ void fmiLibrary::loadFMU(const std::string& fmuPath)
     loadInformation();
 }
 
-void fmiLibrary::loadFMU(const std::string& fmuPath, const std::string& extractLoc)
+void FmiLibrary::loadFMU(const std::string& fmuPath, const std::string& extractLoc)
 {
     extractDirectory = extractLoc;
     fmuName = fmuPath;
     loadInformation();
 }
 
-int fmiLibrary::getCounts(const std::string& countType) const
+int FmiLibrary::getCounts(fmiVariableType countType) const
 {
     size_t cnt = size_t(-1);
-    if (countType == "meobjects") {
+    switch (countType)
+    {
+    case fmiVariableType::meObject:
         cnt = mecount;
-    } else if (countType == "cosimobjects") {
+        break;
+    case fmiVariableType::csObject:
         cnt = cosimcount;
-    } else {
-        cnt = information->getCounts(countType);
+        break;
+    default:
+        return information->getCounts(countType);
     }
-
+    
     if (cnt == size_t(-1)) {
         return (-1);
     }
     return static_cast<int>(cnt);
 }
 
-void fmiLibrary::loadInformation()
+void FmiLibrary::loadInformation()
 {
     auto xmlfile = extractDirectory / "modelDescription.xml";
     if (!exists(xmlfile)) {
@@ -227,7 +238,7 @@ void fmiLibrary::loadInformation()
     }
 }
 
-std::string fmiLibrary::getTypes()
+std::string FmiLibrary::getTypes()
 {
     if (isSoLoaded()) {
         return std::string(baseFunctions.fmi2GetTypesPlatform());
@@ -235,7 +246,7 @@ std::string fmiLibrary::getTypes()
     return "";
 }
 
-std::string fmiLibrary::getVersion()
+std::string FmiLibrary::getVersion()
 {
     if (isSoLoaded()) {
         return std::string(baseFunctions.fmi2GetVersion());
@@ -243,17 +254,18 @@ std::string fmiLibrary::getVersion()
     return "";
 }
 
-int fmiLibrary::extract()
+int FmiLibrary::extract()
 {
     int ret = utilities::unzip(fmuName.string(), extractDirectory.string());
     if (ret != 0) {
         error = true;
     }
+    extracted=true;
     return ret;
 }
 
 std::unique_ptr<fmi2ModelExchangeObject>
-    fmiLibrary::createModelExchangeObject(const std::string& name)
+    FmiLibrary::createModelExchangeObject(const std::string& name)
 {
     if (!isSoLoaded()) {
         loadSharedLibrary(fmu_type::modelExchange);
@@ -279,7 +291,7 @@ std::unique_ptr<fmi2ModelExchangeObject>
     return nullptr;
 }
 
-std::unique_ptr<fmi2CoSimObject> fmiLibrary::createCoSimulationObject(const std::string& name)
+std::unique_ptr<fmi2CoSimObject> FmiLibrary::createCoSimulationObject(const std::string& name)
 {
     if (!isSoLoaded()) {
         loadSharedLibrary(fmu_type::cosimulation);
@@ -304,7 +316,7 @@ std::unique_ptr<fmi2CoSimObject> fmiLibrary::createCoSimulationObject(const std:
     return nullptr;
 }
 
-void fmiLibrary::loadSharedLibrary(fmu_type type)
+void FmiLibrary::loadSharedLibrary(fmu_type type)
 {
     if (isSoLoaded()) {
         return;
@@ -333,7 +345,7 @@ void fmiLibrary::loadSharedLibrary(fmu_type type)
     }
 }
 
-path fmiLibrary::findSoPath(fmu_type type)
+path FmiLibrary::findSoPath(fmu_type type)
 {
     path sopath = extractDirectory / "binaries";
 
@@ -408,7 +420,7 @@ path fmiLibrary::findSoPath(fmu_type type)
     return path{};
 }
 
-void fmiLibrary::makeCallbackFunctions()
+void FmiLibrary::makeCallbackFunctions()
 {
     callbacks = std::make_shared<fmi2CallbackFunctions_nc>();
     callbacks->allocateMemory = &calloc;
