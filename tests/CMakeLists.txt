@@ -47,7 +47,8 @@ target_compile_definitions(
 )
 
 target_compile_definitions(
-    helics_fmi-tests PRIVATE -DFMI_REFERENCE_DIR=\"${PROJECT_BINARY_DIR}/_deps/ref_fmu-build/dist/\"
+    helics_fmi-tests
+    PRIVATE -DFMI_REFERENCE_DIR=\"${PROJECT_BINARY_DIR}/_deps/ref_fmu-build/dist/\"
 )
 
 target_compile_definitions(

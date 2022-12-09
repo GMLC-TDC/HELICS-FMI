@@ -45,5 +45,12 @@ add_subdirectory(${${refName}_SOURCE_DIR} ${${refName}_BINARY_DIR})
 
 message(STATUS "loading reference test FMU's' ${${refName}_SOURCE_DIR}")
 
-
-set_target_properties(BouncingBall Dahlquist Feedthrough Stair VanDerPol Resource PROPERTIES FOLDER "FMUs")
+set_target_properties(
+    BouncingBall
+    Dahlquist
+    Feedthrough
+    Stair
+    VanDerPol
+    Resource
+    PROPERTIES FOLDER "FMUs"
+)
