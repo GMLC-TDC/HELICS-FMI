@@ -10,6 +10,8 @@
 
 include(AddGoogletest)
 
+include(addFMUreferences)
+
 # add a baseline library for underlying dependencies and flags for test executables
 add_library(helics_fmi_test_base INTERFACE)
 target_link_libraries(helics_fmi_test_base INTERFACE gtest gtest_main gmock)
@@ -22,7 +24,13 @@ target_include_directories(helics_fmi_test_base INTERFACE ${PROJECT_SOURCE_DIR}/
 
 set(helics_fmi_test_sources exeTestHelper.cpp exeTestHelper.h fmiLoadTests.cpp helics-fmiTests.cpp)
 
-add_executable(helics_fmi-tests ${helics_fmi_test_sources})
+if(WIN32)
+    set(platform_fmi_tests WindowsTest1.cpp)
+else()
+
+endif()
+
+add_executable(helics_fmi-tests ${helics_fmi_test_sources} ${platform_fmi_tests})
 
 set_target_properties(helics_fmi-tests PROPERTIES FOLDER tests)
 
@@ -30,11 +38,18 @@ target_link_libraries(
     helics_fmi-tests PRIVATE ${HELICS_FMI_HELICS_TARGET_APPS} helics_fmi_test_base
 )
 
-target_link_libraries(helics_fmi-tests)
+target_link_libraries(helics_fmi-tests PUBLIC helicsFMI)
 
 add_test(NAME helics_fmi-tests COMMAND helics_fmi-tests --log_level=test_suite --report_level=short)
 
-target_compile_definitions(helics_fmi-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
+target_compile_definitions(
+    helics_fmi-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/test_files/\"
+)
+
+target_compile_definitions(
+    helics_fmi-tests
+    PRIVATE -DFMI_REFERENCE_DIR=\"${PROJECT_BINARY_DIR}/_deps/ref_fmu-build/dist/\"
+)
 
 target_compile_definitions(
     helics_fmi-tests PRIVATE -DHELICS_BIN_LOC=\"${CMAKE_BINARY_DIR}/src/helics-fmi/\"

@@ -17,20 +17,20 @@
 #include <mutex>
 #include <string>
 
-class fmiLibrary;
+class FmiLibrary;
 class fmi2ModelExchangeObject;
 class fmi2CoSimObject;
 
 /** singleton class for managing fmi library objects*/
 class fmiLibraryManager {
   private:
-    std::map<std::string, std::shared_ptr<fmiLibrary>> libraries;
+    std::map<std::string, std::shared_ptr<FmiLibrary>> libraries;
     std::map<std::string, std::string> quickReferenceLibraries;
     mutable std::mutex libraryLock;
 
   public:
     ~fmiLibraryManager();
-    std::shared_ptr<fmiLibrary> getLibrary(const std::string& libFile);
+    std::shared_ptr<FmiLibrary> getLibrary(const std::string& libFile);
     std::unique_ptr<fmi2ModelExchangeObject>
         createModelExchangeObject(const std::string& fmuIdentifier, const std::string& ObjectName);
     std::unique_ptr<fmi2CoSimObject> createCoSimulationObject(const std::string& fmuIdentifier,

@@ -140,9 +140,9 @@ class readerElement;
 class fmiInfo {
   private:
     std::map<std::string, std::string> headerInfo;  //!< the header information contained in strings
-    double fmiVersion;  //!< the fmi version used
+    double fmiVersion{0.0};  //!< the fmi version used
     // int numberOfEvents;  //!< the number of defined events
-    int maxOrder;  //!< the maximum derivative order for CoSimulation FMU's
+    int maxOrder{0};  //!< the maximum derivative order for CoSimulation FMU's
     std::bitset<32> capabilities;  //!< bitset containing the capabilities of the FMU
     std::vector<variableInformation> variables;  //!< information all the defined variables
     std::vector<fmiUnit> units;  //!< all the units defined in the FMU
@@ -165,6 +165,7 @@ class fmiInfo {
     std::vector<int> deriv;  //!< a list of the derivative information
     std::vector<int> initUnknown;  //!< a list of the unknowns
     std::vector<int> inputs;  //!< a list of the inputs
+    int eventIndicators{0};  //!< number of event indicators
   public:
     fmiInfo();
     explicit fmiInfo(const std::string& xmlFile);
@@ -176,7 +177,7 @@ class fmiInfo {
     /** get the counts for various items in a fmu
     @param[in] countType the type of counts to get
     @return the count*/
-    int getCounts(const std::string& countType) const;
+    int getCounts(fmiVariableType countType) const;
     const std::string& getString(const std::string& field) const;
     /** get a Real variable by name*/
     double getReal(const std::string& field) const;

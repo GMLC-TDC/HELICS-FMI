@@ -21,8 +21,8 @@ fmi2ModelExchangeObject::fmi2ModelExchangeObject(
     fmi2Object(fmuname, cmp, keyInfo, comFunc),
     ModelExchangeFunctions(meFunc)
 {
-    numIndicators = info->getCounts("events");
-    numStates = info->getCounts("states");
+    numIndicators = info->getCounts(fmiVariableType::event);
+    numStates = info->getCounts(fmiVariableType::state);
     if (numStates == 0) {
         hasTime = false;
     }

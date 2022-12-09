@@ -47,10 +47,11 @@ class fmiFatalException: public fmiException {
 /** base class containing the operation functions for working with an FMU*/
 class fmi2Object {
   public:
-    bool exceptionOnDiscard =
-        true;  //!< flag indicating that an exception should be thrown when an input is discarded
-    bool exceptionOnWarning =
-        false;  //!< flag indicating that an exception should be thrown on a fmiWarning
+    /// flag indicating that an exception should be thrown when an input is discarded
+    bool exceptionOnDiscard{true};
+    /// flag indicating that an exception should be thrown on a fmiWarning
+    bool exceptionOnWarning{false};
+
   public:
     fmi2Object(const std::string& name,
                fmi2Component cmp,

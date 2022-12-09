@@ -24,6 +24,7 @@
 #include "helicsFMI/FmiCoSimFederate.hpp"
 #include "helicsFMI/FmiModelExchangeFederate.hpp"
 
+#include <filesystem>
 #include <iostream>
 #include <thread>
 
@@ -139,7 +140,7 @@ int main(int argc, char* argv[])
 
     auto ext = inputFile.substr(inputFile.find_last_of('.'));
 
-    fmiLibrary fmi;
+    FmiLibrary fmi;
     if ((ext == ".fmu") || (ext == ".FMU")) {
         fmi.loadFMU(inputFile);
         if (fmi.checkFlag(fmuCapabilityFlags::coSimulationCapable)) {
@@ -190,9 +191,9 @@ void runSystem(readerElement& elem, helics::FederateInfo& fi)
     std::vector<std::unique_ptr<FmiModelExchangeFederate>> feds_me;
     auto core =
         helics::CoreApp(fi.coreType, "--name=fmu_core " + helics::generateFullCoreInitString(fi));
-    std::vector<std::unique_ptr<fmiLibrary>> fmis;
+    std::vector<std::unique_ptr<FmiLibrary>> fmis;
     while (elem.isValid()) {
-        auto fmilib = std::make_unique<fmiLibrary>();
+        auto fmilib = std::make_unique<FmiLibrary>();
         auto str = elem.getAttributeText("fmu");
         fmilib->loadFMU(str);
         if (fmilib->checkFlag(fmuCapabilityFlags::coSimulationCapable)) {
