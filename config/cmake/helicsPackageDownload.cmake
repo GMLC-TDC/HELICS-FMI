@@ -8,7 +8,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 if(NOT HELICS_CURRENT_VERSION)
-    set(HELICS_CURRENT_VERSION 3.3.0)
+    set(HELICS_CURRENT_VERSION 3.3.2)
 endif()
 
 set(HELICS_DOWNLOAD_BASE
@@ -20,12 +20,12 @@ if(MSVC)
         set(HELICS_CPP_FILE
             "${HELICS_DOWNLOAD_BASE}/Helics-${HELICS_CURRENT_VERSION}-msvc2019-win64.zip"
         )
-        set(HELICS_CPP_SHA 036990acee88a667af17d13fb9d1c67dce6824a596583310003aa02fd97a42d4)
+        set(HELICS_CPP_SHA dc2a0768d9986b9d9718bb08150340d642d06e5df36aeb4a9ba4fa866abb1110)
     else()
         set(HELICS_CPP_FILE
             "${HELICS_DOWNLOAD_BASE}/Helics-${HELICS_CURRENT_VERSION}-msvc2022-win64.zip"
         )
-        set(HELICS_CPP_SHA a67d3d79898ba0c003efd73e6cadb5c97967403ea354ff1c47579894f2112388)
+        set(HELICS_CPP_SHA a7a854b1d8e2b7d95c493f9791bc5a6dc3809345e553777324fd5c81517dee36)
     endif()
 
 endif()
