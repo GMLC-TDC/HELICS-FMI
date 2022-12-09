@@ -66,7 +66,7 @@ TEST(loadtests, loadXML)
 TEST(loadtests, loadXML2)
 {
     auto fmi = std::make_shared<FmiLibrary>();
-    std::string inputFile = std::string(TEST_DIR) + "bouncingBall_cs.fmu";
+    std::string inputFile = std::string(TEST_DIR) + "BouncingBall_cs.fmu";
     EXPECT_NO_THROW(fmi->loadFMU(inputFile));
 
     auto info = fmi->getInfo();
@@ -91,6 +91,6 @@ TEST(loadtests, loadXML2)
 
     fmi.reset();
 
-    auto dir = std::string(TEST_DIR) + "bouncingBall_cs";
+    auto dir = std::string(TEST_DIR) + "BouncingBall_cs";
     EXPECT_FALSE(std::filesystem::exists(dir));
 }
