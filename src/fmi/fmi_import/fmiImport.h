@@ -186,9 +186,10 @@ class FmiLibrary {
     std::string getTypes();
     std::string getVersion();
     /** remove the FMU extraction directory on close*/
-    void deleteFMUdirectory(bool deleteDir=true){deleteDirectory=deleteDir;}
+    void deleteFMUdirectory(bool deleteDir = true) { deleteDirectory = deleteDir; }
     /** get the current status of the delete Directory modifier*/
-    bool getDeleteFMUDirectory() const {return deleteDirectory;}
+    bool getDeleteFMUDirectory() const { return deleteDirectory; }
+
   private:  // private functions
     void loadInformation();
     int extract();
@@ -213,8 +214,9 @@ class FmiLibrary {
     std::shared_ptr<fmiInfo>
         information;  //!< an object containing information derived from the FMU XML file
 
-    bool deleteDirectory{false}; //!< indicator that on close the fmiInfoshould delete the directory
-    bool extracted{false}; //!< set to true if the FMU was extracted
+    bool deleteDirectory{
+        false};  //!< indicator that on close the fmiInfoshould delete the directory
+    bool extracted{false};  //!< set to true if the FMU was extracted
     std::shared_ptr<boost::dll::shared_library> lib;
     std::shared_ptr<fmi2CallbackFunctions_nc> callbacks;
     fmiBaseFunctions baseFunctions;

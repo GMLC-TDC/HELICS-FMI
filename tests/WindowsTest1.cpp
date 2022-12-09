@@ -5,8 +5,6 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "gtest/gtest.h"
-
 #include "fmi/fmi_import/fmiImport.h"
 
-
+#include "gtest/gtest.h"

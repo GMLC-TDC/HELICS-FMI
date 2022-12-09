@@ -35,8 +35,7 @@ BETTER_ENUM(fmi_causality,
             any)
 
 /** enumeration of fmi variable types*/
-enum class fmiVariableType
-{
+enum class fmiVariableType {
     local,
     any,
     input,

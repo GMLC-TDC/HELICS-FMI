@@ -165,7 +165,7 @@ class fmiInfo {
     std::vector<int> deriv;  //!< a list of the derivative information
     std::vector<int> initUnknown;  //!< a list of the unknowns
     std::vector<int> inputs;  //!< a list of the inputs
-    int eventIndicators{0}; //!< number of event indicators
+    int eventIndicators{0};  //!< number of event indicators
   public:
     fmiInfo();
     explicit fmiInfo(const std::string& xmlFile);

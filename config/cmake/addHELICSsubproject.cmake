@@ -13,13 +13,15 @@
 
 string(TOLOWER "helics" lcName)
 
-if (NOT HELICS_CURRENT_VERSION )
+if(NOT HELICS_CURRENT_VERSION)
     set(HELICS_CURRENT_VERSION 3.3.1)
 endif()
 
 include(FetchContent)
 
-fetchcontent_declare(helics GIT_REPOSITORY https://github.com/GMLC-TDC/HELICS.git GIT_TAG v${HELICS_CURRENT_VERSION})
+fetchcontent_declare(
+    helics GIT_REPOSITORY https://github.com/GMLC-TDC/HELICS.git GIT_TAG v${HELICS_CURRENT_VERSION}
+)
 
 fetchcontent_getproperties(helics)
 

@@ -143,15 +143,13 @@ FmiLibrary::FmiLibrary(const std::string& fmuPath, const std::string& extractPat
 
 FmiLibrary::~FmiLibrary()
 {
-    if (deleteDirectory && extracted)
-    {
+    if (deleteDirectory && extracted) {
         std::filesystem::remove_all(extractDirectory);
     }
 }
 
 void FmiLibrary::close()
 {
-    
     soMeLoaded = false;
     soCoSimLoaded = false;
     lib = nullptr;
@@ -196,18 +194,17 @@ void FmiLibrary::loadFMU(const std::string& fmuPath, const std::string& extractL
 int FmiLibrary::getCounts(fmiVariableType countType) const
 {
     size_t cnt = size_t(-1);
-    switch (countType)
-    {
-    case fmiVariableType::meObject:
-        cnt = mecount;
-        break;
-    case fmiVariableType::csObject:
-        cnt = cosimcount;
-        break;
-    default:
-        return information->getCounts(countType);
+    switch (countType) {
+        case fmiVariableType::meObject:
+            cnt = mecount;
+            break;
+        case fmiVariableType::csObject:
+            cnt = cosimcount;
+            break;
+        default:
+            return information->getCounts(countType);
     }
-    
+
     if (cnt == size_t(-1)) {
         return (-1);
     }
@@ -260,7 +257,7 @@ int FmiLibrary::extract()
     if (ret != 0) {
         error = true;
     }
-    extracted=true;
+    extracted = true;
     return ret;
 }
 
