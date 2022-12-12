@@ -18,6 +18,7 @@
 #include "../FMI2/fmi2TypesPlatform.h"
 #include "fmiEnumDefinitions.h"
 #include "utilities/matrixDataOrdered.hpp"
+#include "units/units.hpp"
 
 #ifdef __GNUC__
 #    pragma GCC diagnostic push
@@ -68,21 +69,21 @@ class variableInformation {
     double max = 1e48;
 };
 
-typedef struct {
+class unitDef {
+public:
     std::string name;
-    double factor;
-    double offset;
-} unitDef;
+    double factor{1.0};
+    double offset{0.0};
+    unitDef()=default;
+    unitDef(std::string_view n, double mult) :name(n), factor(mult) {}
+};
 
 /** data class for storing fmi unit information*/
-class fmiUnit {
+class fmiUnit:public unitDef {
   public:
-    std::string name;
-    double factor = 1.0;
-    double offset = 0.0;
     std::vector<unitDef> baseUnits;
-
     std::vector<unitDef> displayUnits;
+    units::precise_unit unitValue;
 };
 
 /**data class matching the definition of an FMI type*/

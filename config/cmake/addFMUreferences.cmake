@@ -41,8 +41,12 @@ hide_variable(FETCHCONTENT_SOURCE_DIR_REF_FMU)
 hide_variable(FETCHCONTENT_UPDATES_DISCONNECTED_REF_FMU)
 
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE INTERNAL "")
+set(OLD_CMAKE_DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
+unset(CMAKE_DEBUG_POSTFIX)
+
 add_subdirectory(${${refName}_SOURCE_DIR} ${${refName}_BINARY_DIR})
 
+set(CMAKE_DEBUG_POSTFIX ${OLD_CMAKE_DEBUG_POSTFIX})
 message(STATUS "loading reference test FMU's' ${${refName}_SOURCE_DIR}")
 
 set_target_properties(

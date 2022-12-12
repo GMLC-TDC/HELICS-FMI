@@ -14,6 +14,7 @@
 
 #include "formatInterpreters/tinyxml2ReaderElement.h"
 #include "gmlc/utilities/stringConversion.h"
+#include "units/units.hpp"
 
 #include <utility>
 
@@ -113,6 +114,7 @@ int fmiInfo::getCounts(fmiVariableType countType) const
             break;
         case fmiVariableType::event:
             cnt = eventIndicators;
+            break;
         default:
             break;
     }
@@ -385,6 +387,17 @@ void fmiInfo::loadUnitInformation(std::shared_ptr<readerElement>& rd)
 
 void loadUnitInfo(std::shared_ptr<readerElement>& rd, fmiUnit& unitInfo)
 {
+    static std::map<std::string_view,units::precise_unit> baseUnitMap
+    {
+        {"m",units::precise::m},
+        {"s",units::precise::s},
+        {"kg",units::precise::kg},
+        {"mol",units::precise::mol},
+        {"rad",units::precise::rad},
+        {"cd",units::precise::cd},
+        {"K",units::precise::candela},
+        {"A",units::precise::A}
+    };
     unitInfo.name = rd->getAttributeText("name");
     if (rd->hasElement("BaseUnit")) {
         rd->moveToFirstChild("BaseUnit");
@@ -395,7 +408,7 @@ void loadUnitInfo(std::shared_ptr<readerElement>& rd, fmiUnit& unitInfo)
             } else if (att.getName() == "factor") {
                 unitInfo.factor = att.getValue();
             } else {
-                // unitInfo.baseUnits.emplace_back(att.getName(), att.getValue());
+                unitInfo.baseUnits.emplace_back(att.getName(), att.getValue());
             }
             att = rd->getNextAttribute();
         }
@@ -414,6 +427,18 @@ void loadUnitInfo(std::shared_ptr<readerElement>& rd, fmiUnit& unitInfo)
         }
         rd->moveToParent();
     }
+    auto def=units::unit_from_string(unitInfo.name);
+    units::precise_unit build=units::precise::one;
+    for (auto udef : unitInfo.baseUnits)
+    {
+        auto fnd=baseUnitMap.find(udef.name);
+        if (fnd != baseUnitMap.end())
+        {
+            build=build*fnd->second.pow(static_cast<int>(udef.factor));
+        }
+        
+    }
+    build=units::precise_unit(unitInfo.factor,build);
 }
 
 /** load a single variable information from the XML

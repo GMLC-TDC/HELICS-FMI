@@ -587,14 +587,14 @@ local unzFile unzOpenInternal (const void *path,
 {
     unz64_s us;
     unz64_s *s;
-    ZPOS64_T central_pos;
-    uLong   uL;
+    ZPOS64_T central_pos=0;
+    uLong   uL=0;
 
-    uLong number_disk;          /* number of the current dist, used for
+    uLong number_disk=0;          /* number of the current dist, used for
                                    spaning ZIP, unsupported, always 0*/
-    uLong number_disk_with_CD;  /* number the the disk with central dir, used
+    uLong number_disk_with_CD=0;  /* number the the disk with central dir, used
                                    for spaning ZIP, unsupported, always 0*/
-    ZPOS64_T number_entry_CD;      /* total number of entries in
+    ZPOS64_T number_entry_CD=0;      /* total number of entries in
                                    the central dir
                                    (same than number_entry on nospan) */
 
@@ -623,8 +623,8 @@ local unzFile unzOpenInternal (const void *path,
     central_pos = unz64local_SearchCentralDir64(&us.z_filefunc,us.filestream);
     if (central_pos)
     {
-        uLong uS;
-        ZPOS64_T uL64;
+        uLong uS=0;
+        ZPOS64_T uL64=0;
 
         us.isZip64 = 1;
 

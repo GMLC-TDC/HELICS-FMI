@@ -33,4 +33,4 @@ endif(UNIX)
 
 add_library(fmiLibrary ${fmiImport_sources} ${fmiImport_headers})
 
-target_link_libraries(fmiLibrary formatInterpreter utilities ${CMAKE_DL_LIBS})
+target_link_libraries(fmiLibrary formatInterpreter utilities units::units ${CMAKE_DL_LIBS})

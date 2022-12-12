@@ -53,6 +53,7 @@ void fmi2Object::setMode(fmuMode mode)
     if (mode == fmuMode::terminated) {
         currentMode = fmuMode::terminated;
         ret = commonFunctions->fmi2Terminate(comp);
+        return;
     }
 
     switch (currentMode) {
