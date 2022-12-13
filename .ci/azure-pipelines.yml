@@ -86,6 +86,11 @@ jobs:
         displayName: 'Test HELICS_FMI'
         workingDirectory: build
 
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathToPublish: 'build/_deps/ref_fmu-build/dist'
+          artifactName: fmus
+
   - job: Windows
     strategy:
       matrix:
