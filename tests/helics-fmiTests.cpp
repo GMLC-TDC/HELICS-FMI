@@ -64,23 +64,21 @@ TEST(loadtests, loadXML)
     EXPECT_FALSE(std::filesystem::exists(dir));
 }
 
-
 TEST(loadtests, loadSO)
 {
     auto fmi = std::make_shared<FmiLibrary>();
     std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
     EXPECT_NO_THROW(fmi->loadFMU(inputFile));
 
-    auto fmiObj=fmi->createModelExchangeObject("model1");
+    auto fmiObj = fmi->createModelExchangeObject("model1");
     ASSERT_TRUE(fmiObj);
-    EXPECT_EQ(fmiObj->getName(),"model1");
+    EXPECT_EQ(fmiObj->getName(), "model1");
 
-    EXPECT_EQ(fmiObj->getCurrentMode(),fmuMode::instantiatedMode);
-    auto str=fmiObj->getInputNames();
+    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::instantiatedMode);
+    auto str = fmiObj->getInputNames();
 
     fmiObj->setMode(fmuMode::terminated);
-    EXPECT_EQ(fmiObj->getCurrentMode(),fmuMode::terminated);
+    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::terminated);
     fmiObj.reset();
     fmi.reset();
-
 }

@@ -377,16 +377,16 @@ path FmiLibrary::findSoPath(fmu_type type)
     if constexpr (sizeof(void*) == 8) {
 #ifdef _WIN32
         sopath /= "win64";
-        sopathDebug=sopath/(identifier+"d.dll");
+        sopathDebug = sopath / (identifier + "d.dll");
         sopath /= identifier + ".dll";
 #else
 #    ifdef MACOS
         sopath /= "darwin64";
-        sopathDebug=sopath/(identifier+"d.dylib");
+        sopathDebug = sopath / (identifier + "d.dylib");
         sopath /= identifier + ".dylib";
 #    else
         sopath /= "linux64";
-        sopathDebug=sopath/(identifier+"d.so");
+        sopathDebug = sopath / (identifier + "d.so");
         sopath /= identifier + ".so";
 #    endif
 #endif
@@ -394,16 +394,16 @@ path FmiLibrary::findSoPath(fmu_type type)
     } else {
 #ifdef _WIN32
         sopath /= "win32";
-        sopathDebug=sopath/(identifier+"d.dll");
+        sopathDebug = sopath / (identifier + "d.dll");
         sopath /= identifier + ".dll";
 #else
 #    ifdef MACOS
         sopath /= "darwin32";
-        sopathDebug=sopath/(identifier+"d.dylib");
+        sopathDebug = sopath / (identifier + "d.dylib");
         sopath /= identifier + ".dylib";
 #    else
         sopath /= "linux32";
-        sopathDebug=sopath/(identifier+"d.so");
+        sopathDebug = sopath / (identifier + "d.so");
         sopath /= identifier + ".so";
 #    endif
 #endif
@@ -412,8 +412,7 @@ path FmiLibrary::findSoPath(fmu_type type)
     if (exists(sopath)) {
         return sopath;
     }
-    if (exists(sopathDebug))
-    {
+    if (exists(sopathDebug)) {
         return sopathDebug;
     }
 
