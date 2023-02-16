@@ -83,7 +83,6 @@ TEST(loadtests, loadSO_ME)
     fmi.reset();
 }
 
-
 TEST(loadtests, loadSO_CS)
 {
     auto fmi = std::make_shared<FmiLibrary>();
@@ -106,7 +105,7 @@ TEST(loadtests, loadSO_CS)
     fmi.reset();
 
     auto dir = std::string(FMI_REFERENCE_DIR) + "BouncingBall";
-    //this is true since we didn't open the directory in this test
+    // this is true since we didn't open the directory in this test
     EXPECT_TRUE(std::filesystem::exists(dir));
 
     std::filesystem::remove_all(dir);

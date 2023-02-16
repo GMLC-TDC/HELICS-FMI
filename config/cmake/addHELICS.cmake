@@ -14,7 +14,9 @@ show_variable(
 set(HELICS_CURRENT_VERSION 3.4.0)
 
 if(MSVC)
-    set(HELICS_PATH_HINTS C:/local/helics_3_4_0 C:/local/helics_3_3_2 C:/local/helics_3_3_1 C:/local/helics_3_3_0 )
+    set(HELICS_PATH_HINTS C:/local/helics_3_4_0 C:/local/helics_3_3_2 C:/local/helics_3_3_1
+                          C:/local/helics_3_3_0
+    )
 endif(MSVC)
 
 include(GNUInstallDirs)
