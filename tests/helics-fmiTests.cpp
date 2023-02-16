@@ -20,6 +20,7 @@ TEST(loadtests, ExtractFMU)
 {
     FmiLibrary fmi;
     std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
+    EXPECT_TRUE(std::filesystem::exists(inputFile));
     EXPECT_NO_THROW(fmi.loadFMU(inputFile));
 
     EXPECT_TRUE(fmi.isXmlLoaded());
