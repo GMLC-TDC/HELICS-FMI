@@ -12,7 +12,7 @@
 # output on failed tests without having to set an environment variable.
 #
 
-set(fmu_ref_version v0.0.20)
+set(fmu_ref_version v0.0.21)
 
 string(TOLOWER "ref_FMU" refName)
 
