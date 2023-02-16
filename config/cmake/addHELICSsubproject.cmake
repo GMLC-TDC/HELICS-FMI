@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2023, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -14,7 +14,7 @@
 string(TOLOWER "helics" lcName)
 
 if(NOT HELICS_CURRENT_VERSION)
-    set(HELICS_CURRENT_VERSION 3.3.1)
+    set(HELICS_CURRENT_VERSION 3.4.0)
 endif()
 
 include(FetchContent)

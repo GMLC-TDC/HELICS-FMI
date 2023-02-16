@@ -46,9 +46,11 @@ target_compile_definitions(
     helics_fmi-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/test_files/\"
 )
 
+get_target_property(BDIR BouncingBall BINARY_DIR)
+message(STATUS "binary dir = ${BDIR}" )
 target_compile_definitions(
     helics_fmi-tests
-    PRIVATE -DFMI_REFERENCE_DIR=\"${PROJECT_BINARY_DIR}/_deps/ref_fmu-build/dist/\"
+    PRIVATE -DFMI_REFERENCE_DIR=\"${BDIR}/dist/\"
 )
 
 target_compile_definitions(

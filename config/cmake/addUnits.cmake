@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2023, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -20,7 +20,7 @@ if(NOT TARGET units::units)
         set(UNITS_INSTALL OFF CACHE INTERNAL "")
 
         if(NOT CMAKE_CXX_STANDARD)
-            set(CMAKE_CXX_STANDARD 17) # Supported values are ``11``, ``14``, and ``17``.
+            set(CMAKE_CXX_STANDARD 17) # Supported values are ``11``, ``14``, ``17`` and ``20``.
         endif()
 
         set(UNITS_BUILD_OBJECT_LIBRARY OFF CACHE INTERNAL "")
