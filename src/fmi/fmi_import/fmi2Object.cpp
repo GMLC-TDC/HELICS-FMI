@@ -51,8 +51,22 @@ void fmi2Object::setMode(fmuMode mode)
     }
     fmi2Status ret = fmi2Error;
     if (mode == fmuMode::terminated) {
-        currentMode = fmuMode::terminated;
+        switch (currentMode) {
+            case fmuMode::instantiatedMode:
+                ret = commonFunctions->fmi2EnterInitializationMode(comp);
+                handleNonOKReturnValues(ret);
+                [[fallthrough]];
+            case fmuMode::initializationMode:
+                ret = commonFunctions->fmi2ExitInitializationMode(comp);
+                handleNonOKReturnValues(ret);
+                break;
+            case fmuMode::error:
+                return;
+        }
         ret = commonFunctions->fmi2Terminate(comp);
+        handleNonOKReturnValues(ret);
+        currentMode = fmuMode::terminated;
+        return;
     }
 
     switch (currentMode) {

@@ -17,6 +17,7 @@
 
 #include "../FMI2/fmi2TypesPlatform.h"
 #include "fmiEnumDefinitions.h"
+#include "units/units.hpp"
 #include "utilities/matrixDataOrdered.hpp"
 
 #ifdef __GNUC__
@@ -68,21 +69,21 @@ class variableInformation {
     double max = 1e48;
 };
 
-typedef struct {
-    std::string name;
-    double factor;
-    double offset;
-} unitDef;
-
-/** data class for storing fmi unit information*/
-class fmiUnit {
+class unitDef {
   public:
     std::string name;
-    double factor = 1.0;
-    double offset = 0.0;
-    std::vector<unitDef> baseUnits;
+    double factor{1.0};
+    double offset{0.0};
+    unitDef() = default;
+    unitDef(std::string_view n, double mult): name(n), factor(mult) {}
+};
 
+/** data class for storing fmi unit information*/
+class fmiUnit: public unitDef {
+  public:
+    std::vector<unitDef> baseUnits;
     std::vector<unitDef> displayUnits;
+    units::precise_unit unitValue;
 };
 
 /**data class matching the definition of an FMI type*/

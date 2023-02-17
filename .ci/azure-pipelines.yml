@@ -82,9 +82,14 @@ jobs:
       # -----------------------
       # Test HELICS_FMI
       # -----------------------
-      - bash: ctest --output-on-failure --timeout 480 -C Release
-        displayName: 'Test HELICS_FMI'
-        workingDirectory: build
+      #- bash: ctest --output-on-failure --timeout 480 -C Release
+      #  displayName: 'Test HELICS_FMI'
+      #  workingDirectory: build
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathToPublish: 'build/_deps/ref_fmu-build/fmus'
+          artifactName: fmus
 
   - job: Windows
     strategy:

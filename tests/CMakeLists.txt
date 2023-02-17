@@ -1,5 +1,5 @@
 ##############################################################################
-#Copyright (C) 2017-2022, Battelle Memorial Institute
+#Copyright (C) 2017-2023, Battelle Memorial Institute
 #All rights reserved.
 
 # This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle
@@ -46,10 +46,9 @@ target_compile_definitions(
     helics_fmi-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/test_files/\"
 )
 
-target_compile_definitions(
-    helics_fmi-tests
-    PRIVATE -DFMI_REFERENCE_DIR=\"${PROJECT_BINARY_DIR}/_deps/ref_fmu-build/dist/\"
-)
+get_target_property(BDIR BouncingBall BINARY_DIR)
+message(STATUS "binary dir = ${BDIR}")
+target_compile_definitions(helics_fmi-tests PRIVATE -DFMI_REFERENCE_DIR=\"${BDIR}/fmus/\")
 
 target_compile_definitions(
     helics_fmi-tests PRIVATE -DHELICS_BIN_LOC=\"${CMAKE_BINARY_DIR}/src/helics-fmi/\"

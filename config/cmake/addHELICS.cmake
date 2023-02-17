@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2023, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -11,10 +11,12 @@ show_variable(
     HELICS_INSTALL_PATH PATH "path to the helics installation" "${PROJECT_BINARY_DIR}/libs"
 )
 
-set(HELICS_CURRENT_VERSION 3.3.2)
+set(HELICS_CURRENT_VERSION 3.4.0)
 
 if(MSVC)
-    set(HELICS_PATH_HINTS C:/local/helics_3_3_0 C:/local/helics_3_3_1 C:/local/helics_3_3_2)
+    set(HELICS_PATH_HINTS C:/local/helics_3_4_0 C:/local/helics_3_3_2 C:/local/helics_3_3_1
+                          C:/local/helics_3_3_0
+    )
 endif(MSVC)
 
 include(GNUInstallDirs)

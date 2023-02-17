@@ -345,7 +345,7 @@ void FmiLibrary::loadSharedLibrary(fmu_type type)
 path FmiLibrary::findSoPath(fmu_type type)
 {
     path sopath = extractDirectory / "binaries";
-
+    path sopathDebug = sopath;
     std::string identifier;
     switch (type) {
         case fmu_type::unknown:
@@ -377,34 +377,33 @@ path FmiLibrary::findSoPath(fmu_type type)
     if constexpr (sizeof(void*) == 8) {
 #ifdef _WIN32
         sopath /= "win64";
+        sopathDebug = sopath / (identifier + "d.dll");
         sopath /= identifier + ".dll";
 #else
 #    ifdef MACOS
         sopath /= "darwin64";
+        sopathDebug = sopath / (identifier + "d.dylib");
         sopath /= identifier + ".dylib";
 #    else
         sopath /= "linux64";
+        sopathDebug = sopath / (identifier + "d.so");
         sopath /= identifier + ".so";
 #    endif
 #endif
 
-        if (exists(sopath)) {
-            return sopath;
-        }
-#ifdef MACOS
-        sopath /= "darwin64";
-        sopath /= identifier + ".so";
-#endif
     } else {
 #ifdef _WIN32
         sopath /= "win32";
+        sopathDebug = sopath / (identifier + "d.dll");
         sopath /= identifier + ".dll";
 #else
 #    ifdef MACOS
         sopath /= "darwin32";
+        sopathDebug = sopath / (identifier + "d.dylib");
         sopath /= identifier + ".dylib";
 #    else
         sopath /= "linux32";
+        sopathDebug = sopath / (identifier + "d.so");
         sopath /= identifier + ".so";
 #    endif
 #endif
@@ -412,6 +411,9 @@ path FmiLibrary::findSoPath(fmu_type type)
 
     if (exists(sopath)) {
         return sopath;
+    }
+    if (exists(sopathDebug)) {
+        return sopathDebug;
     }
 
     return path{};

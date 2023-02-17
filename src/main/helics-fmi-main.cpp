@@ -210,7 +210,7 @@ void runSystem(readerElement& elem, helics::FederateInfo& fi)
                 if (val != readerNullVal) {
                     obj->set(str1, val);
                 } else {
-                    auto str2 = attr.getText();
+                    const auto& str2 = attr.getText();
                     obj->set(str1, str2);
                 }
             }
