@@ -101,6 +101,8 @@ jobs:
       - checkout
       - run: *setup_helics_fmi
       - run: *run_helics_fmi_tests
+      - store_artifacts:
+          path: /root/project/build/_deps/ref_fmu-build/
 
   builder:
     docker:
