@@ -1,14 +1,9 @@
 /*
- * LLNS Copyright Start
- * Copyright (c) 2018, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
- * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
- * Produced at the Lawrence Livermore National Laboratory.
- * All rights reserved.
- * For details, see the LICENSE file.
- * LLNS Copyright End
- */
+Copyright (c) 2017-2023,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
+for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
+All rights reserved. SPDX-License-Identifier: BSD-3-Clause
+*/
 
 #include "fmi/fmi_import/fmiImport.h"
 #include "fmi/fmi_import/fmiObjects.h"
@@ -110,4 +105,67 @@ TEST(loadtests, loadSO_CS)
     EXPECT_TRUE(std::filesystem::exists(dir));
 
     std::filesystem::remove_all(dir);
+}
+
+TEST(loadtests, run_mode_sequence)
+{
+    auto fmi = std::make_shared<FmiLibrary>();
+    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
+    EXPECT_NO_THROW(fmi->loadFMU(inputFile));
+
+    auto fmiObj = fmi->createCoSimulationObject("model_cs");
+    ASSERT_TRUE(fmiObj);
+    EXPECT_EQ(fmiObj->getName(), "model_cs");
+
+    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::instantiatedMode);
+    auto str = fmiObj->getInputNames();
+
+    fmiObj->setMode(fmuMode::initializationMode);
+    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::initializationMode);
+
+    fmiObj->setMode(fmuMode::continuousTimeMode);  // this mode is not valid for cosim object so
+                                                   // going to stepMode
+    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::stepMode);
+
+    fmiObj->setMode(fmuMode::terminated);
+    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::terminated);
+    fmiObj.reset();
+
+    fmi->deleteFMUdirectory();
+
+    fmi.reset();
+}
+
+TEST(loadtests, cs_execution)
+{
+    auto fmi = std::make_shared<FmiLibrary>();
+    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
+    EXPECT_NO_THROW(fmi->loadFMU(inputFile));
+
+    auto fmiObj = fmi->createCoSimulationObject("model_cs");
+    ASSERT_TRUE(fmiObj);
+    EXPECT_EQ(fmiObj->getName(), "model_cs");
+
+    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::instantiatedMode);
+    auto str = fmiObj->getInputNames();
+
+    fmiObj->setMode(fmuMode::initializationMode);
+    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::initializationMode);
+
+    fmiObj->setMode(fmuMode::continuousTimeMode);  // this mode is not valid for cosim object so
+                                                   // going to stepMode
+    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::stepMode);
+
+    double t = 0;
+    while (t < 10.0) {
+        EXPECT_NO_THROW(fmiObj->doStep(t, 1.0, true));
+        t = t + 1.0;
+    }
+    fmiObj->setMode(fmuMode::terminated);
+    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::terminated);
+    fmiObj.reset();
+
+    fmi->deleteFMUdirectory();
+
+    fmi.reset();
 }
