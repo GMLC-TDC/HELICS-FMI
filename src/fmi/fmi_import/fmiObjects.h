@@ -315,8 +315,9 @@ class fmi2CoSimObject: public fmi2Object {
         return CoSimFunctions;
     }
     /** set the operating state of the FMU
-    */
+     */
     virtual void setMode(fmuMode mode) override;
+
   private:
     std::shared_ptr<const fmiCoSimFunctions> CoSimFunctions;
     bool stepPending;

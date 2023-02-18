@@ -128,7 +128,8 @@ TEST(loadtests, run_mode_sequence)
     fmiObj->setMode(fmuMode::initializationMode);
     EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::initializationMode);
 
-    fmiObj->setMode(fmuMode::continuousTimeMode); //this mode is not valid for cosim object so going to stepMode
+    fmiObj->setMode(fmuMode::continuousTimeMode);  // this mode is not valid for cosim object so
+                                                   // going to stepMode
     EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::stepMode);
 
     fmiObj->setMode(fmuMode::terminated);
@@ -139,7 +140,6 @@ TEST(loadtests, run_mode_sequence)
 
     fmi.reset();
 }
-
 
 TEST(loadtests, cs_execution)
 {
@@ -157,14 +157,14 @@ TEST(loadtests, cs_execution)
     fmiObj->setMode(fmuMode::initializationMode);
     EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::initializationMode);
 
-    fmiObj->setMode(fmuMode::continuousTimeMode); //this mode is not valid for cosim object so going to stepMode
+    fmiObj->setMode(fmuMode::continuousTimeMode);  // this mode is not valid for cosim object so
+                                                   // going to stepMode
     EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::stepMode);
 
-    double t=0;
-    while (t < 10.0)
-    {
-        EXPECT_NO_THROW( fmiObj->doStep(t,1.0,true));
-        t=t+1.0;
+    double t = 0;
+    while (t < 10.0) {
+        EXPECT_NO_THROW(fmiObj->doStep(t, 1.0, true));
+        t = t + 1.0;
     }
     fmiObj->setMode(fmuMode::terminated);
     EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::terminated);

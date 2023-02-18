@@ -21,10 +21,10 @@
 #include <boost/dll/import.hpp>
 #include <boost/dll/shared_library.hpp>
 #include <cstdarg>
+#include <iostream>
 #include <map>
 #include <string>
 #include <utility>
-#include <iostream>
 
 using path = std::filesystem::path;
 
@@ -145,14 +145,13 @@ FmiLibrary::FmiLibrary(const std::string& fmuPath, const std::string& extractPat
 FmiLibrary::~FmiLibrary()
 {
     if (deleteDirectory && extracted) {
-        try
-        {
+        try {
             std::filesystem::remove_all(extractDirectory);
         }
-        catch (const std::filesystem::filesystem_error& e)
-        {
-            std::cerr<<"unable to remove directory "<<extractDirectory<<" :"<<e.what()<<std::endl;
-       }
+        catch (const std::filesystem::filesystem_error& e) {
+            std::cerr << "unable to remove directory " << extractDirectory << " :" << e.what()
+                      << std::endl;
+        }
     }
 }
 
