@@ -132,3 +132,18 @@ std::string fmi2CoSimObject::getStatus() const
         return "";
     }
 }
+
+
+void fmi2CoSimObject::setMode(fmuMode mode)
+{
+    //handle a few mixed modes
+    if (mode == fmuMode::continuousTimeMode)
+    {
+        mode=fmuMode::stepMode;
+    }
+    if (mode == fmuMode::eventMode)
+    {
+        mode=fmuMode::stepMode;
+    }
+    fmi2Object::setMode(mode);
+}

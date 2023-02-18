@@ -97,6 +97,7 @@ void fmi2Object::setMode(fmuMode mode)
             if ((mode == fmuMode::eventMode) || (mode == fmuMode::stepMode)) {
                 ret = commonFunctions->fmi2ExitInitializationMode(comp);
             }
+
             break;
         default:
             break;
