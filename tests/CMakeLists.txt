@@ -40,9 +40,7 @@ target_link_libraries(
     helics_fmi-tests PRIVATE ${HELICS_FMI_HELICS_TARGET_APPS} helics_fmi_test_base
 )
 
-target_link_libraries(
-    fmi-tests PRIVATE helics_fmi_test_base
-)
+target_link_libraries(fmi-tests PRIVATE helics_fmi_test_base)
 
 target_link_libraries(fmi-tests PUBLIC fmiLibrary)
 
@@ -50,16 +48,13 @@ target_link_libraries(helics_fmi-tests PUBLIC helicsFMI)
 
 add_test(NAME fmi-tests COMMAND fmi-tests --log_level=test_suite --report_level=short)
 
-target_compile_definitions(
-    fmi-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/test_files/\"
-)
+target_compile_definitions(fmi-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/test_files/\")
 
 add_test(NAME helics_fmi-tests COMMAND helics_fmi-tests --log_level=test_suite --report_level=short)
 
 target_compile_definitions(
     helics_fmi-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/test_files/\"
 )
-
 
 get_target_property(BDIR BouncingBall BINARY_DIR)
 message(STATUS "binary dir = ${BDIR}")
