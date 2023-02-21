@@ -372,12 +372,11 @@ void fmi2Object::setDefaultOutputs()
 
 void fmi2Object::setInputs(const fmi2Real inputs[])
 {
-    if (inputs != nullptr)
-    {
+    if (inputs != nullptr) {
         auto ret = commonFunctions->fmi2SetReal(comp,
-            activeInputs.getValueRef(),
-            activeInputs.getVRcount(),
-            inputs);
+                                                activeInputs.getValueRef(),
+                                                activeInputs.getVRcount(),
+                                                inputs);
         if (ret != fmi2Status::fmi2OK) {
             handleNonOKReturnValues(ret);
         }
@@ -386,13 +385,12 @@ void fmi2Object::setInputs(const fmi2Real inputs[])
 
 void fmi2Object::getCurrentInputs(fmi2Real inputs[])
 {
-    fmi2Status ret=fmi2Status::fmi2Warning;
-    if (inputs != nullptr)
-    {
+    fmi2Status ret = fmi2Status::fmi2Warning;
+    if (inputs != nullptr) {
         ret = commonFunctions->fmi2GetReal(comp,
-            activeInputs.getValueRef(),
-            activeInputs.getVRcount(),
-            inputs);
+                                           activeInputs.getValueRef(),
+                                           activeInputs.getVRcount(),
+                                           inputs);
     }
     if (ret != fmi2Status::fmi2OK) {
         handleNonOKReturnValues(ret);
@@ -401,17 +399,15 @@ void fmi2Object::getCurrentInputs(fmi2Real inputs[])
 
 void fmi2Object::getOutputs(fmi2Real outputs[]) const
 {
-    fmi2Status ret=fmi2Status::fmi2Warning;
-    if (outputs != nullptr)
-    {
-
+    fmi2Status ret = fmi2Status::fmi2Warning;
+    if (outputs != nullptr) {
         ret = commonFunctions->fmi2GetReal(comp,
-            activeOutputs.getValueRef(),
-            activeOutputs.getVRcount(),
-            outputs);
+                                           activeOutputs.getValueRef(),
+                                           activeOutputs.getVRcount(),
+                                           outputs);
     }
     if (ret != fmi2Status::fmi2OK) {
-         handleNonOKReturnValues(ret);
+        handleNonOKReturnValues(ret);
     }
 }
 

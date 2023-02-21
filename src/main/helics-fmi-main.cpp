@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
         fmi.loadFMU(inputFile);
         if (fmi.checkFlag(fmuCapabilityFlags::coSimulationCapable)) {
             std::shared_ptr<fmi2CoSimObject> obj = fmi.createCoSimulationObject("obj1");
-            auto fed = std::make_unique<FmiCoSimFederate>("",obj, fi);
+            auto fed = std::make_unique<FmiCoSimFederate>("", obj, fi);
             fed->configure(stepTime);
             fed->run(stopTime);
         } else {
@@ -194,7 +194,7 @@ void runSystem(readerElement& elem, helics::FederateInfo& fi)
         if (fmilib->checkFlag(fmuCapabilityFlags::coSimulationCapable)) {
             std::shared_ptr<fmi2CoSimObject> obj =
                 fmilib->createCoSimulationObject(elem.getAttributeText("name"));
-            auto fed = std::make_unique<FmiCoSimFederate>(obj->getName(),obj, fi);
+            auto fed = std::make_unique<FmiCoSimFederate>(obj->getName(), obj, fi);
             elem.moveToFirstChild("parameters");
             while (elem.isValid()) {
                 auto str1 = elem.getFirstAttribute().getText();

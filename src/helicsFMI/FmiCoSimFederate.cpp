@@ -13,7 +13,10 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <utility>
 
-FmiCoSimFederate::FmiCoSimFederate(const std::string &name, const std::string& fmu, const helics::FederateInfo& fi):fed(name,fi)
+FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
+                                   const std::string& fmu,
+                                   const helics::FederateInfo& fi):
+    fed(name, fi)
 {
     auto fmi = std::make_shared<FmiLibrary>();
     fmi->loadFMU(fmu);
@@ -25,11 +28,13 @@ FmiCoSimFederate::FmiCoSimFederate(const std::string &name, const std::string& f
     }
 }
 
-FmiCoSimFederate::FmiCoSimFederate(const std::string &name,std::shared_ptr<fmi2CoSimObject> obj,
-                                   const helics::FederateInfo& fi):fed(name,fi),
+FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
+                                   std::shared_ptr<fmi2CoSimObject> obj,
+                                   const helics::FederateInfo& fi):
+    fed(name, fi),
     cs(std::move(obj))
 {
-    fed=helics::ValueFederate(name,fi);
+    fed = helics::ValueFederate(name, fi);
     if (cs) {
         input_list = cs->getInputNames();
         output_list = cs->getOutputNames();
@@ -90,11 +95,10 @@ void FmiCoSimFederate::addConnection(const std::string& conn)
 
 void FmiCoSimFederate::setOutputCapture(bool capture, const std::string& outputFile)
 {
-    if (!outputFile.empty())
-    {
-        outputCaptureFile=outputFile;
+    if (!outputFile.empty()) {
+        outputCaptureFile = outputFile;
     }
-    captureOutput=capture;
+    captureOutput = capture;
 }
 
 void FmiCoSimFederate::run(helics::Time stop)
@@ -110,8 +114,7 @@ void FmiCoSimFederate::run(helics::Time stop)
 
     std::ofstream ofile;
 
-    if (captureOutput)
-    {
+    if (captureOutput) {
         ofile.open(outputCaptureFile);
     }
     fed.enterInitializingMode();
@@ -119,8 +122,7 @@ void FmiCoSimFederate::run(helics::Time stop)
         false, 0, static_cast<double>(timeBias), 1, static_cast<double>(timeBias + stop));
     cs->setMode(fmuMode::initializationMode);
     std::vector<fmi2Real> outputs(pubs.size());
-    if (captureOutput)
-    {
+    if (captureOutput) {
         ofile << "time,";
         for (auto& pub : pubs) {
             ofile << pub.getName() << ",";
@@ -128,15 +130,13 @@ void FmiCoSimFederate::run(helics::Time stop)
         ofile << std::endl;
     }
     std::vector<fmi2Real> inp(inputs.size());
-    if (!pubs.empty())
-    {
+    if (!pubs.empty()) {
         cs->getOutputs(outputs.data());
         for (size_t ii = 0; ii < pubs.size(); ++ii) {
             pubs[ii].publish(outputs[ii]);
         }
     }
-    if (!inp.empty())
-    {
+    if (!inp.empty()) {
         cs->getCurrentInputs(inp.data());
         for (size_t ii = 0; ii < inputs.size(); ++ii) {
             inputs[ii].setDefault(inp[ii]);
@@ -144,8 +144,7 @@ void FmiCoSimFederate::run(helics::Time stop)
     }
     auto result = fed.enterExecutingMode(helics::IterationRequest::ITERATE_IF_NEEDED);
     if (result == helics::IterationResult::ITERATING) {
-        if (!inputs.empty())
-        {
+        if (!inputs.empty()) {
             for (size_t ii = 0; ii < inputs.size(); ++ii) {
                 inp[ii] = inputs[ii].getValue<fmi2Real>();
             }
@@ -161,24 +160,21 @@ void FmiCoSimFederate::run(helics::Time stop)
                    static_cast<double>(stepTime),
                    true);
         currentTime = fed.requestNextStep();
-        if (!outputs.empty())
-        {
+        if (!outputs.empty()) {
             // get the values to publish
             cs->getOutputs(outputs.data());
             for (size_t ii = 0; ii < pubs.size(); ++ii) {
                 pubs[ii].publish(outputs[ii]);
             }
         }
-        if (!inputs.empty())
-        {
+        if (!inputs.empty()) {
             // load the inputs
             for (size_t ii = 0; ii < inputs.size(); ++ii) {
                 inp[ii] = inputs[ii].getValue<fmi2Real>();
             }
             cs->setInputs(inp.data());
         }
-        if (captureOutput)
-        {
+        if (captureOutput) {
             ofile << static_cast<double>(currentTime) << ",";
             for (auto& out : outputs) {
                 ofile << out << ",";

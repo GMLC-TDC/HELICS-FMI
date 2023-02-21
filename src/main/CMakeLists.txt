@@ -17,9 +17,9 @@ target_link_libraries(helics-fmi PUBLIC helicsFMI)
 
 install(TARGETS helics-fmi RUNTIME DESTINATION bin)
 
-if (WIN32)
-add_custom_command(TARGET helics-fmi POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-        ${HELICS_BINARIES}
-        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>")
+if(WIN32)
+    add_custom_command(
+        TARGET helics-fmi POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${HELICS_BINARIES}
+                                             "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>"
+    )
 endif()
