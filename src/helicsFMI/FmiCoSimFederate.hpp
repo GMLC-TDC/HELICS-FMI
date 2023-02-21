@@ -27,8 +27,11 @@ class FmiCoSimFederate {
     std::vector<helics::Input> inputs;  //!< known inputs
     helics::Time stepTime{helics::timeEpsilon};  //!< the step time for the Federate
     helics::Time timeBias{helics::timeZero};  //!< time shift for the federate
+    std::string outputCaptureFile;
+    bool captureOutput{false};
   public:
-    FmiCoSimFederate(std::shared_ptr<fmi2CoSimObject> obj, const helics::FederateInfo& fi);
+    FmiCoSimFederate(const std::string &name, const std::string &fmu, const helics::FederateInfo& fi);
+    FmiCoSimFederate(const std::string &name, std::shared_ptr<fmi2CoSimObject> obj, const helics::FederateInfo& fi);
     /** configure the federate using the specified inputs and outputs*/
     void configure(helics::Time step, helics::Time start = helics::timeZero);
     /** set a string list of inputs*/
@@ -43,6 +46,10 @@ class FmiCoSimFederate {
     void addOutput(const std::string& output_name);
     /** add a connection*/
     void addConnection(const std::string& conn);
+    /** set the capture file*/
+    void setOutputCapture(bool capture=true,const std::string &outputFile="");
     /** run the cosimulation*/
     void run(helics::Time stop);
+    /** get the underlying HELICS federate*/
+    helics::ValueFederate *operator->(){return &fed;}
 };
