@@ -305,8 +305,8 @@ void fmi2Object::setOutputVariables(const std::vector<std::string>& outNames)
     }
     activeOutputs.clear();
     activeOutputIndices.clear();
-    for (auto& outName : outNames) {
-        auto& vI = info->getVariableInfo(outName);
+    for (const auto& outName : outNames) {
+        const auto& vI = info->getVariableInfo(outName);
         if (isRealOutput(vI)) {
             activeOutputs.push(vI.valueRef);
             activeOutputIndices.push_back(vI.index);
@@ -319,8 +319,8 @@ void fmi2Object::setOutputVariables(const std::vector<int>& outIndices)
 {
     activeOutputIndices.clear();
     activeOutputs.clear();
-    for (auto& outIndex : outIndices) {
-        auto& vI = info->getVariableInfo(outIndex);
+    for (const auto& outIndex : outIndices) {
+        const auto& vI = info->getVariableInfo(outIndex);
         if (isRealOutput(vI)) {
             activeOutputs.push(vI.valueRef);
             activeOutputIndices.push_back(vI.index);
@@ -338,8 +338,8 @@ void fmi2Object::setInputVariables(const std::vector<std::string>& inNames)
     }
     activeInputs.clear();
     activeInputIndices.clear();
-    for (auto& inName : inNames) {
-        auto& vI = info->getVariableInfo(inName);
+    for (const auto& inName : inNames) {
+        const auto& vI = info->getVariableInfo(inName);
         if (isRealInput(vI)) {
             activeInputs.push(vI.valueRef);
             activeInputIndices.push_back(vI.index);
@@ -351,8 +351,8 @@ void fmi2Object::setInputVariables(const std::vector<int>& inIndices)
 {
     activeInputs.clear();
     activeInputIndices.clear();
-    for (auto& inIndex : inIndices) {
-        auto& vI = info->getVariableInfo(inIndex);
+    for (const auto& inIndex : inIndices) {
+        const auto& vI = info->getVariableInfo(inIndex);
         if (isRealInput(vI)) {
             activeInputs.push(vI.valueRef);
             activeInputIndices.push_back(vI.index);
@@ -437,7 +437,7 @@ std::vector<std::string> fmi2Object::getOutputNames() const
         oVec = info->getVariableNames("output");
     } else {
         oVec.reserve(activeOutputs.getVRcount());
-        for (auto& os : activeOutputIndices) {
+        for (const auto& os : activeOutputIndices) {
             oVec.push_back(info->getVariableInfo(os).name);
         }
     }
@@ -452,7 +452,7 @@ std::vector<std::string> fmi2Object::getInputNames() const
         oVec = info->getVariableNames("input");
     } else {
         oVec.reserve(activeInputs.getVRcount());
-        for (auto& os : activeInputIndices) {
+        for (const auto& os : activeInputIndices) {
             oVec.push_back(info->getVariableInfo(os).name);
         }
     }
@@ -461,7 +461,7 @@ std::vector<std::string> fmi2Object::getInputNames() const
 
 bool fmi2Object::isParameter(const std::string& param, fmi_variable_type type)
 {
-    auto& vi = info->getVariableInfo(param);
+    const auto& vi = info->getVariableInfo(param);
     if (vi.index >= 0) {
         if ((vi.causality._value == fmi_causality::parameter) ||
             (vi.causality._value == fmi_causality::input)) {
@@ -481,7 +481,7 @@ bool fmi2Object::isParameter(const std::string& param, fmi_variable_type type)
 
 bool fmi2Object::isVariable(const std::string& var, fmi_variable_type type)
 {
-    auto& vi = info->getVariableInfo(var);
+    const auto& vi = info->getVariableInfo(var);
     if (vi.index >= 0) {
         if (vi.type == type) {
             return true;
@@ -500,7 +500,6 @@ void fmi2Object::handleNonOKReturnValues(fmi2Status retval) const
 {
     switch (retval) {
         case fmi2Status::fmi2OK:
-            return;
         case fmi2Status::fmi2Pending:
             return;
         case fmi2Status::fmi2Discard:

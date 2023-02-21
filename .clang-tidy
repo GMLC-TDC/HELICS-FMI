@@ -72,7 +72,7 @@ WarningsAsErrors: "
   -performance-unnecessary-value-param
   "
 
-HeaderFilterRegex: "src/helics/*.hp?p?"
+HeaderFilterRegex: "src/*.hp?p?"
 
 AnalyzeTemporaryDtors: false
 CheckOptions:
