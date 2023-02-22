@@ -16,3 +16,8 @@ add_library(helicsFMI STATIC ${helicsFMI_sources} ${helicsFMI_headers})
 target_link_libraries(
     helicsFMI PUBLIC ${HELICS_FMI_HELICS_TARGET_APPS} fmiLibrary helics_fmi_base solvers
 )
+
+target_include_directories(
+    helicsFMI PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+                     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)

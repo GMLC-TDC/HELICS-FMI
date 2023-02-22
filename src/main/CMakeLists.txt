@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2023, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -16,3 +16,10 @@ add_executable(helics-fmi ${helics-fmi_sources} ${helics-fmi_headers})
 target_link_libraries(helics-fmi PUBLIC helicsFMI)
 
 install(TARGETS helics-fmi RUNTIME DESTINATION bin)
+
+if(WIN32 AND HELICS_BINARIES)
+    add_custom_command(
+        TARGET helics-fmi POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${HELICS_BINARIES}
+                                             "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>"
+    )
+endif()

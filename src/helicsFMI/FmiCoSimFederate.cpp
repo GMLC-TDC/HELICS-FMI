@@ -13,11 +13,28 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <utility>
 
-FmiCoSimFederate::FmiCoSimFederate(std::shared_ptr<fmi2CoSimObject> obj,
+FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
+                                   const std::string& fmu,
                                    const helics::FederateInfo& fi):
-    fed(obj->getName(), fi),
+    fed(name, fi)
+{
+    auto fmi = std::make_shared<FmiLibrary>();
+    fmi->loadFMU(fmu);
+
+    cs = fmi->createCoSimulationObject(name);
+    if (cs) {
+        input_list = cs->getInputNames();
+        output_list = cs->getOutputNames();
+    }
+}
+
+FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
+                                   std::shared_ptr<fmi2CoSimObject> obj,
+                                   const helics::FederateInfo& fi):
+    fed(name, fi),
     cs(std::move(obj))
 {
+    fed = helics::ValueFederate(name, fi);
     if (cs) {
         input_list = cs->getInputNames();
         output_list = cs->getOutputNames();
@@ -76,6 +93,14 @@ void FmiCoSimFederate::addConnection(const std::string& conn)
     connections.push_back(conn);
 }
 
+void FmiCoSimFederate::setOutputCapture(bool capture, const std::string& outputFile)
+{
+    if (!outputFile.empty()) {
+        outputCaptureFile = outputFile;
+    }
+    captureOutput = capture;
+}
+
 void FmiCoSimFederate::run(helics::Time stop)
 {
     auto& def = cs->fmuInformation().getExperiment();
@@ -87,32 +112,44 @@ void FmiCoSimFederate::run(helics::Time stop)
         stop = 30.0;
     }
 
-    std::ofstream ofile(fed.getName() + "_outfile.txt");
+    std::ofstream ofile;
+
+    if (captureOutput) {
+        ofile.open(outputCaptureFile);
+    }
     fed.enterInitializingMode();
     cs->setupExperiment(
         false, 0, static_cast<double>(timeBias), 1, static_cast<double>(timeBias + stop));
     cs->setMode(fmuMode::initializationMode);
     std::vector<fmi2Real> outputs(pubs.size());
-    ofile << "time,";
-    for (auto& pub : pubs) {
-        ofile << pub.getName() << ",";
+    if (captureOutput) {
+        ofile << "time,";
+        for (auto& pub : pubs) {
+            ofile << pub.getName() << ",";
+        }
+        ofile << std::endl;
     }
-    ofile << std::endl;
     std::vector<fmi2Real> inp(inputs.size());
-    cs->getOutputs(outputs.data());
-    for (size_t ii = 0; ii < pubs.size(); ++ii) {
-        pubs[ii].publish(outputs[ii]);
+    if (!pubs.empty()) {
+        cs->getOutputs(outputs.data());
+        for (size_t ii = 0; ii < pubs.size(); ++ii) {
+            pubs[ii].publish(outputs[ii]);
+        }
     }
-    cs->getCurrentInputs(inp.data());
-    for (size_t ii = 0; ii < inputs.size(); ++ii) {
-        inputs[ii].setDefault(inp[ii]);
+    if (!inp.empty()) {
+        cs->getCurrentInputs(inp.data());
+        for (size_t ii = 0; ii < inputs.size(); ++ii) {
+            inputs[ii].setDefault(inp[ii]);
+        }
     }
     auto result = fed.enterExecutingMode(helics::IterationRequest::ITERATE_IF_NEEDED);
     if (result == helics::IterationResult::ITERATING) {
-        for (size_t ii = 0; ii < inputs.size(); ++ii) {
-            inp[ii] = inputs[ii].getValue<fmi2Real>();
+        if (!inputs.empty()) {
+            for (size_t ii = 0; ii < inputs.size(); ++ii) {
+                inp[ii] = inputs[ii].getValue<fmi2Real>();
+            }
+            cs->setInputs(inp.data());
         }
-        cs->setInputs(inp.data());
         fed.enterExecutingMode();
     }
     cs->setMode(fmuMode::stepMode);
@@ -123,21 +160,27 @@ void FmiCoSimFederate::run(helics::Time stop)
                    static_cast<double>(stepTime),
                    true);
         currentTime = fed.requestNextStep();
-        // get the values to publish
-        cs->getOutputs(outputs.data());
-        for (size_t ii = 0; ii < pubs.size(); ++ii) {
-            pubs[ii].publish(outputs[ii]);
+        if (!outputs.empty()) {
+            // get the values to publish
+            cs->getOutputs(outputs.data());
+            for (size_t ii = 0; ii < pubs.size(); ++ii) {
+                pubs[ii].publish(outputs[ii]);
+            }
         }
-        // load the inputs
-        for (size_t ii = 0; ii < inputs.size(); ++ii) {
-            inp[ii] = inputs[ii].getValue<fmi2Real>();
+        if (!inputs.empty()) {
+            // load the inputs
+            for (size_t ii = 0; ii < inputs.size(); ++ii) {
+                inp[ii] = inputs[ii].getValue<fmi2Real>();
+            }
+            cs->setInputs(inp.data());
         }
-        cs->setInputs(inp.data());
-        ofile << static_cast<double>(currentTime) << ",";
-        for (auto& out : outputs) {
-            ofile << out << ",";
+        if (captureOutput) {
+            ofile << static_cast<double>(currentTime) << ",";
+            for (auto& out : outputs) {
+                ofile << out << ",";
+            }
+            ofile << std::endl;
         }
-        ofile << std::endl;
     }
     fed.finalize();
 }

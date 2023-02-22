@@ -58,11 +58,22 @@ else()
                 find_package(HELICS 3.3 HINTS ${helicscpp_SOURCE_DIR})
                 set(${PROJECT_NAME}_HELICS_TARGET HELICS::helicscpp)
                 set(${PROJECT_NAME}_HELICS_TARGET_APPS HELICS::helicscpp-apps)
+                set(${PROJECT_NAME}_HELICS_EXTERNAL ON)
             endif()
         endif()
     else()
         set(${PROJECT_NAME}_HELICS_TARGET HELICS::helicscpp)
         set(${PROJECT_NAME}_HELICS_TARGET_APPS HELICS::helicscpp-apps)
+        set(${PROJECT_NAME}_HELICS_EXTERNAL ON)
     endif()
 
+endif()
+
+if(${PROJECT_NAME}_HELICS_EXTERNAL)
+    get_target_property(
+        HELICS_BINARY_TARGET ${${PROJECT_NAME}_HELICS_TARGET} IMPORTED_LOCATION_RELEASE
+    )
+    get_filename_component(HELICS_BINARY_DIR ${HELICS_BINARY_TARGET} DIRECTORY)
+
+    file(GLOB HELICS_BINARIES "${HELICS_BINARY_DIR}/*")
 endif()
