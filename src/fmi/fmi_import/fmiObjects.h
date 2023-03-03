@@ -165,6 +165,10 @@ class fmi2Object {
     void setOutputVariables(const std::vector<int>& outIndices);
     void setInputVariables(const std::vector<std::string>& inNames);
     void setInputVariables(const std::vector<int>& inIndices);
+    bool addOutputVariable(const std::string &outputName);
+    bool addOutputVariable(int index);
+    bool addInputVariable(const std::string &intputName);
+    bool addInputVariable(int index);
 
     fmiVariableSet getVariableSet(const std::string& variable) const;
     fmiVariableSet getVariableSet(int index) const;

@@ -285,7 +285,7 @@ fmi2Real fmi2Object::getPartialDerivative(int index_x, int index_y, double dx)
 bool isRealOutput(const variableInformation& vI)
 {
     return ((vI.index >= 0) && (vI.type._value == fmi_variable_type::real) &&
-            (fmi_causality::output == vI.causality._value));
+            (fmi_causality::output == vI.causality._value || fmi_causality::local== vI.causality._value));
 }
 
 /** check if an input is real and actually is an input*/
@@ -358,6 +358,48 @@ void fmi2Object::setInputVariables(const std::vector<int>& inIndices)
             activeInputIndices.push_back(vI.index);
         }
     }
+}
+
+
+bool fmi2Object::addOutputVariable(const std::string& outputName)
+{
+    const auto& vI = info->getVariableInfo(outputName);
+    if (isRealOutput(vI)) {
+        activeOutputs.push(vI.valueRef);
+        activeOutputIndices.push_back(vI.index);
+        return true;
+    }
+    return false;
+}
+bool fmi2Object::addOutputVariable(int index)
+{
+    const auto& vI = info->getVariableInfo(index);
+    if (isRealOutput(vI)) {
+        activeOutputs.push(vI.valueRef);
+        activeOutputIndices.push_back(vI.index);
+        return true;
+    }
+    return false;
+}
+bool fmi2Object::addInputVariable(const std::string& inputName)
+{
+    const auto& vI = info->getVariableInfo(inputName);
+    if (isRealInput(vI)) {
+        activeInputs.push(vI.valueRef);
+        activeInputIndices.push_back(vI.index);
+        return true;
+    }
+    return false;
+}
+bool fmi2Object::addInputVariable(int index)
+{
+    const auto& vI = info->getVariableInfo(index);
+    if (isRealInput(vI)) {
+        activeInputs.push(vI.valueRef);
+        activeInputIndices.push_back(vI.index);
+        return true;
+    }
+    return false;
 }
 
 void fmi2Object::setDefaultInputs()

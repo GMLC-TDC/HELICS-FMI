@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2023, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -17,11 +17,10 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE AND NOT HELICS_D
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
-project(HELICS_FMI VERSION 0.7.1)
-project(HELICS_FMI VERSION 0.7.1)
+project(HELICS_FMI VERSION 0.8.0)
 
 # set (HELICS_FMI_VERSION_BUILD )
-set(HELICS_FMI_DATE "2022-12-09")
+set(HELICS_FMI_DATE "2023-03-03")
 set(HELICS_FMI_VERSION_UNDERSCORE
     "${HELICS_FMI_VERSION_MAJOR}_${HELICS_FMI_VERSION_MINOR}_${HELICS_FMI_VERSION_PATCH}"
 )
