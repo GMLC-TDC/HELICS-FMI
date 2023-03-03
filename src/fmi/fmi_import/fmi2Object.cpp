@@ -285,7 +285,8 @@ fmi2Real fmi2Object::getPartialDerivative(int index_x, int index_y, double dx)
 bool isRealOutput(const variableInformation& vI)
 {
     return ((vI.index >= 0) && (vI.type._value == fmi_variable_type::real) &&
-            (fmi_causality::output == vI.causality._value || fmi_causality::local== vI.causality._value));
+            (fmi_causality::output == vI.causality._value ||
+             fmi_causality::local == vI.causality._value));
 }
 
 /** check if an input is real and actually is an input*/
@@ -359,7 +360,6 @@ void fmi2Object::setInputVariables(const std::vector<int>& inIndices)
         }
     }
 }
-
 
 bool fmi2Object::addOutputVariable(const std::string& outputName)
 {

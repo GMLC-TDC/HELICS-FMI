@@ -45,28 +45,21 @@ void FmiCoSimFederate::configure(helics::Time step, helics::Time startTime)
 {
     timeBias = startTime;
     for (auto input : input_list) {
-        auto added=cs->addInputVariable(input);
-        if (added)
-        {
+        auto added = cs->addInputVariable(input);
+        if (added) {
             inputs.emplace_back(&fed, input);
-        }
-        else
-        {
+        } else {
             fed.logWarningMessage(input + " is not a recognized input");
         }
     }
 
     for (auto output : output_list) {
-        auto added=cs->addOutputVariable(output);
-        if (added)
-        {
+        auto added = cs->addOutputVariable(output);
+        if (added) {
             pubs.emplace_back(&fed, output, helics::DataType::HELICS_DOUBLE);
-        }
-        else
-        {
+        } else {
             fed.logWarningMessage(output + " is not a recognized output");
         }
-        
     }
 
     auto& def = cs->fmuInformation().getExperiment();
