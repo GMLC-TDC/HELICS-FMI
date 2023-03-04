@@ -128,7 +128,7 @@ std::string fmi2Object::get<std::string>(const std::string& param) const
     if (retval != fmi2Status::fmi2OK) {
         handleNonOKReturnValues(retval);
     }
-    return std::string(res);  // this should copy the actual the string
+    return {res};  // this should copy the actual the string
 }
 
 void fmi2Object::get(const fmiVariableSet& vrset, fmi2Real value[]) const
@@ -207,7 +207,7 @@ void fmi2Object::setFlag(const std::string& param, bool val)
         handleNonOKReturnValues(fmi2Status::fmi2Discard);
         return;
     }
-    fmi2Boolean val2 = val ? fmi2True : fmi2False;
+    const fmi2Boolean val2 = val ? fmi2True : fmi2False;
     auto ret = commonFunctions->fmi2SetBoolean(comp, &(ref.valueRef), 1, &val2);
     if (ret != fmi2Status::fmi2OK) {
         handleNonOKReturnValues(ret);
@@ -231,12 +231,12 @@ void fmi2Object::setFMUState(fmi2FMUstate FMUstate)
 
 size_t fmi2Object::serializedStateSize(fmi2FMUstate FMUstate)
 {
-    size_t sz;
-    auto ret = commonFunctions->fmi2SerializedFMUstateSize(comp, FMUstate, &sz);
+    size_t size;
+    auto ret = commonFunctions->fmi2SerializedFMUstateSize(comp, FMUstate, &size);
     if (ret != fmi2Status::fmi2OK) {
         handleNonOKReturnValues(ret);
     }
-    return sz;
+    return size;
 }
 void fmi2Object::serializeState(fmi2FMUstate FMUstate, fmi2Byte serializedState[], size_t size)
 {
@@ -268,7 +268,7 @@ void fmi2Object::getDirectionalDerivative(const fmi2ValueReference vUnknown_ref[
     }
 }
 
-fmi2Real fmi2Object::getPartialDerivative(int index_x, int index_y, double dx)
+fmi2Real fmi2Object::getPartialDerivative(int index_x, int index_y, double deltax)
 {
     double dy;
     commonFunctions->fmi2GetDirectionalDerivative(comp,
@@ -276,7 +276,7 @@ fmi2Real fmi2Object::getPartialDerivative(int index_x, int index_y, double dx)
                                                   1,
                                                   &(info->getVariableInfo(index_y).valueRef),
                                                   1,
-                                                  &dx,
+                                                  &deltax,
                                                   &dy);
     return dy;
 }
@@ -285,7 +285,8 @@ fmi2Real fmi2Object::getPartialDerivative(int index_x, int index_y, double dx)
 bool isRealOutput(const variableInformation& vI)
 {
     return ((vI.index >= 0) && (vI.type._value == fmi_variable_type::real) &&
-            (fmi_causality::output == vI.causality._value));
+            (fmi_causality::output == vI.causality._value ||
+             fmi_causality::local == vI.causality._value));
 }
 
 /** check if an input is real and actually is an input*/
@@ -358,6 +359,47 @@ void fmi2Object::setInputVariables(const std::vector<int>& inIndices)
             activeInputIndices.push_back(vI.index);
         }
     }
+}
+
+bool fmi2Object::addOutputVariable(const std::string& outputName)
+{
+    const auto& vI = info->getVariableInfo(outputName);
+    if (isRealOutput(vI)) {
+        activeOutputs.push(vI.valueRef);
+        activeOutputIndices.push_back(vI.index);
+        return true;
+    }
+    return false;
+}
+bool fmi2Object::addOutputVariable(int index)
+{
+    const auto& vI = info->getVariableInfo(index);
+    if (isRealOutput(vI)) {
+        activeOutputs.push(vI.valueRef);
+        activeOutputIndices.push_back(vI.index);
+        return true;
+    }
+    return false;
+}
+bool fmi2Object::addInputVariable(const std::string& inputName)
+{
+    const auto& vI = info->getVariableInfo(inputName);
+    if (isRealInput(vI)) {
+        activeInputs.push(vI.valueRef);
+        activeInputIndices.push_back(vI.index);
+        return true;
+    }
+    return false;
+}
+bool fmi2Object::addInputVariable(int index)
+{
+    const auto& vI = info->getVariableInfo(index);
+    if (isRealInput(vI)) {
+        activeInputs.push(vI.valueRef);
+        activeInputIndices.push_back(vI.index);
+        return true;
+    }
+    return false;
 }
 
 void fmi2Object::setDefaultInputs()
