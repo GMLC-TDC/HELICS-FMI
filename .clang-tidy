@@ -26,6 +26,7 @@ Checks: "
   -bugprone-narrowing-conversions,
   misc-*,
   -misc-non-private-member-variables-in-classes,
+  -misc-no-recursion,
   cert-*,
   -cert-err58-cpp,
   portability-*,
@@ -62,6 +63,7 @@ WarningsAsErrors: "
   -bugprone-narrowing-conversions,
   misc-*,
   -misc-non-private-member-variables-in-classes,
+  -misc-no-recursion,
   cert-*,
   -cert-err58-cpp,
   portability-*,
@@ -315,7 +317,7 @@ CheckOptions:
   - key: readability-identifier-naming.MethodSuffix
     value: ""
   - key: readability-identifier-naming.NamespaceCase
-    value: lowercase
+    value: lower_case
   - key: readability-identifier-naming.NamespacePrefix
     value: ""
   - key: readability-identifier-naming.NamespaceSuffix
