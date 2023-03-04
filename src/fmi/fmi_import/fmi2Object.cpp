@@ -128,7 +128,7 @@ std::string fmi2Object::get<std::string>(const std::string& param) const
     if (retval != fmi2Status::fmi2OK) {
         handleNonOKReturnValues(retval);
     }
-    return { res };  // this should copy the actual the string
+    return {res};  // this should copy the actual the string
 }
 
 void fmi2Object::get(const fmiVariableSet& vrset, fmi2Real value[]) const
