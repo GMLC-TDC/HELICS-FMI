@@ -319,5 +319,5 @@ class fmi2CoSimObject: public fmi2Object {
 
   private:
     std::shared_ptr<const fmiCoSimFunctions> CoSimFunctions;
-    bool stepPending;
+    bool stepPending{false};
 };
