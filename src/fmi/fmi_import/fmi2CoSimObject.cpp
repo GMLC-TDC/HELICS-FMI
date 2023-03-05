@@ -7,8 +7,8 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 #include "fmiObjects.h"
 
-#define MAX_DERIV_ORDER 10
-#define MAX_IO 1000
+static constexpr int MAX_DERIV_ORDER{ 10 };
+static constexpr int MAX_IO{ 1000 };
 
 #include <array>
 #include <memory>
@@ -33,29 +33,29 @@ fmi2CoSimObject::fmi2CoSimObject(const std::string& fmuname,
                                  std::shared_ptr<const fmiInfo> keyInfo,
                                  std::shared_ptr<const fmiCommonFunctions> comFunc,
                                  std::shared_ptr<const fmiCoSimFunctions> csFunc):
-    fmi2Object(fmuname, std::move(cmp), std::move(keyInfo), std::move(comFunc)),
+    fmi2Object(fmuname, cmp, std::move(keyInfo), std::move(comFunc)),
     CoSimFunctions(std::move(csFunc))
 {
 }
 
-void fmi2CoSimObject::setInputDerivatives(int order, const fmi2Real value[])
+void fmi2CoSimObject::setInputDerivatives(int order, const fmi2Real dIdt[])
 {
     auto ret = CoSimFunctions->fmi2SetRealInputDerivatives(comp,
                                                            activeInputs.getValueRef(),
                                                            activeInputs.getVRcount(),
                                                            derivOrder[order].data(),
-                                                           value);
+                                                           dIdt);
     if (ret != fmi2Status::fmi2OK) {
         handleNonOKReturnValues(ret);
     }
 }
-void fmi2CoSimObject::getOutputDerivatives(int order, fmi2Real value[]) const
+void fmi2CoSimObject::getOutputDerivatives(int order, fmi2Real dOdt[]) const
 {
     auto ret = CoSimFunctions->fmi2GetRealOutputDerivatives(comp,
                                                             activeOutputs.getValueRef(),
                                                             activeOutputs.getVRcount(),
                                                             derivOrder[order].data(),
-                                                            value);
+                                                            dOdt);
     if (ret != fmi2Status::fmi2OK) {
         handleNonOKReturnValues(ret);
     }
@@ -107,27 +107,24 @@ bool fmi2CoSimObject::isPending()
         }
         if (status == fmi2Status::fmi2Pending) {
             return true;
-        } else {
+        }
             stepPending = false;
             return false;
-        }
-    } else {
-        return false;
     }
+        return false;
 }
 
 std::string fmi2CoSimObject::getStatus() const
 {
     if (stepPending) {
-        fmi2String s;
-        auto ret = CoSimFunctions->fmi2GetStringStatus(comp, fmi2StatusKind::fmi2PendingStatus, &s);
+        fmi2String status;
+        auto ret = CoSimFunctions->fmi2GetStringStatus(comp, fmi2StatusKind::fmi2PendingStatus, &status);
         if (ret != fmi2Status::fmi2OK) {
             handleNonOKReturnValues(ret);
         }
-        return std::string(s);
-    } else {
-        return "";
+        return { status };
     }
+        return "";
 }
 
 void fmi2CoSimObject::setMode(fmuMode mode)
