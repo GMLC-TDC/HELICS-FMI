@@ -7,8 +7,8 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 #include "fmiObjects.h"
 
-static constexpr int MAX_DERIV_ORDER{ 10 };
-static constexpr int MAX_IO{ 1000 };
+static constexpr int MAX_DERIV_ORDER{10};
+static constexpr int MAX_IO{1000};
 
 #include <array>
 #include <memory>
@@ -109,23 +109,24 @@ bool fmi2CoSimObject::isPending()
         if (status == fmi2Status::fmi2Pending) {
             return true;
         }
-            stepPending = false;
-            return false;
-    }
+        stepPending = false;
         return false;
+    }
+    return false;
 }
 
 std::string fmi2CoSimObject::getStatus() const
 {
     if (stepPending) {
         fmi2String status;
-        auto ret = CoSimFunctions->fmi2GetStringStatus(comp, fmi2StatusKind::fmi2PendingStatus, &status);
+        auto ret =
+            CoSimFunctions->fmi2GetStringStatus(comp, fmi2StatusKind::fmi2PendingStatus, &status);
         if (ret != fmi2Status::fmi2OK) {
             handleNonOKReturnValues(ret);
         }
-        return { status };
+        return {status};
     }
-        return "";
+    return "";
 }
 
 void fmi2CoSimObject::setMode(fmuMode mode)
