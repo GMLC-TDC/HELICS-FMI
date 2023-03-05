@@ -9,6 +9,8 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 #include "fmi/fmi_import/fmiObjects.h"
 
+#include "gmlc/utilities/stringConversion.h"
+
 #include <algorithm>
 #include <fstream>
 #include <utility>
@@ -111,6 +113,39 @@ void FmiCoSimFederate::setOutputCapture(bool capture, const std::string& outputF
     captureOutput = capture;
 }
 
+bool FmiCoSimFederate::setDouble(const std::string& parameter, double value)
+{
+    cs->set(parameter,value);
+    return true;
+}
+
+bool FmiCoSimFederate::setInteger(const std::string& parameter, int64_t value)
+{
+    cs->set(parameter,value);
+    return true;
+}
+
+void FmiCoSimFederate::runCommand(const std::string& command)
+{
+    auto cvec=gmlc::utilities::stringOps::splitlineQuotes(command," ,;:","\"'`",gmlc::utilities::stringOps::delimiter_compression::on);
+    if (cvec[0] == "set")
+    {
+        double val=gmlc::utilities::numeric_conversionComplete<double>(cvec[2],helics::invalidDouble);
+        if (val != helics::invalidDouble)
+        {
+            if (std::round(val) == val)
+            {
+                setInteger(cvec[1],static_cast<int64_t>(val));
+                return;
+            }
+            setDouble(cvec[1],val);
+            return;
+        }
+        cs->set(cvec[1],cvec[2]);
+        return;
+    }
+}
+
 void FmiCoSimFederate::run(helics::Time stop)
 {
     auto& def = cs->fmuInformation().getExperiment();
@@ -130,6 +165,11 @@ void FmiCoSimFederate::run(helics::Time stop)
     fed.enterInitializingMode();
     cs->setupExperiment(
         false, 0, static_cast<double>(timeBias), 1, static_cast<double>(timeBias + stop));
+    auto cmd=fed.getCommand();
+    while (!cmd.first.empty()){
+        runCommand(cmd.first);
+        cmd=fed.getCommand();
+    }
     cs->setMode(fmuMode::initializationMode);
     std::vector<fmi2Real> outputs(pubs.size());
     if (captureOutput) {

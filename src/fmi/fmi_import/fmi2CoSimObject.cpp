@@ -11,6 +11,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #define MAX_IO 1000
 
 #include <array>
+#include <memory>
 /**the co-simulation functions need an array of the derivative order, which for the primary function
 calls will be all identical, so there was no need to have to reconstruct this every time so this
 function just builds a common case to handle a large majority of cases without any additional
@@ -18,13 +19,14 @@ copying or allocation
 */
 auto makeDerivOrderBlocks()
 {
-    std::array<std::array<fmi2Integer, MAX_IO>, MAX_DERIV_ORDER + 1> dblock;
+    auto dblock=std::make_unique<std::array<std::array<fmi2Integer, MAX_IO>, MAX_DERIV_ORDER + 1>>();
     for (int ii = 0; ii <= MAX_DERIV_ORDER; ++ii) {
-        dblock[ii].fill(ii);
+        (*dblock)[ii].fill(ii);
     }
     return dblock;
 }
-static const auto derivOrder = makeDerivOrderBlocks();
+static const auto derivOrderBlock = makeDerivOrderBlocks();
+static const auto &derivOrder=*derivOrderBlock;
 
 fmi2CoSimObject::fmi2CoSimObject(const std::string& fmuname,
                                  fmi2Component cmp,
