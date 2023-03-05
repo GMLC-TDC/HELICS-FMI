@@ -19,14 +19,15 @@ copying or allocation
 */
 auto makeDerivOrderBlocks()
 {
-    auto dblock=std::make_unique<std::array<std::array<fmi2Integer, MAX_IO>, MAX_DERIV_ORDER + 1>>();
+    auto dblock =
+        std::make_unique<std::array<std::array<fmi2Integer, MAX_IO>, MAX_DERIV_ORDER + 1>>();
     for (int ii = 0; ii <= MAX_DERIV_ORDER; ++ii) {
         (*dblock)[ii].fill(ii);
     }
     return dblock;
 }
 static const auto derivOrderBlock = makeDerivOrderBlocks();
-static const auto &derivOrder=*derivOrderBlock;
+static const auto& derivOrder = *derivOrderBlock;
 
 fmi2CoSimObject::fmi2CoSimObject(const std::string& fmuname,
                                  fmi2Component cmp,

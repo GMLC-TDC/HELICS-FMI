@@ -125,7 +125,6 @@ TEST(loadtests, checkPubsExtraBball)
     vFed.finalize();
 }
 
-
 TEST(loadtests, setHeightBball)
 {
     std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
@@ -139,11 +138,10 @@ TEST(loadtests, setHeightBball)
     fi.coreInitString.clear();
 
     helics::ValueFederate vFed("fed1", fi);
-    csFed->setDouble("h",4.0);
+    csFed->setDouble("h", 4.0);
     csFed->configure(0.1, 0.0);
 
     auto rs = std::async(std::launch::async, [csFed]() { csFed->run(1.0); });
-
 
     auto& sub1 = vFed.registerSubscription("bball/h");
     sub1.setDefault(-20.0);
@@ -167,7 +165,6 @@ TEST(loadtests, setHeightBball)
     vFed.finalize();
 }
 
-
 TEST(loadtests, setHeightBballCommand)
 {
     std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
@@ -185,7 +182,6 @@ TEST(loadtests, setHeightBballCommand)
     csFed->configure(0.1, 0.0);
 
     auto rs = std::async(std::launch::async, [csFed]() { csFed->run(1.0); });
-
 
     auto& sub1 = vFed.registerSubscription("bball/h");
     sub1.setDefault(-20.0);
@@ -209,7 +205,6 @@ TEST(loadtests, setHeightBballCommand)
     vFed.finalize();
 }
 
-
 TEST(loadtests, setHeightBballRemoteCommand)
 {
     std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
@@ -223,11 +218,10 @@ TEST(loadtests, setHeightBballRemoteCommand)
     fi.coreInitString.clear();
 
     helics::ValueFederate vFed("fed1", fi);
-   vFed.sendCommand("bball","set h 3.0");
+    vFed.sendCommand("bball", "set h 3.0");
     csFed->configure(0.1, 0.0);
 
     auto rs = std::async(std::launch::async, [csFed]() { csFed->run(1.0); });
-
 
     auto& sub1 = vFed.registerSubscription("bball/h");
     sub1.setDefault(-20.0);

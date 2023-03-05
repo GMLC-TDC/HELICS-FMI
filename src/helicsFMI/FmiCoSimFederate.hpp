@@ -54,11 +54,11 @@ class FmiCoSimFederate {
     /** set the capture file*/
     void setOutputCapture(bool capture = true, const std::string& outputFile = "");
     /** run a command on the cosim object*/
-    void runCommand(const std::string &command);
+    void runCommand(const std::string& command);
     /** set a double parameter*/
-    bool setDouble(const std::string &parameter, double value);
+    bool setDouble(const std::string& parameter, double value);
     /** set a double parameter*/
-    bool setInteger(const std::string &parameter, int64_t value);
+    bool setInteger(const std::string& parameter, int64_t value);
     /** run the cosimulation*/
     void run(helics::Time stop);
     /** get the underlying HELICS federate*/
