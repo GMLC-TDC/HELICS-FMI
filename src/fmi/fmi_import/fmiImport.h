@@ -201,8 +201,8 @@ class FmiLibrary {
     bool xmlLoaded = false;  //!< flag indicating that the FMU information has been loaded
     bool soMeLoaded =
         false;  //!< flag indicating that the Shared Library has been loaded for modelExchange
-    bool soCoSimLoaded =
-        false;  //!< flag indicating that the shared library has been loaded for CoSimulation;
+    bool soCoSimLoaded{
+        false};  //!< flag indicating that the shared library has been loaded for CoSimulation;
     std::string modelName;  //!< the name of the model
     int mecount = 0;  //!< counter for the number of created model exchange objects
     int cosimcount = 0;  //!< counter for the number of created co-simulation objects
