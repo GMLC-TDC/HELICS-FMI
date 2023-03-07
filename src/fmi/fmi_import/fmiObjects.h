@@ -13,8 +13,8 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <string>
 #include <type_traits>
-#include <vector>
 #include <utility>
+#include <vector>
 
 /** base fmiException*/
 class fmiException: public std::exception {
