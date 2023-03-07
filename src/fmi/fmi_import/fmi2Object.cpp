@@ -405,12 +405,12 @@ const fmiVariable& fmi2Object::getOutput(int index) const
 std::vector<std::string> fmi2Object::getOutputNames() const
 {
     std::vector<std::string> oVec;
-    if (activeOutputs.size() == 0) {
+    if (activeOutputs.empty()) {
         oVec = info->getVariableNames("output");
     } else {
         oVec.reserve(activeOutputs.size());
-        for (const auto& os : activeOutputs) {
-            oVec.push_back(info->getVariableInfo(os.index).name);
+        for (const auto& output : activeOutputs) {
+            oVec.push_back(info->getVariableInfo(output.index).name);
         }
     }
 
@@ -420,12 +420,12 @@ std::vector<std::string> fmi2Object::getOutputNames() const
 std::vector<std::string> fmi2Object::getInputNames() const
 {
     std::vector<std::string> oVec;
-    if (activeInputs.size() == 0) {
+    if (activeInputs.empty()) {
         oVec = info->getVariableNames("input");
     } else {
         oVec.reserve(activeInputs.size());
-        for (const auto& os : activeInputs) {
-            oVec.push_back(info->getVariableInfo(os.index).name);
+        for (const auto& input : activeInputs) {
+            oVec.push_back(info->getVariableInfo(input.index).name);
         }
     }
     return oVec;
@@ -433,15 +433,15 @@ std::vector<std::string> fmi2Object::getInputNames() const
 
 bool fmi2Object::isParameter(const std::string& param, fmi_variable_type type)
 {
-    const auto& vi = info->getVariableInfo(param);
-    if (vi.index >= 0) {
-        if ((vi.causality._value == fmi_causality::parameter) ||
-            (vi.causality._value == fmi_causality::input)) {
-            if (vi.type == type) {
+    const auto& varInfo = info->getVariableInfo(param);
+    if (varInfo.index >= 0) {
+        if ((varInfo.causality._value == fmi_causality::parameter) ||
+            (varInfo.causality._value == fmi_causality::input)) {
+            if (varInfo.type == type) {
                 return true;
             }
             if (type._value == fmi_variable_type::numeric) {
-                if (vi.type._value != fmi_variable_type::string) {
+                if (varInfo.type._value != fmi_variable_type::string) {
                     return true;
                 }
             }
@@ -453,13 +453,13 @@ bool fmi2Object::isParameter(const std::string& param, fmi_variable_type type)
 
 bool fmi2Object::isVariable(const std::string& var, fmi_variable_type type)
 {
-    const auto& vi = info->getVariableInfo(var);
-    if (vi.index >= 0) {
-        if (vi.type == type) {
+    const auto& varInfo = info->getVariableInfo(var);
+    if (varInfo.index >= 0) {
+        if (varInfo.type == type) {
             return true;
         }
         if (type._value == fmi_variable_type::numeric) {
-            if (vi.type._value != fmi_variable_type::string) {
+            if (varInfo.type._value != fmi_variable_type::string) {
                 return true;
             }
         }

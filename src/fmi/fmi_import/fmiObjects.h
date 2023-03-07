@@ -105,10 +105,14 @@ class fmi2Object {
                 return T{""};  // if we get here just return an empty string otherwise we threw an
                                // exception
             }
-            fmi2String res;
+            fmi2String res=nullptr;
             retval = commonFunctions->fmi2GetString(comp, &(param.vRef), 1, &res);
             if (retval != fmi2Status::fmi2OK) {
                 handleNonOKReturnValues(retval);
+            }
+            if (res == nullptr)
+            {
+                return T{""};
             }
             return T{res};  // this should copy the actual the string
         } else {
@@ -186,7 +190,7 @@ class fmi2Object {
                                   const fmi2Real dvKnown[],
                                   fmi2Real dvUnknown[]);
 
-    fmi2Real getPartialDerivative(int index_x, int index_y, double dx);
+    fmi2Real getPartialDerivative(int index_x, int index_y, double deltax);
     void setOutputVariables(const std::vector<std::string>& outNames);
     void setOutputVariables(const std::vector<int>& outIndices);
     void setInputVariables(const std::vector<std::string>& inNames);
