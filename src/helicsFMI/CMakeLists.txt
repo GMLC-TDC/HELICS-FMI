@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2023, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -14,7 +14,7 @@ set(helicsFMI_headers FmiCoSimFederate.hpp FmiModelExchangeFederate.hpp FmiHelic
 add_library(helicsFMI STATIC ${helicsFMI_sources} ${helicsFMI_headers})
 
 target_link_libraries(
-    helicsFMI PUBLIC ${HELICS_FMI_HELICS_TARGET_APPS} fmiLibrary helics_fmi_base solvers
+    helicsFMI PUBLIC fmiLibrary ${HELICS_FMI_HELICS_TARGET_APPS} helics_fmi_base solvers
 )
 
 target_include_directories(

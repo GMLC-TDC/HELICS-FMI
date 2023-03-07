@@ -74,7 +74,7 @@ WarningsAsErrors: "
   -performance-unnecessary-value-param
   "
 
-HeaderFilterRegex: "src/*.hp?p?"
+HeaderFilterRegex: "src/(fmi|formatInterpreters|helicsFMI|main|solvers|utilities)/*.hp?p?"
 
 AnalyzeTemporaryDtors: false
 CheckOptions:
