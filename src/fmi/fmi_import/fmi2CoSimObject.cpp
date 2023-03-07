@@ -39,9 +39,9 @@ fmi2CoSimObject::fmi2CoSimObject(const std::string& fmuname,
 {
 }
 
-void fmi2CoSimObject::setInputDerivatives(int order, const fmi2Real dIdt[])
+void fmi2CoSimObject::setInputDerivatives(int /*order*/, const fmi2Real /*dIdt*/[])
 {
-    auto ret = CoSimFunctions->fmi2SetRealInputDerivatives(comp,
+    /*auto ret = CoSimFunctions->fmi2SetRealInputDerivatives(comp,
                                                            activeInputs.getValueRef(),
                                                            activeInputs.getVRcount(),
                                                            derivOrder[order].data(),
@@ -49,10 +49,11 @@ void fmi2CoSimObject::setInputDerivatives(int order, const fmi2Real dIdt[])
     if (ret != fmi2Status::fmi2OK) {
         handleNonOKReturnValues(ret);
     }
+    */
 }
-void fmi2CoSimObject::getOutputDerivatives(int order, fmi2Real dOdt[]) const
+void fmi2CoSimObject::getOutputDerivatives(int /*order*/, fmi2Real /*dOdt*/[]) const
 {
-    auto ret = CoSimFunctions->fmi2GetRealOutputDerivatives(comp,
+    /*auto ret = CoSimFunctions->fmi2GetRealOutputDerivatives(comp,
                                                             activeOutputs.getValueRef(),
                                                             activeOutputs.getVRcount(),
                                                             derivOrder[order].data(),
@@ -60,6 +61,7 @@ void fmi2CoSimObject::getOutputDerivatives(int order, fmi2Real dOdt[]) const
     if (ret != fmi2Status::fmi2OK) {
         handleNonOKReturnValues(ret);
     }
+    */
 }
 void fmi2CoSimObject::doStep(fmi2Real currentCommunicationPoint,
                              fmi2Real communicationStepSize,

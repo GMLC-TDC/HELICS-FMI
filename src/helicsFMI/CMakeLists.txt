@@ -7,9 +7,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-set(helicsFMI_sources FmiCoSimFederate.cpp FmiModelExchangeFederate.cpp)
+set(helicsFMI_sources FmiCoSimFederate.cpp FmiModelExchangeFederate.cpp FmiHelics.cpp)
 
-set(helicsFMI_headers FmiCoSimFederate.hpp FmiModelExchangeFederate.hpp)
+set(helicsFMI_headers FmiCoSimFederate.hpp FmiModelExchangeFederate.hpp FmiHelics.hpp)
 
 add_library(helicsFMI STATIC ${helicsFMI_sources} ${helicsFMI_headers})
 
