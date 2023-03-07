@@ -6,8 +6,8 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "FmiCoSimFederate.hpp"
-#include "FmiHelics.hpp"
 
+#include "FmiHelics.hpp"
 #include "fmi/fmi_import/fmiObjects.h"
 #include "gmlc/utilities/stringConversion.h"
 
@@ -46,20 +46,20 @@ FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
 void FmiCoSimFederate::configure(helics::Time step, helics::Time startTime)
 {
     timeBias = startTime;
-    for (const auto &input : input_list) {
-        const auto &vi = cs->addInputVariable(input);
-        if (vi.index>=0) {
-            auto iType=helicsfmi::getHelicsType(vi.type);
-            inputs.emplace_back(&fed, input,iType);
+    for (const auto& input : input_list) {
+        const auto& vi = cs->addInputVariable(input);
+        if (vi.index >= 0) {
+            auto iType = helicsfmi::getHelicsType(vi.type);
+            inputs.emplace_back(&fed, input, iType);
         } else {
             fed.logWarningMessage(input + " is not a recognized input");
         }
     }
 
     for (auto output : output_list) {
-        const auto &vi = cs->addOutputVariable(output);
-        if (vi.index>=0) {
-            auto iType=helicsfmi::getHelicsType(vi.type);
+        const auto& vi = cs->addOutputVariable(output);
+        if (vi.index >= 0) {
+            auto iType = helicsfmi::getHelicsType(vi.type);
             pubs.emplace_back(&fed, output, iType);
         } else {
             fed.logWarningMessage(output + " is not a recognized output");
@@ -181,23 +181,21 @@ void FmiCoSimFederate::run(helics::Time stop)
         ofile << std::endl;
     }
     if (!pubs.empty()) {
-        
         for (int ii = 0; ii < pubs.size(); ++ii) {
-            helicsfmi::publishOutput(pubs[ii],cs.get(),ii);
+            helicsfmi::publishOutput(pubs[ii], cs.get(), ii);
         }
     }
     if (!inputs.empty()) {
         for (int ii = 0; ii < inputs.size(); ++ii) {
-            helicsfmi::setDefault(inputs[ii],cs.get(),ii);
+            helicsfmi::setDefault(inputs[ii], cs.get(), ii);
         }
     }
     auto result = fed.enterExecutingMode(helics::IterationRequest::ITERATE_IF_NEEDED);
     if (result == helics::IterationResult::ITERATING) {
         if (!inputs.empty()) {
             for (int ii = 0; ii < inputs.size(); ++ii) {
-                helicsfmi::grabInput(inputs[ii],cs.get(), ii);
+                helicsfmi::grabInput(inputs[ii], cs.get(), ii);
             }
-           
         }
         fed.enterExecutingMode();
     }
@@ -212,13 +210,13 @@ void FmiCoSimFederate::run(helics::Time stop)
         if (!outputs.empty()) {
             // get the values to publish
             for (int ii = 0; ii < pubs.size(); ++ii) {
-                helicsfmi::publishOutput(pubs[ii],cs.get(),ii);
+                helicsfmi::publishOutput(pubs[ii], cs.get(), ii);
             }
         }
         if (!inputs.empty()) {
             // load the inputs
             for (int ii = 0; ii < inputs.size(); ++ii) {
-                helicsfmi::grabInput(inputs[ii],cs.get(), ii);
+                helicsfmi::grabInput(inputs[ii], cs.get(), ii);
             }
         }
         if (captureOutput) {

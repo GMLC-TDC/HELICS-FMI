@@ -6,8 +6,9 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "FmiCoSimFederate.hpp"
-#include "helics/application_api/queryFunctions.hpp"
 #include "helics/application_api/helicsTypes.hpp"
+#include "helics/application_api/queryFunctions.hpp"
+
 #include "gtest/gtest.h"
 #include <filesystem>
 #include <future>
@@ -115,10 +116,10 @@ TEST(feedthrough, checkFeedthrough)
     qres = helics::vectorizeQueryResult(vFed.query("fthrough", "inputs"));
 
     EXPECT_EQ(qres.size(), 4U);
-    auto &pub1= vFed.registerPublication<double>("");
-    auto &pub2 = vFed.registerPublication<double>("");
-    auto &pub3 = vFed.registerPublication<int>("");
-    auto &pub4 = vFed.registerPublication<bool>("");
+    auto& pub1 = vFed.registerPublication<double>("");
+    auto& pub2 = vFed.registerPublication<double>("");
+    auto& pub3 = vFed.registerPublication<int>("");
+    auto& pub4 = vFed.registerPublication<bool>("");
 
     pub1.addInputTarget(qres[0]);
     pub2.addInputTarget(qres[1]);
@@ -143,9 +144,9 @@ TEST(feedthrough, checkFeedthrough)
     auto val4 = sub4.getValue<bool>();
 
     // make sure it is not default
-    EXPECT_DOUBLE_EQ(val,13.56);
-    EXPECT_DOUBLE_EQ(val2,18.58);
-    EXPECT_EQ(val3,998);
+    EXPECT_DOUBLE_EQ(val, 13.56);
+    EXPECT_DOUBLE_EQ(val2, 18.58);
+    EXPECT_EQ(val3, 998);
     EXPECT_TRUE(val4);
 
     vFed.finalize();
@@ -187,20 +188,17 @@ TEST(feedthrough, pubTypes)
     auto& sub4 = vFed.registerSubscription(qres[3]);
     sub2.setDefault(-20.0);
 
-
     vFed.enterInitializingMode();
 
-    EXPECT_EQ(sub1.getPublicationType(),helics::typeNameString<double>());
-    EXPECT_EQ(sub2.getPublicationType(),helics::typeNameString<double>());
-    EXPECT_EQ(sub3.getPublicationType(),helics::typeNameString<int64_t>());
-    EXPECT_EQ(sub4.getPublicationType(),helics::typeNameString<bool>());
-
+    EXPECT_EQ(sub1.getPublicationType(), helics::typeNameString<double>());
+    EXPECT_EQ(sub2.getPublicationType(), helics::typeNameString<double>());
+    EXPECT_EQ(sub3.getPublicationType(), helics::typeNameString<int64_t>());
+    EXPECT_EQ(sub4.getPublicationType(), helics::typeNameString<bool>());
 
     vFed.enterExecutingMode();
 
     auto t1 = vFed.requestTime(2.0);
     EXPECT_EQ(t1, 0.1);
-
 
     vFed.finalize();
 }
