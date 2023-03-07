@@ -6,6 +6,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "FmiHelics.hpp"
+#include <string>
 
 namespace helicsfmi
 {

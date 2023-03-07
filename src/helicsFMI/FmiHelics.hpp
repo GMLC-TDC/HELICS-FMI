@@ -9,7 +9,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 #include "fmi/fmi_import/fmiImport.h"
 #include "fmi/fmi_import/fmiObjects.h"
-#include "helics/application_api/helicsPrimaryTypes.hpp"
+#include "helics/application_api/HelicsPrimaryTypes.hpp"
 #include "helics/application_api/ValueFederate.hpp"
 #include <memory>
 #include <string_view>
