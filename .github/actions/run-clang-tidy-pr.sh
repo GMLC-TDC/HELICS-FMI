@@ -9,7 +9,7 @@ tidyerr=0
 if ((filecount > 0 && filecount <= 20)); then
     echo "====Configure CMake===="
     mkdir build && cd build || exit
-    cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DHELICS_FMI_BUILD_TESTS=ON ..
+    cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DHELICS_FMI_BUILD_TESTS=ON -DHELICS_DISABLE_WEBSERVER=ON -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON ..
     cd ..
     echo "====Run clang-tidy===="
     while read -r line; do

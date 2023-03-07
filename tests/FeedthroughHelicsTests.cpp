@@ -16,11 +16,11 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 TEST(feedthrough, simpleRun)
 {
     std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
-    helics::FederateInfo fi(helics::CoreType::INPROC);
-    fi.coreInitString = "--autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::INPROC);
+    fedInfo.coreInitString = "--autobroker";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
     std::shared_ptr<FmiCoSimFederate> csFed;
-    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("fthrough", inputFile, fi));
+    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("fthrough", inputFile, fedInfo));
     csFed->setOutputCapture(true, "testOut.csv");
     csFed->configure(0.1, 0.0);
     csFed->run(2.0);
@@ -33,19 +33,19 @@ TEST(feedthrough, simpleRun)
 TEST(feedthrough, checkIO)
 {
     std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
-    helics::FederateInfo fi(helics::CoreType::INPROC);
-    fi.coreInitString = "--autobroker";
-    fi.brokerInitString = "-f2";
+    helics::FederateInfo fedInfo(helics::CoreType::INPROC);
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.brokerInitString = "-f2";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
     std::shared_ptr<FmiCoSimFederate> csFed;
-    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("fthrough", inputFile, fi));
+    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("fthrough", inputFile, fedInfo));
 
-    fi.coreInitString.clear();
+    fedInfo.coreInitString.clear();
 
-    helics::ValueFederate vFed("fed1", fi);
+    helics::ValueFederate vFed("fed1", fedInfo);
     csFed->configure(0.1, 0.0);
 
-    auto rs = std::async(std::launch::async, [csFed]() { csFed->run(2.0); });
+    auto sync = std::async(std::launch::async, [csFed]() { csFed->run(2.0); });
 
     bool init = helics::waitForInit(&vFed, "fthrough", std::chrono::milliseconds(500));
     if (!init) {
@@ -75,24 +75,25 @@ TEST(feedthrough, checkIO)
     EXPECT_NE(val, -20.0);
     EXPECT_NE(val2, -20.0);
     vFed.finalize();
+        sync.get();
 }
 
 TEST(feedthrough, checkFeedthrough)
 {
     std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
-    helics::FederateInfo fi(helics::CoreType::INPROC);
-    fi.coreInitString = "--autobroker";
-    fi.brokerInitString = "-f2";
+    helics::FederateInfo fedInfo(helics::CoreType::INPROC);
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.brokerInitString = "-f2";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
     std::shared_ptr<FmiCoSimFederate> csFed;
-    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("fthrough", inputFile, fi));
+    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("fthrough", inputFile, fedInfo));
 
-    fi.coreInitString.clear();
+    fedInfo.coreInitString.clear();
 
-    helics::ValueFederate vFed("fed1", fi);
+    helics::ValueFederate vFed("fed1", fedInfo);
     csFed->configure(0.1, 0.0);
 
-    auto rs = std::async(std::launch::async, [csFed]() { csFed->run(2.0); });
+    auto sync = std::async(std::launch::async, [csFed]() { csFed->run(2.0); });
 
     bool init = helics::waitForInit(&vFed, "fthrough", std::chrono::milliseconds(500));
     if (!init) {
@@ -150,24 +151,25 @@ TEST(feedthrough, checkFeedthrough)
     EXPECT_TRUE(val4);
 
     vFed.finalize();
+    sync.get();
 }
 
 TEST(feedthrough, pubTypes)
 {
     std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
-    helics::FederateInfo fi(helics::CoreType::INPROC);
-    fi.coreInitString = "--autobroker";
-    fi.brokerInitString = "-f2";
+    helics::FederateInfo fedInfo(helics::CoreType::INPROC);
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.brokerInitString = "-f2";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
     std::shared_ptr<FmiCoSimFederate> csFed;
-    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("fthrough", inputFile, fi));
+    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("fthrough", inputFile, fedInfo));
 
-    fi.coreInitString.clear();
+    fedInfo.coreInitString.clear();
 
-    helics::ValueFederate vFed("fed1", fi);
+    helics::ValueFederate vFed("fed1", fedInfo);
     csFed->configure(0.1, 0.0);
 
-    auto rs = std::async(std::launch::async, [csFed]() { csFed->run(2.0); });
+    auto sync = std::async(std::launch::async, [csFed]() { csFed->run(2.0); });
 
     bool init = helics::waitForInit(&vFed, "fthrough", std::chrono::milliseconds(500));
     if (!init) {
@@ -201,4 +203,5 @@ TEST(feedthrough, pubTypes)
     EXPECT_EQ(t1, 0.1);
 
     vFed.finalize();
+    sync.get();
 }

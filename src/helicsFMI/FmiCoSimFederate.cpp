@@ -17,8 +17,8 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
                                    const std::string& fmu,
-                                   const helics::FederateInfo& fi):
-    fed(name, fi)
+                                   const helics::FederateInfo& fedInfo):
+    fed(name, fedInfo)
 {
     auto fmi = std::make_shared<FmiLibrary>();
     fmi->loadFMU(fmu);
@@ -32,11 +32,11 @@ FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
 
 FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
                                    std::shared_ptr<fmi2CoSimObject> obj,
-                                   const helics::FederateInfo& fi):
-    fed(name, fi),
+                                   const helics::FederateInfo& fedInfo):
+    fed(name, fedInfo),
     cs(std::move(obj))
 {
-    fed = helics::ValueFederate(name, fi);
+    fed = helics::ValueFederate(name, fedInfo);
     if (cs) {
         input_list = cs->getInputNames();
         output_list = cs->getOutputNames();
