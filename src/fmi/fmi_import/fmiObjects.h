@@ -105,13 +105,12 @@ class fmi2Object {
                 return T{""};  // if we get here just return an empty string otherwise we threw an
                                // exception
             }
-            fmi2String res=nullptr;
+            fmi2String res = nullptr;
             retval = commonFunctions->fmi2GetString(comp, &(param.vRef), 1, &res);
             if (retval != fmi2Status::fmi2OK) {
                 handleNonOKReturnValues(retval);
             }
-            if (res == nullptr)
-            {
+            if (res == nullptr) {
                 return T{""};
             }
             return T{res};  // this should copy the actual the string
