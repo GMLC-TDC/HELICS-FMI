@@ -64,4 +64,3 @@ class FmiCoSimFederate {
     /** get the underlying HELICS federate*/
     helics::ValueFederate* operator->() { return &fed; }
 };
-
