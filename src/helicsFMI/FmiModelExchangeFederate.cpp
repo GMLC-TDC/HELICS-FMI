@@ -7,6 +7,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 #include "FmiModelExchangeFederate.hpp"
 
+#include "FmiHelics.hpp"
 #include "fmi/fmi_import/fmiObjects.h"
 #include "solvers/solverInterface.h"
 
@@ -92,22 +93,24 @@ void FmiModelExchangeFederate::run(helics::Time stop)
 
     fed.enterInitializingMode();
     me->setMode(fmuMode::initializationMode);
-    std::vector<fmi2Real> outputs(pubs.size());
-    std::vector<fmi2Real> inp(inputs.size());
-    me->getOutputs(outputs.data());
-    for (size_t ii = 0; ii < pubs.size(); ++ii) {
-        pubs[ii].publish(outputs[ii]);
+
+    if (!pubs.empty()) {
+        for (int ii = 0; ii < pubs.size(); ++ii) {
+            helicsfmi::publishOutput(pubs[ii], me.get(), ii);
+        }
     }
-    me->getCurrentInputs(inp.data());
-    for (size_t ii = 0; ii < inputs.size(); ++ii) {
-        inputs[ii].setDefault(inp[ii]);
+    if (!inputs.empty()) {
+        for (int ii = 0; ii < inputs.size(); ++ii) {
+            helicsfmi::setDefault(inputs[ii], me.get(), ii);
+        }
     }
     auto result = fed.enterExecutingMode(helics::IterationRequest::ITERATE_IF_NEEDED);
     if (result == helics::IterationResult::ITERATING) {
-        for (size_t ii = 0; ii < inputs.size(); ++ii) {
-            inp[ii] = inputs[ii].getValue<fmi2Real>();
+        if (!inputs.empty()) {
+            for (int ii = 0; ii < inputs.size(); ++ii) {
+                helicsfmi::grabInput(inputs[ii], me.get(), ii);
+            }
         }
-        me->setInputs(inp.data());
         fed.enterExecutingMode();
     }
     me->setMode(fmuMode::continuousTimeMode);
@@ -119,15 +122,18 @@ void FmiModelExchangeFederate::run(helics::Time stop)
         solver->solve(static_cast<double>(currentTime), timeReturn);
         currentTime = fed.requestNextStep();
         // get the values to publish
-        me->getOutputs(outputs.data());
-        for (size_t ii = 0; ii < pubs.size(); ++ii) {
-            pubs[ii].publish(outputs[ii]);
+        if (!pubs.empty()) {
+            // get the values to publish
+            for (int ii = 0; ii < pubs.size(); ++ii) {
+                helicsfmi::publishOutput(pubs[ii], me.get(), ii);
+            }
         }
-        // load the inputs
-        for (size_t ii = 0; ii < inputs.size(); ++ii) {
-            inp[ii] = inputs[ii].getValue<fmi2Real>();
+        if (!inputs.empty()) {
+            // load the inputs
+            for (int ii = 0; ii < inputs.size(); ++ii) {
+                helicsfmi::grabInput(inputs[ii], me.get(), ii);
+            }
         }
-        me->setInputs(inp.data());
     }
     fed.finalize();
 }

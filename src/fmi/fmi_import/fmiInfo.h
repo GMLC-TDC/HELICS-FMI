@@ -97,6 +97,23 @@ class fmiTypeDefinition {
     double nominal;
 };
 
+/** class defining a single variable */
+class fmiVariable {
+  public:
+    fmi2ValueReference vRef{static_cast<fmi2ValueReference>(-1)};
+    fmi_variable_type type{fmi_variable_type::unknown};
+    int index{-1};
+    fmiVariable() = default;
+    fmiVariable(fmi2ValueReference ref, fmi_variable_type type1, int startIndex):
+        vRef{ref}, type(type1), index{startIndex}
+    {
+    }
+    fmiVariable(const variableInformation& var):
+        vRef{var.valueRef}, type(var.type), index(var.index)
+    {
+    }
+};
+
 /** class for storing references to fmi variables*/
 class fmiVariableSet {
   public:

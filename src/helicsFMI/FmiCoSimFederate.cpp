@@ -7,6 +7,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 #include "FmiCoSimFederate.hpp"
 
+#include "FmiHelics.hpp"
 #include "fmi/fmi_import/fmiObjects.h"
 #include "gmlc/utilities/stringConversion.h"
 
@@ -16,8 +17,8 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
                                    const std::string& fmu,
-                                   const helics::FederateInfo& fi):
-    fed(name, fi)
+                                   const helics::FederateInfo& fedInfo):
+    fed(name, fedInfo)
 {
     auto fmi = std::make_shared<FmiLibrary>();
     fmi->loadFMU(fmu);
@@ -31,11 +32,11 @@ FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
 
 FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
                                    std::shared_ptr<fmi2CoSimObject> obj,
-                                   const helics::FederateInfo& fi):
-    fed(name, fi),
+                                   const helics::FederateInfo& fedInfo):
+    fed(name, fedInfo),
     cs(std::move(obj))
 {
-    fed = helics::ValueFederate(name, fi);
+    fed = helics::ValueFederate(name, fedInfo);
     if (cs) {
         input_list = cs->getInputNames();
         output_list = cs->getOutputNames();
@@ -45,19 +46,21 @@ FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
 void FmiCoSimFederate::configure(helics::Time step, helics::Time startTime)
 {
     timeBias = startTime;
-    for (auto input : input_list) {
-        auto added = cs->addInputVariable(input);
-        if (added) {
-            inputs.emplace_back(&fed, input);
+    for (const auto& input : input_list) {
+        const auto& vi = cs->addInputVariable(input);
+        if (vi.index >= 0) {
+            auto iType = helicsfmi::getHelicsType(vi.type);
+            inputs.emplace_back(&fed, input, iType);
         } else {
             fed.logWarningMessage(input + " is not a recognized input");
         }
     }
 
     for (auto output : output_list) {
-        auto added = cs->addOutputVariable(output);
-        if (added) {
-            pubs.emplace_back(&fed, output, helics::DataType::HELICS_DOUBLE);
+        const auto& vi = cs->addOutputVariable(output);
+        if (vi.index >= 0) {
+            auto iType = helicsfmi::getHelicsType(vi.type);
+            pubs.emplace_back(&fed, output, iType);
         } else {
             fed.logWarningMessage(output + " is not a recognized output");
         }
@@ -177,26 +180,22 @@ void FmiCoSimFederate::run(helics::Time stop)
         }
         ofile << std::endl;
     }
-    std::vector<fmi2Real> inp(inputs.size());
     if (!pubs.empty()) {
-        cs->getOutputs(outputs.data());
-        for (size_t ii = 0; ii < pubs.size(); ++ii) {
-            pubs[ii].publish(outputs[ii]);
+        for (int ii = 0; ii < pubs.size(); ++ii) {
+            helicsfmi::publishOutput(pubs[ii], cs.get(), ii);
         }
     }
-    if (!inp.empty()) {
-        cs->getCurrentInputs(inp.data());
-        for (size_t ii = 0; ii < inputs.size(); ++ii) {
-            inputs[ii].setDefault(inp[ii]);
+    if (!inputs.empty()) {
+        for (int ii = 0; ii < inputs.size(); ++ii) {
+            helicsfmi::setDefault(inputs[ii], cs.get(), ii);
         }
     }
     auto result = fed.enterExecutingMode(helics::IterationRequest::ITERATE_IF_NEEDED);
     if (result == helics::IterationResult::ITERATING) {
         if (!inputs.empty()) {
-            for (size_t ii = 0; ii < inputs.size(); ++ii) {
-                inp[ii] = inputs[ii].getValue<fmi2Real>();
+            for (int ii = 0; ii < inputs.size(); ++ii) {
+                helicsfmi::grabInput(inputs[ii], cs.get(), ii);
             }
-            cs->setInputs(inp.data());
         }
         fed.enterExecutingMode();
     }
@@ -210,17 +209,15 @@ void FmiCoSimFederate::run(helics::Time stop)
         currentTime = fed.requestNextStep();
         if (!outputs.empty()) {
             // get the values to publish
-            cs->getOutputs(outputs.data());
-            for (size_t ii = 0; ii < pubs.size(); ++ii) {
-                pubs[ii].publish(outputs[ii]);
+            for (int ii = 0; ii < pubs.size(); ++ii) {
+                helicsfmi::publishOutput(pubs[ii], cs.get(), ii);
             }
         }
         if (!inputs.empty()) {
             // load the inputs
-            for (size_t ii = 0; ii < inputs.size(); ++ii) {
-                inp[ii] = inputs[ii].getValue<fmi2Real>();
+            for (int ii = 0; ii < inputs.size(); ++ii) {
+                helicsfmi::grabInput(inputs[ii], cs.get(), ii);
             }
-            cs->setInputs(inp.data());
         }
         if (captureOutput) {
             ofile << static_cast<double>(currentTime) << ",";

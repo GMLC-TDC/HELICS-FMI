@@ -115,22 +115,6 @@ void fmi2Object::reset()
     }
 }
 
-template<>
-std::string fmi2Object::get<std::string>(const std::string& param) const
-{
-    auto ref = info->getVariableInfo(param);
-    if (ref.type._value != fmi_variable_type::string) {
-        handleNonOKReturnValues(fmi2Status::fmi2Discard);
-        return "";  // if we get here just return an empty string otherwise we threw an exception
-    }
-    fmi2String res;
-    auto retval = commonFunctions->fmi2GetString(comp, &(ref.valueRef), 1, &res);
-    if (retval != fmi2Status::fmi2OK) {
-        handleNonOKReturnValues(retval);
-    }
-    return {res};  // this should copy the actual the string
-}
-
 void fmi2Object::get(const fmiVariableSet& vrset, fmi2Real value[]) const
 {
     auto ret = commonFunctions->fmi2GetReal(comp, vrset.getValueRef(), vrset.getVRcount(), value);
@@ -173,28 +157,26 @@ void fmi2Object::set(const fmiVariableSet& vrset, fmi2Real value[])
     }
 }
 
-void fmi2Object::set(const std::string& param, const char* val)
+void fmi2Object::set(const fmiVariable& param, const char* val)
 {
-    auto ref = info->getVariableInfo(param);
-    if (!(ref.type._value == fmi_variable_type::string)) {
+    if (!(param.type._value == fmi_variable_type::string)) {
         handleNonOKReturnValues(fmi2Status::fmi2Discard);
         return;
     }
-    auto ret = commonFunctions->fmi2SetString(comp, &(ref.valueRef), 1, &val);
+    auto ret = commonFunctions->fmi2SetString(comp, &(param.vRef), 1, &val);
     if (ret != fmi2Status::fmi2OK) {
         handleNonOKReturnValues(ret);
     }
 }
 
-void fmi2Object::set(const std::string& param, const std::string& val)
+void fmi2Object::set(const fmiVariable& param, const std::string& val)
 {
-    auto ref = info->getVariableInfo(param);
-    if (!(ref.type._value == fmi_variable_type::string)) {
+    if (!(param.type._value == fmi_variable_type::string)) {
         handleNonOKReturnValues(fmi2Status::fmi2Discard);
         return;
     }
     fmi2String val2 = val.c_str();
-    auto ret = commonFunctions->fmi2SetString(comp, &(ref.valueRef), 1, &val2);
+    auto ret = commonFunctions->fmi2SetString(comp, &(param.vRef), 1, &val2);
     if (ret != fmi2Status::fmi2OK) {
         handleNonOKReturnValues(ret);
     }
@@ -282,6 +264,20 @@ fmi2Real fmi2Object::getPartialDerivative(int index_x, int index_y, double delta
 }
 
 /** check if an output is real and actually is an output*/
+bool isInput(const variableInformation& vI)
+{
+    return ((vI.index >= 0) && (vI.causality._value == fmi_causality::input));
+}
+
+/** check if an output is real and actually is an output*/
+bool isOutput(const variableInformation& vI)
+{
+    return ((vI.index >= 0) &&
+            (fmi_causality::output == vI.causality._value ||
+             fmi_causality::local == vI.causality._value));
+}
+
+/** check if an output is real and actually is an output*/
 bool isRealOutput(const variableInformation& vI)
 {
     return ((vI.index >= 0) && (vI.type._value == fmi_variable_type::real) &&
@@ -305,27 +301,16 @@ void fmi2Object::setOutputVariables(const std::vector<std::string>& outNames)
         }
     }
     activeOutputs.clear();
-    activeOutputIndices.clear();
     for (const auto& outName : outNames) {
-        const auto& vI = info->getVariableInfo(outName);
-        if (isRealOutput(vI)) {
-            activeOutputs.push(vI.valueRef);
-            activeOutputIndices.push_back(vI.index);
-        }
-        // TODO(PT):: what to do if this condition is not valid?
+        addOutputVariable(outName);
     }
 }
 
 void fmi2Object::setOutputVariables(const std::vector<int>& outIndices)
 {
-    activeOutputIndices.clear();
     activeOutputs.clear();
     for (const auto& outIndex : outIndices) {
-        const auto& vI = info->getVariableInfo(outIndex);
-        if (isRealOutput(vI)) {
-            activeOutputs.push(vI.valueRef);
-            activeOutputIndices.push_back(vI.index);
-        }
+        addOutputVariable(outIndex);
     }
 }
 
@@ -338,68 +323,54 @@ void fmi2Object::setInputVariables(const std::vector<std::string>& inNames)
         }
     }
     activeInputs.clear();
-    activeInputIndices.clear();
     for (const auto& inName : inNames) {
-        const auto& vI = info->getVariableInfo(inName);
-        if (isRealInput(vI)) {
-            activeInputs.push(vI.valueRef);
-            activeInputIndices.push_back(vI.index);
-        }
+        addInputVariable(inName);
     }
 }
 
 void fmi2Object::setInputVariables(const std::vector<int>& inIndices)
 {
     activeInputs.clear();
-    activeInputIndices.clear();
     for (const auto& inIndex : inIndices) {
-        const auto& vI = info->getVariableInfo(inIndex);
-        if (isRealInput(vI)) {
-            activeInputs.push(vI.valueRef);
-            activeInputIndices.push_back(vI.index);
-        }
+        addInputVariable(inIndex);
     }
 }
 
-bool fmi2Object::addOutputVariable(const std::string& outputName)
+static const fmiVariable emptyVariable{static_cast<fmi2ValueReference>(-1),
+                                       fmi_variable_type::unknown,
+                                       -1};
+
+const fmiVariable& fmi2Object::addOutputVariable(const std::string& outputName)
 {
     const auto& vI = info->getVariableInfo(outputName);
-    if (isRealOutput(vI)) {
-        activeOutputs.push(vI.valueRef);
-        activeOutputIndices.push_back(vI.index);
-        return true;
+    if (isOutput(vI)) {
+        return activeOutputs.emplace_back(vI.valueRef, vI.type, vI.index);
     }
-    return false;
+    return emptyVariable;
 }
-bool fmi2Object::addOutputVariable(int index)
+const fmiVariable& fmi2Object::addOutputVariable(int index)
 {
     const auto& vI = info->getVariableInfo(index);
-    if (isRealOutput(vI)) {
-        activeOutputs.push(vI.valueRef);
-        activeOutputIndices.push_back(vI.index);
-        return true;
+    if (isOutput(vI)) {
+        return activeOutputs.emplace_back(vI.valueRef, vI.type, vI.index);
     }
-    return false;
+    return emptyVariable;
 }
-bool fmi2Object::addInputVariable(const std::string& inputName)
+const fmiVariable& fmi2Object::addInputVariable(const std::string& inputName)
 {
     const auto& vI = info->getVariableInfo(inputName);
-    if (isRealInput(vI)) {
-        activeInputs.push(vI.valueRef);
-        activeInputIndices.push_back(vI.index);
-        return true;
+    if (isInput(vI)) {
+        return activeInputs.emplace_back(vI.valueRef, vI.type, vI.index);
     }
-    return false;
+    return emptyVariable;
 }
-bool fmi2Object::addInputVariable(int index)
+const fmiVariable& fmi2Object::addInputVariable(int index)
 {
     const auto& vI = info->getVariableInfo(index);
     if (isRealInput(vI)) {
-        activeInputs.push(vI.valueRef);
-        activeInputIndices.push_back(vI.index);
-        return true;
+        return activeInputs.emplace_back(vI.valueRef, vI.type, vI.index);
     }
-    return false;
+    return emptyVariable;
 }
 
 void fmi2Object::setDefaultInputs()
@@ -412,56 +383,6 @@ void fmi2Object::setDefaultOutputs()
     setOutputVariables(info->getVariableNames("output"));
 }
 
-void fmi2Object::setInputs(const fmi2Real inputs[])
-{
-    if (inputs != nullptr) {
-        auto ret = commonFunctions->fmi2SetReal(comp,
-                                                activeInputs.getValueRef(),
-                                                activeInputs.getVRcount(),
-                                                inputs);
-        if (ret != fmi2Status::fmi2OK) {
-            handleNonOKReturnValues(ret);
-        }
-    }
-}
-
-void fmi2Object::getCurrentInputs(fmi2Real inputs[])
-{
-    fmi2Status ret = fmi2Status::fmi2Warning;
-    if (inputs != nullptr) {
-        ret = commonFunctions->fmi2GetReal(comp,
-                                           activeInputs.getValueRef(),
-                                           activeInputs.getVRcount(),
-                                           inputs);
-    }
-    if (ret != fmi2Status::fmi2OK) {
-        handleNonOKReturnValues(ret);
-    }
-}
-
-void fmi2Object::getOutputs(fmi2Real outputs[]) const
-{
-    fmi2Status ret = fmi2Status::fmi2Warning;
-    if (outputs != nullptr) {
-        ret = commonFunctions->fmi2GetReal(comp,
-                                           activeOutputs.getValueRef(),
-                                           activeOutputs.getVRcount(),
-                                           outputs);
-    }
-    if (ret != fmi2Status::fmi2OK) {
-        handleNonOKReturnValues(ret);
-    }
-}
-
-fmi2Real fmi2Object::getOutput(size_t outNum) const
-{
-    fmi2Real out = -1e48;
-    if (outNum < activeOutputs.getVRcount()) {
-        commonFunctions->fmi2GetReal(comp, activeOutputs.getValueRef() + outNum, 1, &out);
-    }
-    return out;
-}
-
 fmiVariableSet fmi2Object::getVariableSet(const std::string& variable) const
 {
     return info->getVariableSet(variable);
@@ -472,15 +393,24 @@ fmiVariableSet fmi2Object::getVariableSet(int index) const
     return info->getVariableSet(index);
 }
 
+const fmiVariable& fmi2Object::getInput(int index) const
+{
+    return activeInputs.at(index);
+}
+const fmiVariable& fmi2Object::getOutput(int index) const
+{
+    return activeOutputs.at(index);
+}
+
 std::vector<std::string> fmi2Object::getOutputNames() const
 {
     std::vector<std::string> oVec;
-    if (activeOutputs.getVRcount() == 0) {
+    if (activeOutputs.empty()) {
         oVec = info->getVariableNames("output");
     } else {
-        oVec.reserve(activeOutputs.getVRcount());
-        for (const auto& os : activeOutputIndices) {
-            oVec.push_back(info->getVariableInfo(os).name);
+        oVec.reserve(activeOutputs.size());
+        for (const auto& output : activeOutputs) {
+            oVec.push_back(info->getVariableInfo(output.index).name);
         }
     }
 
@@ -490,12 +420,12 @@ std::vector<std::string> fmi2Object::getOutputNames() const
 std::vector<std::string> fmi2Object::getInputNames() const
 {
     std::vector<std::string> oVec;
-    if (activeInputs.getVRcount() == 0) {
+    if (activeInputs.empty()) {
         oVec = info->getVariableNames("input");
     } else {
-        oVec.reserve(activeInputs.getVRcount());
-        for (const auto& os : activeInputIndices) {
-            oVec.push_back(info->getVariableInfo(os).name);
+        oVec.reserve(activeInputs.size());
+        for (const auto& input : activeInputs) {
+            oVec.push_back(info->getVariableInfo(input.index).name);
         }
     }
     return oVec;
@@ -503,15 +433,15 @@ std::vector<std::string> fmi2Object::getInputNames() const
 
 bool fmi2Object::isParameter(const std::string& param, fmi_variable_type type)
 {
-    const auto& vi = info->getVariableInfo(param);
-    if (vi.index >= 0) {
-        if ((vi.causality._value == fmi_causality::parameter) ||
-            (vi.causality._value == fmi_causality::input)) {
-            if (vi.type == type) {
+    const auto& varInfo = info->getVariableInfo(param);
+    if (varInfo.index >= 0) {
+        if ((varInfo.causality._value == fmi_causality::parameter) ||
+            (varInfo.causality._value == fmi_causality::input)) {
+            if (varInfo.type == type) {
                 return true;
             }
             if (type._value == fmi_variable_type::numeric) {
-                if (vi.type._value != fmi_variable_type::string) {
+                if (varInfo.type._value != fmi_variable_type::string) {
                     return true;
                 }
             }
@@ -523,13 +453,13 @@ bool fmi2Object::isParameter(const std::string& param, fmi_variable_type type)
 
 bool fmi2Object::isVariable(const std::string& var, fmi_variable_type type)
 {
-    const auto& vi = info->getVariableInfo(var);
-    if (vi.index >= 0) {
-        if (vi.type == type) {
+    const auto& varInfo = info->getVariableInfo(var);
+    if (varInfo.index >= 0) {
+        if (varInfo.type == type) {
             return true;
         }
         if (type._value == fmi_variable_type::numeric) {
-            if (vi.type._value != fmi_variable_type::string) {
+            if (varInfo.type._value != fmi_variable_type::string) {
                 return true;
             }
         }
