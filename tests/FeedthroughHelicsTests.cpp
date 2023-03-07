@@ -75,7 +75,7 @@ TEST(feedthrough, checkIO)
     EXPECT_NE(val, -20.0);
     EXPECT_NE(val2, -20.0);
     vFed.finalize();
-        sync.get();
+    sync.get();
 }
 
 TEST(feedthrough, checkFeedthrough)
