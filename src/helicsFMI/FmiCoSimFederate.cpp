@@ -36,7 +36,6 @@ FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
     fed(name, fedInfo),
     cs(std::move(obj))
 {
-    fed = helics::ValueFederate(name, fedInfo);
     if (cs) {
         input_list = cs->getInputNames();
         output_list = cs->getOutputNames();

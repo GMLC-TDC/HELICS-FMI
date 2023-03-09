@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
             throw(CLI::Success());
         },
         "specify the versions of helics and helics-fmi");
-
+    app.validate_positionals();
     std::string integrator{"cvode"};
     app.add_option("--integrator",
                    integrator,
@@ -87,6 +87,13 @@ int main(int argc, char* argv[])
     app.add_option("--connections", input_variables, "Specify connections this FMU should make")
         ->delimiter(',');
 
+    bool cosimFmu{true};
+    app.add_flag("--cosim",
+                 cosimFmu,
+                 "specify that the fmu should run as a co-sim FMU if possible");
+    app.add_flag("!--modelexchange",
+                 cosimFmu,
+                 "specify that the fmu should run as a model exchange FMU if possible");
     try {
         app.parse(argc, argv);
     }
@@ -110,10 +117,11 @@ int main(int argc, char* argv[])
     helics::FederateInfo fi;
     // set the default core type to be local
     fi.coreType = helics::CoreType::INPROC;
-    fi.defName = "fmi";
+    fi.defName = "fmu${#}";
     auto remArgs = app.remaining_for_passthrough();
     fi.separator = '.';
     fi.loadInfoFromArgs(remArgs);
+    // this chunk of code is to ease errors on extra args
     if (!remArgs.empty()) {
         app.allow_extras(false);
         try {
@@ -125,10 +133,15 @@ int main(int argc, char* argv[])
     }
     std::unique_ptr<helics::apps::BrokerApp> broker;
     if (fi.autobroker) {
-        broker = std::make_unique<helics::apps::BrokerApp>(fi.coreType, brokerArgs);
-        fi.autobroker = false;
+        try {
+            broker = std::make_unique<helics::apps::BrokerApp>(fi.coreType, brokerArgs);
+        }
+        catch (const std::exception& e) {
+            std::cerr << "error generator broker :" << e.what() << std::endl;
+            return -101;
+        }
     }
-
+    fi.autobroker = false;
     if (inputFile.empty()) {
         inputFile = inputs.front();
     }
@@ -137,40 +150,82 @@ int main(int argc, char* argv[])
 
     FmiLibrary fmi;
     if ((ext == ".fmu") || (ext == ".FMU")) {
-        fmi.loadFMU(inputFile);
-        if (fmi.checkFlag(fmuCapabilityFlags::coSimulationCapable)) {
-            std::shared_ptr<fmi2CoSimObject> obj = fmi.createCoSimulationObject("obj1");
-            auto fed = std::make_unique<FmiCoSimFederate>("", obj, fi);
-            fed->configure(stepTime);
-            fed->run(stopTime);
-        } else {
-            std::shared_ptr<fmi2ModelExchangeObject> obj = fmi.createModelExchangeObject("obj1");
-            auto fed = std::make_unique<FmiModelExchangeFederate>(obj, fi);
-            fed->configure(stepTime);
-            fed->run(stopTime);
+        try {
+            fmi.loadFMU(inputFile);
+            if (cosimFmu && fmi.checkFlag(fmuCapabilityFlags::coSimulationCapable)) {
+                std::shared_ptr<fmi2CoSimObject> obj = fmi.createCoSimulationObject("obj1");
+                auto fed = std::make_unique<FmiCoSimFederate>("", obj, fi);
+                fed->configure(stepTime);
+                fed->run(stopTime);
+            } else {
+                std::shared_ptr<fmi2ModelExchangeObject> obj =
+                    fmi.createModelExchangeObject("obj1");
+                auto fed = std::make_unique<FmiModelExchangeFederate>(obj, fi);
+                fed->configure(stepTime);
+                fed->run(stopTime);
+            }
+        }
+        catch (const std::exception& e) {
+            if (broker) {
+                broker->forceTerminate();
+            }
+            std::cout << "error running system " << e.what() << std::endl;
+            return -101;
         }
     } else if ((ext == ".json") || (ext == ".JSON")) {
         jsonReaderElement system(inputFile);
         if (system.isValid()) {
-            runSystem(system, fi);
+            try {
+                runSystem(system, fi);
+            }
+            catch (const std::exception& e) {
+                if (broker) {
+                    broker->forceTerminate();
+                }
+
+                std::cout << "error running system " << e.what() << std::endl;
+                return -101;
+            }
         } else if (broker) {
             broker->forceTerminate();
         }
     } else if ((ext == ".toml") || (ext == ".TOML")) {
         tomlReaderElement system(inputFile);
         if (system.isValid()) {
-            runSystem(system, fi);
+            try {
+                runSystem(system, fi);
+            }
+            catch (const std::exception& e) {
+                if (broker) {
+                    broker->forceTerminate();
+                }
+                std::cout << "error running system " << e.what() << std::endl;
+                return -101;
+            }
         } else if (broker) {
             broker->forceTerminate();
         }
     } else if ((ext == ".xml") || (ext == ".XML")) {
         tinyxml2ReaderElement system(inputFile);
         if (system.isValid()) {
-            runSystem(system, fi);
+            try {
+                runSystem(system, fi);
+            }
+            catch (const std::exception& e) {
+                if (broker) {
+                    broker->forceTerminate();
+                }
+                std::cout << "error running system " << e.what() << std::endl;
+                return -101;
+            }
         } else if (broker) {
             broker->forceTerminate();
         }
     }
+    if (broker) {
+        broker->waitForDisconnect();
+    }
+    return 0;
 }
 
 void runSystem(readerElement& elem, helics::FederateInfo& fi)

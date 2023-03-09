@@ -1,22 +1,15 @@
 /*
-* LLNS Copyright Start
- * Copyright (c) 2017-2019, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
- * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
- * Produced at the Lawrence Livermore National Laboratory.
- * All rights reserved.
- * For details, see the LICENSE file.
- * LLNS Copyright End
- */
+Copyright (c) 2017-2023,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+*/
 
 #pragma once
 
-#cmakedefine BOOST_STATIC
-
-#define HELICS_FMI_VERSION_MAJOR ${HELICS-FMI_VERSION_MAJOR}
-#define HELICS_FMI_VERSION_MINOR ${HELICS-FMI_VERSION_MINOR}
-#define HELICS_FMI_VERSION_PATCH ${HELICS-FMI_VERSION_PATCH}
-#define HELICS_FMI_VERSION_BUILD "${HELICS-FMI_VERSION_BUILD}"
-#define HELICS_FMI_VERSION_STRING "${HELICS-FMI_VERSION_STRING}"
-#define HELICS_FMI_DATE "${HELICS-FMI_DATE}"
+#define HELICS_FMI_VERSION_MAJOR ${HELICS_FMI_VERSION_MAJOR}
+#define HELICS_FMI_VERSION_MINOR ${HELICS_FMI_VERSION_MINOR}
+#define HELICS_FMI_VERSION_PATCH ${HELICS_FMI_VERSION_PATCH}
+#define HELICS_FMI_VERSION_BUILD "${HELICS_FMI_VERSION_BUILD}"
+#define HELICS_FMI_VERSION_STRING "${HELICS_FMI_VERSION_STRING}"
+#define HELICS_FMI_DATE "${HELICS_FMI_DATE}"
