@@ -88,8 +88,12 @@ int main(int argc, char* argv[])
         ->delimiter(',');
 
     bool cosimFmu{true};
-    app.add_flag("--cosim",cosimFmu,"specify that the fmu should run as a co-sim FMU if possible");
-    app.add_flag("!--modelexchange",cosimFmu,"specify that the fmu should run as a model exchange FMU if possible");
+    app.add_flag("--cosim",
+                 cosimFmu,
+                 "specify that the fmu should run as a co-sim FMU if possible");
+    app.add_flag("!--modelexchange",
+                 cosimFmu,
+                 "specify that the fmu should run as a model exchange FMU if possible");
     try {
         app.parse(argc, argv);
     }
@@ -117,7 +121,7 @@ int main(int argc, char* argv[])
     auto remArgs = app.remaining_for_passthrough();
     fi.separator = '.';
     fi.loadInfoFromArgs(remArgs);
-    //this chunk of code is to ease errors on extra args
+    // this chunk of code is to ease errors on extra args
     if (!remArgs.empty()) {
         app.allow_extras(false);
         try {
@@ -129,13 +133,11 @@ int main(int argc, char* argv[])
     }
     std::unique_ptr<helics::apps::BrokerApp> broker;
     if (fi.autobroker) {
-        try
-        {
+        try {
             broker = std::make_unique<helics::apps::BrokerApp>(fi.coreType, brokerArgs);
         }
-        catch (const  std::exception& e)
-        {
-            std::cerr<<"error generator broker :"<<e.what()<<std::endl;
+        catch (const std::exception& e) {
+            std::cerr << "error generator broker :" << e.what() << std::endl;
             return -101;
         }
     }
@@ -148,8 +150,7 @@ int main(int argc, char* argv[])
 
     FmiLibrary fmi;
     if ((ext == ".fmu") || (ext == ".FMU")) {
-        try
-        {
+        try {
             fmi.loadFMU(inputFile);
             if (cosimFmu && fmi.checkFlag(fmuCapabilityFlags::coSimulationCapable)) {
                 std::shared_ptr<fmi2CoSimObject> obj = fmi.createCoSimulationObject("obj1");
@@ -157,19 +158,18 @@ int main(int argc, char* argv[])
                 fed->configure(stepTime);
                 fed->run(stopTime);
             } else {
-                std::shared_ptr<fmi2ModelExchangeObject> obj = fmi.createModelExchangeObject("obj1");
+                std::shared_ptr<fmi2ModelExchangeObject> obj =
+                    fmi.createModelExchangeObject("obj1");
                 auto fed = std::make_unique<FmiModelExchangeFederate>(obj, fi);
                 fed->configure(stepTime);
                 fed->run(stopTime);
             }
         }
-        catch (const std::exception& e)
-        {
-            if (broker)
-            {
+        catch (const std::exception& e) {
+            if (broker) {
                 broker->forceTerminate();
             }
-            std::cout<<"error running system "<<e.what()<<std::endl;
+            std::cout << "error running system " << e.what() << std::endl;
             return -101;
         }
     } else if ((ext == ".json") || (ext == ".JSON")) {
@@ -178,14 +178,12 @@ int main(int argc, char* argv[])
             try {
                 runSystem(system, fi);
             }
-            catch (const std::exception& e)
-            {
-                if (broker)
-                {
+            catch (const std::exception& e) {
+                if (broker) {
                     broker->forceTerminate();
                 }
-                
-                std::cout<<"error running system "<<e.what()<<std::endl;
+
+                std::cout << "error running system " << e.what() << std::endl;
                 return -101;
             }
         } else if (broker) {
@@ -197,13 +195,11 @@ int main(int argc, char* argv[])
             try {
                 runSystem(system, fi);
             }
-            catch (const std::exception& e)
-            {
-                if (broker)
-                {
+            catch (const std::exception& e) {
+                if (broker) {
                     broker->forceTerminate();
                 }
-                std::cout<<"error running system "<<e.what()<<std::endl;
+                std::cout << "error running system " << e.what() << std::endl;
                 return -101;
             }
         } else if (broker) {
@@ -215,21 +211,18 @@ int main(int argc, char* argv[])
             try {
                 runSystem(system, fi);
             }
-            catch (const std::exception& e)
-            {
-                if (broker)
-                {
+            catch (const std::exception& e) {
+                if (broker) {
                     broker->forceTerminate();
                 }
-                std::cout<<"error running system "<<e.what()<<std::endl;
+                std::cout << "error running system " << e.what() << std::endl;
                 return -101;
             }
         } else if (broker) {
             broker->forceTerminate();
         }
     }
-    if (broker)
-    {
+    if (broker) {
         broker->waitForDisconnect();
     }
     return 0;

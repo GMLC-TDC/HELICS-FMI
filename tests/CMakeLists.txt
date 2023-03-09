@@ -80,7 +80,9 @@ set(executable_test_sources exeTestHelper.cpp exeTestHelper.h helicsFmiExecutabl
 
 add_executable(helics_fmi_executable-tests ${executable_test_sources})
 
-target_compile_definitions(helics_fmi_executable-tests PRIVATE -DFMI_REFERENCE_DIR=\"${BDIR}/fmus/\")
+target_compile_definitions(
+    helics_fmi_executable-tests PRIVATE -DFMI_REFERENCE_DIR=\"${BDIR}/fmus/\"
+)
 
 target_compile_definitions(
     helics_fmi_executable-tests PRIVATE -DHELICS_EXE_LOC=\"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/\"
@@ -88,9 +90,13 @@ target_compile_definitions(
 
 target_link_libraries(helics_fmi_executable-tests PUBLIC helicsFMI)
 
-add_test(NAME helics_fmi_executable-tests COMMAND helics_fmi_executable-tests --log_level=test_suite --report_level=short)
+add_test(NAME helics_fmi_executable-tests COMMAND helics_fmi_executable-tests
+                                                  --log_level=test_suite --report_level=short
+)
 
-target_compile_definitions(helics_fmi_executable-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/test_files/\")
+target_compile_definitions(
+    helics_fmi_executable-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/test_files/\"
+)
 
 set_target_properties(helics_fmi_executable-tests PROPERTIES FOLDER tests)
 
