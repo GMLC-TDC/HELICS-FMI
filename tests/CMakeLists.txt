@@ -83,7 +83,7 @@ add_executable(helics_fmi_executable-tests ${executable_test_sources})
 target_compile_definitions(helics_fmi_executable-tests PRIVATE -DFMI_REFERENCE_DIR=\"${BDIR}/fmus/\")
 
 target_compile_definitions(
-    helics_fmi_executable-tests PRIVATE -DHELICS_BIN_LOC=\"${CMAKE_BINARY_DIR}/src/helics-fmi/\"
+    helics_fmi_executable-tests PRIVATE -DHELICS_EXE_LOC=\"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/\"
 )
 
 target_link_libraries(helics_fmi_executable-tests PUBLIC helicsFMI)
