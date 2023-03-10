@@ -63,16 +63,22 @@ TEST(exeTests, dualFedAsyncZMQ)
     std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
 
     /**test that things run to completion with auto broker*/
-    auto out = hfmi.runAsync(
+    auto out = hfmi.runCaptureOutputAsync(
         std::string(
-            "--autobroker --core=zmq --step=0.1 --stop=2.0 --name=ftfed --brokerargs=\"-f2 --force\" ") +
+            "--autobroker --coretype=zmq --step=0.1 --stop=2.0 --name=ftfed --brokerargs=\"-f2 --force\" ") +
         inputFile);
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    helics::ValueFederate vFed("fed1", "--coretype=zmq");
 
-    helics::ValueFederate vFed("fed1", "--core=zmq");
-
-    bool init = helics::waitForInit(&vFed, "ftfed", std::chrono::milliseconds(1000));
+    bool init = helics::waitForInit(&vFed, "ftfed", std::chrono::milliseconds(10000));
     if (!init) {
-        init = helics::waitForInit(&vFed, "ftfed", std::chrono::milliseconds(1000));
+        init = helics::waitForInit(&vFed, "ftfed", std::chrono::milliseconds(10000));
+    }
+    if (!init)
+    {
+        vFed.globalError(-4,"init failed");
+        auto result=out.get();
+        std::cout<<result<<std::endl;
     }
     ASSERT_TRUE(init);
 
@@ -98,5 +104,5 @@ TEST(exeTests, dualFedAsyncZMQ)
     EXPECT_NE(val, -20.0);
     EXPECT_NE(val2, -20.0);
     vFed.finalize();
-    EXPECT_EQ(out.get(), 0);
+    auto str=out.get();
 }

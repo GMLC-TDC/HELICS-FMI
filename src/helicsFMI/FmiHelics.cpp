@@ -46,9 +46,9 @@ helics::DataType getHelicsType(fmi_variable_type type)
     }
 }
 
-void publishOutput(helics::Publication& pub, fmi2Object* cs, int index)
+void publishOutput(helics::Publication& pub, fmi2Object* cs, std::size_t index)
 {
-    const auto& var = cs->getOutput(index);
+    const auto& var = cs->getOutput(static_cast<int>(index));
     switch (var.type) {
         case fmi_variable_type::boolean: {
             auto val = cs->get<fmi2Boolean>(var);
@@ -72,9 +72,9 @@ void publishOutput(helics::Publication& pub, fmi2Object* cs, int index)
     }
 }
 
-void grabInput(helics::Input& inp, fmi2Object* cs, int index)
+void grabInput(helics::Input& inp, fmi2Object* cs, std::size_t index)
 {
-    const auto& var = cs->getInput(index);
+    const auto& var = cs->getInput(static_cast<int>(index));
     switch (var.type) {
         case fmi_variable_type::boolean: {
             auto val = inp.getValue<fmi2Boolean>();
@@ -98,9 +98,9 @@ void grabInput(helics::Input& inp, fmi2Object* cs, int index)
     }
 }
 
-void setDefault(helics::Input& inp, fmi2Object* cs, int index)
+void setDefault(helics::Input& inp, fmi2Object* cs, std::size_t index)
 {
-    const auto& var = cs->getInput(index);
+    const auto& var = cs->getInput(static_cast<int>(index));
     switch (var.type) {
         case fmi_variable_type::boolean: {
             auto val = cs->get<bool>(var);

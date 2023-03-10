@@ -14,6 +14,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <fstream>
 #include <utility>
+#include <iostream>
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
@@ -33,7 +34,7 @@ FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
 
 FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
                                    std::shared_ptr<fmi2CoSimObject> obj,
-                                   const helics::FederateInfo& fedInfo):
+                                   const helics::FederateInfo& fedInfo) try:
     fed(name, fedInfo),
     cs(std::move(obj))
 {
@@ -41,6 +42,11 @@ FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
         input_list = cs->getInputNames();
         output_list = cs->getOutputNames();
     }
+}
+catch (const std::exception& e)
+{
+    std::cout<<"error in constructor of federate:"<<e.what() << std::endl;
+    throw;
 }
 
 void FmiCoSimFederate::configure(helics::Time step, helics::Time startTime)
@@ -158,7 +164,7 @@ double FmiCoSimFederate::initialize(double stop, std::ofstream& ofile)
         stop = 30.0;
     }
 
-    fed.enterInitializingMode();
+    
     cs->setupExperiment(
         fmi2False, 0, static_cast<double>(timeBias), 1, static_cast<double>(timeBias + stop));
     auto cmd = fed.getCommand();
@@ -166,6 +172,7 @@ double FmiCoSimFederate::initialize(double stop, std::ofstream& ofile)
         runCommand(cmd.first);
         cmd = fed.getCommand();
     }
+    fed.enterInitializingMode();
     cs->setMode(fmuMode::initializationMode);
     if (captureOutput) {
         ofile << "time,";
@@ -175,12 +182,12 @@ double FmiCoSimFederate::initialize(double stop, std::ofstream& ofile)
         ofile << std::endl;
     }
     if (!pubs.empty()) {
-        for (int ii = 0; ii < pubs.size(); ++ii) {
+        for (std::size_t ii = 0; ii < pubs.size(); ++ii) {
             helicsfmi::publishOutput(pubs[ii], cs.get(), ii);
         }
     }
     if (!inputs.empty()) {
-        for (int ii = 0; ii < inputs.size(); ++ii) {
+        for (std::size_t ii = 0; ii < inputs.size(); ++ii) {
             helicsfmi::setDefault(inputs[ii], cs.get(), ii);
         }
     }
@@ -200,7 +207,7 @@ void FmiCoSimFederate::run(helics::Time stop)
     auto result = fed.enterExecutingMode(helics::IterationRequest::ITERATE_IF_NEEDED);
     if (result == helics::IterationResult::ITERATING) {
         if (!inputs.empty()) {
-            for (int ii = 0; ii < inputs.size(); ++ii) {
+            for (std::size_t ii = 0; ii < inputs.size(); ++ii) {
                 helicsfmi::grabInput(inputs[ii], cs.get(), ii);
             }
         }
@@ -216,13 +223,13 @@ void FmiCoSimFederate::run(helics::Time stop)
         currentTime = fed.requestNextStep();
         if (!pubs.empty()) {
             // get the values to publish
-            for (int ii = 0; ii < pubs.size(); ++ii) {
+            for (std::size_t ii = 0; ii < pubs.size(); ++ii) {
                 helicsfmi::publishOutput(pubs[ii], cs.get(), ii);
             }
         }
         if (!inputs.empty()) {
             // load the inputs
-            for (int ii = 0; ii < inputs.size(); ++ii) {
+            for (std::size_t ii = 0; ii < inputs.size(); ++ii) {
                 helicsfmi::grabInput(inputs[ii], cs.get(), ii);
             }
         }
