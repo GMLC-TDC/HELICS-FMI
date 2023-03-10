@@ -30,7 +30,7 @@ namespace solvers {
         basicOdeFactory(gmlc::utilities::stringVector{"basicode", "dyndiff", "differential"});
 
 }  // namespace solvers
-SolverInterface::SolverInterface(const std::string& objName): helperObject(objName) {}
+SolverInterface::SolverInterface(const std::string& objName): HelperObject(objName) {}
 SolverInterface::SolverInterface(SolvableObject* obj, const solverMode& sMode):
     mode(sMode), sobj(obj)
 {
@@ -169,7 +169,7 @@ double SolverInterface::get(const std::string& param) const
     } else if (param == "tolerance") {
         res = tolerance;
     } else {
-        return helperObject::get(param);
+        return HelperObject::get(param);
     }
     return res;
 }
@@ -227,7 +227,7 @@ void SolverInterface::set(const std::string& param, const std::string& val)
         jacFile = val;
         stateFile = val;
     } else {
-        helperObject::set(param, val);
+        HelperObject::set(param, val);
     }
 }
 
@@ -263,7 +263,7 @@ void SolverInterface::set(const std::string& param, double val)
     } else if (param == "index") {
         mode.offsetIndex = static_cast<solver_index_type>(val);
     } else {
-        helperObject::set(param, val);
+        HelperObject::set(param, val);
     }
 }
 

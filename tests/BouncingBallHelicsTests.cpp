@@ -138,7 +138,7 @@ TEST(bouncingBall, setHeight)
     fi.coreInitString.clear();
 
     helics::ValueFederate vFed("fed1", fi);
-    csFed->setDouble("h", 4.0);
+    csFed->set("h", 4.0);
     csFed->configure(0.1, 0.0);
 
     auto rs = std::async(std::launch::async, [csFed]() { csFed->run(1.0); });

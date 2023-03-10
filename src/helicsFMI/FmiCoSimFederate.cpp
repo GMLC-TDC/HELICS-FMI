@@ -118,18 +118,6 @@ void FmiCoSimFederate::setOutputCapture(bool capture, const std::string& outputF
     captureOutput = capture;
 }
 
-bool FmiCoSimFederate::setDouble(const std::string& parameter, double value)
-{
-    cs->set(parameter, value);
-    return true;
-}
-
-bool FmiCoSimFederate::setInteger(const std::string& parameter, int64_t value)
-{
-    cs->set(parameter, value);
-    return true;
-}
-
 void FmiCoSimFederate::runCommand(const std::string& command)
 {
     auto cvec = gmlc::utilities::stringOps::splitlineQuotes(
@@ -139,10 +127,10 @@ void FmiCoSimFederate::runCommand(const std::string& command)
             gmlc::utilities::numeric_conversionComplete<double>(cvec[2], helics::invalidDouble);
         if (val != helics::invalidDouble) {
             if (std::round(val) == val) {
-                setInteger(cvec[1], static_cast<int64_t>(val));
+                set(cvec[1], static_cast<int64_t>(val));
                 return;
             }
-            setDouble(cvec[1], val);
+            set(cvec[1], val);
             return;
         }
         cs->set(cvec[1], cvec[2]);

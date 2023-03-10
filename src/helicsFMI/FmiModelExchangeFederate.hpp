@@ -45,6 +45,12 @@ class FmiModelExchangeFederate: public griddyn::SolvableObject {
     /** run the cosimulation*/
     void run(helics::Time stop);
 
+    /** set a parameter*/
+    template <typename... Args>
+    void set(Args&&... args)
+    {
+        me->set(std::forward<Args>(args)...);
+    }
     virtual solver_index_type jacobianSize(const griddyn::solverMode& sMode) const override;
 
     virtual void guessCurrentValue(double time,
@@ -72,8 +78,8 @@ class FmiModelExchangeFederate: public griddyn::SolvableObject {
     virtual int jacobianFunction(double time,
                                  const double state[],
                                  const double dstate_dt[],
-                                 matrixData<double>& md,
-                                 double cj,
+                                 matrixData<double>& matrix,
+                                 double jacConst,
                                  const griddyn::solverMode& sMode) noexcept override;
     virtual int rootFindingFunction(double time,
                                     const double state[],

@@ -17,12 +17,12 @@
 #include <string>
 
 namespace griddyn {
-class coreObject;
+class CoreObject;
 /** @brief      base class for helper objects
  Base class for all helper objects the main purpose is to deal with names and
  give a common interface for the various helper objects
 **/
-class helperObject {
+class HelperObject {
   private:
     static std::atomic<uint64_t> s_obcnt;  //!< static counter for a global object counter
     std::uint64_t m_oid;  //!< the identifier for the object
@@ -30,16 +30,16 @@ class helperObject {
 
   public:
     /** @brief default constructor*/
-    helperObject() noexcept;
+    HelperObject() noexcept;
 
-    explicit helperObject(std::string objectName);
+    explicit HelperObject(std::string objectName);
 
     // don't allow copy constructors and assignment operator as they would introduce all sorts of
     // other complicated issues in the system
-    helperObject(const helperObject&) = delete;
-    void operator=(helperObject& obj) = delete;
+    HelperObject(const HelperObject&) = delete;
+    void operator=(HelperObject& obj) = delete;
     /** @brief default destructor  so it can be overridden*/
-    virtual ~helperObject();
+    virtual ~HelperObject();
 
     virtual void set(const std::string& param, const std::string& val);
     /**
@@ -96,10 +96,10 @@ class helperObject {
     void makeNewOID();
 
     /**
-    @brief get an expected or actual owner of the helperObject
-    @return the actual or targeted owner of the helperObject
+    @brief get an expected or actual owner of the HelperObject
+    @return the actual or targeted owner of the HelperObject
     */
-    virtual coreObject* getOwner() const;
+    virtual CoreObject* getOwner() const;
 
   protected:
     /** a notification functions primary implemented by derived class
@@ -115,7 +115,7 @@ a negative sign in front of the flag indicates the flag should be turned off
 @param[in] obj the helper object to set
 @param[in] flags the list of flags to set
 */
-void setMultipleFlags(helperObject* obj, const std::string& flags);
+void setMultipleFlags(HelperObject* obj, const std::string& flags);
 
 /** exception classes */
 class unrecognizedParameter: public std::invalid_argument {

@@ -272,9 +272,9 @@ void runSystem(readerElement& elem, helics::FederateInfo& fedInfo)
                 elem.moveToNextSibling("parameters");
                 const double val = attr.getValue();
                 if (val != readerNullVal) {
-                    obj->set(str1, val);
+                    fed->set(str1, val);
                 } else {
-                    obj->set(str1, attr.getText());
+                    fed->set(str1, attr.getText());
                 }
             }
             elem.moveToParent();
@@ -287,13 +287,13 @@ void runSystem(readerElement& elem, helics::FederateInfo& fedInfo)
         } else {
             std::shared_ptr<fmi2ModelExchangeObject> obj =
                 fmilib->createModelExchangeObject(elem.getAttributeText("name"));
-            auto fed = std::make_unique<FmiModelExchangeFederate>(obj, fedInfo);
+            auto fed = std::make_unique<FmiModelExchangeFederate>(std::move(obj), fedInfo);
             elem.moveToFirstChild("parameters");
             while (elem.isValid()) {
                 auto str1 = elem.getFirstAttribute().getText();
                 auto str2 = elem.getNextAttribute().getText();
                 elem.moveToNextSibling("parameters");
-                obj->set(str1, str2);
+                fed->set(str1, str2);
             }
             elem.moveToParent();
             fed->configure(1.0);

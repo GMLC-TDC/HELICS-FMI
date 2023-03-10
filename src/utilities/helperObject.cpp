@@ -22,18 +22,18 @@
 namespace griddyn {
 // start at 100 since there are some objects that use low numbers as a check for interface number
 // and the id as secondary
-std::atomic<std::uint64_t> helperObject::s_obcnt(101);
+std::atomic<std::uint64_t> HelperObject::s_obcnt(101);
 
-helperObject::helperObject() noexcept: m_oid(s_obcnt++) {}
-helperObject::~helperObject() = default;
+HelperObject::HelperObject() noexcept: m_oid(s_obcnt++) {}
+HelperObject::~HelperObject() = default;
 
-helperObject::helperObject(std::string objectName): m_oid(s_obcnt++), um_name(std::move(objectName))
+HelperObject::HelperObject(std::string objectName): m_oid(s_obcnt++), um_name(std::move(objectName))
 {
 }
 static gmlc::libguarded::guarded<std::unordered_map<std::uint64_t, std::string>>
     descriptionDictionary;
 
-void helperObject::set(const std::string& param, const std::string& val)
+void HelperObject::set(const std::string& param, const std::string& val)
 {
     if ((param == "name") || (param == "id")) {
         setName(val);
@@ -46,16 +46,16 @@ void helperObject::set(const std::string& param, const std::string& val)
     }
 }
 
-void helperObject::set(const std::string& param, double val)
+void HelperObject::set(const std::string& param, double val)
 {
     setFlag(param, (val > 0.1));
 }
-void helperObject::setDescription(const std::string& description)
+void HelperObject::setDescription(const std::string& description)
 {
     descriptionDictionary.lock()->emplace(m_oid, description);
 }
 
-std::string helperObject::getDescription() const
+std::string HelperObject::getDescription() const
 {
     auto lk = descriptionDictionary.lock();
     auto res = lk->find(m_oid);
@@ -64,29 +64,29 @@ std::string helperObject::getDescription() const
     }
     return std::string{};
 }
-void helperObject::setFlag(const std::string& flag, bool /*val*/)
+void HelperObject::setFlag(const std::string& flag, bool /*val*/)
 {
     throw(unrecognizedParameter(flag));
 }
-bool helperObject::getFlag(const std::string& flag) const
+bool HelperObject::getFlag(const std::string& flag) const
 {
     throw(unrecognizedParameter(flag));
 }
-double helperObject::get(const std::string& param) const
+double HelperObject::get(const std::string& param) const
 {
     return getFlag(param) ? 1.0 : 0.0;
 }
-void helperObject::nameUpdate() {}
-void helperObject::makeNewOID()
+void HelperObject::nameUpdate() {}
+void HelperObject::makeNewOID()
 {
     m_oid = ++s_obcnt;
 }
-coreObject* helperObject::getOwner() const
+CoreObject* HelperObject::getOwner() const
 {
     return nullptr;
 }
 
-void setMultipleFlags(helperObject* obj, const std::string& flags)
+void setMultipleFlags(HelperObject* obj, const std::string& flags)
 {
     auto lcflags = gmlc::utilities::convertToLowerCase(flags);
     auto flgs = gmlc::utilities::string_viewOps::split(lcflags);
