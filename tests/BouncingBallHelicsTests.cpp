@@ -12,9 +12,10 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <filesystem>
 #include <future>
 
+static const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
+
 TEST(bouncingBall, simpleRun)
 {
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
     helics::FederateInfo fedInfo(helics::CoreType::INPROC);
     fedInfo.coreInitString = "--autobroker";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
@@ -31,7 +32,6 @@ TEST(bouncingBall, simpleRun)
 
 TEST(bouncingBall, checkPubsOutput)
 {
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
     helics::FederateInfo fedInfo(helics::CoreType::INPROC);
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";
@@ -73,7 +73,6 @@ TEST(bouncingBall, checkPubsOutput)
 
 TEST(bouncingBall, checkPubsExtra)
 {
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
     helics::FederateInfo fedInfo(helics::CoreType::INPROC);
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";
@@ -127,7 +126,6 @@ TEST(bouncingBall, checkPubsExtra)
 
 TEST(bouncingBall, setHeight)
 {
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
     helics::FederateInfo fedInfo(helics::CoreType::INPROC);
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";
@@ -167,7 +165,6 @@ TEST(bouncingBall, setHeight)
 
 TEST(bouncingBall, setHeightCommand)
 {
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
     helics::FederateInfo fedInfo(helics::CoreType::INPROC);
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";
@@ -207,7 +204,7 @@ TEST(bouncingBall, setHeightCommand)
 
 TEST(bouncingBall, setHeightRemoteCommand)
 {
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
+
     helics::FederateInfo fedInfo(helics::CoreType::INPROC);
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";

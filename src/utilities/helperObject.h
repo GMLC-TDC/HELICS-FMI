@@ -121,7 +121,7 @@ void setMultipleFlags(HelperObject* obj, const std::string& flags);
 class UnrecognizedParameter: public std::invalid_argument {
   public:
     UnrecognizedParameter() noexcept: std::invalid_argument("unrecognized parameter") {}
-    UnrecognizedParameter(const std::string& param):
+    explicit UnrecognizedParameter(const std::string& param):
         std::invalid_argument(std::string("unrecognized Parameter:") + param)
     {
     }
@@ -130,7 +130,7 @@ class UnrecognizedParameter: public std::invalid_argument {
 class InvalidParameterValue: public std::invalid_argument {
   public:
     InvalidParameterValue() noexcept: std::invalid_argument("invalid parameter entry") {}
-    InvalidParameterValue(const std::string& param):
+    explicit InvalidParameterValue(const std::string& param):
         std::invalid_argument(std::string("invalid parameter value for ") + param)
     {
     }

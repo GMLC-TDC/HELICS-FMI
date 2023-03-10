@@ -18,6 +18,9 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 
 using ::testing::HasSubstr;
+
+static const std::string bballFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
+static const std::string ftFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
 TEST(exeTests, version)
 {
     const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
@@ -31,43 +34,41 @@ TEST(exeTests, version)
 TEST(exeTests, singleFed)
 {
     const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
-    const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
+    
 
     /**test that things run to completion with auto broker*/
-    auto out = hfmi.run(std::string("--autobroker ") + inputFile);
+    auto out = hfmi.run(std::string("--autobroker ") + bballFile);
     EXPECT_EQ(out, 0);
 }
 
 TEST(exeTests, singleFedAsync)
 {
     const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
-    const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
 
     /**test that things run to completion with auto broker*/
-    auto out = hfmi.runAsync(std::string("--autobroker ") + inputFile);
+    auto out = hfmi.runAsync(std::string("--autobroker ") + bballFile);
     EXPECT_EQ(out.get(), 0);
 }
 
 TEST(exeTests, singleFedAsyncZMQ)
 {
     const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
-    const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
+    
 
     /**test that things run to completion with auto broker*/
-    auto out = hfmi.runAsync(std::string("--autobroker --core=zmq ") + inputFile);
+    auto out = hfmi.runAsync(std::string("--autobroker --core=zmq ") + ftFile);
     EXPECT_EQ(out.get(), 0);
 }
 
 TEST(exeTests, dualFedAsyncZMQ)
 {
     exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
 
     /**test that things run to completion with auto broker*/
     auto out = hfmi.runCaptureOutputAsync(
         std::string(
             "--autobroker --coretype=zmq --step=0.1 --stop=2.0 --name=ftfed --brokerargs=\"-f2 --force\" ") +
-        inputFile);
+        ftFile);
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
     helics::ValueFederate vFed("fed1", "--coretype=zmq");
 

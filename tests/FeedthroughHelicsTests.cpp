@@ -13,9 +13,10 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <filesystem>
 #include <future>
 
+static const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
+
 TEST(feedthrough, simpleRun)
 {
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
     helics::FederateInfo fedInfo(helics::CoreType::INPROC);
     fedInfo.coreInitString = "--autobroker";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
@@ -32,7 +33,7 @@ TEST(feedthrough, simpleRun)
 
 TEST(feedthrough, checkIO)
 {
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
+    
     helics::FederateInfo fedInfo(helics::CoreType::INPROC);
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";
@@ -80,7 +81,6 @@ TEST(feedthrough, checkIO)
 
 TEST(feedthrough, checkFeedthrough)
 {
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
     helics::FederateInfo fedInfo(helics::CoreType::INPROC);
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";
@@ -156,7 +156,6 @@ TEST(feedthrough, checkFeedthrough)
 
 TEST(feedthrough, pubTypes)
 {
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
     helics::FederateInfo fedInfo(helics::CoreType::INPROC);
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";
