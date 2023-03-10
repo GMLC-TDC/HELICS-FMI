@@ -69,7 +69,10 @@ class HelperObject {
      * @param[in] param the name of the parameter to get
      * @return val the value of the parameter
      */
-    [[nodiscard]] inline int getInt(const std::string& param) const { return static_cast<int>(get(param)); }
+    [[nodiscard]] inline int getInt(const std::string& param) const
+    {
+        return static_cast<int>(get(param));
+    }
 
     /** @brief set the name*/
     void setName(const std::string& newName)
