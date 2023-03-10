@@ -42,7 +42,7 @@ void HelperObject::set(const std::string& param, const std::string& val)
     } else if ((param == "flags") || (param == "flag")) {
         setMultipleFlags(this, val);
     } else {
-        throw(unrecognizedParameter(param));
+        throw(UnrecognizedParameter(param));
     }
 }
 
@@ -66,11 +66,11 @@ std::string HelperObject::getDescription() const
 }
 void HelperObject::setFlag(const std::string& flag, bool /*val*/)
 {
-    throw(unrecognizedParameter(flag));
+    throw(UnrecognizedParameter(flag));
 }
 bool HelperObject::getFlag(const std::string& flag) const
 {
-    throw(unrecognizedParameter(flag));
+    throw(UnrecognizedParameter(flag));
 }
 double HelperObject::get(const std::string& param) const
 {

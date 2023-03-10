@@ -16,6 +16,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <string>
 #include <vector>
+#include <utility>
 
 namespace griddyn {
 class SolverInterface;
@@ -26,7 +27,7 @@ class SolverMode;
 class FmiModelExchangeFederate: public griddyn::SolvableObject {
   public:
     FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj,
-                             const helics::FederateInfo& fi);
+                             const helics::FederateInfo& fedInfo);
     virtual ~FmiModelExchangeFederate();
     /** configure the federate using the specified inputs and outputs*/
     void configure(helics::Time step, helics::Time start = helics::timeZero);

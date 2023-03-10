@@ -15,11 +15,11 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 TEST(bouncingBall, simpleRun)
 {
     std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
-    helics::FederateInfo fi(helics::CoreType::INPROC);
-    fi.coreInitString = "--autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::INPROC);
+    fedInfo.coreInitString = "--autobroker";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
     std::shared_ptr<FmiCoSimFederate> csFed;
-    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("bball", inputFile, fi));
+    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("bball", inputFile, fedInfo));
     csFed->setOutputCapture(true, "testOut.csv");
     csFed->configure(0.1, 0.0);
     csFed->run(2.0);
@@ -32,16 +32,16 @@ TEST(bouncingBall, simpleRun)
 TEST(bouncingBall, checkPubsOutput)
 {
     std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
-    helics::FederateInfo fi(helics::CoreType::INPROC);
-    fi.coreInitString = "--autobroker";
-    fi.brokerInitString = "-f2";
+    helics::FederateInfo fedInfo(helics::CoreType::INPROC);
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.brokerInitString = "-f2";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
     std::shared_ptr<FmiCoSimFederate> csFed;
-    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("bball", inputFile, fi));
+    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("bball", inputFile, fedInfo));
 
-    fi.coreInitString.clear();
+    fedInfo.coreInitString.clear();
 
-    helics::ValueFederate vFed("fed1", fi);
+    helics::ValueFederate vFed("fed1", fedInfo);
     csFed->configure(0.1, 0.0);
 
     auto rs = std::async(std::launch::async, [csFed]() { csFed->run(2.0); });
@@ -74,16 +74,16 @@ TEST(bouncingBall, checkPubsOutput)
 TEST(bouncingBall, checkPubsExtra)
 {
     std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
-    helics::FederateInfo fi(helics::CoreType::INPROC);
-    fi.coreInitString = "--autobroker";
-    fi.brokerInitString = "-f2";
+    helics::FederateInfo fedInfo(helics::CoreType::INPROC);
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.brokerInitString = "-f2";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
     std::shared_ptr<FmiCoSimFederate> csFed;
-    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("bball", inputFile, fi));
+    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("bball", inputFile, fedInfo));
 
-    fi.coreInitString.clear();
+    fedInfo.coreInitString.clear();
 
-    helics::ValueFederate vFed("fed1", fi);
+    helics::ValueFederate vFed("fed1", fedInfo);
     csFed->addOutput("der(h)");
     csFed->configure(0.1, 0.0);
 
@@ -128,16 +128,16 @@ TEST(bouncingBall, checkPubsExtra)
 TEST(bouncingBall, setHeight)
 {
     std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
-    helics::FederateInfo fi(helics::CoreType::INPROC);
-    fi.coreInitString = "--autobroker";
-    fi.brokerInitString = "-f2";
+    helics::FederateInfo fedInfo(helics::CoreType::INPROC);
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.brokerInitString = "-f2";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
     std::shared_ptr<FmiCoSimFederate> csFed;
-    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("bball", inputFile, fi));
+    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("bball", inputFile, fedInfo));
 
-    fi.coreInitString.clear();
+    fedInfo.coreInitString.clear();
 
-    helics::ValueFederate vFed("fed1", fi);
+    helics::ValueFederate vFed("fed1", fedInfo);
     csFed->set("h", 4.0);
     csFed->configure(0.1, 0.0);
 
@@ -168,16 +168,16 @@ TEST(bouncingBall, setHeight)
 TEST(bouncingBall, setHeightCommand)
 {
     std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
-    helics::FederateInfo fi(helics::CoreType::INPROC);
-    fi.coreInitString = "--autobroker";
-    fi.brokerInitString = "-f2";
+    helics::FederateInfo fedInfo(helics::CoreType::INPROC);
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.brokerInitString = "-f2";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
     std::shared_ptr<FmiCoSimFederate> csFed;
-    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("bball", inputFile, fi));
+    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("bball", inputFile, fedInfo));
 
-    fi.coreInitString.clear();
+    fedInfo.coreInitString.clear();
 
-    helics::ValueFederate vFed("fed1", fi);
+    helics::ValueFederate vFed("fed1", fedInfo);
     csFed->runCommand("set h 3.0");
     csFed->configure(0.1, 0.0);
 
@@ -208,16 +208,16 @@ TEST(bouncingBall, setHeightCommand)
 TEST(bouncingBall, setHeightRemoteCommand)
 {
     std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
-    helics::FederateInfo fi(helics::CoreType::INPROC);
-    fi.coreInitString = "--autobroker";
-    fi.brokerInitString = "-f2";
+    helics::FederateInfo fedInfo(helics::CoreType::INPROC);
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.brokerInitString = "-f2";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
     std::shared_ptr<FmiCoSimFederate> csFed;
-    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("bball", inputFile, fi));
+    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("bball", inputFile, fedInfo));
 
-    fi.coreInitString.clear();
+    fedInfo.coreInitString.clear();
 
-    helics::ValueFederate vFed("fed1", fi);
+    helics::ValueFederate vFed("fed1", fedInfo);
     vFed.sendCommand("bball", "set h 3.0");
     csFed->configure(0.1, 0.0);
 

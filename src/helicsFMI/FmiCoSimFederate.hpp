@@ -14,6 +14,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <string>
 #include <vector>
+#include <utility>
 
 /** class defining a co-simulation federate*/
 class FmiCoSimFederate {
