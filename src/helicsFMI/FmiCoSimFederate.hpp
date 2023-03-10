@@ -33,10 +33,10 @@ class FmiCoSimFederate {
   public:
     FmiCoSimFederate(const std::string& name,
                      const std::string& fmu,
-                     const helics::FederateInfo& fi);
+                     const helics::FederateInfo& fedInfo);
     FmiCoSimFederate(const std::string& name,
                      std::shared_ptr<fmi2CoSimObject> obj,
-                     const helics::FederateInfo& fi);
+                     const helics::FederateInfo& fedInfo);
     /** configure the federate using the specified inputs and outputs*/
     void configure(helics::Time step, helics::Time start = helics::timeZero);
     /** set a string list of inputs*/
@@ -63,4 +63,6 @@ class FmiCoSimFederate {
     void run(helics::Time stop);
     /** get the underlying HELICS federate*/
     helics::ValueFederate* operator->() { return &fed; }
+private:
+    double FmiCoSimFederate::initialize(double stop,std::ofstream& ofile);
 };

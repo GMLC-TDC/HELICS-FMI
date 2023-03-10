@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
                    "the type of integrator to use(cvode, arkode, boost)")
         ->capture_default_str()
         ->transform(CLI::IsMember({"cvode", "arkode", "boost"}));
-    auto input_group = app.add_option_group("input files")->required();
+    auto *input_group = app.add_option_group("input files")->required();
     std::string inputFile;
     input_group->add_option("inputfile", inputFile, "specify the input files")
         ->check(CLI::ExistingFile);
@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
                    "Specify the input variables of the FMU by name")
         ->ignore_underscore()
         ->delimiter(',');
-    app.add_option("--connections", input_variables, "Specify connections this FMU should make")
+    app.add_option("--connections", connections, "Specify connections this FMU should make")
         ->delimiter(',');
 
     bool cosimFmu{true};
@@ -99,7 +99,8 @@ int main(int argc, char* argv[])
     }
     catch (const CLI::CallForHelp& e) {
         auto ret = app.exit(e);
-        helics::FederateInfo fi(argc, argv);
+        //this is to trigger the help
+        helics::FederateInfo(argc, argv);
         return ret;
     }
     catch (const CLI::ParseError& e) {
@@ -154,13 +155,13 @@ int main(int argc, char* argv[])
             fmi.loadFMU(inputFile);
             if (cosimFmu && fmi.checkFlag(fmuCapabilityFlags::coSimulationCapable)) {
                 std::shared_ptr<fmi2CoSimObject> obj = fmi.createCoSimulationObject("obj1");
-                auto fed = std::make_unique<FmiCoSimFederate>("", obj, fi);
+                auto fed = std::make_unique<FmiCoSimFederate>("", std::move(obj), fi);
                 fed->configure(stepTime);
                 fed->run(stopTime);
             } else {
                 std::shared_ptr<fmi2ModelExchangeObject> obj =
                     fmi.createModelExchangeObject("obj1");
-                auto fed = std::make_unique<FmiModelExchangeFederate>(obj, fi);
+                auto fed = std::make_unique<FmiModelExchangeFederate>(std::move(obj), fi);
                 fed->configure(stepTime);
                 fed->run(stopTime);
             }
