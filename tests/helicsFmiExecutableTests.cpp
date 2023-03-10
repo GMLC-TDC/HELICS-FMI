@@ -74,11 +74,10 @@ TEST(exeTests, dualFedAsyncZMQ)
     if (!init) {
         init = helics::waitForInit(&vFed, "ftfed", std::chrono::milliseconds(10000));
     }
-    if (!init)
-    {
-        vFed.globalError(-4,"init failed");
-        auto result=out.get();
-        std::cout<<result<<std::endl;
+    if (!init) {
+        vFed.globalError(-4, "init failed");
+        auto result = out.get();
+        std::cout << result << std::endl;
     }
     ASSERT_TRUE(init);
 
@@ -104,5 +103,5 @@ TEST(exeTests, dualFedAsyncZMQ)
     EXPECT_NE(val, -20.0);
     EXPECT_NE(val2, -20.0);
     vFed.finalize();
-    auto str=out.get();
+    auto str = out.get();
 }

@@ -13,8 +13,8 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <fstream>
-#include <utility>
 #include <iostream>
+#include <utility>
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
@@ -34,18 +34,15 @@ FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
 
 FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
                                    std::shared_ptr<fmi2CoSimObject> obj,
-                                   const helics::FederateInfo& fedInfo) try:
-    fed(name, fedInfo),
-    cs(std::move(obj))
-{
+                                   const helics::FederateInfo& fedInfo)
+try : fed(name, fedInfo), cs(std::move(obj)) {
     if (cs) {
         input_list = cs->getInputNames();
         output_list = cs->getOutputNames();
     }
 }
-catch (const std::exception& e)
-{
-    std::cout<<"error in constructor of federate:"<<e.what() << std::endl;
+catch (const std::exception& e) {
+    std::cout << "error in constructor of federate:" << e.what() << std::endl;
     throw;
 }
 
@@ -164,7 +161,6 @@ double FmiCoSimFederate::initialize(double stop, std::ofstream& ofile)
         stop = 30.0;
     }
 
-    
     cs->setupExperiment(
         fmi2False, 0, static_cast<double>(timeBias), 1, static_cast<double>(timeBias + stop));
     auto cmd = fed.getCommand();

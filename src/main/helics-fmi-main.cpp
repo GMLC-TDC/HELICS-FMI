@@ -25,8 +25,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 void runSystem(readerElement& elem, helics::FederateInfo& fi);
 
-struct exeData
-{
+struct exeData {
     std::string inputFile;
     std::string integrator{"cvode"};
     std::string integratorArgs;
@@ -40,30 +39,30 @@ struct exeData
     bool cosimFmu{true};
 };
 
-std::unique_ptr<CLI::App> generateCLI(exeData &data);
+std::unique_ptr<CLI::App> generateCLI(exeData& data);
 
 int main(int argc, char* argv[])
 {
     exeData configData;
-    auto app=generateCLI(configData);
+    auto app = generateCLI(configData);
     try {
         app->parse(argc, argv);
     }
     catch (const CLI::CallForHelp& e) {
         auto ret = app->exit(e);
-        //this is to trigger the help
+        // this is to trigger the help
         helics::FederateInfo [[maybe_unused]] fedInfo(argc, argv);
         return ret;
     }
     catch (const CLI::ParseError& e) {
         return app->exit(e);
     }
-    
+
     helics::FederateInfo fedInfo;
     // set the default core type to be local
     fedInfo.coreType = helics::CoreType::INPROC;
     fedInfo.defName = "fmu${#}";
-    
+
     auto remArgs = app->remaining_for_passthrough();
     fedInfo.separator = '.';
     fedInfo.loadInfoFromArgs(remArgs);
@@ -80,9 +79,9 @@ int main(int argc, char* argv[])
     std::unique_ptr<helics::apps::BrokerApp> broker;
     if (fedInfo.autobroker) {
         try {
-            broker = std::make_unique<helics::apps::BrokerApp>(fedInfo.coreType, configData.brokerArgs);
-            if (!broker->isConnected())
-            {
+            broker =
+                std::make_unique<helics::apps::BrokerApp>(fedInfo.coreType, configData.brokerArgs);
+            if (!broker->isConnected()) {
                 broker->connect();
             }
         }
@@ -95,7 +94,7 @@ int main(int argc, char* argv[])
     if (configData.inputFile.empty()) {
         configData.inputFile = configData.inputs.front();
     }
-    fedInfo.forceNewCore=true;
+    fedInfo.forceNewCore = true;
     auto ext = configData.inputFile.substr(configData.inputFile.find_last_of('.'));
 
     FmiLibrary fmi;
@@ -178,10 +177,10 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-
 std::unique_ptr<CLI::App> generateCLI(exeData& data)
 {
-    auto app = std::make_unique<CLI::App>("HELICS-FMI for loading and executing FMU's with HELICS", "helics-fmi");
+    auto app = std::make_unique<CLI::App>("HELICS-FMI for loading and executing FMU's with HELICS",
+                                          "helics-fmi");
     app->add_flag_function(
         "-v,--version",
         [](size_t) {
@@ -191,55 +190,56 @@ std::unique_ptr<CLI::App> generateCLI(exeData& data)
         },
         "specify the versions of helics and helics-fmi");
     app->validate_positionals();
-    
+
     app->add_option("--integrator",
-        data.integrator,
-        "the type of integrator to use(cvode, arkode, boost)")
+                    data.integrator,
+                    "the type of integrator to use(cvode, arkode, boost)")
         ->capture_default_str()
         ->transform(CLI::IsMember({"cvode", "arkode", "boost"}));
-    auto *input_group = app->add_option_group("input files")->required();
+    auto* input_group = app->add_option_group("input files")->required();
 
     input_group->add_option("inputfile", data.inputFile, "specify the input files")
         ->check(CLI::ExistingFile);
     input_group->add_option("-i,--input", data.inputs, "specify the input files")
         ->check(CLI::ExistingFile);
-    app->add_option("--integrator-args", data.integratorArgs, "arguments to pass to the integrator");
-
-
+    app->add_option("--integrator-args",
+                    data.integratorArgs,
+                    "arguments to pass to the integrator");
 
     app->add_option("--step",
-        data.stepTime,
-        "the step size to use (specified in seconds or as a time string (10ms)");
+                    data.stepTime,
+                    "the step size to use (specified in seconds or as a time string (10ms)");
     app->add_option(
         "--stop",
         data.stopTime,
         "the time to stop the simulation (specified in seconds or as a time string (10ms)");
 
     app->add_option("--brokerargs",
-        data.brokerArgs,
-        "arguments to pass to an automatically generated broker");
+                    data.brokerArgs,
+                    "arguments to pass to an automatically generated broker");
     app->set_help_flag("-h,-?,--help", "print this help module");
     app->allow_extras();
     app->set_config("--config-file");
 
-    app->add_option("--output_variables", data.output_variables, "Specify outputs of the FMU by name")
+    app->add_option("--output_variables",
+                    data.output_variables,
+                    "Specify outputs of the FMU by name")
         ->ignore_underscore()
         ->delimiter(',');
     app->add_option("--input_variables",
-        data.input_variables,
-        "Specify the input variables of the FMU by name")
+                    data.input_variables,
+                    "Specify the input variables of the FMU by name")
         ->ignore_underscore()
         ->delimiter(',');
     app->add_option("--connections", data.connections, "Specify connections this FMU should make")
         ->delimiter(',');
 
-    
     app->add_flag("--cosim",
-        data.cosimFmu,
-        "specify that the fmu should run as a co-sim FMU if possible");
+                  data.cosimFmu,
+                  "specify that the fmu should run as a co-sim FMU if possible");
     app->add_flag("!--modelexchange",
-        data.cosimFmu,
-        "specify that the fmu should run as a model exchange FMU if possible");
+                  data.cosimFmu,
+                  "specify that the fmu should run as a model exchange FMU if possible");
     return app;
 }
 
