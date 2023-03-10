@@ -204,7 +204,6 @@ TEST(bouncingBall, setHeightCommand)
 
 TEST(bouncingBall, setHeightRemoteCommand)
 {
-
     helics::FederateInfo fedInfo(helics::CoreType::INPROC);
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";

@@ -492,7 +492,7 @@ std::unique_ptr<SolverInterface> makeSolver(SolvableObject* sobj, const solverMo
     std::unique_ptr<SolverInterface> sd = nullptr;
     if (isLocal(sMode)) {
         sd = std::make_unique<SolverInterface>(sobj, sMode);
-    // } else if ((isAlgebraicOnly(sMode)) || (!isDynamic(sMode))) {
+        // } else if ((isAlgebraicOnly(sMode)) || (!isDynamic(sMode))) {
         /*
         sd = std::make_unique<solvers::kinsolInterface> (sobj, sMode);
         if (sMode.offsetIndex == power_flow)
@@ -504,7 +504,7 @@ std::unique_ptr<SolverInterface> makeSolver(SolvableObject* sobj, const solverMo
             sd->setName ("algebraic");
         }
         */
-   // } else if (isDAE(sMode)) {
+        // } else if (isDAE(sMode)) {
         /*
         sd = std::make_unique<solvers::idaInterface> (sobj, sMode);
         if (sMode.offsetIndex == dae)

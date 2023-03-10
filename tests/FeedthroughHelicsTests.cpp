@@ -33,7 +33,6 @@ TEST(feedthrough, simpleRun)
 
 TEST(feedthrough, checkIO)
 {
-    
     helics::FederateInfo fedInfo(helics::CoreType::INPROC);
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";
