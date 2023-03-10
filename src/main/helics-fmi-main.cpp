@@ -253,8 +253,8 @@ void runSystem(readerElement& elem, helics::FederateInfo& fedInfo)
     elem.moveToFirstChild("fmus");
     std::vector<std::unique_ptr<FmiCoSimFederate>> feds_cs;
     std::vector<std::unique_ptr<FmiModelExchangeFederate>> feds_me;
-    auto core =
-        helics::CoreApp(fedInfo.coreType, "--name=fmu_core " + helics::generateFullCoreInitString(fedInfo));
+    auto core = helics::CoreApp(fedInfo.coreType,
+                                "--name=fmu_core " + helics::generateFullCoreInitString(fedInfo));
     std::vector<std::unique_ptr<FmiLibrary>> fmis;
     while (elem.isValid()) {
         auto fmilib = std::make_unique<FmiLibrary>();
@@ -314,11 +314,11 @@ void runSystem(readerElement& elem, helics::FederateInfo& fedInfo)
     // load each of the fmu's into its own thread
     std::vector<std::thread> threads(feds_cs.size() + feds_me.size());
     for (size_t ii = 0; ii < feds_cs.size(); ++ii) {
-        auto *tfed = feds_cs[ii].get();
+        auto* tfed = feds_cs[ii].get();
         threads[ii] = std::thread([tfed, stopTime]() { tfed->run(stopTime); });
     }
     for (size_t jj = 0; jj < feds_me.size(); ++jj) {
-        auto *tfed = feds_me[jj].get();
+        auto* tfed = feds_me[jj].get();
         threads[jj + feds_cs.size()] = std::thread([tfed, stopTime]() { tfed->run(stopTime); });
     }
     for (auto& thread : threads) {
