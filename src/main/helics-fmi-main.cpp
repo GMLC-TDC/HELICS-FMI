@@ -23,7 +23,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <thread>
 
-void runSystem(readerElement& elem, helics::FederateInfo& fi);
+void runSystem(readerElement& elem, helics::FederateInfo& fedInfo);
 
 struct exeData {
     std::string inputFile;
@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
     catch (const CLI::CallForHelp& e) {
         auto ret = app->exit(e);
         // this is to trigger the help
-        helics::FederateInfo [[maybe_unused]] fedInfo(argc, argv);
+        [[maybe_unused]] const helics::FederateInfo fedInfo(argc, argv);
         return ret;
     }
     catch (const CLI::ParseError& e) {
@@ -243,10 +243,10 @@ std::unique_ptr<CLI::App> generateCLI(exeData& data)
     return app;
 }
 
-void runSystem(readerElement& elem, helics::FederateInfo& fi)
+void runSystem(readerElement& elem, helics::FederateInfo& fedInfo)
 {
     helics::Time stopTime = helics::timeZero;
-    fi.coreName = "fmu_core";
+    fedInfo.coreName = "fmu_core";
     if (elem.hasAttribute("stoptime")) {
         stopTime = elem.getAttributeValue("stoptime");
     }
@@ -254,7 +254,7 @@ void runSystem(readerElement& elem, helics::FederateInfo& fi)
     std::vector<std::unique_ptr<FmiCoSimFederate>> feds_cs;
     std::vector<std::unique_ptr<FmiModelExchangeFederate>> feds_me;
     auto core =
-        helics::CoreApp(fi.coreType, "--name=fmu_core " + helics::generateFullCoreInitString(fi));
+        helics::CoreApp(fedInfo.coreType, "--name=fmu_core " + helics::generateFullCoreInitString(fedInfo));
     std::vector<std::unique_ptr<FmiLibrary>> fmis;
     while (elem.isValid()) {
         auto fmilib = std::make_unique<FmiLibrary>();
@@ -263,7 +263,7 @@ void runSystem(readerElement& elem, helics::FederateInfo& fi)
         if (fmilib->checkFlag(fmuCapabilityFlags::coSimulationCapable)) {
             std::shared_ptr<fmi2CoSimObject> obj =
                 fmilib->createCoSimulationObject(elem.getAttributeText("name"));
-            auto fed = std::make_unique<FmiCoSimFederate>(obj->getName(), obj, fi);
+            auto fed = std::make_unique<FmiCoSimFederate>(obj->getName(), std::move(obj), fedInfo);
             elem.moveToFirstChild("parameters");
             while (elem.isValid()) {
                 const auto& str1 = elem.getFirstAttribute().getText();
@@ -287,7 +287,7 @@ void runSystem(readerElement& elem, helics::FederateInfo& fi)
         } else {
             std::shared_ptr<fmi2ModelExchangeObject> obj =
                 fmilib->createModelExchangeObject(elem.getAttributeText("name"));
-            auto fed = std::make_unique<FmiModelExchangeFederate>(obj, fi);
+            auto fed = std::make_unique<FmiModelExchangeFederate>(obj, fedInfo);
             elem.moveToFirstChild("parameters");
             while (elem.isValid()) {
                 auto str1 = elem.getFirstAttribute().getText();
@@ -314,11 +314,11 @@ void runSystem(readerElement& elem, helics::FederateInfo& fi)
     // load each of the fmu's into its own thread
     std::vector<std::thread> threads(feds_cs.size() + feds_me.size());
     for (size_t ii = 0; ii < feds_cs.size(); ++ii) {
-        auto tfed = feds_cs[ii].get();
+        auto *tfed = feds_cs[ii].get();
         threads[ii] = std::thread([tfed, stopTime]() { tfed->run(stopTime); });
     }
     for (size_t jj = 0; jj < feds_me.size(); ++jj) {
-        auto tfed = feds_me[jj].get();
+        auto *tfed = feds_me[jj].get();
         threads[jj + feds_cs.size()] = std::thread([tfed, stopTime]() { tfed->run(stopTime); });
     }
     for (auto& thread : threads) {

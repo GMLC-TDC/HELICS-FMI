@@ -15,11 +15,12 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <filesystem>
 #include <future>
+#include <thread>
 
 using ::testing::HasSubstr;
 TEST(exeTests, version)
 {
-    exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
+    const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
 
     EXPECT_TRUE(hfmi.isActive());
 
@@ -29,8 +30,8 @@ TEST(exeTests, version)
 
 TEST(exeTests, singleFed)
 {
-    exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
+    const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
+    const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
 
     /**test that things run to completion with auto broker*/
     auto out = hfmi.run(std::string("--autobroker ") + inputFile);
@@ -39,8 +40,8 @@ TEST(exeTests, singleFed)
 
 TEST(exeTests, singleFedAsync)
 {
-    exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
+    const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
+    const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
 
     /**test that things run to completion with auto broker*/
     auto out = hfmi.runAsync(std::string("--autobroker ") + inputFile);
@@ -49,8 +50,8 @@ TEST(exeTests, singleFedAsync)
 
 TEST(exeTests, singleFedAsyncZMQ)
 {
-    exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
+    const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
+    const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
 
     /**test that things run to completion with auto broker*/
     auto out = hfmi.runAsync(std::string("--autobroker --core=zmq ") + inputFile);
@@ -95,8 +96,8 @@ TEST(exeTests, dualFedAsyncZMQ)
     EXPECT_EQ(qres.size(), 4U);
 
     vFed.enterExecutingMode();
-    auto t1 = vFed.requestTime(2.0);
-    EXPECT_LT(t1, 2.0);
+    auto time1 = vFed.requestTime(2.0);
+    EXPECT_LT(time1, 2.0);
 
     auto val = sub1.getValue<double>();
     auto val2 = sub2.getValue<double>();

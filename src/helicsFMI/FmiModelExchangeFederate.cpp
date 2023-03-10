@@ -95,19 +95,19 @@ void FmiModelExchangeFederate::run(helics::Time stop)
     me->setMode(fmuMode::initializationMode);
 
     if (!pubs.empty()) {
-        for (int ii = 0; ii < pubs.size(); ++ii) {
+        for (std::size_t ii = 0; ii < pubs.size(); ++ii) {
             helicsfmi::publishOutput(pubs[ii], me.get(), ii);
         }
     }
     if (!inputs.empty()) {
-        for (int ii = 0; ii < inputs.size(); ++ii) {
+        for (std::size_t ii = 0; ii < inputs.size(); ++ii) {
             helicsfmi::setDefault(inputs[ii], me.get(), ii);
         }
     }
     auto result = fed.enterExecutingMode(helics::IterationRequest::ITERATE_IF_NEEDED);
     if (result == helics::IterationResult::ITERATING) {
         if (!inputs.empty()) {
-            for (int ii = 0; ii < inputs.size(); ++ii) {
+            for (std::size_t ii = 0; ii < inputs.size(); ++ii) {
                 helicsfmi::grabInput(inputs[ii], me.get(), ii);
             }
         }
@@ -124,13 +124,13 @@ void FmiModelExchangeFederate::run(helics::Time stop)
         // get the values to publish
         if (!pubs.empty()) {
             // get the values to publish
-            for (int ii = 0; ii < pubs.size(); ++ii) {
+            for (std::size_t ii = 0; ii < pubs.size(); ++ii) {
                 helicsfmi::publishOutput(pubs[ii], me.get(), ii);
             }
         }
         if (!inputs.empty()) {
             // load the inputs
-            for (int ii = 0; ii < inputs.size(); ++ii) {
+            for (std::size_t ii = 0; ii < inputs.size(); ++ii) {
                 helicsfmi::grabInput(inputs[ii], me.get(), ii);
             }
         }
