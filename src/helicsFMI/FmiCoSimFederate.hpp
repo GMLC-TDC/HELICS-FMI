@@ -56,7 +56,7 @@ class FmiCoSimFederate {
     /** run a command on the cosim object*/
     void runCommand(const std::string& command);
     /** set a parameter*/
-    template <typename... Args>
+    template<typename... Args>
     void set(Args&&... args)
     {
         cs->set(std::forward<Args>(args)...);

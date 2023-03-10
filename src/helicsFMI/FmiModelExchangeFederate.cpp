@@ -183,7 +183,7 @@ int FmiModelExchangeFederate::derivativeFunction(
 {
     me->setStates(state);
     me->getDerivatives(dstate_dt);
-    //printf("tt=%f, state=%f deriv=%e\n", time, state[0], dstate_dt[0]);
+    // printf("tt=%f, state=%f deriv=%e\n", time, state[0], dstate_dt[0]);
     return 0;
 }
 

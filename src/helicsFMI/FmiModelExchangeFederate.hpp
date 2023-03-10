@@ -46,7 +46,7 @@ class FmiModelExchangeFederate: public griddyn::SolvableObject {
     void run(helics::Time stop);
 
     /** set a parameter*/
-    template <typename... Args>
+    template<typename... Args>
     void set(Args&&... args)
     {
         me->set(std::forward<Args>(args)...);
