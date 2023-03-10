@@ -15,7 +15,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <utility>
 
-//NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
                                    const std::string& fmu,
                                    const helics::FederateInfo& fedInfo):
@@ -56,7 +56,7 @@ void FmiCoSimFederate::configure(helics::Time step, helics::Time startTime)
         }
     }
 
-    for (const auto &output : output_list) {
+    for (const auto& output : output_list) {
         const auto& outputInfo = cs->addOutputVariable(output);
         if (outputInfo.index >= 0) {
             auto iType = helicsfmi::getHelicsType(outputInfo.type);
@@ -147,7 +147,7 @@ void FmiCoSimFederate::runCommand(const std::string& command)
     }
 }
 
-double FmiCoSimFederate::initialize(double stop,std::ofstream& ofile)
+double FmiCoSimFederate::initialize(double stop, std::ofstream& ofile)
 {
     const auto& def = cs->fmuInformation().getExperiment();
 
@@ -195,8 +195,7 @@ void FmiCoSimFederate::run(helics::Time stop)
         ofile.open(outputCaptureFile);
     }
 
-    stop=initialize(stop,ofile );
-
+    stop = initialize(stop, ofile);
 
     auto result = fed.enterExecutingMode(helics::IterationRequest::ITERATE_IF_NEEDED);
     if (result == helics::IterationResult::ITERATING) {
@@ -227,14 +226,14 @@ void FmiCoSimFederate::run(helics::Time stop)
                 helicsfmi::grabInput(inputs[ii], cs.get(), ii);
             }
         }
-       /* if (captureOutput) {
-            ofile << static_cast<double>(currentTime) << ",";
-            for (auto& out : outputs) {
-                ofile << out << ",";
-            }
-            ofile << std::endl;
-        }
-        */
+        /* if (captureOutput) {
+             ofile << static_cast<double>(currentTime) << ",";
+             for (auto& out : outputs) {
+                 ofile << out << ",";
+             }
+             ofile << std::endl;
+         }
+         */
     }
     fed.finalize();
 }

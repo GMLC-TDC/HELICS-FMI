@@ -63,6 +63,7 @@ class FmiCoSimFederate {
     void run(helics::Time stop);
     /** get the underlying HELICS federate*/
     helics::ValueFederate* operator->() { return &fed; }
-private:
-    double FmiCoSimFederate::initialize(double stop,std::ofstream& ofile);
+
+  private:
+    double FmiCoSimFederate::initialize(double stop, std::ofstream& ofile);
 };
