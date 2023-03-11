@@ -57,9 +57,9 @@ void HelperObject::setDescription(const std::string& description)
 
 std::string HelperObject::getDescription() const
 {
-    auto lk = descriptionDictionary.lock();
-    auto res = lk->find(m_oid);
-    if (res != lk->end()) {
+    auto descLock = descriptionDictionary.lock();
+    auto res = descLock->find(m_oid);
+    if (res != descLock->end()) {
         return res->second;
     }
     return std::string{};

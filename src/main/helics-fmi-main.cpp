@@ -65,7 +65,13 @@ int main(int argc, char* argv[])
 
     auto remArgs = app->remaining_for_passthrough();
     fedInfo.separator = '.';
-    fedInfo.loadInfoFromArgs(remArgs);
+    try
+    {
+        fedInfo.loadInfoFromArgs(remArgs);
+    }
+    catch(const CLI::ParseError& e) {
+       return app->exit(e);
+    }
     // this chunk of code is to ease errors on extra args
     if (!remArgs.empty()) {
         app->allow_extras(false);

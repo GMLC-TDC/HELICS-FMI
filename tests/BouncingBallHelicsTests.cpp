@@ -44,7 +44,7 @@ TEST(bouncingBall, checkPubsOutput)
     helics::ValueFederate vFed("fed1", fedInfo);
     csFed->configure(0.1, 0.0);
 
-    auto rs = std::async(std::launch::async, [csFed]() { csFed->run(2.0); });
+    auto result = std::async(std::launch::async, [csFed]() { csFed->run(2.0); });
 
     bool init = helics::waitForInit(&vFed, "bball", std::chrono::milliseconds(500));
     if (!init) {
@@ -69,6 +69,7 @@ TEST(bouncingBall, checkPubsOutput)
     EXPECT_NE(val, -20.0);
     EXPECT_NE(val2, -20.0);
     vFed.finalize();
+    result.get();
 }
 
 TEST(bouncingBall, checkPubsExtra)
@@ -86,7 +87,7 @@ TEST(bouncingBall, checkPubsExtra)
     csFed->addOutput("der(h)");
     csFed->configure(0.1, 0.0);
 
-    auto rs = std::async(std::launch::async, [csFed]() { csFed->run(2.0); });
+    auto result = std::async(std::launch::async, [csFed]() { csFed->run(2.0); });
 
     bool init = helics::waitForInit(&vFed, "bball", std::chrono::milliseconds(500));
     if (!init) {
@@ -122,6 +123,7 @@ TEST(bouncingBall, checkPubsExtra)
     // the 2nd and third should be equal v and der(h)
     EXPECT_DOUBLE_EQ(val2, val3);
     vFed.finalize();
+    result.get();
 }
 
 TEST(bouncingBall, setHeight)
@@ -139,7 +141,7 @@ TEST(bouncingBall, setHeight)
     csFed->set("h", 4.0);
     csFed->configure(0.1, 0.0);
 
-    auto rs = std::async(std::launch::async, [csFed]() { csFed->run(1.0); });
+    auto result = std::async(std::launch::async, [csFed]() { csFed->run(1.0); });
 
     auto& sub1 = vFed.registerSubscription("bball/h");
     sub1.setDefault(-20.0);
@@ -161,6 +163,7 @@ TEST(bouncingBall, setHeight)
     EXPECT_GT(val, 3.0);
     EXPECT_LT(val2, 0.0);
     vFed.finalize();
+    result.get();
 }
 
 TEST(bouncingBall, setHeightCommand)
@@ -178,7 +181,7 @@ TEST(bouncingBall, setHeightCommand)
     csFed->runCommand("set h 3.0");
     csFed->configure(0.1, 0.0);
 
-    auto rs = std::async(std::launch::async, [csFed]() { csFed->run(1.0); });
+    auto result = std::async(std::launch::async, [csFed]() { csFed->run(1.0); });
 
     auto& sub1 = vFed.registerSubscription("bball/h");
     sub1.setDefault(-20.0);
@@ -200,6 +203,7 @@ TEST(bouncingBall, setHeightCommand)
     EXPECT_GT(val, 2.0);
     EXPECT_LT(val2, 0.0);
     vFed.finalize();
+    result.get();
 }
 
 TEST(bouncingBall, setHeightRemoteCommand)
@@ -216,9 +220,10 @@ TEST(bouncingBall, setHeightRemoteCommand)
 
     helics::ValueFederate vFed("fed1", fedInfo);
     vFed.sendCommand("bball", "set h 3.0");
+    vFed.query("root","global_flush");
     csFed->configure(0.1, 0.0);
 
-    auto rs = std::async(std::launch::async, [csFed]() { csFed->run(1.0); });
+    auto result = std::async(std::launch::async, [csFed]() { csFed->run(1.0); });
 
     auto& sub1 = vFed.registerSubscription("bball/h");
     sub1.setDefault(-20.0);
@@ -240,4 +245,5 @@ TEST(bouncingBall, setHeightRemoteCommand)
     EXPECT_GT(val, 2.0);
     EXPECT_LT(val2, 0.0);
     vFed.finalize();
+    result.get();
 }

@@ -62,7 +62,7 @@ TEST(exeTests, singleFedAsyncZMQ)
 
 TEST(exeTests, dualFedAsyncZMQ)
 {
-    exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
+    const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
 
     /**test that things run to completion with auto broker*/
     auto out = hfmi.runCaptureOutputAsync(

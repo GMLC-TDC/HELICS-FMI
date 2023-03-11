@@ -68,8 +68,8 @@ TEST(feedthrough, checkIO)
     EXPECT_EQ(qres.size(), 4U);
 
     vFed.enterExecutingMode();
-    auto t1 = vFed.requestTime(2.0);
-    EXPECT_LT(t1, 2.0);
+    auto time = vFed.requestTime(2.0);
+    EXPECT_LT(time, 2.0);
 
     auto val = sub1.getValue<double>();
     auto val2 = sub2.getValue<double>();
@@ -136,8 +136,8 @@ TEST(feedthrough, checkFeedthrough)
 
     vFed.enterExecutingMode();
 
-    auto t1 = vFed.requestTime(2.0);
-    EXPECT_LT(t1, 2.0);
+    auto time = vFed.requestTime(2.0);
+    EXPECT_LT(time, 2.0);
 
     auto val = sub1.getValue<double>();
     auto val2 = sub2.getValue<double>();
@@ -198,8 +198,8 @@ TEST(feedthrough, pubTypes)
 
     vFed.enterExecutingMode();
 
-    auto t1 = vFed.requestTime(2.0);
-    EXPECT_EQ(t1, 0.1);
+    auto time = vFed.requestTime(2.0);
+    EXPECT_EQ(time, 0.1);
 
     vFed.finalize();
     sync.get();
