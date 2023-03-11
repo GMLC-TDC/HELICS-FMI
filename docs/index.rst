@@ -22,7 +22,7 @@ HELICS-FMI functions as a bridge between HELICS and Functional mockup interfaces
 
 The :ref:`Introduction` is a discussion about the why? and how the application came together and a generally what it does and how it was tested.
 The :ref:`Installation` guide is a discussion about installing the application, and the :ref:`User Guide` is the
-how-to about how to use the application.  For the details see :ref:`Details`  
+how-to about how to use the application.  For the details see :ref:`Details`
 
 .. toctree::
    :maxdepth: 1
