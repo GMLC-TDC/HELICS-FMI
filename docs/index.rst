@@ -1,39 +1,28 @@
-.. units documentation master file, created by
-   sphinx-quickstart on Fri Jan 17 16:04:22 2020.
+.. HELICS-FMI documentation master file, created by
+   sphinx-quickstart on Fri Jan 17 16:04:22 2023.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
 *************************************************************
-Welcome to The units library user guide and documentation!
+Welcome to The HELICS-FMI user guide and documentation!
 *************************************************************
 
-A library that provides runtime unit values, instead of individual unit types, for the purposes of working with units of measurement at run time possibly from user input or configuration files.  It supports conversion and interpretation of units to and from string representations.
+HELICS-FMI functions as a bridge between HELICS and Functional mockup interfaces
 
-This software was developed for use in LLNL/GridDyn, and is currently a work in progress. Namespaces, function names, and code organization is subject to change, input is welcome.
+|Azure| |Circle CI| |License|
 
-|Build Status| |codecov| |Codacy| |Azure| |Circle CI| |License|
+.. |Azure| image:: https://dev.azure.com/HELICS-test/HELICS_FMI/_apis/build/status/GMLC-TDC.HELICS-FMI?branchName=main
+    :target: https://dev.azure.com/HELICS-test/HELICS_FMI/_build/latest?definitionId=8&branchName=main
 
-.. |Build Status| image:: https://travis-ci.com/LLNL/units.svg?branch=master
-   :target: https://travis-ci.com/LLNL/units
-
-.. |codecov| image:: https://codecov.io/gh/LLNL/units/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/LLNL/units
-
-.. |Codacy| image:: https://api.codacy.com/project/badge/Grade/c0b5367026f34c4a9dc94ca4c19c770a
-   :target: https://app.codacy.com/app/phlptp/units?utm_source=github.com&utm_medium=referral&utm_content=LLNL/units&utm_campaign=Badge_Grade_Settings
-
-.. |Azure| image:: https://dev.azure.com/phlptp/units/_apis/build/status/LLNL.units?branchName=master
-    :target: https://dev.azure.com/phlptp/units/_build/latest?definitionId=1&branchName=master
-
-.. |Circle CI| image:: https://circleci.com/gh/LLNL/units.svg?style=svg
-    :target: https://circleci.com/gh/LLNL/units
+.. |Circle CI| image:: https://dl.circleci.com/status-badge/img/gh/GMLC-TDC/HELICS-FMI/tree/main.svg?style=svg
+   :target: https://dl.circleci.com/status-badge/redirect/gh/GMLC-TDC/HELICS-FMI/tree/main
 
 .. |License| image:: https://img.shields.io/badge/License-BSD-blue.svg
-    :target: https://github.com/GMLC-TDC/HELICS-src/blob/master/LICENSE
+    :target: https://github.com/GMLC-TDC/HELICS-FMI/blob/main/LICENSE
 
-The :ref:`Introduction` is a discussion about the why? and How the library came together and a generally what it does and how it was tested.
-The :ref:`Installation and Linking` guide is a discussion about linking and using the library, and the :ref:`User Guide` is the
-how-to about how to use the software library.  For the details see :ref:`Details`  and to try out some of the string conversions check out :ref:`Units on the Web`
+The :ref:`Introduction` is a discussion about the why? and how the application came together and a generally what it does and how it was tested.
+The :ref:`Installation` guide is a discussion about installing the application, and the :ref:`User Guide` is the
+how-to about how to use the application.  For the details see :ref:`Details`  
 
 .. toctree::
    :maxdepth: 1
@@ -43,7 +32,6 @@ how-to about how to use the software library.  For the details see :ref:`Details
    installation/index
    user-guide/index
    details/index
-   web/index
 
 Indices and tables
 ==================
