@@ -34,7 +34,6 @@ TEST(exeTests, version)
 TEST(exeTests, singleFed)
 {
     const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
-    
 
     /**test that things run to completion with auto broker*/
     auto out = hfmi.run(std::string("--autobroker ") + bballFile);
@@ -53,7 +52,6 @@ TEST(exeTests, singleFedAsync)
 TEST(exeTests, singleFedAsyncZMQ)
 {
     const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
-    
 
     /**test that things run to completion with auto broker*/
     auto out = hfmi.runAsync(std::string("--autobroker --core=zmq ") + ftFile);
