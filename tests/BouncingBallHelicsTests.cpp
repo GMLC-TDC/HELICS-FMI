@@ -219,7 +219,7 @@ TEST(bouncingBall, setHeightRemoteCommand)
 
     helics::ValueFederate vFed("fed1", fedInfo);
     vFed.sendCommand("bball", "set h 3.0");
-    vFed.query("root","global_flush");
+    vFed.query("root", "global_flush");
     csFed->configure(0.1, 0.0);
 
     auto result = std::async(std::launch::async, [csFed]() { csFed->run(1.0); });
