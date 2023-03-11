@@ -61,8 +61,8 @@ TEST(bouncingBall, checkPubsOutput)
     auto& sub2 = vFed.registerSubscription(qres[1]);
     sub2.setDefault(-20.0);
     vFed.enterExecutingMode();
-    auto t1 = vFed.requestTime(2.0);
-    EXPECT_LT(t1, 2.0);
+    auto time = vFed.requestTime(2.0);
+    EXPECT_LT(time, 2.0);
 
     auto val = sub1.getValue<double>();
     auto val2 = sub2.getValue<double>();
@@ -106,8 +106,8 @@ TEST(bouncingBall, checkPubsExtra)
     auto& sub3 = vFed.registerSubscription(qres[2]);
     sub2.setDefault(-20.0);
     vFed.enterExecutingMode();
-    auto t1 = vFed.requestTime(2.0);
-    EXPECT_LT(t1, 2.0);
+    auto time = vFed.requestTime(2.0);
+    EXPECT_LT(time, 2.0);
 
     auto val = sub1.getValue<double>();
     auto val2 = sub2.getValue<double>();
@@ -154,8 +154,8 @@ TEST(bouncingBall, setHeight)
     EXPECT_DOUBLE_EQ(val, 4.0);
     EXPECT_DOUBLE_EQ(val2, 0.0);
 
-    auto t1 = vFed.requestTime(2.0);
-    EXPECT_EQ(t1, 0.1);
+    auto time = vFed.requestTime(2.0);
+    EXPECT_EQ(time, 0.1);
 
     val = sub1.getValue<double>();
     val2 = sub2.getValue<double>();
@@ -194,8 +194,8 @@ TEST(bouncingBall, setHeightCommand)
     EXPECT_DOUBLE_EQ(val, 3.0);
     EXPECT_DOUBLE_EQ(val2, 0.0);
 
-    auto t1 = vFed.requestTime(2.0);
-    EXPECT_EQ(t1, 0.1);
+    auto time = vFed.requestTime(2.0);
+    EXPECT_EQ(time, 0.1);
 
     val = sub1.getValue<double>();
     val2 = sub2.getValue<double>();
@@ -235,8 +235,8 @@ TEST(bouncingBall, setHeightRemoteCommand)
     EXPECT_DOUBLE_EQ(val, 3.0);
     EXPECT_DOUBLE_EQ(val2, 0.0);
 
-    auto t1 = vFed.requestTime(2.0);
-    EXPECT_EQ(t1, 0.1);
+    auto time = vFed.requestTime(2.0);
+    EXPECT_EQ(time, 0.1);
 
     val = sub1.getValue<double>();
     val2 = sub2.getValue<double>();
