@@ -14,8 +14,8 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 FmiModelExchangeFederate::FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj,
-                                                   const helics::FederateInfo& fi):
-    fed(std::string(), fi),
+                                                   const helics::FederateInfo& fedInfo):
+    fed(std::string(), fedInfo),
     me(std::move(obj))
 
 {
@@ -30,15 +30,15 @@ FmiModelExchangeFederate::~FmiModelExchangeFederate() = default;
 void FmiModelExchangeFederate::configure(helics::Time step, helics::Time startTime)
 {
     timeBias = startTime;
-    for (auto input : input_list) {
+    for (const auto& input : input_list) {
         inputs.emplace_back(&fed, input);
     }
 
-    for (auto output : output_list) {
+    for (const auto& output : output_list) {
         pubs.emplace_back(&fed, output, helics::DataType::HELICS_DOUBLE);
     }
 
-    auto& def = me->fmuInformation().getExperiment();
+    const auto& def = me->fmuInformation().getExperiment();
 
     if (step <= helics::timeZero) {
         step = def.stepSize;
@@ -82,7 +82,7 @@ void FmiModelExchangeFederate::addConnection(const std::string& conn)
 
 void FmiModelExchangeFederate::run(helics::Time stop)
 {
-    auto& def = me->fmuInformation().getExperiment();
+    const auto& def = me->fmuInformation().getExperiment();
 
     if (stop <= helics::timeZero) {
         stop = def.stopTime;
@@ -95,19 +95,19 @@ void FmiModelExchangeFederate::run(helics::Time stop)
     me->setMode(fmuMode::initializationMode);
 
     if (!pubs.empty()) {
-        for (int ii = 0; ii < pubs.size(); ++ii) {
+        for (std::size_t ii = 0; ii < pubs.size(); ++ii) {
             helicsfmi::publishOutput(pubs[ii], me.get(), ii);
         }
     }
     if (!inputs.empty()) {
-        for (int ii = 0; ii < inputs.size(); ++ii) {
+        for (std::size_t ii = 0; ii < inputs.size(); ++ii) {
             helicsfmi::setDefault(inputs[ii], me.get(), ii);
         }
     }
     auto result = fed.enterExecutingMode(helics::IterationRequest::ITERATE_IF_NEEDED);
     if (result == helics::IterationResult::ITERATING) {
         if (!inputs.empty()) {
-            for (int ii = 0; ii < inputs.size(); ++ii) {
+            for (std::size_t ii = 0; ii < inputs.size(); ++ii) {
                 helicsfmi::grabInput(inputs[ii], me.get(), ii);
             }
         }
@@ -124,13 +124,13 @@ void FmiModelExchangeFederate::run(helics::Time stop)
         // get the values to publish
         if (!pubs.empty()) {
             // get the values to publish
-            for (int ii = 0; ii < pubs.size(); ++ii) {
+            for (std::size_t ii = 0; ii < pubs.size(); ++ii) {
                 helicsfmi::publishOutput(pubs[ii], me.get(), ii);
             }
         }
         if (!inputs.empty()) {
             // load the inputs
-            for (int ii = 0; ii < inputs.size(); ++ii) {
+            for (std::size_t ii = 0; ii < inputs.size(); ++ii) {
                 helicsfmi::grabInput(inputs[ii], me.get(), ii);
             }
         }
@@ -176,14 +176,14 @@ int FmiModelExchangeFederate::residualFunction(double time,
 }
 
 int FmiModelExchangeFederate::derivativeFunction(
-    double time,
+    [[maybe_unused]] double time,
     const double state[],
     double dstate_dt[],
     [[maybe_unused]] const griddyn::solverMode& sMode) noexcept
 {
     me->setStates(state);
     me->getDerivatives(dstate_dt);
-    printf("tt=%f, state=%f deriv=%e\n", time, state[0], dstate_dt[0]);
+    // printf("tt=%f, state=%f deriv=%e\n", time, state[0], dstate_dt[0]);
     return 0;
 }
 
@@ -200,8 +200,8 @@ int FmiModelExchangeFederate::jacobianFunction(
     [[maybe_unused]] double time,
     [[maybe_unused]] const double state[],
     [[maybe_unused]] const double dstate_dt[],
-    [[maybe_unused]] matrixData<double>& md,
-    [[maybe_unused]] double cj,
+    [[maybe_unused]] matrixData<double>& matrix,
+    [[maybe_unused]] double jacConst,
     [[maybe_unused]] const griddyn::solverMode& sMode) noexcept
 {
     return 0;

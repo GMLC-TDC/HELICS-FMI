@@ -46,79 +46,79 @@ helics::DataType getHelicsType(fmi_variable_type type)
     }
 }
 
-void publishOutput(helics::Publication& pub, fmi2Object* cs, int index)
+void publishOutput(helics::Publication& pub, fmi2Object* fmiObj, std::size_t index)
 {
-    const auto& var = cs->getOutput(index);
+    const auto& var = fmiObj->getOutput(static_cast<int>(index));
     switch (var.type) {
         case fmi_variable_type::boolean: {
-            auto val = cs->get<fmi2Boolean>(var);
-            pub.publish((val == fmi2False) ? false : true);
+            auto val = fmiObj->get<fmi2Boolean>(var);
+            pub.publish(val != fmi2False);
         } break;
         case fmi_variable_type::integer:
         case fmi_variable_type::enumeration: {
-            auto val = cs->get<std::int64_t>(var);
+            auto val = fmiObj->get<std::int64_t>(var);
             pub.publish(val);
         } break;
         case fmi_variable_type::real:
         case fmi_variable_type::numeric: {
-            auto val = cs->get<double>(var);
+            auto val = fmiObj->get<double>(var);
             pub.publish(val);
         } break;
         case fmi_variable_type::string:
         default: {
-            auto val = cs->get<std::string_view>(var);
+            auto val = fmiObj->get<std::string_view>(var);
             pub.publish(val);
         } break;
     }
 }
 
-void grabInput(helics::Input& inp, fmi2Object* cs, int index)
+void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index)
 {
-    const auto& var = cs->getInput(index);
+    const auto& var = fmiObj->getInput(static_cast<int>(index));
     switch (var.type) {
         case fmi_variable_type::boolean: {
             auto val = inp.getValue<fmi2Boolean>();
-            cs->set(var, val);
+            fmiObj->set(var, val);
         } break;
         case fmi_variable_type::integer:
         case fmi_variable_type::enumeration: {
             auto val = inp.getValue<fmi2Integer>();
-            cs->set(var, val);
+            fmiObj->set(var, val);
         } break;
         case fmi_variable_type::real:
         case fmi_variable_type::numeric: {
             auto val = inp.getValue<fmi2Real>();
-            cs->set(var, val);
+            fmiObj->set(var, val);
         } break;
         case fmi_variable_type::string:
         default: {
             auto val = inp.getValue<std::string>();
-            cs->set(var, val);
+            fmiObj->set(var, val);
         } break;
     }
 }
 
-void setDefault(helics::Input& inp, fmi2Object* cs, int index)
+void setDefault(helics::Input& inp, fmi2Object* fmiObj, std::size_t index)
 {
-    const auto& var = cs->getInput(index);
+    const auto& var = fmiObj->getInput(static_cast<int>(index));
     switch (var.type) {
         case fmi_variable_type::boolean: {
-            auto val = cs->get<bool>(var);
+            auto val = fmiObj->get<bool>(var);
             inp.setDefault(val);
         } break;
         case fmi_variable_type::integer:
         case fmi_variable_type::enumeration: {
-            auto val = cs->get<std::int64_t>(var);
+            auto val = fmiObj->get<std::int64_t>(var);
             inp.setDefault(val);
         } break;
         case fmi_variable_type::real:
         case fmi_variable_type::numeric: {
-            auto val = cs->get<double>(var);
+            auto val = fmiObj->get<double>(var);
             inp.setDefault(val);
         } break;
         case fmi_variable_type::string:
         default: {
-            auto val = cs->get<std::string_view>(var);
+            auto val = fmiObj->get<std::string_view>(var);
             inp.setDefault(val);
         } break;
     }

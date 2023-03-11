@@ -13,9 +13,10 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <filesystem>
 #include <future>
 
+static const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
+
 TEST(feedthrough, simpleRun)
 {
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
     helics::FederateInfo fedInfo(helics::CoreType::INPROC);
     fedInfo.coreInitString = "--autobroker";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
@@ -32,7 +33,6 @@ TEST(feedthrough, simpleRun)
 
 TEST(feedthrough, checkIO)
 {
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
     helics::FederateInfo fedInfo(helics::CoreType::INPROC);
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";
@@ -67,8 +67,8 @@ TEST(feedthrough, checkIO)
     EXPECT_EQ(qres.size(), 4U);
 
     vFed.enterExecutingMode();
-    auto t1 = vFed.requestTime(2.0);
-    EXPECT_LT(t1, 2.0);
+    auto time = vFed.requestTime(2.0);
+    EXPECT_LT(time, 2.0);
 
     auto val = sub1.getValue<double>();
     auto val2 = sub2.getValue<double>();
@@ -80,7 +80,6 @@ TEST(feedthrough, checkIO)
 
 TEST(feedthrough, checkFeedthrough)
 {
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
     helics::FederateInfo fedInfo(helics::CoreType::INPROC);
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";
@@ -136,8 +135,8 @@ TEST(feedthrough, checkFeedthrough)
 
     vFed.enterExecutingMode();
 
-    auto t1 = vFed.requestTime(2.0);
-    EXPECT_LT(t1, 2.0);
+    auto time = vFed.requestTime(2.0);
+    EXPECT_LT(time, 2.0);
 
     auto val = sub1.getValue<double>();
     auto val2 = sub2.getValue<double>();
@@ -156,7 +155,6 @@ TEST(feedthrough, checkFeedthrough)
 
 TEST(feedthrough, pubTypes)
 {
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
     helics::FederateInfo fedInfo(helics::CoreType::INPROC);
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";
@@ -199,8 +197,8 @@ TEST(feedthrough, pubTypes)
 
     vFed.enterExecutingMode();
 
-    auto t1 = vFed.requestTime(2.0);
-    EXPECT_EQ(t1, 0.1);
+    auto time = vFed.requestTime(2.0);
+    EXPECT_EQ(time, 0.1);
 
     vFed.finalize();
     sync.get();

@@ -13,6 +13,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 /** class defining a co-simulation federate*/
@@ -33,10 +34,10 @@ class FmiCoSimFederate {
   public:
     FmiCoSimFederate(const std::string& name,
                      const std::string& fmu,
-                     const helics::FederateInfo& fi);
+                     const helics::FederateInfo& fedInfo);
     FmiCoSimFederate(const std::string& name,
                      std::shared_ptr<fmi2CoSimObject> obj,
-                     const helics::FederateInfo& fi);
+                     const helics::FederateInfo& fedInfo);
     /** configure the federate using the specified inputs and outputs*/
     void configure(helics::Time step, helics::Time start = helics::timeZero);
     /** set a string list of inputs*/
@@ -55,12 +56,17 @@ class FmiCoSimFederate {
     void setOutputCapture(bool capture = true, const std::string& outputFile = "");
     /** run a command on the cosim object*/
     void runCommand(const std::string& command);
-    /** set a double parameter*/
-    bool setDouble(const std::string& parameter, double value);
-    /** set a double parameter*/
-    bool setInteger(const std::string& parameter, int64_t value);
+    /** set a parameter*/
+    template<typename... Args>
+    void set(Args&&... args)
+    {
+        cs->set(std::forward<Args>(args)...);
+    }
     /** run the cosimulation*/
     void run(helics::Time stop);
     /** get the underlying HELICS federate*/
     helics::ValueFederate* operator->() { return &fed; }
+
+  private:
+    double initialize(double stop, std::ofstream& ofile);
 };

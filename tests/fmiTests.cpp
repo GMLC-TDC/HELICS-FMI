@@ -11,10 +11,12 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <filesystem>
 
+static const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
+
 TEST(loadtests, ExtractFMU)
 {
     FmiLibrary fmi;
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
+
     EXPECT_TRUE(std::filesystem::exists(inputFile));
     EXPECT_NO_THROW(fmi.loadFMU(inputFile));
 
@@ -31,7 +33,6 @@ TEST(loadtests, ExtractFMU)
 TEST(loadtests, loadXML)
 {
     auto fmi = std::make_shared<FmiLibrary>();
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
     EXPECT_NO_THROW(fmi->loadFMU(inputFile));
 
     auto info = fmi->getInfo();
@@ -60,10 +61,9 @@ TEST(loadtests, loadXML)
     EXPECT_FALSE(std::filesystem::exists(dir));
 }
 
-TEST(loadtests, loadSO_ME)
+TEST(loadtests, loadSharedME)
 {
     auto fmi = std::make_shared<FmiLibrary>();
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
     EXPECT_NO_THROW(fmi->loadFMU(inputFile));
 
     auto fmiObj = fmi->createModelExchangeObject("model1");
@@ -79,10 +79,9 @@ TEST(loadtests, loadSO_ME)
     fmi.reset();
 }
 
-TEST(loadtests, loadSO_CS)
+TEST(loadtests, loadSharedCS)
 {
     auto fmi = std::make_shared<FmiLibrary>();
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
     EXPECT_NO_THROW(fmi->loadFMU(inputFile));
 
     auto fmiObj = fmi->createCoSimulationObject("model_cs");
@@ -101,16 +100,15 @@ TEST(loadtests, loadSO_CS)
     fmi.reset();
 
     auto dir = std::string(FMI_REFERENCE_DIR) + "BouncingBall";
-    // this is true since we didn't open the directory in this test
+    // this is true since we didn'time open the directory in this test
     EXPECT_TRUE(std::filesystem::exists(dir));
 
     std::filesystem::remove_all(dir);
 }
 
-TEST(loadtests, run_mode_sequence)
+TEST(loadtests, runModeSequence)
 {
     auto fmi = std::make_shared<FmiLibrary>();
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
     EXPECT_NO_THROW(fmi->loadFMU(inputFile));
 
     auto fmiObj = fmi->createCoSimulationObject("model_cs");
@@ -136,10 +134,9 @@ TEST(loadtests, run_mode_sequence)
     fmi.reset();
 }
 
-TEST(loadtests, cs_execution)
+TEST(loadtests, csExecution)
 {
     auto fmi = std::make_shared<FmiLibrary>();
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
     EXPECT_NO_THROW(fmi->loadFMU(inputFile));
 
     auto fmiObj = fmi->createCoSimulationObject("model_cs");
@@ -156,10 +153,10 @@ TEST(loadtests, cs_execution)
                                                    // going to stepMode
     EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::stepMode);
 
-    double t = 0;
-    while (t < 10.0) {
-        EXPECT_NO_THROW(fmiObj->doStep(t, 1.0, true));
-        t = t + 1.0;
+    double time = 0;
+    while (time < 10.0) {
+        EXPECT_NO_THROW(fmiObj->doStep(time, 1.0, true));
+        time = time + 1.0;
     }
     fmiObj->setMode(fmuMode::terminated);
     EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::terminated);

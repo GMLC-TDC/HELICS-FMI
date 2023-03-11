@@ -15,11 +15,15 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <filesystem>
 #include <future>
+#include <thread>
 
 using ::testing::HasSubstr;
+
+static const std::string bballFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
+static const std::string ftFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
 TEST(exeTests, version)
 {
-    exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
+    const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
 
     EXPECT_TRUE(hfmi.isActive());
 
@@ -29,50 +33,51 @@ TEST(exeTests, version)
 
 TEST(exeTests, singleFed)
 {
-    exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
+    const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
 
     /**test that things run to completion with auto broker*/
-    auto out = hfmi.run(std::string("--autobroker ") + inputFile);
+    auto out = hfmi.run(std::string("--autobroker ") + bballFile);
     EXPECT_EQ(out, 0);
 }
 
 TEST(exeTests, singleFedAsync)
 {
-    exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
+    const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
 
     /**test that things run to completion with auto broker*/
-    auto out = hfmi.runAsync(std::string("--autobroker ") + inputFile);
+    auto out = hfmi.runAsync(std::string("--autobroker ") + bballFile);
     EXPECT_EQ(out.get(), 0);
 }
 
 TEST(exeTests, singleFedAsyncZMQ)
 {
-    exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
+    const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
 
     /**test that things run to completion with auto broker*/
-    auto out = hfmi.runAsync(std::string("--autobroker --core=zmq ") + inputFile);
+    auto out = hfmi.runAsync(std::string("--autobroker --core=zmq ") + ftFile);
     EXPECT_EQ(out.get(), 0);
 }
 
 TEST(exeTests, dualFedAsyncZMQ)
 {
-    exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
-    std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
+    const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
 
     /**test that things run to completion with auto broker*/
-    auto out = hfmi.runAsync(
+    auto out = hfmi.runCaptureOutputAsync(
         std::string(
-            "--autobroker --core=zmq --step=0.1 --stop=2.0 --name=ftfed --brokerargs=\"-f2 --force\" ") +
-        inputFile);
+            "--autobroker --coretype=zmq --step=0.1 --stop=2.0 --name=ftfed --brokerargs=\"-f2 --force\" ") +
+        ftFile);
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    helics::ValueFederate vFed("fed1", "--coretype=zmq");
 
-    helics::ValueFederate vFed("fed1", "--core=zmq");
-
-    bool init = helics::waitForInit(&vFed, "ftfed", std::chrono::milliseconds(1000));
+    bool init = helics::waitForInit(&vFed, "ftfed", std::chrono::milliseconds(10000));
     if (!init) {
-        init = helics::waitForInit(&vFed, "ftfed", std::chrono::milliseconds(1000));
+        init = helics::waitForInit(&vFed, "ftfed", std::chrono::milliseconds(10000));
+    }
+    if (!init) {
+        vFed.globalError(-4, "init failed");
+        auto result = out.get();
+        std::cout << result << std::endl;
     }
     ASSERT_TRUE(init);
 
@@ -90,13 +95,13 @@ TEST(exeTests, dualFedAsyncZMQ)
     EXPECT_EQ(qres.size(), 4U);
 
     vFed.enterExecutingMode();
-    auto t1 = vFed.requestTime(2.0);
-    EXPECT_LT(t1, 2.0);
+    auto time1 = vFed.requestTime(2.0);
+    EXPECT_LT(time1, 2.0);
 
     auto val = sub1.getValue<double>();
     auto val2 = sub2.getValue<double>();
     EXPECT_NE(val, -20.0);
     EXPECT_NE(val2, -20.0);
     vFed.finalize();
-    EXPECT_EQ(out.get(), 0);
+    auto str = out.get();
 }

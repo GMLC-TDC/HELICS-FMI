@@ -30,7 +30,7 @@ namespace solvers {
         basicOdeFactory(gmlc::utilities::stringVector{"basicode", "dyndiff", "differential"});
 
 }  // namespace solvers
-SolverInterface::SolverInterface(const std::string& objName): helperObject(objName) {}
+SolverInterface::SolverInterface(const std::string& objName): HelperObject(objName) {}
 SolverInterface::SolverInterface(SolvableObject* obj, const solverMode& sMode):
     mode(sMode), sobj(obj)
 {
@@ -169,7 +169,7 @@ double SolverInterface::get(const std::string& param) const
     } else if (param == "tolerance") {
         res = tolerance;
     } else {
-        return helperObject::get(param);
+        return HelperObject::get(param);
     }
     return res;
 }
@@ -227,7 +227,7 @@ void SolverInterface::set(const std::string& param, const std::string& val)
         jacFile = val;
         stateFile = val;
     } else {
-        helperObject::set(param, val);
+        HelperObject::set(param, val);
     }
 }
 
@@ -263,7 +263,7 @@ void SolverInterface::set(const std::string& param, double val)
     } else if (param == "index") {
         mode.offsetIndex = static_cast<solver_index_type>(val);
     } else {
-        helperObject::set(param, val);
+        HelperObject::set(param, val);
     }
 }
 
@@ -402,7 +402,7 @@ void SolverInterface::addMaskElement(solver_index_type newMaskElement)
 }
 void SolverInterface::addMaskElements(const std::vector<solver_index_type>& newMsk)
 {
-    for (auto& nme : newMsk) {
+    for (const auto& nme : newMsk) {
         maskElements.push_back(nme);
     }
 }
@@ -492,7 +492,7 @@ std::unique_ptr<SolverInterface> makeSolver(SolvableObject* sobj, const solverMo
     std::unique_ptr<SolverInterface> sd = nullptr;
     if (isLocal(sMode)) {
         sd = std::make_unique<SolverInterface>(sobj, sMode);
-    } else if ((isAlgebraicOnly(sMode)) || (!isDynamic(sMode))) {
+        // } else if ((isAlgebraicOnly(sMode)) || (!isDynamic(sMode))) {
         /*
         sd = std::make_unique<solvers::kinsolInterface> (sobj, sMode);
         if (sMode.offsetIndex == power_flow)
@@ -504,7 +504,7 @@ std::unique_ptr<SolverInterface> makeSolver(SolvableObject* sobj, const solverMo
             sd->setName ("algebraic");
         }
         */
-    } else if (isDAE(sMode)) {
+        // } else if (isDAE(sMode)) {
         /*
         sd = std::make_unique<solvers::idaInterface> (sobj, sMode);
         if (sMode.offsetIndex == dae)
