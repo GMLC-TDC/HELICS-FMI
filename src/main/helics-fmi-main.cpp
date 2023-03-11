@@ -41,7 +41,7 @@ struct exeData {
 
 std::unique_ptr<CLI::App> generateCLI(exeData& data);
 
-//NOLINTNEXTLINE(bugprone-exception-escape)
+// NOLINTNEXTLINE(bugprone-exception-escape)
 int main(int argc, char* argv[])
 {
     exeData configData;
