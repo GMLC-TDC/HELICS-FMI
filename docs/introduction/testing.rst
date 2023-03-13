@@ -2,7 +2,7 @@
 Testing
 =====================================
 
-The Code for the units library is put through a series of CI tests before being merged.
+The Code for the HELICS_FMI program is put through a series of CI tests before being merged.
 Current tests include running on CI systems.
 
 
