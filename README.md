@@ -1,9 +1,9 @@
 # HELICS-FMI
 
-[![Build status](https://ci.appveyor.com/api/projects/status/8pt3yp3tveflmj3s/branch/main?svg=true)](https://ci.appveyor.com/project/phlptp/helics-fmi/branch/main)
+[![Build Status](https://dev.azure.com/HELICS-test/HELICS_FMI/_apis/build/status/GMLC-TDC.HELICS-FMI?branchName=main)](https://dev.azure.com/HELICS-test/HELICS_FMI/_build/latest?definitionId=8&branchName=main)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/GMLC-TDC/HELICS-FMI/main.svg)](https://results.pre-commit.ci/latest/github/GMLC-TDC/HELICS-FMI/main)
 
-Executable to allow Functional Mockup units to interact with [HELICS](https://github.com/GMLC-TDC/HELICS)
+Executable and other tools to allow [Functional Mockup units](https://fmi-standard.org/) to interact with [HELICS](https://github.com/GMLC-TDC/HELICS). Currently FMI 2.0 is supported.
 
 ## Building
 
@@ -18,6 +18,21 @@ HELICS-FMI will attempt to locate an existing HELICS installation and use those 
 ### Linux and others
 
 The process is the same as for Windows, with the exception that HELICS will not automatically build unless the AUTOBUILD_HELICS option is enabled.
+
+## Executing
+
+`helics-fmi` is the main program it work similarly to other federates in HELICS. +
+
+```sh
+$ helics-fmi feedthrough.fmu
+```
+
+```sh
+$ helics-fmi --autobroker --step=0.1 --stop=4.0 feedthrough.fmu
+```
+
+Will start up a broker as well as the fmu. The step and stop time can be specified.
+additional broker args can be added through `--brokerargs` option.
 
 ## Source Repo
 
