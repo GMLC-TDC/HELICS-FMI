@@ -8,4 +8,3 @@ The HELICS_FMI user guide is an in depth look at how to use the HELICS fmi progr
    :maxdepth: 1
 
    helics_fmi
-

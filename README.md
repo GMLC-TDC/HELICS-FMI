@@ -3,7 +3,7 @@
 [![Build Status](https://dev.azure.com/HELICS-test/HELICS_FMI/_apis/build/status/GMLC-TDC.HELICS-FMI?branchName=main)](https://dev.azure.com/HELICS-test/HELICS_FMI/_build/latest?definitionId=8&branchName=main)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/GMLC-TDC/HELICS-FMI/main.svg)](https://results.pre-commit.ci/latest/github/GMLC-TDC/HELICS-FMI/main)
 
-Executable and other tools to allow [Functional Mockup units](https://fmi-standard.org/) to interact with [HELICS](https://github.com/GMLC-TDC/HELICS).  Currently FMI 2.0 is supported.  
+Executable and other tools to allow [Functional Mockup units](https://fmi-standard.org/) to interact with [HELICS](https://github.com/GMLC-TDC/HELICS). Currently FMI 2.0 is supported.
 
 ## Building
 
@@ -21,8 +21,9 @@ The process is the same as for Windows, with the exception that HELICS will not 
 
 ## Executing
 
-`helics-fmi` is the main program it work similarly to other federates in HELICS.  +
-``` sh
+`helics-fmi` is the main program it work similarly to other federates in HELICS. +
+
+```sh
 $ helics-fmi feedthrough.fmu
 ```
 
