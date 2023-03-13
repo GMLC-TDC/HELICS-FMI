@@ -26,6 +26,12 @@ The process is the same as for Windows, with the exception that HELICS will not 
 $ helics-fmi feedthrough.fmu
 ```
 
+``` sh
+$ helics-fmi --autobroker --step=0.1 --stop=4.0 feedthrough.fmu
+```
+Will start up a broker as well as the fmu.  The step and stop time can be specified.
+additional broker args can be added through `--brokerargs` option.
+
 ## Source Repo
 
 The HELICS-FMI source code is hosted on GitHub: [https://github.com/GMLC-TDC/HELICS-FMI](https://github.com/GMLC-TDC/HELICS-FMI)
