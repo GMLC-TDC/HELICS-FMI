@@ -7,13 +7,19 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-set(helics-fmi_sources helics-fmi-main.cpp)
+set(helics-fmi_sources helicsFmiRunner.cpp)
 
-set(helics-fmi_headers)
+set(helics-fmi_headers helicsFmiRunner.hpp)
 
-add_executable(helics-fmi ${helics-fmi_sources} ${helics-fmi_headers})
 
-target_link_libraries(helics-fmi PUBLIC helicsFMI)
+
+add_library(helicsFmiRunner STATIC ${helics-fmi_sources} ${helics-fmi_headers})
+
+add_executable(helics-fmi helics-fmi-main.cpp)
+
+target_link_libraries(helicsFmiRunner PUBLIC helicsFMI)
+
+target_link_libraries(helics-fmi PUBLIC helicsFmiRunner)
 
 install(TARGETS helics-fmi RUNTIME DESTINATION bin)
 

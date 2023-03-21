@@ -15,13 +15,15 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 static const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
 
+using helicsfmi::CoSimFederate;
+
 TEST(feedthrough, simpleRun)
 {
     helics::FederateInfo fedInfo(helics::CoreType::INPROC);
     fedInfo.coreInitString = "--autobroker";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
-    std::shared_ptr<FmiCoSimFederate> csFed;
-    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("fthrough", inputFile, fedInfo));
+    std::shared_ptr<CoSimFederate> csFed;
+    EXPECT_NO_THROW(csFed = std::make_shared<CoSimFederate>("fthrough", inputFile, fedInfo));
     csFed->setOutputCapture(true, "testOut.csv");
     csFed->configure(0.1, 0.0);
     csFed->run(2.0);
@@ -37,8 +39,8 @@ TEST(feedthrough, checkIO)
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
-    std::shared_ptr<FmiCoSimFederate> csFed;
-    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("fthrough", inputFile, fedInfo));
+    std::shared_ptr<CoSimFederate> csFed;
+    EXPECT_NO_THROW(csFed = std::make_shared<CoSimFederate>("fthrough", inputFile, fedInfo));
 
     fedInfo.coreInitString.clear();
 
@@ -84,8 +86,8 @@ TEST(feedthrough, checkFeedthrough)
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
-    std::shared_ptr<FmiCoSimFederate> csFed;
-    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("fthrough", inputFile, fedInfo));
+    std::shared_ptr<CoSimFederate> csFed;
+    EXPECT_NO_THROW(csFed = std::make_shared<CoSimFederate>("fthrough", inputFile, fedInfo));
 
     fedInfo.coreInitString.clear();
 
@@ -159,8 +161,8 @@ TEST(feedthrough, pubTypes)
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
-    std::shared_ptr<FmiCoSimFederate> csFed;
-    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("fthrough", inputFile, fedInfo));
+    std::shared_ptr<CoSimFederate> csFed;
+    EXPECT_NO_THROW(csFed = std::make_shared<CoSimFederate>("fthrough", inputFile, fedInfo));
 
     fedInfo.coreInitString.clear();
 

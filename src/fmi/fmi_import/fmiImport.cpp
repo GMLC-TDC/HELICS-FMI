@@ -174,7 +174,7 @@ bool FmiLibrary::isSoLoaded(fmu_type type) const
     }
 }
 
-void FmiLibrary::loadFMU(const std::string& fmuPath)
+bool FmiLibrary::loadFMU(const std::string& fmuPath)
 {
     path ipath(fmuPath);
     if (is_directory(ipath)) {
@@ -183,14 +183,14 @@ void FmiLibrary::loadFMU(const std::string& fmuPath)
         fmuName = ipath;
         extractDirectory = fmuName.parent_path() / fmuName.stem();
     }
-    loadInformation();
+    return loadInformation();
 }
 
-void FmiLibrary::loadFMU(const std::string& fmuPath, const std::string& extractLoc)
+bool FmiLibrary::loadFMU(const std::string& fmuPath, const std::string& extractLoc)
 {
     extractDirectory = extractLoc;
     fmuName = fmuPath;
-    loadInformation();
+    return loadInformation();
 }
 
 int FmiLibrary::getCounts(fmiVariableType countType) const
@@ -213,19 +213,19 @@ int FmiLibrary::getCounts(fmiVariableType countType) const
     return static_cast<int>(cnt);
 }
 
-void FmiLibrary::loadInformation()
+bool FmiLibrary::loadInformation()
 {
     auto xmlfile = extractDirectory / "modelDescription.xml";
     if (!exists(xmlfile)) {
         auto res = extract();
         if (res != 0) {
-            return;
+            return false;
         }
     }
     int res = information->loadFile(xmlfile.string());
     if (res != 0) {
-        error = true;
-        return;
+        errorCode = res;
+        return false;
     }
     xmlLoaded = true;
 
@@ -235,6 +235,7 @@ void FmiLibrary::loadInformation()
     } else {
         resourceDir = "";
     }
+    return true;
 }
 
 std::string FmiLibrary::getTypes()
@@ -257,7 +258,7 @@ int FmiLibrary::extract()
 {
     int ret = utilities::unzip(fmuName.string(), extractDirectory.string());
     if (ret != 0) {
-        error = true;
+        errorCode = ret;
     }
     extracted = true;
     return ret;

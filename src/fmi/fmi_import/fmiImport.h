@@ -161,13 +161,15 @@ class FmiLibrary {
     @return true if loaded false if not*/
     bool isSoLoaded(fmu_type type = fmu_type::unknown) const;
     /** load the FMU from the fmu path
-    @param[in] fmuPath the file location of the fmu*/
-    void loadFMU(const std::string& fmuPath);
+    @param[in] fmuPath the file location of the fmu
+    @return true if the fmu was loaded*/
+    bool loadFMU(const std::string& fmuPath);
     /** load the FMU from the fmu path
     @param[in] fmuPath the file location of the fmu
     @param[in] extractLoc the path to extract the fmu to
+    @return true if the fmu was loaded false otherwise
     */
-    void loadFMU(const std::string& fmuPath, const std::string& extractLoc);
+    bool loadFMU(const std::string& fmuPath, const std::string& extractLoc);
     std::shared_ptr<fmiInfo> getInfo() const { return information; }
     void close();
     const std::string& getName() const { return modelName; }
@@ -184,9 +186,10 @@ class FmiLibrary {
     void deleteFMUdirectory(bool deleteDir = true) { deleteDirectory = deleteDir; }
     /** get the current status of the delete Directory modifier*/
     bool getDeleteFMUDirectory() const { return deleteDirectory; }
-
+    /** get the latest error code*/
+    int getErrorCode()const {return errorCode;}
   private:  // private functions
-    void loadInformation();
+    bool loadInformation();
     int extract();
 
     std::filesystem::path findSoPath(fmu_type type = fmu_type::unknown);
@@ -197,7 +200,7 @@ class FmiLibrary {
     std::filesystem::path extractDirectory;  //!< the path to the extracted directory
     std::filesystem::path fmuName;  //!< the path to the FMU file itself
     std::filesystem::path resourceDir;  //!< the path to the resource Directory
-    bool error = false;  //!< flag indicating that the fmuLibrary has an error
+    
     bool xmlLoaded = false;  //!< flag indicating that the FMU information has been loaded
     bool soMeLoaded =
         false;  //!< flag indicating that the Shared Library has been loaded for modelExchange
@@ -209,6 +212,7 @@ class FmiLibrary {
     std::shared_ptr<fmiInfo>
         information;  //!< an object containing information derived from the FMU XML file
 
+    int errorCode{0};  //!< code indicating error source
     bool deleteDirectory{
         false};  //!< indicator that on close the fmiInfoshould delete the directory
     bool extracted{false};  //!< set to true if the FMU was extracted
