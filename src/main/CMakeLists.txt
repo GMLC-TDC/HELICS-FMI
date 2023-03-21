@@ -11,8 +11,6 @@ set(helics-fmi_sources helicsFmiRunner.cpp)
 
 set(helics-fmi_headers helicsFmiRunner.hpp)
 
-
-
 add_library(helicsFmiRunner STATIC ${helics-fmi_sources} ${helics-fmi_headers})
 
 add_executable(helics-fmi helics-fmi-main.cpp)

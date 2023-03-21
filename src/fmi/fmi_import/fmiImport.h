@@ -187,7 +187,8 @@ class FmiLibrary {
     /** get the current status of the delete Directory modifier*/
     bool getDeleteFMUDirectory() const { return deleteDirectory; }
     /** get the latest error code*/
-    int getErrorCode()const {return errorCode;}
+    int getErrorCode() const { return errorCode; }
+
   private:  // private functions
     bool loadInformation();
     int extract();
@@ -200,7 +201,7 @@ class FmiLibrary {
     std::filesystem::path extractDirectory;  //!< the path to the extracted directory
     std::filesystem::path fmuName;  //!< the path to the FMU file itself
     std::filesystem::path resourceDir;  //!< the path to the resource Directory
-    
+
     bool xmlLoaded = false;  //!< flag indicating that the FMU information has been loaded
     bool soMeLoaded =
         false;  //!< flag indicating that the Shared Library has been loaded for modelExchange

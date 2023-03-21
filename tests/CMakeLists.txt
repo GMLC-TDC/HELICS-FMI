@@ -23,8 +23,8 @@ target_include_directories(helics_fmi_test_base INTERFACE ${PROJECT_SOURCE_DIR}/
 # -----------------------------------------------------------------------------
 
 set(fmi_test_sources fmiTests.cpp BouncingBallFMITests.cpp fmiFailureTests.cpp)
-set(helics_fmi_test_sources helicsFmiTests.cpp
-                            BouncingBallHelicsTests.cpp FeedthroughHelicsTests.cpp helicsFmiFailureTests.cpp
+set(helics_fmi_test_sources helicsFmiTests.cpp BouncingBallHelicsTests.cpp
+                            FeedthroughHelicsTests.cpp helicsFmiFailureTests.cpp
 )
 if(WIN32)
     set(platform_fmi_tests WindowsTest1.cpp)

@@ -11,13 +11,13 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <filesystem>
 
-static const std::string inputDir = std::string(FMI_REFERENCE_DIR)+"/";
+static const std::string inputDir = std::string(FMI_REFERENCE_DIR) + "/";
 
 TEST(invalidFMU, nonExistingFile)
 {
     FmiLibrary fmi;
     bool res{true};
-    EXPECT_NO_THROW(res=fmi.loadFMU(inputDir+"nonExistingFmu.fmu"));
+    EXPECT_NO_THROW(res = fmi.loadFMU(inputDir + "nonExistingFmu.fmu"));
     EXPECT_FALSE(res);
     EXPECT_FALSE(fmi.isXmlLoaded());
     EXPECT_FALSE(fmi.isSoLoaded());
@@ -29,7 +29,7 @@ TEST(invalidFMU, invalidZip)
 {
     FmiLibrary fmi;
     bool res{true};
-    EXPECT_NO_THROW(res=fmi.loadFMU(inputDir+"dummy.fmu"));
+    EXPECT_NO_THROW(res = fmi.loadFMU(inputDir + "dummy.fmu"));
     EXPECT_FALSE(res);
     EXPECT_FALSE(fmi.isXmlLoaded());
     EXPECT_FALSE(fmi.isSoLoaded());
@@ -41,7 +41,7 @@ TEST(invalidFMU, invalidFMU)
 {
     FmiLibrary fmi;
     bool res{true};
-    EXPECT_NO_THROW(res=fmi.loadFMU(inputDir+"validZip.fmu"));
+    EXPECT_NO_THROW(res = fmi.loadFMU(inputDir + "validZip.fmu"));
     EXPECT_FALSE(res);
     EXPECT_FALSE(fmi.isXmlLoaded());
     EXPECT_FALSE(fmi.isSoLoaded());
@@ -53,7 +53,7 @@ TEST(invalidFMU, missingSO)
 {
     FmiLibrary fmi;
     bool res{true};
-    EXPECT_NO_THROW(res=fmi.loadFMU(inputDir+"missingSO.fmu"));
+    EXPECT_NO_THROW(res = fmi.loadFMU(inputDir + "missingSO.fmu"));
     EXPECT_FALSE(res);
     EXPECT_FALSE(fmi.isXmlLoaded());
     EXPECT_FALSE(fmi.isSoLoaded());

@@ -7,50 +7,51 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 
-#include <string>
-#include <vector>
-#include "helics/external/CLI11/CLI11.hpp"
-#include "helics/application_api/timeOperations.hpp"
 #include "helics/application_api/FederateInfo.hpp"
+#include "helics/application_api/timeOperations.hpp"
 #include "helics/apps/BrokerApp.hpp"
 #include "helics/apps/CoreApp.hpp"
+#include "helics/external/CLI11/CLI11.hpp"
 #include "helicsFMI/FmiCoSimFederate.hpp"
 #include "helicsFMI/FmiModelExchangeFederate.hpp"
-#include <memory>
 
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace helicsfmi {
 
-    class FmiRunner
-    {
-    private:
-        std::string inputFile;
-        std::string integrator{ "cvode" };
-        std::string integratorArgs;
-        std::string brokerArgs;
-        helics::Time stepTime = helics::Time::minVal();
-        helics::Time stopTime = helics::Time::minVal();
-        std::vector<std::string> inputs;
-        std::vector<std::string> output_variables;
-        std::vector<std::string> input_variables;
-        std::vector<std::string> connections;
-        bool cosimFmu{ true };
-        helics::FederateInfo fedInfo;
-        std::unique_ptr<helics::apps::BrokerApp> broker;
-        std::unique_ptr<helics::apps::CoreApp> core;
-        std::vector<std::unique_ptr<CoSimFederate>> cosimFeds;
-        std::vector<std::unique_ptr<FmiModelExchangeFederate>> meFeds;
-        enum class state{created,loaded,initialized,running,closed};
-        state currentState{state::created};
-    public:
-        FmiRunner();
-        std::unique_ptr<CLI::App> generateCLI();
-        int load();
-        int initialize();
-        int run(helics::Time stop=helics::initializationTime);
-        int close();
-    private:
-        int loadFile(readerElement& elem);
-    };
+class FmiRunner {
+  private:
+    std::string inputFile;
+    std::string integrator{"cvode"};
+    std::string integratorArgs;
+    std::string brokerArgs;
+    helics::Time stepTime = helics::Time::minVal();
+    helics::Time stopTime = helics::Time::minVal();
+    std::vector<std::string> inputs;
+    std::vector<std::string> output_variables;
+    std::vector<std::string> input_variables;
+    std::vector<std::string> connections;
+    bool cosimFmu{true};
+    helics::FederateInfo fedInfo;
+    std::unique_ptr<helics::apps::BrokerApp> broker;
+    std::unique_ptr<helics::apps::CoreApp> core;
+    std::vector<std::unique_ptr<CoSimFederate>> cosimFeds;
+    std::vector<std::unique_ptr<FmiModelExchangeFederate>> meFeds;
+    enum class state { created, loaded, initialized, running, closed };
+    state currentState{state::created};
 
-}
+  public:
+    FmiRunner();
+    std::unique_ptr<CLI::App> generateCLI();
+    int load();
+    int initialize();
+    int run(helics::Time stop = helics::initializationTime);
+    int close();
+
+  private:
+    int loadFile(readerElement& elem);
+};
+
+}  // namespace helicsfmi
