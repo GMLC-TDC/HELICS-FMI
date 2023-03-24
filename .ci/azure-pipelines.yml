@@ -40,7 +40,7 @@ jobs:
       # -----------------------
       # Test HELICS_FMI
       # -----------------------
-      - bash: ctest --output-on-failure --timeout 480 -C Release
+      - bash: ctest --output-on-failure --timeout 60 -C Release
         displayName: 'Test HELICS_FMI'
         workingDirectory: build
 
@@ -82,7 +82,7 @@ jobs:
       # -----------------------
       # Test HELICS_FMI
       # -----------------------
-      #- bash: ctest --output-on-failure --timeout 480 -C Release
+      #- bash: ctest --output-on-failure --timeout 60 -C Release
       #  displayName: 'Test HELICS_FMI'
       #  workingDirectory: build
 
@@ -158,7 +158,7 @@ jobs:
       # -----------------------
       # Test HELICS_FMI
       # -----------------------
-      - bash: ctest --output-on-failure --timeout 480 -C Release
+      - bash: ctest --output-on-failure --timeout 60 -C Release
         displayName: 'Test HELICS_FMI'
         workingDirectory: build
 

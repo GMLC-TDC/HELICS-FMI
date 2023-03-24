@@ -189,6 +189,7 @@ class FmiLibrary {
     /** get the latest error code*/
     int getErrorCode() const { return errorCode; }
 
+    static constexpr int invalidCount{ -1 };
   private:  // private functions
     bool loadInformation();
     int extract();

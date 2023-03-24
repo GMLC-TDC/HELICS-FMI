@@ -76,7 +76,7 @@ target_compile_definitions(
 # helics fmi executable tests
 # -----------------------------------------------------------------------------
 
-set(executable_test_sources exeTestHelper.cpp exeTestHelper.h helicsFmiExecutableTests.cpp)
+set(executable_test_sources exeTestHelper.cpp exeTestHelper.h helicsFmiExecutableTests.cpp RunnerTests.cpp)
 
 add_executable(helics_fmi_executable-tests ${executable_test_sources})
 
@@ -88,7 +88,7 @@ target_compile_definitions(
     helics_fmi_executable-tests PRIVATE -DHELICS_EXE_LOC=\"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/\"
 )
 
-target_link_libraries(helics_fmi_executable-tests PUBLIC helicsFMI)
+target_link_libraries(helics_fmi_executable-tests PUBLIC helicsFMI helicsFmiRunner)
 
 add_test(NAME helics_fmi_executable-tests COMMAND helics_fmi_executable-tests
                                                   --log_level=test_suite --report_level=short

@@ -18,6 +18,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <string>
 #include <vector>
+#include <future>
 
 namespace helicsfmi {
 
@@ -27,7 +28,7 @@ class FmiRunner {
     std::string integrator{"cvode"};
     std::string integratorArgs;
     std::string brokerArgs;
-    helics::Time stepTime = helics::Time::minVal();
+    helics::Time stepTime{ 0.001 };
     helics::Time stopTime = helics::Time::minVal();
     std::vector<std::string> inputs;
     std::vector<std::string> output_variables;
@@ -39,15 +40,19 @@ class FmiRunner {
     std::unique_ptr<helics::apps::CoreApp> core;
     std::vector<std::unique_ptr<CoSimFederate>> cosimFeds;
     std::vector<std::unique_ptr<FmiModelExchangeFederate>> meFeds;
-    enum class state { created, loaded, initialized, running, closed };
-    state currentState{state::created};
+    enum class state { CREATED, LOADED, INITIALIZED, RUNNING, CLOSED };
+    state currentState{state::CREATED};
 
   public:
     FmiRunner();
     std::unique_ptr<CLI::App> generateCLI();
+    /** parse a string input*/
+    void parse(const std::string &cliString);
     int load();
     int initialize();
     int run(helics::Time stop = helics::initializationTime);
+    std::future<int> runAsync(helics::Time stop = helics::initializationTime);
+
     int close();
 
   private:

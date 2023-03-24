@@ -24,7 +24,6 @@ namespace helicsfmi {
 
 FmiRunner::FmiRunner()
 {
-    fedInfo.coreType = helics::CoreType::INPROC;
     fedInfo.defName = "fmu${#}";
     fedInfo.separator = '.';
 }
@@ -89,31 +88,55 @@ std::unique_ptr<CLI::App> FmiRunner::generateCLI()
                   cosimFmu,
                   "specify that the fmu should run as a model exchange FMU if possible");
 
-    app->final_callback([this, apt = app.get()]() {
-        auto remArgs = apt->remaining_for_passthrough();
-        fedInfo.loadInfoFromArgs(remArgs);
-        if (!remArgs.empty()) {
-            throw CLI::ExtrasError(remArgs);
-        }
-    });
-    app->footer([]() {
-        [[maybe_unused]] const helics::FederateInfo fedInfo("--help");
-        return std::string{};
-    });
+    fedInfo.injectParser(app.get());
+   
     return app;
+}
+
+void FmiRunner::parse(const std::string& cliString)
+{
+    auto app = generateCLI();
+    try
+    {
+        app->parse(cliString);
+    }
+    catch (const CLI::Error&)
+    {
+
+    }
 }
 
 int FmiRunner::load()
 {
+    if (currentState >= state::LOADED)
+    {
+        return 1;
+    }
     if (fedInfo.autobroker) {
         try {
-            broker = std::make_unique<helics::apps::BrokerApp>(fedInfo.coreType, brokerArgs);
-            if (!broker->isConnected()) {
-                broker->connect();
+            std::string args=brokerArgs;
+            if (!fedInfo.brokerInitString.empty())
+            {
+                if (!args.empty())
+                {
+                    args.push_back(' ');
+                }
+                args.append(fedInfo.brokerInitString);
+                fedInfo.brokerInitString.clear();
             }
+            broker = std::make_unique<helics::apps::BrokerApp>(fedInfo.coreType, args);
+            if (!broker->isConnected()) {
+                
+                if (!broker->connect()) {
+                    std::cerr << "broker failed to connect" << std::endl;
+                    return -102;
+                }
+            }
+
+            std::cout<<"started autobroker with args \""<<args<<"\""<<std::endl;
         }
         catch (const std::exception& e) {
-            std::cerr << "error generator broker :" << e.what() << std::endl;
+            std::cerr << "error generating broker :" << e.what() << std::endl;
             return -101;
         }
     }
@@ -121,9 +144,32 @@ int FmiRunner::load()
     if (inputFile.empty()) {
         inputFile = inputs.front();
     }
-    fedInfo.forceNewCore = true;
-    auto ext = inputFile.substr(inputFile.find_last_of('.'));
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD,stepTime);
 
+    if (broker)
+    {
+        fedInfo.brokerPort=-1;
+        fedInfo.broker=broker->getAddress();
+    }
+    std::cout<<"starting core with args "<<helics::generateFullCoreInitString(fedInfo)<<std::endl;
+    core = std::make_unique<helics::CoreApp>(fedInfo.coreType,
+        helics::generateFullCoreInitString(fedInfo));
+    if (!core->isConnected())
+    {
+        if (!core->connect())
+        {
+            if (broker)
+            {
+                broker->forceTerminate();
+            }
+            std::cerr << "core failed to connect" << std::endl;
+            return -102;
+        }
+    }
+    fedInfo.coreName=core->getIdentifier();
+
+    auto ext = inputFile.substr(inputFile.find_last_of('.'));
+    
     FmiLibrary fmi;
     if ((ext == ".fmu") || (ext == ".FMU")) {
         try {
@@ -196,14 +242,20 @@ int FmiRunner::load()
             broker->forceTerminate();
         }
     }
-    if (broker) {
-        broker->waitForDisconnect();
-    }
+    currentState=state::LOADED;
     return 0;
 }
 
 int FmiRunner::run(helics::Time stop)
 {
+    if (currentState < state::INITIALIZED)
+    {
+        int ret=initialize();
+        if (ret < 0)
+        {
+            return ret;
+        }
+    }
     // load each of the fmu's into its own thread
     std::vector<std::thread> threads(cosimFeds.size() + meFeds.size());
     for (size_t ii = 0; ii < cosimFeds.size(); ++ii) {
@@ -217,13 +269,40 @@ int FmiRunner::run(helics::Time stop)
     for (auto& thread : threads) {
         thread.join();
     }
-
-    core->forceTerminate();
+    if (core)
+    {
+        core->forceTerminate();
+    }
+    currentState=state::RUNNING;
     return 0;
+}
+
+std::future<int> FmiRunner::runAsync(helics::Time stop)
+{
+    return std::async(std::launch::async,[this,stop](){return run(stop);});
 }
 
 int FmiRunner::initialize()
 {
+    if (currentState < state::LOADED)
+    {
+        int ret=load();
+        if (ret < 0)
+        {
+            return ret;
+        }
+    }
+    if (currentState >= state::INITIALIZED)
+    {
+        return 1;
+    }
+    for (auto &csFed:cosimFeds) {
+        csFed->configure(stepTime);
+    }
+    for (auto &meFed:meFeds) {
+        meFed->configure(stepTime);
+    }
+    currentState=state::INITIALIZED;
     return 0;
 }
 
@@ -231,19 +310,24 @@ int FmiRunner::close()
 {
     cosimFeds.clear();
     meFeds.clear();
+    if (broker) {
+        broker->waitForDisconnect();
+    }
+    if (core) {
+        core->waitForDisconnect();
+    }
+    currentState=state::CLOSED;
     return 0;
 }
 
 int FmiRunner::loadFile(readerElement& elem)
 {
-    fedInfo.coreName = "fmu_core";
+
     if (elem.hasAttribute("stoptime")) {
         stopTime = elem.getAttributeValue("stoptime");
     }
     elem.moveToFirstChild("fmus");
-    core = std::make_unique<helics::CoreApp>(fedInfo.coreType,
-                                             "--name=fmu_core " +
-                                                 helics::generateFullCoreInitString(fedInfo));
+  
     std::vector<std::unique_ptr<FmiLibrary>> fmis;
     while (elem.isValid()) {
         auto fmilib = std::make_unique<FmiLibrary>();

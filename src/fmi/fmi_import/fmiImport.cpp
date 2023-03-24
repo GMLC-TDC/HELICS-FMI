@@ -176,7 +176,7 @@ bool FmiLibrary::isSoLoaded(fmu_type type) const
 
 bool FmiLibrary::loadFMU(const std::string& fmuPath)
 {
-    path ipath(fmuPath);
+    const path ipath(fmuPath);
     if (is_directory(ipath)) {
         extractDirectory = ipath;
     } else {
@@ -193,9 +193,10 @@ bool FmiLibrary::loadFMU(const std::string& fmuPath, const std::string& extractL
     return loadInformation();
 }
 
+
 int FmiLibrary::getCounts(fmiVariableType countType) const
 {
-    size_t cnt = size_t(-1);
+    int cnt = invalidCount;
     switch (countType) {
         case fmiVariableType::meObject:
             cnt = mecount;
@@ -207,10 +208,7 @@ int FmiLibrary::getCounts(fmiVariableType countType) const
             return information->getCounts(countType);
     }
 
-    if (cnt == size_t(-1)) {
-        return (-1);
-    }
-    return static_cast<int>(cnt);
+    return cnt;
 }
 
 bool FmiLibrary::loadInformation()
@@ -241,7 +239,7 @@ bool FmiLibrary::loadInformation()
 std::string FmiLibrary::getTypes()
 {
     if (isSoLoaded()) {
-        return std::string(baseFunctions.fmi2GetTypesPlatform());
+        return { baseFunctions.fmi2GetTypesPlatform() };
     }
     return "";
 }
@@ -249,7 +247,7 @@ std::string FmiLibrary::getTypes()
 std::string FmiLibrary::getVersion()
 {
     if (isSoLoaded()) {
-        return std::string(baseFunctions.fmi2GetVersion());
+        return { baseFunctions.fmi2GetVersion() };
     }
     return "";
 }
@@ -274,7 +272,7 @@ std::unique_ptr<fmi2ModelExchangeObject>
         if (!callbacks) {
             makeCallbackFunctions();
         }
-        auto comp =
+        auto *comp =
             baseFunctions.fmi2Instantiate(name.c_str(),
                                           fmi2ModelExchange,
                                           information->getString("guid").c_str(),
@@ -300,7 +298,7 @@ std::unique_ptr<fmi2CoSimObject> FmiLibrary::createCoSimulationObject(const std:
         if (!callbacks) {
             makeCallbackFunctions();
         }
-        auto comp =
+        auto* comp =
             baseFunctions.fmi2Instantiate(name.c_str(),
                                           fmi2CoSimulation,
                                           information->getString("guid").c_str(),

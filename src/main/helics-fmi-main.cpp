@@ -18,11 +18,11 @@ int main(int argc, char* argv[])
     helicsfmi::FmiRunner runner;
     auto app = runner.generateCLI();
     CLI11_PARSE(*app, argc, argv);
-
     int ret = runner.load();
     if (ret != 0) {
         return ret;
     }
+
     ret = runner.initialize();
     if (ret != 0) {
         return ret;
