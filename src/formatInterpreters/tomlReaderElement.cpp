@@ -178,7 +178,7 @@ readerAttribute tomlReaderElement::getFirstAttribute()
 
     while (attIterator != elementEnd) {
         if (isAttribute(attIterator->second)) {
-            return { attIterator->first, attIterator->second.as_string() };
+            return {attIterator->first, attIterator->second.as_string()};
         }
         ++attIterator;
         ++iteratorCount;
@@ -207,7 +207,7 @@ readerAttribute tomlReaderElement::getNextAttribute()
     ++iteratorCount;
     while (attIterator != elementEnd) {
         if (isAttribute(attIterator->second)) {
-            return { attIterator->first, attIterator->second.as_string() };
+            return {attIterator->first, attIterator->second.as_string()};
         }
         ++attIterator;
         ++iteratorCount;
@@ -221,7 +221,7 @@ readerAttribute tomlReaderElement::getAttribute(const std::string& attributeName
     helicsfmi::fileops::replaceIfMember(current->getElement(), attributeName, valueString);
 
     if (!valueString.empty()) {
-        return { attributeName, valueString };
+        return {attributeName, valueString};
     }
     return emptyAttribute;
 }
