@@ -190,11 +190,12 @@ class FmiLibrary {
     int getErrorCode() const { return errorCode; }
 
     static constexpr int invalidCount{-1};
-    void logMessage(const std::string &message) const;
+    void logMessage(const std::string& message) const;
     void setLoggerCallback(std::function<void(const std::string& message)> logCallback)
     {
-        loggerCallback=std::move(logCallback);
+        loggerCallback = std::move(logCallback);
     }
+
   private:  // private functions
     bool loadInformation();
     int extract();
@@ -230,7 +231,7 @@ class FmiLibrary {
     std::shared_ptr<fmiModelExchangeFunctions> ModelExchangeFunctions;
     std::shared_ptr<fmiCoSimFunctions> CoSimFunctions;
 
-    std::function<void(const std::string &message)> loggerCallback;
+    std::function<void(const std::string& message)> loggerCallback;
 };
 
 /** logging function to capture log messages
