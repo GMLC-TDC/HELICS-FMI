@@ -14,10 +14,10 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 #include <exception>
 #include <memory>
-#include <string_view>
-#include <vector>
 #include <string>
+#include <string_view>
 #include <utility>
+#include <vector>
 
 namespace helicsfmi {
 
