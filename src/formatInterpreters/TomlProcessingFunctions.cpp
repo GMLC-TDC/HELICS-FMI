@@ -80,4 +80,4 @@ std::string tomlAsString(const toml::value& element)
         }
     }
 }
-}  // namespace helics_fmi::fileops
+}  // namespace helicsfmi::fileops

@@ -129,4 +129,4 @@ inline bool isMember(const toml::value& element, const std::string& key)
     return (!val.is_uninitialized());
 }
 
-}  // namespace helics_fmi::fileops
+}  // namespace helicsfmi::fileops

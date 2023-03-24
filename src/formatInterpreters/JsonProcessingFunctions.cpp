@@ -80,4 +80,4 @@ std::string generateJsonString(const Json::Value& block)
     return ret;
 }
 
-}  // namespace helics::fileops
+}  // namespace helicsfmi::fileops

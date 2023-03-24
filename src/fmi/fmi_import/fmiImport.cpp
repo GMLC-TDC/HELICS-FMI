@@ -19,7 +19,6 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <map>
 
-
 using path = std::filesystem::path;
 
 fmiBaseFunctions::fmiBaseFunctions(const std::shared_ptr<boost::dll::shared_library>& slib)
@@ -453,9 +452,8 @@ void loggerFunc(fmi2ComponentEnvironment compEnv,
     va_end(arglist);
     temp.resize(std::min(static_cast<std::size_t>(stringSize), cStringBufferSize));
 
-    auto *fmilib=reinterpret_cast<FmiLibrary *>(compEnv);
-    if (fmilib != nullptr)
-    {
+    auto* fmilib = reinterpret_cast<FmiLibrary*>(compEnv);
+    if (fmilib != nullptr) {
         fmilib->logMessage(temp);
     } else {
         std::cout << message << std::endl;
