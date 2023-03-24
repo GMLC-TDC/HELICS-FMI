@@ -429,13 +429,10 @@ void FmiLibrary::makeCallbackFunctions()
 
 void FmiLibrary::logMessage(const std::string& message) const
 {
-    if (loggerCallback)
-    {
+    if (loggerCallback) {
         loggerCallback(message);
-    }
-    else
-    {
-        std::cout<< message<<std::endl;
+    } else {
+        std::cout << message << std::endl;
     }
 }
 
@@ -460,9 +457,7 @@ void loggerFunc(fmi2ComponentEnvironment compEnv,
     if (fmilib != nullptr)
     {
         fmilib->logMessage(temp);
-    }
-    else
-    {
-        std::cout<< message<<std::endl;
+    } else {
+        std::cout << message << std::endl;
     }
 }
