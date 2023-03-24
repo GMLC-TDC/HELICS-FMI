@@ -438,11 +438,11 @@ void loggerFunc([[maybe_unused]] fmi2ComponentEnvironment compEnv,
                 ...)
 {
     std::string temp;
-    temp.resize( cStringBufferSize);
+    temp.resize(cStringBufferSize);
     va_list arglist;
     va_start(arglist, message);
-    auto sz = vsnprintf(temp.data(),  cStringBufferSize, message, arglist);
+    auto sz = vsnprintf(temp.data(), cStringBufferSize, message, arglist);
     va_end(arglist);
-    temp.resize(std::min(static_cast<std::size_t>(sz),cStringBufferSize));
+    temp.resize(std::min(static_cast<std::size_t>(sz), cStringBufferSize));
     printf("%s\n", temp.c_str());
 }
