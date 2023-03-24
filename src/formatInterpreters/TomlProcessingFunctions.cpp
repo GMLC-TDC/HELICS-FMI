@@ -45,8 +45,7 @@ toml::value loadTomlStr(const std::string& tomlString)
 {
     try {
         std::istringstream tstring(tomlString);
-        toml::value pr = toml::parse(tstring);
-        return pr;
+        return toml::parse(tstring);
     }
     catch (const toml::exception& se) {
         throw(std::invalid_argument(se.what()));

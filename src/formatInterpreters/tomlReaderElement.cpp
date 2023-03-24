@@ -136,6 +136,8 @@ std::string tomlReaderElement::getMultiText(const std::string& /*sep*/) const
     }
     return nullStr;
 }
+static const toml::value uval;
+
 // no attributes in toml
 bool tomlReaderElement::hasAttribute(const std::string& attributeName) const
 {
@@ -143,7 +145,6 @@ bool tomlReaderElement::hasAttribute(const std::string& attributeName) const
         return false;
     }
 
-    toml::value uval;
     auto val = toml::find_or(current->getElement(), attributeName, uval);
     if (!val.is_uninitialized()) {
         return false;
@@ -153,7 +154,6 @@ bool tomlReaderElement::hasAttribute(const std::string& attributeName) const
 
 bool tomlReaderElement::hasElement(const std::string& elementName) const
 {
-    toml::value uval;
     auto val = toml::find_or(current->getElement(), elementName, uval);
     if (!val.is_uninitialized()) {
         return false;
@@ -161,13 +161,15 @@ bool tomlReaderElement::hasElement(const std::string& elementName) const
     return (val.is_array() || val.is_table());
 }
 
+static const readerAttribute emptyAttribute{};
+
 readerAttribute tomlReaderElement::getFirstAttribute()
 {
     if (!isValid()) {
-        return readerAttribute();
+        return emptyAttribute;
     }
     if (current->getElement().type() != toml::value_t::table) {
-        return readerAttribute();
+        return emptyAttribute;
     }
     auto& tab = current->getElement().as_table();
     auto attIterator = tab.begin();
@@ -176,18 +178,18 @@ readerAttribute tomlReaderElement::getFirstAttribute()
 
     while (attIterator != elementEnd) {
         if (isAttribute(attIterator->second)) {
-            return readerAttribute(attIterator->first, attIterator->second.as_string());
+            return { attIterator->first, attIterator->second.as_string() };
         }
         ++attIterator;
         ++iteratorCount;
     }
-    return readerAttribute();
+    return emptyAttribute;
 }
 
 readerAttribute tomlReaderElement::getNextAttribute()
 {
     if (!isValid()) {
-        return readerAttribute();
+        return emptyAttribute;
     }
     auto& tab = current->getElement().as_table();
     auto attIterator = tab.begin();
@@ -195,33 +197,33 @@ readerAttribute tomlReaderElement::getNextAttribute()
     for (int ii = 0; ii < iteratorCount; ++ii) {
         ++attIterator;
         if (attIterator == elementEnd) {
-            return readerAttribute();
+            return emptyAttribute;
         }
     }
     if (attIterator == elementEnd) {
-        return readerAttribute();
+        return emptyAttribute;
     }
     ++attIterator;
     ++iteratorCount;
     while (attIterator != elementEnd) {
         if (isAttribute(attIterator->second)) {
-            return readerAttribute(attIterator->first, attIterator->second.as_string());
+            return { attIterator->first, attIterator->second.as_string() };
         }
         ++attIterator;
         ++iteratorCount;
     }
-    return readerAttribute();
+    return emptyAttribute;
 }
 
 readerAttribute tomlReaderElement::getAttribute(const std::string& attributeName) const
 {
-    std::string vs;
-    helicsfmi::fileops::replaceIfMember(current->getElement(), attributeName, vs);
+    std::string valueString;
+    helicsfmi::fileops::replaceIfMember(current->getElement(), attributeName, valueString);
 
-    if (!vs.empty()) {
-        return readerAttribute(attributeName, vs);
+    if (!valueString.empty()) {
+        return { attributeName, valueString };
     }
-    return readerAttribute();
+    return emptyAttribute;
 }
 
 std::string tomlReaderElement::getAttributeText(const std::string& attributeName) const
@@ -255,7 +257,7 @@ void tomlReaderElement::moveToFirstChild()
     }
     current->elementIndex = 0;
     if (current->getElement().type() == toml::value_t::table) {
-        auto& tab = current->getElement().as_table();
+        const auto& tab = current->getElement().as_table();
         auto elementIterator = tab.begin();
         auto endIterator = tab.end();
 
@@ -310,7 +312,7 @@ void tomlReaderElement::moveToNextSibling()
     }
     // there are no more elements in a potential array
 
-    auto& tab = parents.back()->getElement().as_table();
+    const auto& tab = parents.back()->getElement().as_table();
     auto elementIterator = tab.begin();
     auto elementEnd = tab.end();
     ++parents.back()->elementIndex;
@@ -348,7 +350,7 @@ void tomlReaderElement::moveToNextSibling(const std::string& siblingName)
         }
         current->clear();
     } else {
-        toml::value uval;
+        const toml::value uval;
         auto val = toml::find_or(current->getElement(), siblingName, uval);
         if (!val.is_uninitialized()) {
             current = std::make_shared<tomlElement>(uval, siblingName);
