@@ -5,11 +5,11 @@ for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
 All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "helicsFmiRunner.hpp"
 #include "helics-fmi/helics-fmi-config.h"
 #include "helics/application_api/BrokerApp.hpp"
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/application_api/queryFunctions.hpp"
+#include "helicsFmiRunner.hpp"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -26,20 +26,18 @@ using helicsfmi::FmiRunner;
 
 TEST(runnerTests, singleFed)
 {
-
     FmiRunner runner;
     runner.parse(std::string("--autobroker ") + bballFile);
     /**test that things run to completion with auto broker*/
     int ret = runner.load();
-    ASSERT_EQ(ret,0);
+    ASSERT_EQ(ret, 0);
     ret = runner.initialize();
-    ASSERT_EQ(ret,0);
+    ASSERT_EQ(ret, 0);
     ret = runner.run();
-    ASSERT_EQ(ret,0);
+    ASSERT_EQ(ret, 0);
     ret = runner.close();
-    EXPECT_EQ(ret,0);
+    EXPECT_EQ(ret, 0);
 }
-
 
 TEST(runnerTests, singleFedAsyncZMQ)
 {
@@ -47,29 +45,29 @@ TEST(runnerTests, singleFedAsyncZMQ)
     runner.parse(std::string("--autobroker --core=zmq ") + ftFile);
     /**test that things run to completion with auto broker*/
     int ret = runner.load();
-    ASSERT_EQ(ret,0);
+    ASSERT_EQ(ret, 0);
     ret = runner.initialize();
-    ASSERT_EQ(ret,0);
+    ASSERT_EQ(ret, 0);
     ret = runner.run();
-    ASSERT_EQ(ret,0);
+    ASSERT_EQ(ret, 0);
     ret = runner.close();
-    EXPECT_EQ(ret,0);
-
+    EXPECT_EQ(ret, 0);
 }
 //
 TEST(runnerTests, dualFedAsyncZMQ)
 {
     FmiRunner runner;
-    runner.parse(std::string(
-        "--autobroker --coretype=zmq --step=0.1 --stop=2.0 --name=ftfed --brokerargs=\"-f2 --force\" ") +
+    runner.parse(
+        std::string(
+            "--autobroker --coretype=zmq --step=0.1 --stop=2.0 --name=ftfed --brokerargs=\"-f2 --force\" ") +
         ftFile);
     int ret = runner.load();
-    ASSERT_EQ(ret,0);
+    ASSERT_EQ(ret, 0);
     ret = runner.initialize();
-    ASSERT_EQ(ret,0);
+    ASSERT_EQ(ret, 0);
 
-    auto fut=runner.runAsync();
-    
+    auto fut = runner.runAsync();
+
     helics::ValueFederate vFed("fed1", "--coretype=zmq --forcenewcore");
 
     vFed.enterInitializingModeIterative();
@@ -97,5 +95,5 @@ TEST(runnerTests, dualFedAsyncZMQ)
     EXPECT_NE(val2, -20.0);
     vFed.finalize();
     auto str = fut.get();
-    EXPECT_EQ(str,0);
+    EXPECT_EQ(str, 0);
 }

@@ -76,7 +76,9 @@ target_compile_definitions(
 # helics fmi executable tests
 # -----------------------------------------------------------------------------
 
-set(executable_test_sources exeTestHelper.cpp exeTestHelper.h helicsFmiExecutableTests.cpp RunnerTests.cpp)
+set(executable_test_sources exeTestHelper.cpp exeTestHelper.h helicsFmiExecutableTests.cpp
+                            RunnerTests.cpp
+)
 
 add_executable(helics_fmi_executable-tests ${executable_test_sources})
 

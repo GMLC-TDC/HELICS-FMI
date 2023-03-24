@@ -14,8 +14,7 @@ show_variable(
 set(HELICS_CURRENT_VERSION 3.4.0)
 
 if(MSVC)
-    set(HELICS_PATH_HINTS C:/local/helics_3_4_0 C:/local/helics_3_4_1 
-    )
+    set(HELICS_PATH_HINTS C:/local/helics_3_4_0 C:/local/helics_3_4_1)
 endif(MSVC)
 
 include(GNUInstallDirs)
@@ -74,10 +73,10 @@ if(${PROJECT_NAME}_HELICS_EXTERNAL)
     get_target_property(
         HELICS_BINARY_TARGET ${${PROJECT_NAME}_HELICS_TARGET} IMPORTED_LOCATION_RELEASE
     )
-    if (NOT HELICS_BINARY_TARGET)
-     get_target_property(
-        HELICS_BINARY_TARGET ${${PROJECT_NAME}_HELICS_TARGET} IMPORTED_LOCATION_DEBUG
-    )
+    if(NOT HELICS_BINARY_TARGET)
+        get_target_property(
+            HELICS_BINARY_TARGET ${${PROJECT_NAME}_HELICS_TARGET} IMPORTED_LOCATION_DEBUG
+        )
     endif()
     get_filename_component(HELICS_BINARY_DIR ${HELICS_BINARY_TARGET} DIRECTORY)
 

@@ -15,10 +15,10 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "helicsFMI/FmiCoSimFederate.hpp"
 #include "helicsFMI/FmiModelExchangeFederate.hpp"
 
+#include <future>
 #include <memory>
 #include <string>
 #include <vector>
-#include <future>
 
 namespace helicsfmi {
 
@@ -28,7 +28,7 @@ class FmiRunner {
     std::string integrator{"cvode"};
     std::string integratorArgs;
     std::string brokerArgs;
-    helics::Time stepTime{ 0.001 };
+    helics::Time stepTime{0.001};
     helics::Time stopTime = helics::Time::minVal();
     std::vector<std::string> inputs;
     std::vector<std::string> output_variables;
@@ -47,7 +47,7 @@ class FmiRunner {
     FmiRunner();
     std::unique_ptr<CLI::App> generateCLI();
     /** parse a string input*/
-    void parse(const std::string &cliString);
+    void parse(const std::string& cliString);
     int load();
     int initialize();
     int run(helics::Time stop = helics::initializationTime);

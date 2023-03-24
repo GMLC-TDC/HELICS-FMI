@@ -193,7 +193,6 @@ bool FmiLibrary::loadFMU(const std::string& fmuPath, const std::string& extractL
     return loadInformation();
 }
 
-
 int FmiLibrary::getCounts(fmiVariableType countType) const
 {
     int cnt = invalidCount;
@@ -239,7 +238,7 @@ bool FmiLibrary::loadInformation()
 std::string FmiLibrary::getTypes()
 {
     if (isSoLoaded()) {
-        return { baseFunctions.fmi2GetTypesPlatform() };
+        return {baseFunctions.fmi2GetTypesPlatform()};
     }
     return "";
 }
@@ -247,7 +246,7 @@ std::string FmiLibrary::getTypes()
 std::string FmiLibrary::getVersion()
 {
     if (isSoLoaded()) {
-        return { baseFunctions.fmi2GetVersion() };
+        return {baseFunctions.fmi2GetVersion()};
     }
     return "";
 }
@@ -272,7 +271,7 @@ std::unique_ptr<fmi2ModelExchangeObject>
         if (!callbacks) {
             makeCallbackFunctions();
         }
-        auto *comp =
+        auto* comp =
             baseFunctions.fmi2Instantiate(name.c_str(),
                                           fmi2ModelExchange,
                                           information->getString("guid").c_str(),
