@@ -17,7 +17,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <thread>
 
-using ::testing::HasSubstr;
+//using ::testing::HasSubstr;
 
 static const std::string bballFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
 static const std::string ftFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";

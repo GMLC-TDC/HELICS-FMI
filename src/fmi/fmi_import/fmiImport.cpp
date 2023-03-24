@@ -219,7 +219,7 @@ bool FmiLibrary::loadInformation()
             return false;
         }
     }
-    int res = information->loadFile(xmlfile.string());
+    const int res = information->loadFile(xmlfile.string());
     if (res != 0) {
         errorCode = res;
         return false;
@@ -428,7 +428,8 @@ void FmiLibrary::makeCallbackFunctions()
     callbacks->componentEnvironment = static_cast<void*>(this);
 }
 
-#define STRING_BUFFER_SIZE 1000
+static constexpr std::size_t cStringBufferSize{1000};
+
 void loggerFunc([[maybe_unused]] fmi2ComponentEnvironment compEnv,
                 [[maybe_unused]] fmi2String instanceName,
                 [[maybe_unused]] fmi2Status status,
@@ -437,11 +438,11 @@ void loggerFunc([[maybe_unused]] fmi2ComponentEnvironment compEnv,
                 ...)
 {
     std::string temp;
-    temp.resize(STRING_BUFFER_SIZE);
+    temp.resize( cStringBufferSize);
     va_list arglist;
     va_start(arglist, message);
-    auto sz = vsnprintf(&(temp[0]), STRING_BUFFER_SIZE, message, arglist);
+    auto sz = vsnprintf(temp.data(),  cStringBufferSize, message, arglist);
     va_end(arglist);
-    temp.resize(std::min(sz, STRING_BUFFER_SIZE));
+    temp.resize(std::min(static_cast<std::size_t>(sz),cStringBufferSize));
     printf("%s\n", temp.c_str());
 }

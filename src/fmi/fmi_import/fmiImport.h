@@ -153,7 +153,7 @@ class FmiLibrary {
     @param[in] fmuPath the path to the fmu
     @param[in] extractLoc the folder location to extract the FMU
     */
-    FmiLibrary(const std::string& fmuPath, const std::string& extractLoc);
+    FmiLibrary(const std::string& fmuPath, const std::string& extractPath);
     /** check if the xml file for the fmu has been loaded
     @return true if loaded false if not*/
     bool isXmlLoaded() const { return xmlLoaded; }

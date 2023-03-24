@@ -105,7 +105,7 @@ void FmiRunner::parse(const std::string& cliString)
 
 int FmiRunner::load()
 {
-    if (currentState >= state::LOADED) {
+    if (currentState >= State::LOADED) {
         return 1;
     }
     if (fedInfo.autobroker) {
@@ -232,14 +232,14 @@ int FmiRunner::load()
             broker->forceTerminate();
         }
     }
-    currentState = state::LOADED;
+    currentState = State::LOADED;
     return 0;
 }
 
 int FmiRunner::run(helics::Time stop)
 {
-    if (currentState < state::INITIALIZED) {
-        int ret = initialize();
+    if (currentState < State::INITIALIZED) {
+        const int ret = initialize();
         if (ret < 0) {
             return ret;
         }
@@ -260,7 +260,7 @@ int FmiRunner::run(helics::Time stop)
     if (core) {
         core->forceTerminate();
     }
-    currentState = state::RUNNING;
+    currentState = State::RUNNING;
     return 0;
 }
 
@@ -271,13 +271,13 @@ std::future<int> FmiRunner::runAsync(helics::Time stop)
 
 int FmiRunner::initialize()
 {
-    if (currentState < state::LOADED) {
-        int ret = load();
+    if (currentState < State::LOADED) {
+        const int ret = load();
         if (ret < 0) {
             return ret;
         }
     }
-    if (currentState >= state::INITIALIZED) {
+    if (currentState >= State::INITIALIZED) {
         return 1;
     }
     for (auto& csFed : cosimFeds) {
@@ -286,7 +286,7 @@ int FmiRunner::initialize()
     for (auto& meFed : meFeds) {
         meFed->configure(stepTime);
     }
-    currentState = state::INITIALIZED;
+    currentState = State::INITIALIZED;
     return 0;
 }
 
@@ -300,7 +300,7 @@ int FmiRunner::close()
     if (core) {
         core->waitForDisconnect();
     }
-    currentState = state::CLOSED;
+    currentState = State::CLOSED;
     return 0;
 }
 

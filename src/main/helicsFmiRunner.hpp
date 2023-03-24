@@ -19,6 +19,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <string>
 #include <vector>
+#include <utility>
 
 namespace helicsfmi {
 
@@ -40,8 +41,8 @@ class FmiRunner {
     std::unique_ptr<helics::apps::CoreApp> core;
     std::vector<std::unique_ptr<CoSimFederate>> cosimFeds;
     std::vector<std::unique_ptr<FmiModelExchangeFederate>> meFeds;
-    enum class state { CREATED, LOADED, INITIALIZED, RUNNING, CLOSED };
-    state currentState{state::CREATED};
+    enum class State { CREATED, LOADED, INITIALIZED, RUNNING, CLOSED };
+    State currentState{State::CREATED};
 
   public:
     FmiRunner();

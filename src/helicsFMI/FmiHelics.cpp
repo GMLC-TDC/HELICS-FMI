@@ -7,8 +7,6 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 #include "FmiHelics.hpp"
 
-#include <string>
-
 namespace helicsfmi {
 std::string_view getHelicsTypeString(fmi_variable_type type)
 {
