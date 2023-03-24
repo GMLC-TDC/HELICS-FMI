@@ -65,6 +65,8 @@ jobs:
         displayName: 'Set XCode Path'
         condition: ne(variables['xcode_path'],'')
       - bash: |
+          brew update-reset
+          brew update
           brew install zeromq boost
         displayName: 'Install dependencies'
       - task: CMake@1
