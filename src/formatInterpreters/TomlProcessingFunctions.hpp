@@ -25,7 +25,7 @@ them using the toml library
 #include <functional>
 #include <string>
 
-namespace helics_fmi::fileops {
+namespace helicsfmi::fileops {
 /** load a TOML string or filename that points to a TOML file and return a
 toml::Value to the root object
 */

@@ -66,7 +66,7 @@ std::shared_ptr<readerElement> tomlReaderElement::clone() const
 bool tomlReaderElement::loadFile(const std::string& fileName)
 {
     try {
-        auto vres = helics_fmi::fileops::loadToml(fileName);
+        auto vres = helicsfmi::fileops::loadToml(fileName);
         doc = std::make_shared<tomlElement>(vres, fileName);
         current = doc;
         clear();
@@ -81,7 +81,7 @@ bool tomlReaderElement::loadFile(const std::string& fileName)
 bool tomlReaderElement::parse(const std::string& inputString)
 {
     try {
-        auto vres = helics_fmi::fileops::loadTomlStr(inputString);
+        auto vres = helicsfmi::fileops::loadTomlStr(inputString);
         doc = std::make_shared<tomlElement>(vres, inputString);
         current = doc;
         clear();
@@ -216,7 +216,7 @@ readerAttribute tomlReaderElement::getNextAttribute()
 readerAttribute tomlReaderElement::getAttribute(const std::string& attributeName) const
 {
     std::string vs;
-    helics_fmi::fileops::replaceIfMember(current->getElement(), attributeName, vs);
+    helicsfmi::fileops::replaceIfMember(current->getElement(), attributeName, vs);
 
     if (!vs.empty()) {
         return readerAttribute(attributeName, vs);
@@ -226,12 +226,12 @@ readerAttribute tomlReaderElement::getAttribute(const std::string& attributeName
 
 std::string tomlReaderElement::getAttributeText(const std::string& attributeName) const
 {
-    return helics_fmi::fileops::getOrDefault(current->getElement(), attributeName, nullStr);
+    return helicsfmi::fileops::getOrDefault(current->getElement(), attributeName, nullStr);
 }
 
 double tomlReaderElement::getAttributeValue(const std::string& attributeName) const
 {
-    return helics_fmi::fileops::getOrDefault(current->getElement(), attributeName, readerNullVal);
+    return helicsfmi::fileops::getOrDefault(current->getElement(), attributeName, readerNullVal);
 }
 
 std::shared_ptr<readerElement> tomlReaderElement::firstChild() const

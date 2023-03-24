@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <string>
 
-namespace helics_fmi::fileops {
+namespace helicsfmi::fileops {
 
 bool hasTomlExtension(std::string_view tomlString)
 {
@@ -22,7 +22,7 @@ toml::value loadToml(const std::string& tomlString)
 {
     if (tomlString.size() > 128) {
         try {
-            return helics_fmi::fileops::loadTomlStr(tomlString);
+            return loadTomlStr(tomlString);
         }
         catch (const std::invalid_argument&) {
             // just pass through this was an assumption

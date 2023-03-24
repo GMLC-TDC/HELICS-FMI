@@ -18,8 +18,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <cstdarg>
 #include <iostream>
 #include <map>
-#include <string>
-#include <utility>
+
 
 using path = std::filesystem::path;
 
@@ -457,7 +456,7 @@ void loggerFunc(fmi2ComponentEnvironment compEnv,
     va_end(arglist);
     temp.resize(std::min(static_cast<std::size_t>(stringSize), cStringBufferSize));
 
-    FmiLibrary *fmilib=reinterpret_cast<FmiLibrary *>(compEnv);
+    auto *fmilib=reinterpret_cast<FmiLibrary *>(compEnv);
     if (fmilib != nullptr)
     {
         fmilib->logMessage(temp);

@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <sstream>
 #include <string>
 
-namespace helics::fileops {
+namespace helicsfmi::fileops {
 
 bool hasJsonExtension(const std::string& jsonString)
 {
