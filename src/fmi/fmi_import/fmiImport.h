@@ -180,8 +180,8 @@ class FmiLibrary {
 
     std::unique_ptr<fmi2ModelExchangeObject> createModelExchangeObject(const std::string& name);
     std::unique_ptr<fmi2CoSimObject> createCoSimulationObject(const std::string& name);
-    std::string getTypes();
-    std::string getVersion();
+    std::string getTypes() const;
+    std::string getVersion() const;
     /** remove the FMU extraction directory on close*/
     void deleteFMUdirectory(bool deleteDir = true) { deleteDirectory = deleteDir; }
     /** get the current status of the delete Directory modifier*/
@@ -190,7 +190,11 @@ class FmiLibrary {
     int getErrorCode() const { return errorCode; }
 
     static constexpr int invalidCount{-1};
-
+    void logMessage(const std::string &message) const;
+    void setLoggerCallback(std::function<void(const std::string& message)> logCallback)
+    {
+        loggerCallback=std::move(logCallback);
+    }
   private:  // private functions
     bool loadInformation();
     int extract();
@@ -225,6 +229,8 @@ class FmiLibrary {
     std::shared_ptr<fmiCommonFunctions> commonFunctions;
     std::shared_ptr<fmiModelExchangeFunctions> ModelExchangeFunctions;
     std::shared_ptr<fmiCoSimFunctions> CoSimFunctions;
+
+    std::function<void(const std::string &message)> loggerCallback;
 };
 
 /** logging function to capture log messages

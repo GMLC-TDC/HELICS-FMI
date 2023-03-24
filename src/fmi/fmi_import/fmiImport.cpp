@@ -235,7 +235,7 @@ bool FmiLibrary::loadInformation()
     return true;
 }
 
-std::string FmiLibrary::getTypes()
+std::string FmiLibrary::getTypes() const
 {
     if (isSoLoaded()) {
         return {baseFunctions.fmi2GetTypesPlatform()};
@@ -243,7 +243,7 @@ std::string FmiLibrary::getTypes()
     return "";
 }
 
-std::string FmiLibrary::getVersion()
+std::string FmiLibrary::getVersion() const
 {
     if (isSoLoaded()) {
         return {baseFunctions.fmi2GetVersion()};
@@ -253,7 +253,7 @@ std::string FmiLibrary::getVersion()
 
 int FmiLibrary::extract()
 {
-    int ret = utilities::unzip(fmuName.string(), extractDirectory.string());
+    const int ret = utilities::unzip(fmuName.string(), extractDirectory.string());
     if (ret != 0) {
         errorCode = ret;
     }
@@ -428,9 +428,21 @@ void FmiLibrary::makeCallbackFunctions()
     callbacks->componentEnvironment = static_cast<void*>(this);
 }
 
+void FmiLibrary::logMessage(const std::string& message) const
+{
+    if (loggerCallback)
+    {
+        loggerCallback(message);
+    }
+    else
+    {
+        std::cout<< message<<std::endl;
+    }
+}
+
 static constexpr std::size_t cStringBufferSize{1000};
 
-void loggerFunc([[maybe_unused]] fmi2ComponentEnvironment compEnv,
+void loggerFunc(fmi2ComponentEnvironment compEnv,
                 [[maybe_unused]] fmi2String instanceName,
                 [[maybe_unused]] fmi2Status status,
                 [[maybe_unused]] fmi2String category,
@@ -441,8 +453,17 @@ void loggerFunc([[maybe_unused]] fmi2ComponentEnvironment compEnv,
     temp.resize(cStringBufferSize);
     va_list arglist;
     va_start(arglist, message);
-    auto sz = vsnprintf(temp.data(), cStringBufferSize, message, arglist);
+    auto stringSize = vsnprintf(temp.data(), cStringBufferSize, message, arglist);
     va_end(arglist);
-    temp.resize(std::min(static_cast<std::size_t>(sz), cStringBufferSize));
-    printf("%s\n", temp.c_str());
+    temp.resize(std::min(static_cast<std::size_t>(stringSize), cStringBufferSize));
+
+    FmiLibrary *fmilib=reinterpret_cast<FmiLibrary *>(compEnv);
+    if (fmilib != nullptr)
+    {
+        fmilib->logMessage(temp);
+    }
+    else
+    {
+        std::cout<< message<<std::endl;
+    }
 }
