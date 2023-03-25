@@ -65,18 +65,24 @@ std::string getName(const toml::value& element)
 
 std::string tomlAsString(const toml::value& element)
 {
+    std::string text;
     switch (element.type()) {
         case toml::value_t::string:
-            return element.as_string(std::nothrow_t());
+            text=element.as_string(std::nothrow_t());
+            break;
         case toml::value_t::floating:
-            return std::to_string(element.as_floating(std::nothrow_t()));
+            text=std::to_string(element.as_floating(std::nothrow_t()));
+            break;
         case toml::value_t::integer:
-            return std::to_string(element.as_integer(std::nothrow_t()));
+            text=std::to_string(element.as_integer(std::nothrow_t()));
+            break;
         default: {
             std::ostringstream str;
             str << element;
-            return str.str();
+            text= str.str();
+            break;
         }
     }
+    return text;
 }
 }  // namespace helicsfmi::fileops

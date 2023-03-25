@@ -55,7 +55,7 @@ std::shared_ptr<readerElement> tomlReaderElement::clone() const
 {
     auto ret = std::make_shared<tomlReaderElement>();
     ret->parents.reserve(parents.size());
-    for (auto& parent : parents) {
+    for (const auto& parent : parents) {
         ret->parents.push_back(std::make_shared<tomlElement>(*parent));
     }
     ret->current = std::make_shared<tomlElement>(*current);
@@ -115,26 +115,21 @@ double tomlReaderElement::getValue() const
 
 std::string tomlReaderElement::getText() const
 {
-    if (!isValid()) {
-        return nullStr;
+    std::string text;
+    if (isValid() && current->getElement().is_string()) {
+        text=current->getElement().as_string();
     }
-
-    if (current->getElement().is_string()) {
-        return current->getElement().as_string();
-    }
-    return nullStr;
+    return text;
 }
 
 std::string tomlReaderElement::getMultiText(const std::string& /*sep*/) const
 {
-    if (!isValid()) {
-        return nullStr;
+    std::string text;
+    
+    if (isValid() && current->getElement().is_string()) {
+        text=current->getElement().as_string();
     }
-
-    if (current->getElement().is_string()) {
-        return current->getElement().as_string();
-    }
-    return nullStr;
+    return text;
 }
 static const toml::value uval;
 
@@ -171,7 +166,7 @@ readerAttribute tomlReaderElement::getFirstAttribute()
     if (current->getElement().type() != toml::value_t::table) {
         return emptyAttribute;
     }
-    auto& tab = current->getElement().as_table();
+    const auto& tab = current->getElement().as_table();
     auto attIterator = tab.begin();
     auto elementEnd = tab.end();
     iteratorCount = 0;
@@ -191,7 +186,7 @@ readerAttribute tomlReaderElement::getNextAttribute()
     if (!isValid()) {
         return emptyAttribute;
     }
-    auto& tab = current->getElement().as_table();
+    const auto& tab = current->getElement().as_table();
     auto attIterator = tab.begin();
     auto elementEnd = tab.end();
     for (int ii = 0; ii < iteratorCount; ++ii) {
@@ -284,7 +279,6 @@ void tomlReaderElement::moveToFirstChild(const std::string& childName)
     if (current->getElement().type() != toml::value_t::table) {
         return;
     }
-    toml::value uval;
     auto val = toml::find_or(current->getElement(), childName, uval);
     if (!val.is_uninitialized()) {
         current = std::make_shared<tomlElement>(uval, childName);
