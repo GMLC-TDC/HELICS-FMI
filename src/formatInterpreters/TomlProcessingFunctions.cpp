@@ -68,18 +68,18 @@ std::string tomlAsString(const toml::value& element)
     std::string text;
     switch (element.type()) {
         case toml::value_t::string:
-            text=element.as_string(std::nothrow_t());
+            text = element.as_string(std::nothrow_t());
             break;
         case toml::value_t::floating:
-            text=std::to_string(element.as_floating(std::nothrow_t()));
+            text = std::to_string(element.as_floating(std::nothrow_t()));
             break;
         case toml::value_t::integer:
-            text=std::to_string(element.as_integer(std::nothrow_t()));
+            text = std::to_string(element.as_integer(std::nothrow_t()));
             break;
         default: {
             std::ostringstream str;
             str << element;
-            text= str.str();
+            text = str.str();
             break;
         }
     }

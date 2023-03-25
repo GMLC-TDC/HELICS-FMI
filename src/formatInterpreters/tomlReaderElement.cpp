@@ -117,7 +117,7 @@ std::string tomlReaderElement::getText() const
 {
     std::string text;
     if (isValid() && current->getElement().is_string()) {
-        text=current->getElement().as_string();
+        text = current->getElement().as_string();
     }
     return text;
 }
@@ -125,9 +125,9 @@ std::string tomlReaderElement::getText() const
 std::string tomlReaderElement::getMultiText(const std::string& /*sep*/) const
 {
     std::string text;
-    
+
     if (isValid() && current->getElement().is_string()) {
-        text=current->getElement().as_string();
+        text = current->getElement().as_string();
     }
     return text;
 }
