@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <string>
 
-namespace helics_fmi::fileops {
+namespace helicsfmi::fileops {
 
 bool hasTomlExtension(std::string_view tomlString)
 {
@@ -22,7 +22,7 @@ toml::value loadToml(const std::string& tomlString)
 {
     if (tomlString.size() > 128) {
         try {
-            return helics_fmi::fileops::loadTomlStr(tomlString);
+            return loadTomlStr(tomlString);
         }
         catch (const std::invalid_argument&) {
             // just pass through this was an assumption
@@ -45,8 +45,7 @@ toml::value loadTomlStr(const std::string& tomlString)
 {
     try {
         std::istringstream tstring(tomlString);
-        toml::value pr = toml::parse(tstring);
-        return pr;
+        return toml::parse(tstring);
     }
     catch (const toml::exception& se) {
         throw(std::invalid_argument(se.what()));
@@ -66,18 +65,24 @@ std::string getName(const toml::value& element)
 
 std::string tomlAsString(const toml::value& element)
 {
+    std::string text;
     switch (element.type()) {
         case toml::value_t::string:
-            return element.as_string(std::nothrow_t());
+            text = element.as_string(std::nothrow_t());
+            break;
         case toml::value_t::floating:
-            return std::to_string(element.as_floating(std::nothrow_t()));
+            text = std::to_string(element.as_floating(std::nothrow_t()));
+            break;
         case toml::value_t::integer:
-            return std::to_string(element.as_integer(std::nothrow_t()));
+            text = std::to_string(element.as_integer(std::nothrow_t()));
+            break;
         default: {
             std::ostringstream str;
             str << element;
-            return str.str();
+            text = str.str();
+            break;
         }
     }
+    return text;
 }
-}  // namespace helics_fmi::fileops
+}  // namespace helicsfmi::fileops

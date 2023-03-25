@@ -9,9 +9,9 @@ If you would like to contribute to any of the HELICS related projects see [CONTR
 
 - Ryan Mast\*
 - Philip Top\*
-- Corey Mcneish\*
-- Mert Korkali\*
-- Brian Kelley\*
+- Corey Mcneish
+- Mert Korkali
+- Brian Kelley
 
 ### Lawrence Berkeley National Lab
 

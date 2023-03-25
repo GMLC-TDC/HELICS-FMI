@@ -16,8 +16,9 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 #include <vector>
 
+namespace helicsfmi {
 /** class defining a co-simulation federate*/
-class FmiCoSimFederate {
+class CoSimFederate {
   private:
     helics::ValueFederate fed;  //!< the federate
     std::shared_ptr<fmi2CoSimObject> cs;  //!< the co-simulation object
@@ -32,12 +33,12 @@ class FmiCoSimFederate {
     bool captureOutput{false};
 
   public:
-    FmiCoSimFederate(const std::string& name,
-                     const std::string& fmu,
-                     const helics::FederateInfo& fedInfo);
-    FmiCoSimFederate(const std::string& name,
-                     std::shared_ptr<fmi2CoSimObject> obj,
-                     const helics::FederateInfo& fedInfo);
+    CoSimFederate(const std::string& name,
+                  const std::string& fmu,
+                  const helics::FederateInfo& fedInfo);
+    CoSimFederate(const std::string& name,
+                  std::shared_ptr<fmi2CoSimObject> obj,
+                  const helics::FederateInfo& fedInfo);
     /** configure the federate using the specified inputs and outputs*/
     void configure(helics::Time step, helics::Time start = helics::timeZero);
     /** set a string list of inputs*/
@@ -70,3 +71,5 @@ class FmiCoSimFederate {
   private:
     double initialize(double stop, std::ofstream& ofile);
 };
+
+}  // namespace helicsfmi

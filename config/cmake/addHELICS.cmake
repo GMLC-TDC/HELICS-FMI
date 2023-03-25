@@ -14,9 +14,7 @@ show_variable(
 set(HELICS_CURRENT_VERSION 3.4.0)
 
 if(MSVC)
-    set(HELICS_PATH_HINTS C:/local/helics_3_4_0 C:/local/helics_3_3_2 C:/local/helics_3_3_1
-                          C:/local/helics_3_3_0
-    )
+    set(HELICS_PATH_HINTS C:/local/helics_3_4_0 C:/local/helics_3_4_1)
 endif(MSVC)
 
 include(GNUInstallDirs)
@@ -26,6 +24,8 @@ show_variable(
 )
 
 option(${PROJECT_NAME}_FORCE_HELICS_SUBPROJECT "Force a helics subproject" OFF)
+
+set(HELICS_MINIMUM_VERSION 3.4)
 
 if(${PROJECT_NAME}_FORCE_HELICS_SUBPROJECT)
     include(addHELICSsubproject)
@@ -37,7 +37,7 @@ else()
 
     find_package(
         HELICS
-        3.3
+        ${HELICS_MINIMUM_VERSION}
         HINTS
         ${HELICS_INSTALL_PATH}
         $ENV{HELICS_INSTALL_PATH}
@@ -55,7 +55,7 @@ else()
             include(helicsPackageDownload)
             if(helicscpp_POPULATED)
 
-                find_package(HELICS 3.3 HINTS ${helicscpp_SOURCE_DIR})
+                find_package(HELICS ${HELICS_MINIMUM_VERSION} HINTS ${helicscpp_SOURCE_DIR})
                 set(${PROJECT_NAME}_HELICS_TARGET HELICS::helicscpp)
                 set(${PROJECT_NAME}_HELICS_TARGET_APPS HELICS::helicscpp-apps)
                 set(${PROJECT_NAME}_HELICS_EXTERNAL ON)
@@ -73,6 +73,11 @@ if(${PROJECT_NAME}_HELICS_EXTERNAL)
     get_target_property(
         HELICS_BINARY_TARGET ${${PROJECT_NAME}_HELICS_TARGET} IMPORTED_LOCATION_RELEASE
     )
+    if(NOT HELICS_BINARY_TARGET)
+        get_target_property(
+            HELICS_BINARY_TARGET ${${PROJECT_NAME}_HELICS_TARGET} IMPORTED_LOCATION_DEBUG
+        )
+    endif()
     get_filename_component(HELICS_BINARY_DIR ${HELICS_BINARY_TARGET} DIRECTORY)
 
     file(GLOB HELICS_BINARIES "${HELICS_BINARY_DIR}/*")

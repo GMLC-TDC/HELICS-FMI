@@ -40,7 +40,7 @@ jobs:
       # -----------------------
       # Test HELICS_FMI
       # -----------------------
-      - bash: ctest --output-on-failure --timeout 480 -C Release
+      - bash: ctest --output-on-failure --timeout 60 -C Release
         displayName: 'Test HELICS_FMI'
         workingDirectory: build
 
@@ -65,6 +65,7 @@ jobs:
         displayName: 'Set XCode Path'
         condition: ne(variables['xcode_path'],'')
       - bash: |
+          brew update-reset
           brew install zeromq boost
         displayName: 'Install dependencies'
       - task: CMake@1
@@ -82,7 +83,7 @@ jobs:
       # -----------------------
       # Test HELICS_FMI
       # -----------------------
-      #- bash: ctest --output-on-failure --timeout 480 -C Release
+      #- bash: ctest --output-on-failure --timeout 60 -C Release
       #  displayName: 'Test HELICS_FMI'
       #  workingDirectory: build
 
@@ -158,7 +159,7 @@ jobs:
       # -----------------------
       # Test HELICS_FMI
       # -----------------------
-      - bash: ctest --output-on-failure --timeout 480 -C Release
+      - bash: ctest --output-on-failure --timeout 60 -C Release
         displayName: 'Test HELICS_FMI'
         workingDirectory: build
 

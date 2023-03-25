@@ -12,11 +12,31 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/HelicsPrimaryTypes.hpp"
 #include "helics/application_api/ValueFederate.hpp"
 
+#include <exception>
 #include <memory>
+#include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 namespace helicsfmi {
+
+// All errors derive from this one
+class Error: public std::runtime_error {
+    int actual_exit_code;
+    std::string error_name{"Error"};
+
+  public:
+    [[nodiscard]] int get_exit_code() const { return actual_exit_code; }
+
+    [[nodiscard]] std::string get_name() const { return error_name; }
+
+    Error(std::string name, std::string msg, int exit_code = -101):
+        runtime_error(msg), actual_exit_code(exit_code), error_name(std::move(name))
+    {
+    }
+};
+
 /** get the corresponding helics type name to an FMI variable type*/
 std::string_view getHelicsTypeString(fmi_variable_type type);
 /** get the corresponding helics data type to an FMI variable type*/

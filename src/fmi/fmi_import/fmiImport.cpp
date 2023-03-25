@@ -18,8 +18,6 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <cstdarg>
 #include <iostream>
 #include <map>
-#include <string>
-#include <utility>
 
 using path = std::filesystem::path;
 
@@ -174,28 +172,28 @@ bool FmiLibrary::isSoLoaded(fmu_type type) const
     }
 }
 
-void FmiLibrary::loadFMU(const std::string& fmuPath)
+bool FmiLibrary::loadFMU(const std::string& fmuPath)
 {
-    path ipath(fmuPath);
+    const path ipath(fmuPath);
     if (is_directory(ipath)) {
         extractDirectory = ipath;
     } else {
         fmuName = ipath;
         extractDirectory = fmuName.parent_path() / fmuName.stem();
     }
-    loadInformation();
+    return loadInformation();
 }
 
-void FmiLibrary::loadFMU(const std::string& fmuPath, const std::string& extractLoc)
+bool FmiLibrary::loadFMU(const std::string& fmuPath, const std::string& extractLoc)
 {
     extractDirectory = extractLoc;
     fmuName = fmuPath;
-    loadInformation();
+    return loadInformation();
 }
 
 int FmiLibrary::getCounts(fmiVariableType countType) const
 {
-    size_t cnt = size_t(-1);
+    int cnt = invalidCount;
     switch (countType) {
         case fmiVariableType::meObject:
             cnt = mecount;
@@ -207,25 +205,22 @@ int FmiLibrary::getCounts(fmiVariableType countType) const
             return information->getCounts(countType);
     }
 
-    if (cnt == size_t(-1)) {
-        return (-1);
-    }
-    return static_cast<int>(cnt);
+    return cnt;
 }
 
-void FmiLibrary::loadInformation()
+bool FmiLibrary::loadInformation()
 {
     auto xmlfile = extractDirectory / "modelDescription.xml";
     if (!exists(xmlfile)) {
         auto res = extract();
         if (res != 0) {
-            return;
+            return false;
         }
     }
-    int res = information->loadFile(xmlfile.string());
+    const int res = information->loadFile(xmlfile.string());
     if (res != 0) {
-        error = true;
-        return;
+        errorCode = res;
+        return false;
     }
     xmlLoaded = true;
 
@@ -235,29 +230,30 @@ void FmiLibrary::loadInformation()
     } else {
         resourceDir = "";
     }
+    return true;
 }
 
-std::string FmiLibrary::getTypes()
+std::string FmiLibrary::getTypes() const
 {
     if (isSoLoaded()) {
-        return std::string(baseFunctions.fmi2GetTypesPlatform());
+        return {baseFunctions.fmi2GetTypesPlatform()};
     }
     return "";
 }
 
-std::string FmiLibrary::getVersion()
+std::string FmiLibrary::getVersion() const
 {
     if (isSoLoaded()) {
-        return std::string(baseFunctions.fmi2GetVersion());
+        return {baseFunctions.fmi2GetVersion()};
     }
     return "";
 }
 
 int FmiLibrary::extract()
 {
-    int ret = utilities::unzip(fmuName.string(), extractDirectory.string());
+    const int ret = utilities::unzip(fmuName.string(), extractDirectory.string());
     if (ret != 0) {
-        error = true;
+        errorCode = ret;
     }
     extracted = true;
     return ret;
@@ -273,7 +269,7 @@ std::unique_ptr<fmi2ModelExchangeObject>
         if (!callbacks) {
             makeCallbackFunctions();
         }
-        auto comp =
+        auto* comp =
             baseFunctions.fmi2Instantiate(name.c_str(),
                                           fmi2ModelExchange,
                                           information->getString("guid").c_str(),
@@ -299,7 +295,7 @@ std::unique_ptr<fmi2CoSimObject> FmiLibrary::createCoSimulationObject(const std:
         if (!callbacks) {
             makeCallbackFunctions();
         }
-        auto comp =
+        auto* comp =
             baseFunctions.fmi2Instantiate(name.c_str(),
                                           fmi2CoSimulation,
                                           information->getString("guid").c_str(),
@@ -430,8 +426,18 @@ void FmiLibrary::makeCallbackFunctions()
     callbacks->componentEnvironment = static_cast<void*>(this);
 }
 
-#define STRING_BUFFER_SIZE 1000
-void loggerFunc([[maybe_unused]] fmi2ComponentEnvironment compEnv,
+void FmiLibrary::logMessage(const std::string& message) const
+{
+    if (loggerCallback) {
+        loggerCallback(message);
+    } else {
+        std::cout << message << std::endl;
+    }
+}
+
+static constexpr std::size_t cStringBufferSize{1000};
+
+void loggerFunc(fmi2ComponentEnvironment compEnv,
                 [[maybe_unused]] fmi2String instanceName,
                 [[maybe_unused]] fmi2Status status,
                 [[maybe_unused]] fmi2String category,
@@ -439,11 +445,17 @@ void loggerFunc([[maybe_unused]] fmi2ComponentEnvironment compEnv,
                 ...)
 {
     std::string temp;
-    temp.resize(STRING_BUFFER_SIZE);
+    temp.resize(cStringBufferSize);
     va_list arglist;
     va_start(arglist, message);
-    auto sz = vsnprintf(&(temp[0]), STRING_BUFFER_SIZE, message, arglist);
+    auto stringSize = vsnprintf(temp.data(), cStringBufferSize, message, arglist);
     va_end(arglist);
-    temp.resize(std::min(sz, STRING_BUFFER_SIZE));
-    printf("%s\n", temp.c_str());
+    temp.resize(std::min(static_cast<std::size_t>(stringSize), cStringBufferSize));
+
+    auto* fmilib = reinterpret_cast<FmiLibrary*>(compEnv);
+    if (fmilib != nullptr) {
+        fmilib->logMessage(temp);
+    } else {
+        std::cout << message << std::endl;
+    }
 }

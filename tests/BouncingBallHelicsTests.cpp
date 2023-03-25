@@ -14,13 +14,15 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 static const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
 
+using helicsfmi::CoSimFederate;
+
 TEST(bouncingBall, simpleRun)
 {
     helics::FederateInfo fedInfo(helics::CoreType::INPROC);
     fedInfo.coreInitString = "--autobroker";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
-    std::shared_ptr<FmiCoSimFederate> csFed;
-    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("bball", inputFile, fedInfo));
+    std::shared_ptr<CoSimFederate> csFed;
+    EXPECT_NO_THROW(csFed = std::make_shared<CoSimFederate>("bball", inputFile, fedInfo));
     csFed->setOutputCapture(true, "testOut.csv");
     csFed->configure(0.1, 0.0);
     csFed->run(2.0);
@@ -36,8 +38,8 @@ TEST(bouncingBall, checkPubsOutput)
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
-    std::shared_ptr<FmiCoSimFederate> csFed;
-    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("bball", inputFile, fedInfo));
+    std::shared_ptr<CoSimFederate> csFed;
+    EXPECT_NO_THROW(csFed = std::make_shared<CoSimFederate>("bball", inputFile, fedInfo));
 
     fedInfo.coreInitString.clear();
 
@@ -78,8 +80,8 @@ TEST(bouncingBall, checkPubsExtra)
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
-    std::shared_ptr<FmiCoSimFederate> csFed;
-    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("bball", inputFile, fedInfo));
+    std::shared_ptr<CoSimFederate> csFed;
+    EXPECT_NO_THROW(csFed = std::make_shared<CoSimFederate>("bball", inputFile, fedInfo));
 
     fedInfo.coreInitString.clear();
 
@@ -132,8 +134,8 @@ TEST(bouncingBall, setHeight)
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
-    std::shared_ptr<FmiCoSimFederate> csFed;
-    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("bball", inputFile, fedInfo));
+    std::shared_ptr<CoSimFederate> csFed;
+    EXPECT_NO_THROW(csFed = std::make_shared<CoSimFederate>("bball", inputFile, fedInfo));
 
     fedInfo.coreInitString.clear();
 
@@ -172,8 +174,8 @@ TEST(bouncingBall, setHeightCommand)
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
-    std::shared_ptr<FmiCoSimFederate> csFed;
-    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("bball", inputFile, fedInfo));
+    std::shared_ptr<CoSimFederate> csFed;
+    EXPECT_NO_THROW(csFed = std::make_shared<CoSimFederate>("bball", inputFile, fedInfo));
 
     fedInfo.coreInitString.clear();
 
@@ -212,8 +214,8 @@ TEST(bouncingBall, setHeightRemoteCommand)
     fedInfo.coreInitString = "--autobroker";
     fedInfo.brokerInitString = "-f2";
     EXPECT_TRUE(std::filesystem::exists(inputFile));
-    std::shared_ptr<FmiCoSimFederate> csFed;
-    EXPECT_NO_THROW(csFed = std::make_shared<FmiCoSimFederate>("bball", inputFile, fedInfo));
+    std::shared_ptr<CoSimFederate> csFed;
+    EXPECT_NO_THROW(csFed = std::make_shared<CoSimFederate>("bball", inputFile, fedInfo));
 
     fedInfo.coreInitString.clear();
 

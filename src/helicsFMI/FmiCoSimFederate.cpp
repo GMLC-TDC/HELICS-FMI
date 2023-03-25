@@ -16,14 +16,17 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <utility>
 
+namespace helicsfmi {
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
-                                   const std::string& fmu,
-                                   const helics::FederateInfo& fedInfo):
+CoSimFederate::CoSimFederate(const std::string& name,
+                             const std::string& fmu,
+                             const helics::FederateInfo& fedInfo):
     fed(name, fedInfo)
 {
     auto fmi = std::make_shared<FmiLibrary>();
-    fmi->loadFMU(fmu);
+    if (!fmi->loadFMU(fmu)) {
+        throw(Error("CoSimFederate", "unable to load FMU", -101));
+    }
 
     cs = fmi->createCoSimulationObject(name);
     if (cs) {
@@ -32,9 +35,9 @@ FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
     }
 }
 
-FmiCoSimFederate::FmiCoSimFederate(const std::string& name,
-                                   std::shared_ptr<fmi2CoSimObject> obj,
-                                   const helics::FederateInfo& fedInfo)
+CoSimFederate::CoSimFederate(const std::string& name,
+                             std::shared_ptr<fmi2CoSimObject> obj,
+                             const helics::FederateInfo& fedInfo)
 try : fed(name, fedInfo), cs(std::move(obj)) {
     if (cs) {
         input_list = cs->getInputNames();
@@ -46,7 +49,7 @@ catch (const std::exception& e) {
     throw;
 }
 
-void FmiCoSimFederate::configure(helics::Time step, helics::Time startTime)
+void CoSimFederate::configure(helics::Time step, helics::Time startTime)
 {
     timeBias = startTime;
     for (const auto& input : input_list) {
@@ -82,35 +85,35 @@ void FmiCoSimFederate::configure(helics::Time step, helics::Time startTime)
     stepTime = step;
 }
 
-void FmiCoSimFederate::setInputs(std::vector<std::string> input_names)
+void CoSimFederate::setInputs(std::vector<std::string> input_names)
 {
     input_list = std::move(input_names);
 }
-void FmiCoSimFederate::setOutputs(std::vector<std::string> output_names)
+void CoSimFederate::setOutputs(std::vector<std::string> output_names)
 {
     output_list = std::move(output_names);
 }
-void FmiCoSimFederate::setConnections(std::vector<std::string> conn)
+void CoSimFederate::setConnections(std::vector<std::string> conn)
 {
     connections = std::move(conn);
 }
 
-void FmiCoSimFederate::addInput(const std::string& input_name)
+void CoSimFederate::addInput(const std::string& input_name)
 {
     input_list.push_back(input_name);
 }
 
-void FmiCoSimFederate::addOutput(const std::string& output_name)
+void CoSimFederate::addOutput(const std::string& output_name)
 {
     output_list.push_back(output_name);
 }
 
-void FmiCoSimFederate::addConnection(const std::string& conn)
+void CoSimFederate::addConnection(const std::string& conn)
 {
     connections.push_back(conn);
 }
 
-void FmiCoSimFederate::setOutputCapture(bool capture, const std::string& outputFile)
+void CoSimFederate::setOutputCapture(bool capture, const std::string& outputFile)
 {
     if (!outputFile.empty()) {
         outputCaptureFile = outputFile;
@@ -118,7 +121,7 @@ void FmiCoSimFederate::setOutputCapture(bool capture, const std::string& outputF
     captureOutput = capture;
 }
 
-void FmiCoSimFederate::runCommand(const std::string& command)
+void CoSimFederate::runCommand(const std::string& command)
 {
     auto cvec = gmlc::utilities::stringOps::splitlineQuotes(
         command, " ,;:", "\"'`", gmlc::utilities::stringOps::delimiter_compression::on);
@@ -138,7 +141,7 @@ void FmiCoSimFederate::runCommand(const std::string& command)
     }
 }
 
-double FmiCoSimFederate::initialize(double stop, std::ofstream& ofile)
+double CoSimFederate::initialize(double stop, std::ofstream& ofile)
 {
     const auto& def = cs->fmuInformation().getExperiment();
 
@@ -178,7 +181,7 @@ double FmiCoSimFederate::initialize(double stop, std::ofstream& ofile)
     return stop;
 }
 
-void FmiCoSimFederate::run(helics::Time stop)
+void CoSimFederate::run(helics::Time stop)
 {
     std::ofstream ofile;
 
@@ -228,3 +231,4 @@ void FmiCoSimFederate::run(helics::Time stop)
     }
     fed.finalize();
 }
+}  // namespace helicsfmi

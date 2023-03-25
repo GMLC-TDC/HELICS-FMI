@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <sstream>
 #include <string>
 
-namespace helics::fileops {
+namespace helicsfmi::fileops {
 
 bool hasJsonExtension(const std::string& jsonString)
 {
@@ -35,10 +35,8 @@ Json::Value loadJson(const std::string& jsonString)
 
     if (file.is_open()) {
         Json::Value doc;
-        Json::CharReaderBuilder rbuilder;
         std::string errs;
-        bool ok = Json::parseFromStream(rbuilder, file, &doc, &errs);
-        if (!ok) {
+        if (!Json::parseFromStream(Json::CharReaderBuilder{}, file, &doc, &errs)) {
             throw(std::invalid_argument(errs.c_str()));
         }
         return doc;
@@ -49,11 +47,10 @@ Json::Value loadJson(const std::string& jsonString)
 Json::Value loadJsonStr(std::string_view jsonString)
 {
     Json::Value doc;
-    Json::CharReaderBuilder rbuilder;
+    const Json::CharReaderBuilder rbuilder;
     std::string errs;
     auto reader = std::unique_ptr<Json::CharReader>(rbuilder.newCharReader());
-    bool ok = reader->parse(jsonString.data(), jsonString.data() + jsonString.size(), &doc, &errs);
-    if (!ok) {
+    if (!reader->parse(jsonString.data(), jsonString.data() + jsonString.size(), &doc, &errs)) {
         throw(std::invalid_argument(errs.c_str()));
     }
     return doc;
@@ -80,4 +77,4 @@ std::string generateJsonString(const Json::Value& block)
     return ret;
 }
 
-}  // namespace helics::fileops
+}  // namespace helicsfmi::fileops
