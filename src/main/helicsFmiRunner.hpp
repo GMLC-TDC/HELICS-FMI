@@ -25,7 +25,6 @@ namespace helicsfmi {
 
 class FmiRunner {
   private:
-    std::string inputFile;
     std::string integrator{"cvode"};
     std::string integratorArgs;
     std::string brokerArgs;
@@ -41,14 +40,28 @@ class FmiRunner {
     std::unique_ptr<helics::apps::CoreApp> core;
     std::vector<std::unique_ptr<CoSimFederate>> cosimFeds;
     std::vector<std::unique_ptr<FmiModelExchangeFederate>> meFeds;
-    enum class State { CREATED, LOADED, INITIALIZED, RUNNING, CLOSED };
+    enum class State { CREATED, LOADED, INITIALIZED, RUNNING, CLOSED, ERROR };
     State currentState{State::CREATED};
+    int returnCode{ EXIT_SUCCESS };
+public:
+    enum ExitCodes:int
+    {
+        BrokerConnectFailure=32,
+        CoreConnectFailure=33,
+        MissingFile=34,
+        InvalidFile=45,
+        FileProcessingError=47,
+        InvalidFmu=55,
+        FmuError=56,
+        IncorrectFmu=57,
+        CallNotAllowedInCurrentState=83
+    };
 
   public:
     FmiRunner();
     std::unique_ptr<CLI::App> generateCLI();
     /** parse a string input*/
-    void parse(const std::string& cliString);
+    int parse(const std::string& cliString);
     int load();
     int initialize();
     int run(helics::Time stop = helics::initializationTime);
@@ -58,6 +71,7 @@ class FmiRunner {
 
   private:
     int loadFile(readerElement& elem);
+    int errorTerminate(int errorCode);
 };
 
 }  // namespace helicsfmi

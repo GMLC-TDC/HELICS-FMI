@@ -97,3 +97,57 @@ TEST(exeTests, dualFedAsyncZMQ)
     vFed.finalize();
     auto str = out.get();
 }
+
+
+static const std::string inputDir = std::string(TEST_DIR) + "/";
+
+TEST(exeTests, nonExistingFile)
+{
+
+    const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
+
+    /**test that things run to completion with auto broker*/
+    auto out = hfmi.runAsync(
+        std::string(
+            "--autobroker ") +
+        inputDir + "nonExistent.fmu");
+    EXPECT_NE(out.get(), 0);
+
+}
+
+TEST(exeTests, invalidZip)
+{
+
+    const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
+
+    /**test that things run to completion with auto broker*/
+    auto out = hfmi.runAsync(std::string(
+        "--autobroker ") +
+        inputDir + "dummy.fmu");
+    EXPECT_NE(out.get(), 0);
+
+}
+
+TEST(exeTests, invalidFMU)
+{
+    const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
+
+    /**test that things run to completion with auto broker*/
+    auto out = hfmi.runAsync(std::string(
+        "--autobroker ") +
+        inputDir + "validZip.fmu");
+    EXPECT_NE(out.get(), 0);
+
+}
+
+TEST(exeTests, missingSO)
+{
+    const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
+
+    /**test that things run to completion with auto broker*/
+    auto out = hfmi.runAsync(std::string(
+        "--autobroker ") +
+        inputDir + "missingSO.fmu");
+    EXPECT_NE(out.get(), 0);
+
+}
