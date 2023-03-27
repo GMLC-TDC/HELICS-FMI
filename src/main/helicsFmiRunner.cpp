@@ -128,7 +128,7 @@ int FmiRunner::load()
             if (!broker->isConnected()) {
                 if (!broker->connect()) {
                     std::cerr << "broker failed to connect" << std::endl;
-                    return errorTerminate(BrokerConnectFailure);
+                    return errorTerminate(BROKER_CONNECT_FAILURE);
                 }
             }
 
@@ -136,7 +136,7 @@ int FmiRunner::load()
         }
         catch (const std::exception& e) {
             std::cerr << "error generating broker :" << e.what() << std::endl;
-            return errorTerminate(BrokerConnectFailure);
+            return errorTerminate(BROKER_CONNECT_FAILURE);
         }
     }
     fedInfo.autobroker = false;
@@ -155,7 +155,7 @@ int FmiRunner::load()
         if (!core->connect()) {
             core.reset();
             std::cerr << "core failed to connect" << std::endl;
-            return errorTerminate(CoreConnectFailure);
+            return errorTerminate(CORE_CONNECT_FAILURE);
         }
     }
     fedInfo.coreName = core->getIdentifier();
@@ -163,22 +163,21 @@ int FmiRunner::load()
         currentState = State::ERROR;
         return -203;
     }
-    std::string inputFile = inputs.front();
+    const std::string &inputFile = inputs.front();
     auto ext = inputFile.substr(inputFile.find_last_of('.'));
 
     FmiLibrary fmi;
     if ((ext == ".fmu") || (ext == ".FMU")) {
         try {
-            bool loaded = fmi.loadFMU(inputFile);
-            if (!loaded) {
+            if (!fmi.loadFMU(inputFile)) {
                 std::cout << "error loading fmu: error code=" << fmi.getErrorCode() << std::endl;
-                return errorTerminate(InvalidFmu);
+                return errorTerminate(INVALID_FMU);
             }
             if (cosimFmu && fmi.checkFlag(fmuCapabilityFlags::coSimulationCapable)) {
                 std::shared_ptr<fmi2CoSimObject> obj = fmi.createCoSimulationObject("obj1");
                 if (!obj) {
                     std::cout << "unable to create cosim object " << std::endl;
-                    return errorTerminate(FmuError);
+                    return errorTerminate(FMU_ERROR);
                 }
                 auto fed = std::make_unique<CoSimFederate>("", std::move(obj), fedInfo);
                 cosimFeds.push_back(std::move(fed));
@@ -187,7 +186,7 @@ int FmiRunner::load()
                     fmi.createModelExchangeObject("obj1");
                 if (!obj) {
                     std::cout << "unable to create model exchange object " << std::endl;
-                    return errorTerminate(FmuError);
+                    return errorTerminate(FMU_ERROR);
                 }
                 auto fed = std::make_unique<FmiModelExchangeFederate>(std::move(obj), fedInfo);
                 meFeds.push_back(std::move(fed));
@@ -195,7 +194,7 @@ int FmiRunner::load()
         }
         catch (const std::exception& e) {
             std::cout << "error running fmu: " << e.what() << std::endl;
-            return errorTerminate(FmuError);
+            return errorTerminate(FMU_ERROR);
         }
     } else if ((ext == ".json") || (ext == ".JSON")) {
         jsonReaderElement system(inputFile);
@@ -205,10 +204,10 @@ int FmiRunner::load()
             }
             catch (const std::exception& e) {
                 std::cout << "error running system " << e.what() << std::endl;
-                return errorTerminate(FileProcessingError);
+                return errorTerminate(FILE_PROCESSING_ERROR);
             }
         } else if (broker) {
-            return errorTerminate(FileProcessingError);
+            return errorTerminate(FILE_PROCESSING_ERROR);
         }
     } else if ((ext == ".toml") || (ext == ".TOML")) {
         tomlReaderElement system(inputFile);
@@ -218,7 +217,7 @@ int FmiRunner::load()
             }
             catch (const std::exception& e) {
                 std::cout << "error running system " << e.what() << std::endl;
-                return errorTerminate(FileProcessingError);
+                return errorTerminate(FILE_PROCESSING_ERROR);
             }
         } else if (broker) {
             broker->forceTerminate();
@@ -231,7 +230,7 @@ int FmiRunner::load()
             }
             catch (const std::exception& e) {
                 std::cout << "error running system " << e.what() << std::endl;
-                return errorTerminate(FileProcessingError);
+                return errorTerminate(FILE_PROCESSING_ERROR);
             }
         } else if (broker) {
             broker->forceTerminate();

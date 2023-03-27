@@ -46,18 +46,17 @@ class FmiRunner {
 
   public:
     enum ExitCodes : int {
-        BrokerConnectFailure = 32,
-        CoreConnectFailure = 33,
-        MissingFile = 34,
-        InvalidFile = 45,
-        FileProcessingError = 47,
-        InvalidFmu = 55,
-        FmuError = 56,
-        IncorrectFmu = 57,
-        CallNotAllowedInCurrentState = 83
+        BROKER_CONNECT_FAILURE = 32,
+        CORE_CONNECT_FAILURE = 33,
+        MISSING_FILE = 34,
+        INVALID_FILE = 45,
+        FILE_PROCESSING_ERROR = 47,
+        INVALID_FMU = 55,
+        FMU_ERROR = 56,
+        INCORRECT_FMU = 57,
+        CALL_NOT_ALLOWED_IN_CURRENT_STATE = 83
     };
 
-  public:
     FmiRunner();
     std::unique_ptr<CLI::App> generateCLI();
     /** parse a string input*/

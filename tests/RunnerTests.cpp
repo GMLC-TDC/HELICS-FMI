@@ -103,9 +103,9 @@ static const std::string inputDir = std::string(TEST_DIR) + "/";
 TEST(runnerTests, nonExistingFile)
 {
     FmiRunner runner;
-    int ret = runner.parse(std::string("--autobroker ") + inputDir + "nonExistent.fmu");
+    const int ret = runner.parse(std::string("--autobroker ") + inputDir + "nonExistent.fmu");
     EXPECT_NE(ret, 0);
-    int ret2 = runner.load();
+    const int ret2 = runner.load();
     EXPECT_EQ(ret, ret2);
 }
 
@@ -116,7 +116,7 @@ TEST(runnerTests, invalidZip)
     EXPECT_EQ(ret, 0);
     ret = runner.load();
     EXPECT_NE(ret, 0);
-    EXPECT_EQ(ret, FmiRunner::InvalidFmu);
+    EXPECT_EQ(ret, FmiRunner::INVALID_FMU);
 }
 
 TEST(runnerTests, invalidFMU)
