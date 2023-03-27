@@ -49,7 +49,8 @@ std::unique_ptr<CLI::App> FmiRunner::generateCLI()
         ->transform(CLI::IsMember({"cvode", "arkode", "boost"}));
 
     app->add_option("inputfile,-i,--input", inputs, "specify the input files")
-        ->check(CLI::ExistingFile)->required();
+        ->check(CLI::ExistingFile)
+        ->required();
 
     app->add_option("--integrator-args", integratorArgs, "arguments to pass to the integrator");
 
@@ -93,17 +94,16 @@ std::unique_ptr<CLI::App> FmiRunner::generateCLI()
 
 int FmiRunner::parse(const std::string& cliString)
 {
-    currentState=State::CREATED;
+    currentState = State::CREATED;
     auto app = generateCLI();
     try {
         app->parse(cliString);
         return EXIT_SUCCESS;
     }
     catch (const CLI::Error& e) {
-        returnCode= app->exit(e);
-        if (returnCode != static_cast<int>(CLI::ExitCodes::Success))
-        {
-            currentState=State::ERROR;
+        returnCode = app->exit(e);
+        if (returnCode != static_cast<int>(CLI::ExitCodes::Success)) {
+            currentState = State::ERROR;
         }
         return returnCode;
     }
@@ -112,7 +112,7 @@ int FmiRunner::parse(const std::string& cliString)
 int FmiRunner::load()
 {
     if (currentState >= State::LOADED) {
-        return  (currentState==State::ERROR)?returnCode:EXIT_SUCCESS;
+        return (currentState == State::ERROR) ? returnCode : EXIT_SUCCESS;
     }
     if (fedInfo.autobroker) {
         try {
@@ -137,11 +137,10 @@ int FmiRunner::load()
         catch (const std::exception& e) {
             std::cerr << "error generating broker :" << e.what() << std::endl;
             return errorTerminate(BrokerConnectFailure);
-
         }
     }
     fedInfo.autobroker = false;
-    
+
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, stepTime);
 
     if (broker) {
@@ -160,29 +159,25 @@ int FmiRunner::load()
         }
     }
     fedInfo.coreName = core->getIdentifier();
-    if (inputs.empty())
-    {
-        currentState=State::ERROR;
+    if (inputs.empty()) {
+        currentState = State::ERROR;
         return -203;
     }
-    std::string inputFile=inputs.front();
+    std::string inputFile = inputs.front();
     auto ext = inputFile.substr(inputFile.find_last_of('.'));
 
     FmiLibrary fmi;
     if ((ext == ".fmu") || (ext == ".FMU")) {
         try {
-            bool loaded=fmi.loadFMU(inputFile);
-            if (!loaded)
-            {
-                
-                std::cout << "error loading fmu: error code="<<fmi.getErrorCode()<<std::endl;
+            bool loaded = fmi.loadFMU(inputFile);
+            if (!loaded) {
+                std::cout << "error loading fmu: error code=" << fmi.getErrorCode() << std::endl;
                 return errorTerminate(InvalidFmu);
             }
             if (cosimFmu && fmi.checkFlag(fmuCapabilityFlags::coSimulationCapable)) {
                 std::shared_ptr<fmi2CoSimObject> obj = fmi.createCoSimulationObject("obj1");
-                if (!obj)
-                {
-                    std::cout << "unable to create cosim object "<<std::endl;
+                if (!obj) {
+                    std::cout << "unable to create cosim object " << std::endl;
                     return errorTerminate(FmuError);
                 }
                 auto fed = std::make_unique<CoSimFederate>("", std::move(obj), fedInfo);
@@ -190,9 +185,8 @@ int FmiRunner::load()
             } else {
                 std::shared_ptr<fmi2ModelExchangeObject> obj =
                     fmi.createModelExchangeObject("obj1");
-                if (!obj)
-                {
-                    std::cout << "unable to create model exchange object "<<std::endl;
+                if (!obj) {
+                    std::cout << "unable to create model exchange object " << std::endl;
                     return errorTerminate(FmuError);
                 }
                 auto fed = std::make_unique<FmiModelExchangeFederate>(std::move(obj), fedInfo);
@@ -223,7 +217,6 @@ int FmiRunner::load()
                 loadFile(system);
             }
             catch (const std::exception& e) {
-                
                 std::cout << "error running system " << e.what() << std::endl;
                 return errorTerminate(FileProcessingError);
             }
@@ -237,7 +230,6 @@ int FmiRunner::load()
                 loadFile(system);
             }
             catch (const std::exception& e) {
-               
                 std::cout << "error running system " << e.what() << std::endl;
                 return errorTerminate(FileProcessingError);
             }
@@ -251,8 +243,7 @@ int FmiRunner::load()
 
 int FmiRunner::run(helics::Time stop)
 {
-    if (currentState == State::ERROR)
-    {
+    if (currentState == State::ERROR) {
         return returnCode;
     }
     if (currentState < State::INITIALIZED) {
@@ -327,13 +318,12 @@ int FmiRunner::errorTerminate(int errorCode)
         broker->forceTerminate();
         broker.reset();
     }
-    if (core)
-    {
+    if (core) {
         core->forceTerminate();
         core.reset();
     }
-    currentState=State::ERROR;
-    returnCode=errorCode;
+    currentState = State::ERROR;
+    returnCode = errorCode;
     return returnCode;
 }
 

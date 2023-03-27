@@ -98,55 +98,41 @@ TEST(runnerTests, dualFedAsyncZMQ)
     EXPECT_EQ(str, 0);
 }
 
-
 static const std::string inputDir = std::string(TEST_DIR) + "/";
 
 TEST(runnerTests, nonExistingFile)
 {
     FmiRunner runner;
-    int ret=runner.parse(
-        std::string(
-            "--autobroker ") +
-        inputDir + "nonExistent.fmu");
-    EXPECT_NE(ret,0);
+    int ret = runner.parse(std::string("--autobroker ") + inputDir + "nonExistent.fmu");
+    EXPECT_NE(ret, 0);
     int ret2 = runner.load();
-    EXPECT_EQ(ret,ret2);
+    EXPECT_EQ(ret, ret2);
 }
 
 TEST(runnerTests, invalidZip)
 {
     FmiRunner runner;
-    int ret=runner.parse(
-        std::string(
-            "--autobroker ") +
-        inputDir + "dummy.fmu");
-    EXPECT_EQ(ret,0);
+    int ret = runner.parse(std::string("--autobroker ") + inputDir + "dummy.fmu");
+    EXPECT_EQ(ret, 0);
     ret = runner.load();
-    EXPECT_NE(ret,0);
-    EXPECT_EQ(ret,FmiRunner::InvalidFmu);
+    EXPECT_NE(ret, 0);
+    EXPECT_EQ(ret, FmiRunner::InvalidFmu);
 }
 
 TEST(runnerTests, invalidFMU)
 {
     FmiRunner runner;
-    int ret=runner.parse(
-        std::string(
-            "--autobroker ") +
-        inputDir + "validZip.fmu");
-    EXPECT_EQ(ret,0);
+    int ret = runner.parse(std::string("--autobroker ") + inputDir + "validZip.fmu");
+    EXPECT_EQ(ret, 0);
     ret = runner.load();
-    EXPECT_NE(ret,0);
+    EXPECT_NE(ret, 0);
 }
 
 TEST(runnerTests, missingSO)
 {
     FmiRunner runner;
-    int ret=runner.parse(
-        std::string(
-            "--autobroker ") +
-        inputDir + "missingSO.fmu");
-    EXPECT_EQ(ret,0);
+    int ret = runner.parse(std::string("--autobroker ") + inputDir + "missingSO.fmu");
+    EXPECT_EQ(ret, 0);
     ret = runner.load();
-    EXPECT_NE(ret,0);
-
+    EXPECT_NE(ret, 0);
 }

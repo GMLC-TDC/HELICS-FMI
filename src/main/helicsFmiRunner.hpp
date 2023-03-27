@@ -42,19 +42,19 @@ class FmiRunner {
     std::vector<std::unique_ptr<FmiModelExchangeFederate>> meFeds;
     enum class State { CREATED, LOADED, INITIALIZED, RUNNING, CLOSED, ERROR };
     State currentState{State::CREATED};
-    int returnCode{ EXIT_SUCCESS };
-public:
-    enum ExitCodes:int
-    {
-        BrokerConnectFailure=32,
-        CoreConnectFailure=33,
-        MissingFile=34,
-        InvalidFile=45,
-        FileProcessingError=47,
-        InvalidFmu=55,
-        FmuError=56,
-        IncorrectFmu=57,
-        CallNotAllowedInCurrentState=83
+    int returnCode{EXIT_SUCCESS};
+
+  public:
+    enum ExitCodes : int {
+        BrokerConnectFailure = 32,
+        CoreConnectFailure = 33,
+        MissingFile = 34,
+        InvalidFile = 45,
+        FileProcessingError = 47,
+        InvalidFmu = 55,
+        FmuError = 56,
+        IncorrectFmu = 57,
+        CallNotAllowedInCurrentState = 83
     };
 
   public:
