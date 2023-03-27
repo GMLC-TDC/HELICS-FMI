@@ -163,7 +163,7 @@ int FmiRunner::load()
         currentState = State::ERROR;
         return -203;
     }
-    const std::string &inputFile = inputs.front();
+    const std::string& inputFile = inputs.front();
     auto ext = inputFile.substr(inputFile.find_last_of('.'));
 
     FmiLibrary fmi;
