@@ -40,7 +40,7 @@ std::unique_ptr<CLI::App> FmiRunner::generateCLI()
             throw(CLI::Success());
         },
         "specify the versions of helics and helics-fmi");
-    app->validate_positionals();
+    app->validate_positionals()->validate_optional_arguments();
 
     app->add_option("--integrator",
                     integrator,
@@ -49,7 +49,6 @@ std::unique_ptr<CLI::App> FmiRunner::generateCLI()
         ->transform(CLI::IsMember({"cvode", "arkode", "boost"}));
 
     app->add_option("inputfile,-i,--input", inputs, "specify the input files")
-        ->check(CLI::ExistingFile)
         ->required();
 
     app->add_option("--integrator-args", integratorArgs, "arguments to pass to the integrator");
@@ -79,7 +78,7 @@ std::unique_ptr<CLI::App> FmiRunner::generateCLI()
         ->delimiter(',');
     app->add_option("--connections", connections, "Specify connections this FMU should make")
         ->delimiter(',');
-
+    app->add_option("-L,--fmupath",paths,"Specify additional search paths for the fmu's or configuration files")->check(CLI::ExistingPath);
     app->add_flag("--cosim",
                   cosimFmu,
                   "specify that the fmu should run as a co-sim FMU if possible");
@@ -163,9 +162,13 @@ int FmiRunner::load()
         currentState = State::ERROR;
         return -203;
     }
-    const std::string& inputFile = inputs.front();
-    auto ext = inputFile.substr(inputFile.find_last_of('.'));
+    const std::string inputFile = getFilePath(inputs.front());
+    if (inputFile.empty())
+    {
 
+    }
+    auto ext = inputFile.substr(inputFile.find_last_of('.'));
+   
     FmiLibrary fmi;
     if ((ext == ".fmu") || (ext == ".FMU")) {
         try {
@@ -324,6 +327,27 @@ int FmiRunner::errorTerminate(int errorCode)
     currentState = State::ERROR;
     returnCode = errorCode;
     return returnCode;
+}
+
+std::string  FmiRunner::getFilePath(const std::string& file) const
+{
+    if (std::filesystem::exists(file))
+    {
+        return file;
+    }
+    if (!paths.empty())
+    {
+        for (const auto& pth : paths)
+        {
+            std::filesystem::path libraryPath(pth);
+            libraryPath/=file;
+            if (std::filesystem::exists(libraryPath))
+            {
+                return libraryPath.string();
+            }
+        }
+    }
+    return {};
 }
 
 int FmiRunner::loadFile(readerElement& elem)
