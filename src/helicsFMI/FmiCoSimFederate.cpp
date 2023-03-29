@@ -49,6 +49,41 @@ catch (const std::exception& e) {
     throw;
 }
 
+
+CoSimFederate::CoSimFederate(const std::string& name,
+    std::shared_ptr<helics::Core> crptr,
+    const std::string& fmu,
+    const helics::FederateInfo& fedInfo
+):
+    fed(name,std::move(crptr), fedInfo)
+{
+    auto fmi = std::make_shared<FmiLibrary>();
+    if (!fmi->loadFMU(fmu)) {
+        throw(Error("CoSimFederate", "unable to load FMU", -101));
+    }
+
+    cs = fmi->createCoSimulationObject(name);
+    if (cs) {
+        input_list = cs->getInputNames();
+        output_list = cs->getOutputNames();
+    }
+}
+
+CoSimFederate::CoSimFederate(const std::string& name,
+    std::shared_ptr<fmi2CoSimObject> obj,
+    std::shared_ptr<helics::Core> crptr,
+    const helics::FederateInfo& fedInfo)
+try : fed(name, std::move(crptr),fedInfo), cs(std::move(obj)) {
+    if (cs) {
+        input_list = cs->getInputNames();
+        output_list = cs->getOutputNames();
+    }
+}
+catch (const std::exception& e) {
+    std::cout << "error in constructor of federate:" << e.what() << std::endl;
+    throw;
+}
+
 void CoSimFederate::configure(helics::Time step, helics::Time startTime)
 {
     timeBias = startTime;
