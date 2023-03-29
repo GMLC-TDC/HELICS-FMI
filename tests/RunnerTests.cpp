@@ -100,7 +100,6 @@ TEST(runnerTests, dualFedZMQ)
 
 static const std::string inputDir = std::string(TEST_DIR) + "/";
 
-
 TEST(runnerTests, NoFile)
 {
     FmiRunner runner;
