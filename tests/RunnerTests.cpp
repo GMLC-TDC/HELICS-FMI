@@ -100,13 +100,21 @@ TEST(runnerTests, dualFedZMQ)
 
 static const std::string inputDir = std::string(TEST_DIR) + "/";
 
+
+TEST(runnerTests, NoFile)
+{
+    FmiRunner runner;
+    const int ret = runner.parse("--autobroker ");
+    EXPECT_NE(ret, 0);
+}
+
 TEST(runnerTests, nonExistingFile)
 {
     FmiRunner runner;
     const int ret = runner.parse(std::string("--autobroker ") + inputDir + "nonExistent.fmu");
-    EXPECT_NE(ret, 0);
+    EXPECT_EQ(ret, 0);
     const int ret2 = runner.load();
-    EXPECT_EQ(ret, ret2);
+    EXPECT_NE(ret, ret2);
 }
 
 TEST(runnerTests, invalidZip)

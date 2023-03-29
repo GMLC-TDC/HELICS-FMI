@@ -221,7 +221,7 @@ int FmiRunner::load()
         tomlReaderElement system(inputFile);
         if (system.isValid()) {
             try {
-                int lfile = loadFile(system);
+                const int lfile = loadFile(system);
                 if (lfile != 0) {
                     return lfile;
                 }
@@ -237,7 +237,7 @@ int FmiRunner::load()
         tinyxml2ReaderElement system(inputFile);
         if (system.isValid()) {
             try {
-                int lfile = loadFile(system);
+                const int lfile = loadFile(system);
                 if (lfile != 0) {
                     return lfile;
                 }
@@ -304,30 +304,30 @@ int FmiRunner::initialize()
     std::vector<int> paramUsed(setParameters.size(), 0);
     for (auto& csFed : cosimFeds) {
         csFed->configure(stepTime);
-        int ii = 0;
+        int index = 0;
         for (const auto& param : setParameters) {
             auto eloc = param.find_first_of('=');
             try {
                 csFed->set(param.substr(0, eloc), param.substr(eloc + 1));
-                paramUsed[ii] = 1;
+                paramUsed[index] = 1;
             }
             catch (const fmiDiscardException&) {
             }
-            ++ii;
+            ++index;
         }
     }
     for (auto& meFed : meFeds) {
         meFed->configure(stepTime);
         for (const auto& param : setParameters) {
             auto eloc = param.find_first_of('=');
-            int ii = 0;
+            int index = 0;
             try {
                 meFed->set(param.substr(0, eloc), param.substr(eloc + 1));
-                paramUsed[ii] = 1;
+                paramUsed[index] = 1;
             }
             catch (const fmiDiscardException&) {
             }
-            ++ii;
+            ++index;
         }
     }
 
