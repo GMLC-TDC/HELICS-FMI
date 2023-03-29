@@ -7,6 +7,8 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 #include "fmiObjects.h"
 
+#include <cstdlib>
+
 fmi2Object::fmi2Object(const std::string& fmuname,
                        fmi2Component cmp,
                        std::shared_ptr<const fmiInfo> keyInfo,
@@ -159,27 +161,29 @@ void fmi2Object::set(const fmiVariableSet& vrset, fmi2Real value[])
 
 void fmi2Object::set(const fmiVariable& param, const char* val)
 {
-    if (!(param.type._value == fmi_variable_type::string)) {
-        handleNonOKReturnValues(fmi2Status::fmi2Discard);
-        return;
+    if (param.type._value == fmi_variable_type::string){
+            auto ret = commonFunctions->fmi2SetString(comp, &(param.vRef), 1, &val);
+            if (ret != fmi2Status::fmi2OK) {
+                handleNonOKReturnValues(ret);
+            }
     }
-    auto ret = commonFunctions->fmi2SetString(comp, &(param.vRef), 1, &val);
-    if (ret != fmi2Status::fmi2OK) {
-        handleNonOKReturnValues(ret);
+    else
+    {
+        char* pEnd;
+        double vdouble=std::strtod(val,&pEnd);
+        if (pEnd != val)
+        {
+            set(param,vdouble);
+        }
+        
     }
+    
+    
 }
 
 void fmi2Object::set(const fmiVariable& param, const std::string& val)
 {
-    if (!(param.type._value == fmi_variable_type::string)) {
-        handleNonOKReturnValues(fmi2Status::fmi2Discard);
-        return;
-    }
-    fmi2String val2 = val.c_str();
-    auto ret = commonFunctions->fmi2SetString(comp, &(param.vRef), 1, &val2);
-    if (ret != fmi2Status::fmi2OK) {
-        handleNonOKReturnValues(ret);
-    }
+    set(param,val.c_str());
 }
 
 void fmi2Object::setFlag(const std::string& param, bool val)
