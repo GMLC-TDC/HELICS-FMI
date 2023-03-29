@@ -161,29 +161,23 @@ void fmi2Object::set(const fmiVariableSet& vrset, fmi2Real value[])
 
 void fmi2Object::set(const fmiVariable& param, const char* val)
 {
-    if (param.type._value == fmi_variable_type::string){
-            auto ret = commonFunctions->fmi2SetString(comp, &(param.vRef), 1, &val);
-            if (ret != fmi2Status::fmi2OK) {
-                handleNonOKReturnValues(ret);
-            }
-    }
-    else
-    {
-        char* pEnd;
-        double vdouble=std::strtod(val,&pEnd);
-        if (pEnd != val)
-        {
-            set(param,vdouble);
+    if (param.type._value == fmi_variable_type::string) {
+        auto ret = commonFunctions->fmi2SetString(comp, &(param.vRef), 1, &val);
+        if (ret != fmi2Status::fmi2OK) {
+            handleNonOKReturnValues(ret);
         }
-        
+    } else {
+        char* pEnd;
+        double vdouble = std::strtod(val, &pEnd);
+        if (pEnd != val) {
+            set(param, vdouble);
+        }
     }
-    
-    
 }
 
 void fmi2Object::set(const fmiVariable& param, const std::string& val)
 {
-    set(param,val.c_str());
+    set(param, val.c_str());
 }
 
 void fmi2Object::setFlag(const std::string& param, bool val)

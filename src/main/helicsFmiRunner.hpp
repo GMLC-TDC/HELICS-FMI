@@ -77,7 +77,7 @@ class FmiRunner {
     /// @brief  find the full path for a file name
     /// @param file the filename
     /// @return a string with the full file path
-    std::string getFilePath(const std::string &file) const;
+    std::string getFilePath(const std::string& file) const;
 };
 
 }  // namespace helicsfmi

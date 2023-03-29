@@ -204,15 +204,13 @@ void CoSimFederate::run(helics::Time stop)
 
     helics::Time currentTime = helics::timeZero;
     while (currentTime + timeBias <= stop) {
-        try
-        {
+        try {
             cs->doStep(static_cast<double>(currentTime + timeBias),
-                static_cast<double>(stepTime),
-                fmi2True);
+                       static_cast<double>(stepTime),
+                       fmi2True);
         }
-        catch (const fmiException& fe)
-        {
-            fed.localError(56,fe.what());
+        catch (const fmiException& fe) {
+            fed.localError(56, fe.what());
             break;
         }
         currentTime = fed.requestNextStep();

@@ -137,7 +137,6 @@ TEST(runnerTests, missingSO)
     EXPECT_NE(ret, 0);
 }
 
-
 TEST(runnerTests, setfield)
 {
     FmiRunner runner;
@@ -165,7 +164,6 @@ TEST(runnerTests, setfield)
     auto& sub2 = vFed.registerSubscription(qres[1]);
     sub2.setDefault(-20.0);
 
-
     vFed.enterExecutingMode();
     auto time1 = vFed.requestTime(2.0);
     EXPECT_LT(time1, 2.0);
@@ -177,7 +175,6 @@ TEST(runnerTests, setfield)
     auto str = fut.get();
     EXPECT_EQ(str, 0);
 }
-
 
 TEST(runnerTests, setfield2)
 {
@@ -205,7 +202,6 @@ TEST(runnerTests, setfield2)
     sub1.setDefault(-20.0);
     auto& sub2 = vFed.registerSubscription(qres[1]);
     sub2.setDefault(-20.0);
-
 
     vFed.enterExecutingMode();
     auto time1 = vFed.requestTime(2.0);

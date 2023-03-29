@@ -48,8 +48,7 @@ std::unique_ptr<CLI::App> FmiRunner::generateCLI()
         ->capture_default_str()
         ->transform(CLI::IsMember({"cvode", "arkode", "boost"}));
 
-    app->add_option("inputfile,-i,--input", inputs, "specify the input files")
-        ->required();
+    app->add_option("inputfile,-i,--input", inputs, "specify the input files")->required();
 
     app->add_option("--integrator-args", integratorArgs, "arguments to pass to the integrator");
 
@@ -76,10 +75,17 @@ std::unique_ptr<CLI::App> FmiRunner::generateCLI()
                     "Specify the input variables of the FMU by name")
         ->ignore_underscore()
         ->delimiter(',');
-    app->add_option("--set",setParameters,"Specify initial values for Fmu parameters or variables as a semocolon separated list p1=34;p2=19.5")->delimiter(';');
+    app->add_option(
+           "--set",
+           setParameters,
+           "Specify initial values for Fmu parameters or variables as a semocolon separated list p1=34;p2=19.5")
+        ->delimiter(';');
     app->add_option("--connections", connections, "Specify connections this FMU should make")
         ->delimiter(',');
-    app->add_option("-L,--fmupath",paths,"Specify additional search paths for the fmu's or configuration files")->check(CLI::ExistingPath);
+    app->add_option("-L,--fmupath",
+                    paths,
+                    "Specify additional search paths for the fmu's or configuration files")
+        ->check(CLI::ExistingPath);
     app->add_flag("--cosim",
                   cosimFmu,
                   "specify that the fmu should run as a co-sim FMU if possible");
@@ -160,15 +166,14 @@ int FmiRunner::load()
     }
     fedInfo.coreName = core->getIdentifier();
     if (inputs.empty()) {
-        return errorTerminate(MISSING_FILE); 
+        return errorTerminate(MISSING_FILE);
     }
     const std::string inputFile = getFilePath(inputs.front());
-    if (inputFile.empty())
-    {
+    if (inputFile.empty()) {
         return errorTerminate(INVALID_FILE);
     }
     auto ext = inputFile.substr(inputFile.find_last_of('.'));
-   
+
     FmiLibrary fmi;
     if ((ext == ".fmu") || (ext == ".FMU")) {
         try {
@@ -216,9 +221,8 @@ int FmiRunner::load()
         tomlReaderElement system(inputFile);
         if (system.isValid()) {
             try {
-                int lfile=loadFile(system);
-                if (lfile != 0)
-                {
+                int lfile = loadFile(system);
+                if (lfile != 0) {
                     return lfile;
                 }
             }
@@ -233,9 +237,8 @@ int FmiRunner::load()
         tinyxml2ReaderElement system(inputFile);
         if (system.isValid()) {
             try {
-                int lfile=loadFile(system);
-                if (lfile != 0)
-                {
+                int lfile = loadFile(system);
+                if (lfile != 0) {
                     return lfile;
                 }
             }
@@ -298,49 +301,39 @@ int FmiRunner::initialize()
     if (currentState >= State::INITIALIZED) {
         return 0;
     }
-    std::vector<int> paramUsed(setParameters.size(),0);
+    std::vector<int> paramUsed(setParameters.size(), 0);
     for (auto& csFed : cosimFeds) {
         csFed->configure(stepTime);
-        int ii=0;
-        for (const auto& param : setParameters)
-        {
-            auto eloc=param.find_first_of('=');
-            try
-            {
-                csFed->set(param.substr(0,eloc),param.substr(eloc+1));
-                paramUsed[ii]=1;
+        int ii = 0;
+        for (const auto& param : setParameters) {
+            auto eloc = param.find_first_of('=');
+            try {
+                csFed->set(param.substr(0, eloc), param.substr(eloc + 1));
+                paramUsed[ii] = 1;
             }
-            catch (const fmiDiscardException&)
-            {
-
+            catch (const fmiDiscardException&) {
             }
             ++ii;
         }
     }
     for (auto& meFed : meFeds) {
         meFed->configure(stepTime);
-        for (const auto& param : setParameters)
-        {
-            auto eloc=param.find_first_of('=');
-            int ii=0;
-            try
-            {
-            meFed->set(param.substr(0,eloc),param.substr(eloc+1));
-            paramUsed[ii]=1;
+        for (const auto& param : setParameters) {
+            auto eloc = param.find_first_of('=');
+            int ii = 0;
+            try {
+                meFed->set(param.substr(0, eloc), param.substr(eloc + 1));
+                paramUsed[ii] = 1;
             }
-            catch (const fmiDiscardException&)
-            {
-
+            catch (const fmiDiscardException&) {
             }
             ++ii;
         }
     }
 
-    for (int ii = 0; ii < paramUsed.size(); ++ii)
-    {
-        if (paramUsed[ii] == 0)
-        {
-            std::cout<<"WARNING: "<<setParameters[ii] << " is unused"<<std::endl;
+    for (int ii = 0; ii < paramUsed.size(); ++ii) {
+        if (paramUsed[ii] == 0) {
+            std::cout << "WARNING: " << setParameters[ii] << " is unused" << std::endl;
         }
     }
     currentState = State::INITIALIZED;
@@ -376,20 +369,16 @@ int FmiRunner::errorTerminate(int errorCode)
     return returnCode;
 }
 
-std::string  FmiRunner::getFilePath(const std::string& file) const
+std::string FmiRunner::getFilePath(const std::string& file) const
 {
-    if (std::filesystem::exists(file))
-    {
+    if (std::filesystem::exists(file)) {
         return file;
     }
-    if (!paths.empty())
-    {
-        for (const auto& pth : paths)
-        {
+    if (!paths.empty()) {
+        for (const auto& pth : paths) {
             std::filesystem::path libraryPath(pth);
-            libraryPath/=file;
-            if (std::filesystem::exists(libraryPath))
-            {
+            libraryPath /= file;
+            if (std::filesystem::exists(libraryPath)) {
                 return libraryPath.string();
             }
         }
@@ -408,8 +397,7 @@ int FmiRunner::loadFile(readerElement& elem)
     while (elem.isValid()) {
         auto fmilib = std::make_unique<FmiLibrary>();
         auto str = getFilePath(elem.getAttributeText("fmu"));
-        if (str.empty())
-        {
+        if (str.empty()) {
             std::cout << "unable to locate file " << elem.getAttributeText("fmu") << std::endl;
             return errorTerminate(MISSING_FILE);
         }
