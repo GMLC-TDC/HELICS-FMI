@@ -215,8 +215,7 @@ int FmiRunner::load()
                 if (!core->isOpenToNewFederates()) {
                     std::cout << "core " << core->getIdentifier() << " is moved on\n";
                 }
-                if (!core->isConnected())
-                {
+                if (!core->isConnected()) {
                     std::cout << "core " << core->getIdentifier() << " is not connected\n";
                 }
             }
