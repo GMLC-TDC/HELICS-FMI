@@ -199,8 +199,11 @@ int FmiRunner::load()
                     std::cout << "unable to create model exchange object " << std::endl;
                     return errorTerminate(FMU_ERROR);
                 }
-                auto nm=obj->getName();
-                auto fed = std::make_unique<FmiModelExchangeFederate>(nm,std::move(obj),core->getCopyofCorePointer(), fedInfo);
+                auto nm = obj->getName();
+                auto fed = std::make_unique<FmiModelExchangeFederate>(nm,
+                                                                      std::move(obj),
+                                                                      core->getCopyofCorePointer(),
+                                                                      fedInfo);
                 meFeds.push_back(std::move(fed));
             }
         }
@@ -413,7 +416,7 @@ int FmiRunner::loadFile(readerElement& elem)
                 std::cout << "unable to create cosim object " << std::endl;
                 return errorTerminate(FMU_ERROR);
             }
-            auto nm=obj->getName();
+            auto nm = obj->getName();
             auto fed = std::make_unique<CoSimFederate>(nm,
                                                        std::move(obj),
                                                        core->getCopyofCorePointer(),
@@ -445,8 +448,11 @@ int FmiRunner::loadFile(readerElement& elem)
                 std::cout << "unable to create model exchange object " << std::endl;
                 return errorTerminate(FMU_ERROR);
             }
-            auto nm=obj->getName();
-            auto fed = std::make_unique<FmiModelExchangeFederate>(nm,std::move(obj),core->getCopyofCorePointer(),fedInfo);
+            auto nm = obj->getName();
+            auto fed = std::make_unique<FmiModelExchangeFederate>(nm,
+                                                                  std::move(obj),
+                                                                  core->getCopyofCorePointer(),
+                                                                  fedInfo);
             elem.moveToFirstChild("parameters");
             while (elem.isValid()) {
                 auto str1 = elem.getFirstAttribute().getText();
