@@ -186,9 +186,19 @@ int FmiRunner::load()
                     std::cout << "unable to create cosim object " << std::endl;
                     return errorTerminate(FMU_ERROR);
                 }
+                if (fedInfo.defName.empty())
+                {
+                    fedInfo.defName=obj->getName();
+                }
+                
+                auto cr=core->getCopyofCorePointer();
+                if (!core->isOpenToNewFederates()) {
+                    std::cout << "core " << core->getIdentifier() << " is moved on to state "<<core->query("core","state")<<"\n";
+                }
+                core->setLoggingLevel(HELICS_LOG_LEVEL_TRACE);
                 auto fed = std::make_unique<CoSimFederate>("",
                                                            std::move(obj),
-                                                           core->getCopyofCorePointer(),
+                                                           std::move(cr),
                                                            fedInfo);
                 cosimFeds.push_back(std::move(fed));
             } else {
@@ -198,8 +208,11 @@ int FmiRunner::load()
                     std::cout << "unable to create model exchange object " << std::endl;
                     return errorTerminate(FMU_ERROR);
                 }
-                auto nm = obj->getName();
-                auto fed = std::make_unique<FmiModelExchangeFederate>(nm,
+                if (fedInfo.defName.empty())
+                {
+                    fedInfo.defName=obj->getName();
+                }
+                auto fed = std::make_unique<FmiModelExchangeFederate>("",
                                                                       std::move(obj),
                                                                       core->getCopyofCorePointer(),
                                                                       fedInfo);
@@ -207,13 +220,13 @@ int FmiRunner::load()
             }
         }
         catch (const std::exception& e) {
-            std::cout << "error running fmu: " << e.what() << std::endl;
+            std::cout << "error creating federate fmu: " << e.what() << std::endl;
             auto cr = core->getCopyofCorePointer();
             if (!cr) {
                 std::cout << "core not valid" << std::endl;
             } else {
                 if (!core->isOpenToNewFederates()) {
-                    std::cout << "core " << core->getIdentifier() << " is moved on\n";
+                    std::cout << "core " << core->getIdentifier() << " is moved on to state "<<core->query("core","state")<<"\n";
                 }
                 if (!core->isConnected()) {
                     std::cout << "core " << core->getIdentifier() << " is not connected\n";
