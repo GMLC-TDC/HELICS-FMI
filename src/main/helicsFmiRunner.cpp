@@ -164,9 +164,8 @@ int FmiRunner::load()
             return errorTerminate(CORE_CONNECT_FAILURE);
         }
     }
-    if (!core->isOpenToNewFederates())
-    {
-        std::cerr << "core is not open oddly core name="<<core->getIdentifier() << std::endl;
+    if (!core->isOpenToNewFederates()) {
+        std::cerr << "core is not open oddly core name=" << core->getIdentifier() << std::endl;
         return errorTerminate(CORE_CONNECT_FAILURE);
     }
     if (inputs.empty()) {
