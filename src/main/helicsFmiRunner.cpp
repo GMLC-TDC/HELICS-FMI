@@ -213,7 +213,7 @@ int FmiRunner::load()
                 std::cout << "core not valid" << std::endl;
             } else {
                 if (!core->isOpenToNewFederates()) {
-                    std::cout << "core "<<core->getIdentifier()<<" is moved on\n";
+                    std::cout << "core " << core->getIdentifier() << " is moved on\n";
                 }
             }
             return errorTerminate(FMU_ERROR);
@@ -262,7 +262,7 @@ int FmiRunner::load()
                 std::cout << "error running system " << e.what() << std::endl;
                 return errorTerminate(FILE_PROCESSING_ERROR);
             }
-        } else  {
+        } else {
             return errorTerminate(FILE_PROCESSING_ERROR);
         }
     }
