@@ -149,7 +149,7 @@ TEST(runnerTests, setfield)
     FmiRunner runner;
     runner.parse(
         std::string(
-            "--autobroker --coretype=zmq --step=0.1 --stop=2.0 --name=bbfed --set h=4 --brokerargs=\"-f2 --force\" ") +
+            "--autobroker --coretype=zmq --step=0.1 --loglevel=debug --stop=2.0 --name=bbfed --set h=4 --brokerargs=\"-f2 --force\" ") +
         bballFile);
     int ret = runner.load();
     ASSERT_EQ(ret, 0);

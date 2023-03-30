@@ -164,11 +164,6 @@ int FmiRunner::load()
             return errorTerminate(CORE_CONNECT_FAILURE);
         }
     }
-    if (!core->isOpenToNewFederates())
-    {
-        std::cerr << "core is not open oddly core name="<<core->getIdentifier() << std::endl;
-        return errorTerminate(CORE_CONNECT_FAILURE);
-    }
     if (inputs.empty()) {
         return errorTerminate(MISSING_FILE);
     }
@@ -218,7 +213,7 @@ int FmiRunner::load()
                 std::cout << "core not valid" << std::endl;
             } else {
                 if (!core->isOpenToNewFederates()) {
-                    std::cout << "core is moved on\n";
+                    std::cout << "core "<<core->getIdentifier()<<" is moved on\n";
                 }
             }
             return errorTerminate(FMU_ERROR);
@@ -233,7 +228,7 @@ int FmiRunner::load()
                 std::cout << "error running system " << e.what() << std::endl;
                 return errorTerminate(FILE_PROCESSING_ERROR);
             }
-        } else if (broker) {
+        } else {
             return errorTerminate(FILE_PROCESSING_ERROR);
         }
     } else if ((ext == ".toml") || (ext == ".TOML")) {
@@ -242,6 +237,7 @@ int FmiRunner::load()
             try {
                 const int lfile = loadFile(system);
                 if (lfile != 0) {
+                    errorTerminate(FILE_PROCESSING_ERROR);
                     return lfile;
                 }
             }
@@ -249,8 +245,8 @@ int FmiRunner::load()
                 std::cout << "error running system " << e.what() << std::endl;
                 return errorTerminate(FILE_PROCESSING_ERROR);
             }
-        } else if (broker) {
-            broker->forceTerminate();
+        } else {
+            return errorTerminate(FILE_PROCESSING_ERROR);
         }
     } else if ((ext == ".xml") || (ext == ".XML")) {
         tinyxml2ReaderElement system(inputFile);
@@ -258,6 +254,7 @@ int FmiRunner::load()
             try {
                 const int lfile = loadFile(system);
                 if (lfile != 0) {
+                    errorTerminate(FILE_PROCESSING_ERROR);
                     return lfile;
                 }
             }
@@ -265,8 +262,8 @@ int FmiRunner::load()
                 std::cout << "error running system " << e.what() << std::endl;
                 return errorTerminate(FILE_PROCESSING_ERROR);
             }
-        } else if (broker) {
-            broker->forceTerminate();
+        } else  {
+            return errorTerminate(FILE_PROCESSING_ERROR);
         }
     }
     currentState = State::LOADED;
