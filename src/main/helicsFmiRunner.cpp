@@ -209,16 +209,12 @@ int FmiRunner::load()
         }
         catch (const std::exception& e) {
             std::cout << "error running fmu: " << e.what() << std::endl;
-            auto cr=core->getCopyofCorePointer();
-            if (!cr)
-            {
-                std::cout<<"core not valid"<<std::endl;
-            }
-            else
-            {
-                if (!core->isOpenToNewFederates())
-                {
-                    std::cout<<"core is moved on\n";
+            auto cr = core->getCopyofCorePointer();
+            if (!cr) {
+                std::cout << "core not valid" << std::endl;
+            } else {
+                if (!core->isOpenToNewFederates()) {
+                    std::cout << "core is moved on\n";
                 }
             }
             return errorTerminate(FMU_ERROR);
