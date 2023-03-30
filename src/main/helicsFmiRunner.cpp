@@ -186,20 +186,18 @@ int FmiRunner::load()
                     std::cout << "unable to create cosim object " << std::endl;
                     return errorTerminate(FMU_ERROR);
                 }
-                if (fedInfo.defName.empty())
-                {
-                    fedInfo.defName=obj->getName();
+                if (fedInfo.defName.empty()) {
+                    fedInfo.defName = obj->getName();
                 }
-                
-                auto cr=core->getCopyofCorePointer();
+
+                auto cr = core->getCopyofCorePointer();
                 if (!core->isOpenToNewFederates()) {
-                    std::cout << "core " << core->getIdentifier() << " is moved on to state "<<core->query("core","state")<<"\n";
+                    std::cout << "core " << core->getIdentifier() << " is moved on to state "
+                              << core->query("core", "state") << "\n";
                 }
                 core->setLoggingLevel(HELICS_LOG_LEVEL_TRACE);
-                auto fed = std::make_unique<CoSimFederate>("",
-                                                           std::move(obj),
-                                                           std::move(cr),
-                                                           fedInfo);
+                auto fed =
+                    std::make_unique<CoSimFederate>("", std::move(obj), std::move(cr), fedInfo);
                 cosimFeds.push_back(std::move(fed));
             } else {
                 std::shared_ptr<fmi2ModelExchangeObject> obj =
@@ -208,9 +206,8 @@ int FmiRunner::load()
                     std::cout << "unable to create model exchange object " << std::endl;
                     return errorTerminate(FMU_ERROR);
                 }
-                if (fedInfo.defName.empty())
-                {
-                    fedInfo.defName=obj->getName();
+                if (fedInfo.defName.empty()) {
+                    fedInfo.defName = obj->getName();
                 }
                 auto fed = std::make_unique<FmiModelExchangeFederate>("",
                                                                       std::move(obj),
@@ -226,7 +223,8 @@ int FmiRunner::load()
                 std::cout << "core not valid" << std::endl;
             } else {
                 if (!core->isOpenToNewFederates()) {
-                    std::cout << "core " << core->getIdentifier() << " is moved on to state "<<core->query("core","state")<<"\n";
+                    std::cout << "core " << core->getIdentifier() << " is moved on to state "
+                              << core->query("core", "state") << "\n";
                 }
                 if (!core->isConnected()) {
                     std::cout << "core " << core->getIdentifier() << " is not connected\n";
