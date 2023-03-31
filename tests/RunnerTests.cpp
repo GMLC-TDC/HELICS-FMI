@@ -142,6 +142,8 @@ TEST(runnerTests, missingSO)
     EXPECT_EQ(ret, 0);
     ret = runner.load();
     EXPECT_NE(ret, 0);
+    runner.close();
+    helics::cleanupHelicsLibrary();
 }
 
 TEST(runnerTests, setfield)
