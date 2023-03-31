@@ -409,15 +409,12 @@ int FmiRunner::errorTerminate(int errorCode)
         broker->forceTerminate();
         broker.reset();
         if (core) {
-            if (!core->waitForDisconnect(std::chrono::milliseconds(150)))
-            {
+            if (!core->waitForDisconnect(std::chrono::milliseconds(150))) {
                 core->forceTerminate();
             }
             core.reset();
         }
-    }
-    else if (core)
-    {
+    } else if (core) {
         core->forceTerminate();
         core.reset();
     }
