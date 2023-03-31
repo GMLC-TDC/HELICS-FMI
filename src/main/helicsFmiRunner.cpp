@@ -197,8 +197,15 @@ int FmiRunner::load()
                     std::cout << "core " << cr->getIdentifier() << " is moved on to state prior to fed creation"
                               << core->query("core", "state") << "\n";
                 }
+                else
+                {
+                    std::cout << "core " << cr->getIdentifier() << " is ready for fedarate connections "
+                        << core->query("core", "state") << "\n";
+                }
+                std::cout<<"starting creation of cosim federate"<<std::endl;
                 auto fed =
                     std::make_unique<CoSimFederate>("", std::move(obj), std::move(cr), fedInfo);
+                std::cout<<"fed is created"<<std::endl;
                 cosimFeds.push_back(std::move(fed));
             } else {
                 std::shared_ptr<fmi2ModelExchangeObject> obj =
