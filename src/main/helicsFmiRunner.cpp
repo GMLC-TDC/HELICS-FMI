@@ -118,7 +118,7 @@ int FmiRunner::parse(const std::string& cliString)
 
 int FmiRunner::load()
 {
-    std::cout<<"starting FMU load"<<std::endl;
+    std::cout << "starting FMU load" << std::endl;
     if (currentState >= State::LOADED) {
         return (currentState == State::ERROR) ? returnCode : EXIT_SUCCESS;
     }
@@ -194,7 +194,8 @@ int FmiRunner::load()
 
                 auto cr = core->getCopyofCorePointer();
                 if (!cr->isOpenToNewFederates()) {
-                    std::cout << "core " << cr->getIdentifier() << " is moved on to state prior to fed creation"
+                    std::cout << "core " << cr->getIdentifier()
+                              << " is moved on to state prior to fed creation"
                               << core->query("core", "state") << "\n";
                 }
                 else
