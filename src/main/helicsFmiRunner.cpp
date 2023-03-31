@@ -203,6 +203,16 @@ int FmiRunner::load()
                               << core->query("core", "current_state") << "\n";
                 }
                 std::cout << "starting creation of cosim federate" << std::endl;
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                if (!cr->isOpenToNewFederates()) {
+                    std::cout << "core " << cr->getIdentifier()
+                        << " is moved on to state prior to fed creation after sleep"
+                        << core->query("core", "current_state") << "\n";
+                } else {
+                    std::cout << "core " << cr->getIdentifier()
+                        << " is ready for fedarate connections after sleep "
+                        << core->query("core", "current_state") << "\n";
+                }
                 auto fed =
                     std::make_unique<CoSimFederate>("", std::move(obj), std::move(cr), fedInfo);
                 std::cout << "fed is created" << std::endl;
