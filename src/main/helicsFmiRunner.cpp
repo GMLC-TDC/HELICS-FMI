@@ -385,7 +385,7 @@ int FmiRunner::close()
 
 int FmiRunner::errorTerminate(int errorCode)
 {
-    std::cout<<"error terminate with code "<<errorCode<<std::endl;
+    std::cout << "error terminate with code " << errorCode << std::endl;
     if (broker) {
         broker->forceTerminate();
         broker.reset();
