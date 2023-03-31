@@ -59,7 +59,7 @@ TEST(runnerTests, dualFedZMQ)
     FmiRunner runner;
     runner.parse(
         std::string(
-            "--autobroker --coretype=zmq --step=0.1 --stop=2.0 --name=ftfed --brokerargs=\"-f2 --force\" ") +
+            "--autobroker --coretype=zmq --step=0.1 --stop=2.0 --name=ftfed --brokerargs=\"-f2 \" ") +
         ftFile);
     int ret = runner.load();
     ASSERT_EQ(ret, 0);

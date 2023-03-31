@@ -53,7 +53,7 @@ CoSimFederate::CoSimFederate(const std::string& name,
                              std::shared_ptr<helics::Core> crptr,
                              const std::string& fmu,
                              const helics::FederateInfo& fedInfo):
-    fed(name, std::move(crptr), fedInfo)
+    fed(name, crptr, fedInfo)
 {
     auto fmi = std::make_shared<FmiLibrary>();
     if (!fmi->loadFMU(fmu)) {
@@ -71,7 +71,7 @@ CoSimFederate::CoSimFederate(const std::string& name,
                              std::shared_ptr<fmi2CoSimObject> obj,
                              std::shared_ptr<helics::Core> crptr,
                              const helics::FederateInfo& fedInfo)
-try : fed(name, std::move(crptr), fedInfo), cs(std::move(obj)) {
+try : fed(name, crptr, fedInfo), cs(std::move(obj)) {
     if (cs) {
         input_list = cs->getInputNames();
         output_list = cs->getOutputNames();

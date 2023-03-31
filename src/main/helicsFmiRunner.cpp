@@ -14,6 +14,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/timeStringOps.hpp"
 #include "helics-fmi/helics-fmi-config.h"
 #include "helics/apps/CoreApp.hpp"
+#include "helics/core/Core.hpp"
 #include "helics/core/helicsVersion.hpp"
 
 #include <filesystem>
@@ -117,6 +118,7 @@ int FmiRunner::parse(const std::string& cliString)
 
 int FmiRunner::load()
 {
+    std::cout<<"starting FMU load"<<std::endl;
     if (currentState >= State::LOADED) {
         return (currentState == State::ERROR) ? returnCode : EXIT_SUCCESS;
     }
@@ -191,8 +193,8 @@ int FmiRunner::load()
                 }
 
                 auto cr = core->getCopyofCorePointer();
-                if (!core->isOpenToNewFederates()) {
-                    std::cout << "core " << core->getIdentifier() << " is moved on to state "
+                if (!cr->isOpenToNewFederates()) {
+                    std::cout << "core " << cr->getIdentifier() << " is moved on to state prior to fed creation"
                               << core->query("core", "state") << "\n";
                 }
                 auto fed =
