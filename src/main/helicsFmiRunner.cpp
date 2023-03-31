@@ -191,7 +191,7 @@ int FmiRunner::load()
                 if (fedInfo.defName.empty()) {
                     fedInfo.defName = obj->getName();
                 }
-                std::cout<< core->query("root","current_state")<<std::endl;
+                std::cout << core->query("root", "current_state") << std::endl;
                 auto cr = core->getCopyofCorePointer();
                 if (!cr->isOpenToNewFederates()) {
                     std::cout << "core " << cr->getIdentifier()
