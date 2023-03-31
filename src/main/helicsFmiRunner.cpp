@@ -196,11 +196,11 @@ int FmiRunner::load()
                 if (!cr->isOpenToNewFederates()) {
                     std::cout << "core " << cr->getIdentifier()
                               << " is moved on to state prior to fed creation"
-                              << core->query("core", "state") << "\n";
+                              << core->query("core", "current_state") << "\n";
                 } else {
                     std::cout << "core " << cr->getIdentifier()
                               << " is ready for fedarate connections "
-                              << core->query("core", "state") << "\n";
+                              << core->query("core", "current_state") << "\n";
                 }
                 std::cout << "starting creation of cosim federate" << std::endl;
                 auto fed =
@@ -232,7 +232,7 @@ int FmiRunner::load()
             } else {
                 if (!core->isOpenToNewFederates()) {
                     std::cout << "core " << core->getIdentifier() << " is moved on to state "
-                              << core->query("core", "state") << "\n";
+                              << core->query("core", "current_state") << "\n";
                 }
                 if (!core->isConnected()) {
                     std::cout << "core " << core->getIdentifier() << " is not connected\n";
