@@ -195,7 +195,6 @@ int FmiRunner::load()
                     std::cout << "core " << core->getIdentifier() << " is moved on to state "
                               << core->query("core", "state") << "\n";
                 }
-                core->setLoggingLevel(HELICS_LOG_LEVEL_TRACE);
                 auto fed =
                     std::make_unique<CoSimFederate>("", std::move(obj), std::move(cr), fedInfo);
                 cosimFeds.push_back(std::move(fed));
@@ -386,6 +385,7 @@ int FmiRunner::close()
 
 int FmiRunner::errorTerminate(int errorCode)
 {
+    std::cout<<"error terminate with code "<<errorCode<<std::endl;
     if (broker) {
         broker->forceTerminate();
         broker.reset();
