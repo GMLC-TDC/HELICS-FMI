@@ -73,7 +73,10 @@ TEST(exeTests, dualFedAsyncZMQ)
 
     vFed.enterInitializingModeIterative();
 
-    auto qres = helics::vectorizeQueryResult(vFed.query("ftfed", "publications"));
+    auto qres = helics::vectorizeQueryResult(vFed.query("root", "federates"));
+    EXPECT_EQ(qres.size(), 2U);
+
+    qres = helics::vectorizeQueryResult(vFed.query("ftfed", "publications"));
 
     EXPECT_EQ(qres.size(), 4U);
 
