@@ -50,10 +50,10 @@ catch (const std::exception& e) {
 }
 
 CoSimFederate::CoSimFederate(const std::string& name,
-                             helics::CoreApp& cr,
+                             helics::CoreApp& core,
                              const std::string& fmu,
                              const helics::FederateInfo& fedInfo):
-    fed(name, cr, fedInfo)
+    fed(name, core, fedInfo)
 {
     auto fmi = std::make_shared<FmiLibrary>();
     if (!fmi->loadFMU(fmu)) {
@@ -69,16 +69,10 @@ CoSimFederate::CoSimFederate(const std::string& name,
 
 CoSimFederate::CoSimFederate(const std::string& name,
                              std::shared_ptr<fmi2CoSimObject> obj,
-                             helics::CoreApp& cr,
+                             helics::CoreApp& core,
                              const helics::FederateInfo& fedInfo)
-try : cs(std::move(obj)) {
-    try {
-        fed = helics::ValueFederate(name, cr, fedInfo);
-    }
-    catch (const helics::HelicsException& e) {
-        std::cout << "error in constructor of federate:" << e.what() << std::endl;
-        throw;
-    }
+try : fed(name, core, fedInfo),cs(std::move(obj)) {
+   
     if (cs) {
         input_list = cs->getInputNames();
         output_list = cs->getOutputNames();

@@ -104,7 +104,7 @@ TEST(runnerTests, setfield)
     FmiRunner runner;
     runner.parse(
         std::string(
-            "--autobroker --coreinitstring=\"--log_level=trace\" --coretype=zmq --step=0.1 --stop=2.0 --name=bbfed --set h=4 --brokerargs=\"-f2 --name=sf1broker --loglevel=trace\" ") +
+            R"(--autobroker --coreinitstring="--log_level=trace" --coretype=zmq --step=0.1 --stop=2.0 --name=bbfed --set h=4 --brokerargs="-f2 --name=sf1broker --loglevel=trace" )") +
         bballFile);
     int ret = runner.load();
     ASSERT_EQ(ret, 0);

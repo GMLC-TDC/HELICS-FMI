@@ -118,7 +118,6 @@ int FmiRunner::parse(const std::string& cliString)
 
 int FmiRunner::load()
 {
-    std::cout << "starting FMU load" << std::endl;
     if (currentState >= State::LOADED) {
         return (currentState == State::ERROR) ? returnCode : EXIT_SUCCESS;
     }
@@ -191,33 +190,9 @@ int FmiRunner::load()
                 if (fedInfo.defName.empty()) {
                     fedInfo.defName = obj->getName();
                 }
-                std::cout << core->query("root", "current_state") << std::endl;
-                if (!core->isOpenToNewFederates()) {
-                    std::cout << "core " << core->getIdentifier()
-                              << " is moved on to state prior to fed creation"
-                              << core->query("core", "current_state") << "\n";
-                } else {
-                    std::cout << "core " << core->getIdentifier()
-                              << " is ready for fedarate connections "
-                              << core->query("core", "current_state") << "\n";
-                }
-                std::cout << "starting creation of cosim federate" << std::endl;
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                if (!core->isOpenToNewFederates()) {
-                    std::cout << "core " << core->getIdentifier()
-                              << " is moved on to state prior to fed creation after sleep"
-                              << core->query("core", "current_state") << "\n";
-                } else {
-                    std::cout << "core " << core->getIdentifier()
-                              << " is ready for fedarate connections after sleep "
-                              << core->query("core", "current_state") << "\n";
-                }
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                std::cout << "slept again now really starting creation of cosim federate"
-                          << std::endl;
-
+                
                 auto fed = std::make_unique<CoSimFederate>("", std::move(obj), fedInfo);
-                std::cout << "fed is created" << std::endl;
+                
                 cosimFeds.push_back(std::move(fed));
             } else {
                 std::shared_ptr<fmi2ModelExchangeObject> obj =
@@ -235,18 +210,6 @@ int FmiRunner::load()
         }
         catch (const std::exception& e) {
             std::cout << "error creating federate fmu: " << e.what() << std::endl;
-            auto cr = core->getCopyofCorePointer();
-            if (!cr) {
-                std::cout << "core not valid" << std::endl;
-            } else {
-                if (!core->isOpenToNewFederates()) {
-                    std::cout << "core " << core->getIdentifier() << " is moved on to state "
-                              << core->query("core", "current_state") << "\n";
-                }
-                if (!core->isConnected()) {
-                    std::cout << "core " << core->getIdentifier() << " is not connected\n";
-                }
-            }
             return errorTerminate(FMU_ERROR);
         }
     } else if ((ext == ".json") || (ext == ".JSON")) {

@@ -48,10 +48,10 @@ catch (const std::exception& e) {
 }
 
 FmiModelExchangeFederate::FmiModelExchangeFederate(const std::string& name,
-                                                   std::shared_ptr<helics::Core> crptr,
+    helics::CoreApp& core,
                                                    const std::string& fmu,
                                                    const helics::FederateInfo& fedInfo):
-    fed(name, std::move(crptr), fedInfo)
+    fed(name, core, fedInfo)
 {
     auto fmi = std::make_shared<FmiLibrary>();
     if (!fmi->loadFMU(fmu)) {
@@ -67,9 +67,9 @@ FmiModelExchangeFederate::FmiModelExchangeFederate(const std::string& name,
 
 FmiModelExchangeFederate::FmiModelExchangeFederate(const std::string& name,
                                                    std::shared_ptr<fmi2ModelExchangeObject> obj,
-                                                   std::shared_ptr<helics::Core> crptr,
+    helics::CoreApp& core,
                                                    const helics::FederateInfo& fedInfo)
-try : fed(name, std::move(crptr), fedInfo), me(std::move(obj)) {
+try : fed(name, core, fedInfo), me(std::move(obj)) {
     if (me) {
         input_list = me->getInputNames();
         output_list = me->getOutputNames();

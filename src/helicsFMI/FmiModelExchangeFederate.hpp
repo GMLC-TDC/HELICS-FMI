@@ -34,12 +34,12 @@ class FmiModelExchangeFederate: public griddyn::SolvableObject {
                              std::shared_ptr<fmi2ModelExchangeObject> obj,
                              const helics::FederateInfo& fedInfo);
     FmiModelExchangeFederate(const std::string& name,
-                             std::shared_ptr<helics::Core> crptr,
+                             helics::CoreApp& core,
                              const std::string& fmu,
                              const helics::FederateInfo& fedInfo);
     FmiModelExchangeFederate(const std::string& name,
                              std::shared_ptr<fmi2ModelExchangeObject> obj,
-                             std::shared_ptr<helics::Core> crptr,
+                             helics::CoreApp& core,
                              const helics::FederateInfo& fedInfo);
 
     virtual ~FmiModelExchangeFederate();
