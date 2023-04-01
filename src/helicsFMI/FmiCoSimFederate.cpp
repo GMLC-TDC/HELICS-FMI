@@ -50,7 +50,7 @@ catch (const std::exception& e) {
 }
 
 CoSimFederate::CoSimFederate(const std::string& name,
-                             helics::CoreApp & cr,
+                             helics::CoreApp& cr,
                              const std::string& fmu,
                              const helics::FederateInfo& fedInfo):
     fed(name, cr, fedInfo)
@@ -69,7 +69,7 @@ CoSimFederate::CoSimFederate(const std::string& name,
 
 CoSimFederate::CoSimFederate(const std::string& name,
                              std::shared_ptr<fmi2CoSimObject> obj,
-                             helics::CoreApp & cr,
+                             helics::CoreApp& cr,
                              const helics::FederateInfo& fedInfo)
 try : cs(std::move(obj)) {
     try

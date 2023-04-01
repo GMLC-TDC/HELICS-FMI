@@ -466,10 +466,7 @@ int FmiRunner::loadFile(readerElement& elem)
                 return errorTerminate(FMU_ERROR);
             }
             auto nm = obj->getName();
-            auto fed = std::make_unique<CoSimFederate>(nm,
-                                                       std::move(obj),
-                                                       *core,
-                                                       fedInfo);
+            auto fed = std::make_unique<CoSimFederate>(nm, std::move(obj), *core, fedInfo);
             elem.moveToFirstChild("parameters");
             while (elem.isValid()) {
                 const auto& str1 = elem.getFirstAttribute().getText();
