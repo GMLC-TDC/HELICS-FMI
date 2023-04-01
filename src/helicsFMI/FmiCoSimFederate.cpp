@@ -71,14 +71,22 @@ CoSimFederate::CoSimFederate(const std::string& name,
                              std::shared_ptr<fmi2CoSimObject> obj,
                              helics::CoreApp & cr,
                              const helics::FederateInfo& fedInfo)
-try : fed(name, cr, fedInfo), cs(std::move(obj)) {
+try : cs(std::move(obj)) {
+    try
+    {
+        fed=helics::ValueFederate(name, cr, fedInfo);
+    }
+    catch (const helics::HelicsException &e) {
+        std::cout << "error in constructor of federate:" << e.what() << std::endl;
+        throw;
+    }
     if (cs) {
         input_list = cs->getInputNames();
         output_list = cs->getOutputNames();
     }
 }
 catch (const std::exception& e) {
-    std::cout << "error in constructor of federate:" << e.what() << std::endl;
+    std::cout << "error in constructor of federate2:" << e.what() << std::endl;
     throw;
 }
 
