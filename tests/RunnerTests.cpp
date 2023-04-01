@@ -98,8 +98,6 @@ TEST(runnerTests, dualFedZMQ)
     EXPECT_EQ(str, 0);
 }
 
-
-
 TEST(runnerTests, setfield)
 {
     helics::cleanupHelicsLibrary();
