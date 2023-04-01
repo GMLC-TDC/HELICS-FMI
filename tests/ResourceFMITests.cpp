@@ -5,15 +5,16 @@ for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
 All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
+
 #include "fmi/fmi_import/fmiImport.h"
 #include "fmi/fmi_import/fmiObjects.h"
 
 #include "gtest/gtest.h"
 #include <filesystem>
 
-static const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
+static const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Resource.fmu";
 
-TEST(bouncingBall, ExtractFMU)
+TEST(resource, ExtractFMU)
 {
     FmiLibrary fmi;
 
@@ -23,14 +24,14 @@ TEST(bouncingBall, ExtractFMU)
     EXPECT_TRUE(fmi.isXmlLoaded());
     EXPECT_FALSE(fmi.isSoLoaded());
 
-    auto dir = std::string(FMI_REFERENCE_DIR) + "BouncingBall";
+    auto dir = std::string(FMI_REFERENCE_DIR) + "Resource";
     EXPECT_TRUE(std::filesystem::exists(dir));
 
     fmi.close();
     std::filesystem::remove_all(dir);
 }
 
-TEST(bouncingBall, loadXML)
+TEST(resource, loadXML)
 {
     auto fmi = std::make_shared<FmiLibrary>();
     EXPECT_NO_THROW(fmi->loadFMU(inputFile));
@@ -40,14 +41,14 @@ TEST(bouncingBall, loadXML)
     EXPECT_TRUE(info->checkFlag(modelExchangeCapable));
     EXPECT_TRUE(info->checkFlag(coSimulationCapable));
 
-    EXPECT_EQ(info->getString("modelName"), "BouncingBall");
+    EXPECT_EQ(info->getString("modelName"), "Resource");
     EXPECT_EQ(info->getCounts(fmiVariableType::input), 0);
-    EXPECT_EQ(info->getCounts(fmiVariableType::output), 2);
-    EXPECT_EQ(info->getCounts(fmiVariableType::parameter), 2);
-    EXPECT_EQ(info->getCounts(fmiVariableType::any), 8);
-    EXPECT_EQ(info->getCounts(fmiVariableType::state), 2);
-    EXPECT_EQ(info->getCounts(fmiVariableType::local), 3);
-    EXPECT_EQ(info->getCounts(fmiVariableType::units), 3);
+    EXPECT_EQ(info->getCounts(fmiVariableType::output), 1);
+    EXPECT_EQ(info->getCounts(fmiVariableType::parameter), 0);
+    EXPECT_EQ(info->getCounts(fmiVariableType::any), 2);
+    EXPECT_EQ(info->getCounts(fmiVariableType::state), 0);
+    EXPECT_EQ(info->getCounts(fmiVariableType::local), 0);
+    EXPECT_EQ(info->getCounts(fmiVariableType::units), 0);
 
     EXPECT_EQ(info->getCounts(fmiVariableType::meObject), 1);
     EXPECT_EQ(info->getCounts(fmiVariableType::csObject), 1);
@@ -57,11 +58,11 @@ TEST(bouncingBall, loadXML)
 
     fmi.reset();
 
-    auto dir = std::string(FMI_REFERENCE_DIR) + "BouncingBall";
+    auto dir = std::string(FMI_REFERENCE_DIR) + "Resource";
     EXPECT_FALSE(std::filesystem::exists(dir));
 }
 
-TEST(bouncingBall, loadSharedME)
+TEST(resource, loadSharedME)
 {
     auto fmi = std::make_shared<FmiLibrary>();
     EXPECT_NO_THROW(fmi->loadFMU(inputFile));
@@ -79,7 +80,7 @@ TEST(bouncingBall, loadSharedME)
     fmi.reset();
 }
 
-TEST(bouncingBall, loadSharedCS)
+TEST(resource, loadSharedCS)
 {
     auto fmi = std::make_shared<FmiLibrary>();
     EXPECT_NO_THROW(fmi->loadFMU(inputFile));
@@ -99,14 +100,14 @@ TEST(bouncingBall, loadSharedCS)
 
     fmi.reset();
 
-    auto dir = std::string(FMI_REFERENCE_DIR) + "BouncingBall";
+    auto dir = std::string(FMI_REFERENCE_DIR) + "Resource";
     // this is true since we didn'time open the directory in this test
     EXPECT_TRUE(std::filesystem::exists(dir));
 
     std::filesystem::remove_all(dir);
 }
 
-TEST(bouncingBall, runModeSequence)
+TEST(resource, runModeSequence)
 {
     auto fmi = std::make_shared<FmiLibrary>();
     EXPECT_NO_THROW(fmi->loadFMU(inputFile));
@@ -134,7 +135,7 @@ TEST(bouncingBall, runModeSequence)
     fmi.reset();
 }
 
-TEST(bouncingBall, csExecution)
+TEST(resource, csExecution)
 {
     auto fmi = std::make_shared<FmiLibrary>();
     EXPECT_NO_THROW(fmi->loadFMU(inputFile));
