@@ -11,18 +11,73 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "fmi/fmi_import/fmiObjects.h"
 #include "solvers/solverInterface.h"
 
+#include <iostream>
 #include <utility>
 
-FmiModelExchangeFederate::FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj,
-                                                   const helics::FederateInfo& fedInfo):
-    fed(std::string(), fedInfo),
-    me(std::move(obj))
+namespace helicsfmi {
 
+FmiModelExchangeFederate::FmiModelExchangeFederate(const std::string& name,
+                                                   const std::string& fmu,
+                                                   const helics::FederateInfo& fedInfo):
+    fed(name, fedInfo)
 {
+    auto fmi = std::make_shared<FmiLibrary>();
+    if (!fmi->loadFMU(fmu)) {
+        throw(Error("ModelExchangeFederate", "unable to load FMU", -101));
+    }
+
+    me = fmi->createModelExchangeObject(name);
     if (me) {
         input_list = me->getInputNames();
         output_list = me->getOutputNames();
     }
+}
+
+FmiModelExchangeFederate::FmiModelExchangeFederate(const std::string& name,
+                                                   std::shared_ptr<fmi2ModelExchangeObject> obj,
+                                                   const helics::FederateInfo& fedInfo)
+try : fed(name, fedInfo), me(std::move(obj)) {
+    if (me) {
+        input_list = me->getInputNames();
+        output_list = me->getOutputNames();
+    }
+}
+catch (const std::exception& e) {
+    std::cout << "error in constructor of federate:" << e.what() << std::endl;
+    throw;
+}
+
+FmiModelExchangeFederate::FmiModelExchangeFederate(const std::string& name,
+                                                   helics::CoreApp& core,
+                                                   const std::string& fmu,
+                                                   const helics::FederateInfo& fedInfo):
+    fed(name, core, fedInfo)
+{
+    auto fmi = std::make_shared<FmiLibrary>();
+    if (!fmi->loadFMU(fmu)) {
+        throw(Error("ModelExchangeFederate", "unable to load FMU", -101));
+    }
+
+    me = fmi->createModelExchangeObject(name);
+    if (me) {
+        input_list = me->getInputNames();
+        output_list = me->getOutputNames();
+    }
+}
+
+FmiModelExchangeFederate::FmiModelExchangeFederate(const std::string& name,
+                                                   std::shared_ptr<fmi2ModelExchangeObject> obj,
+                                                   helics::CoreApp& core,
+                                                   const helics::FederateInfo& fedInfo)
+try : fed(name, core, fedInfo), me(std::move(obj)) {
+    if (me) {
+        input_list = me->getInputNames();
+        output_list = me->getOutputNames();
+    }
+}
+catch (const std::exception& e) {
+    std::cout << "error in constructor of federate:" << e.what() << std::endl;
+    throw;
 }
 
 FmiModelExchangeFederate::~FmiModelExchangeFederate() = default;
@@ -225,3 +280,5 @@ int FmiModelExchangeFederate::dynAlgebraicSolve(
 {
     return 0;
 }
+
+}  // namespace helicsfmi

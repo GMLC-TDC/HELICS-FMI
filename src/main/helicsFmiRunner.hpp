@@ -34,12 +34,15 @@ class FmiRunner {
     std::vector<std::string> output_variables;
     std::vector<std::string> input_variables;
     std::vector<std::string> connections;
+    //!< paths to find the fmu or other files
+    std::vector<std::string> paths;
     bool cosimFmu{true};
     helics::FederateInfo fedInfo;
     std::unique_ptr<helics::apps::BrokerApp> broker;
     std::unique_ptr<helics::apps::CoreApp> core;
     std::vector<std::unique_ptr<CoSimFederate>> cosimFeds;
     std::vector<std::unique_ptr<FmiModelExchangeFederate>> meFeds;
+    std::vector<std::string> setParameters;
     enum class State { CREATED, LOADED, INITIALIZED, RUNNING, CLOSED, ERROR };
     State currentState{State::CREATED};
     int returnCode{EXIT_SUCCESS};
@@ -71,6 +74,10 @@ class FmiRunner {
   private:
     int loadFile(readerElement& elem);
     int errorTerminate(int errorCode);
+    /// @brief  find the full path for a file name
+    /// @param file the filename
+    /// @return a string with the full file path
+    [[nodiscard]] std::string getFilePath(const std::string& file) const;
 };
 
 }  // namespace helicsfmi

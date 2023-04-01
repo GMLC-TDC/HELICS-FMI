@@ -14,6 +14,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/timeStringOps.hpp"
 #include "helics-fmi/helics-fmi-config.h"
 #include "helics/apps/CoreApp.hpp"
+#include "helics/core/Core.hpp"
 #include "helics/core/helicsVersion.hpp"
 
 #include <filesystem>
@@ -40,7 +41,7 @@ std::unique_ptr<CLI::App> FmiRunner::generateCLI()
             throw(CLI::Success());
         },
         "specify the versions of helics and helics-fmi");
-    app->validate_positionals();
+    app->validate_positionals()->validate_optional_arguments();
 
     app->add_option("--integrator",
                     integrator,
@@ -48,9 +49,7 @@ std::unique_ptr<CLI::App> FmiRunner::generateCLI()
         ->capture_default_str()
         ->transform(CLI::IsMember({"cvode", "arkode", "boost"}));
 
-    app->add_option("inputfile,-i,--input", inputs, "specify the input files")
-        ->check(CLI::ExistingFile)
-        ->required();
+    app->add_option("inputfile,-i,--input", inputs, "specify the input files")->required();
 
     app->add_option("--integrator-args", integratorArgs, "arguments to pass to the integrator");
 
@@ -77,9 +76,17 @@ std::unique_ptr<CLI::App> FmiRunner::generateCLI()
                     "Specify the input variables of the FMU by name")
         ->ignore_underscore()
         ->delimiter(',');
+    app->add_option(
+           "--set",
+           setParameters,
+           "Specify initial values for Fmu parameters or variables as a semocolon separated list p1=34;p2=19.5")
+        ->delimiter(';');
     app->add_option("--connections", connections, "Specify connections this FMU should make")
         ->delimiter(',');
-
+    app->add_option("-L,--fmupath",
+                    paths,
+                    "Specify additional search paths for the fmu's or configuration files")
+        ->check(CLI::ExistingPath);
     app->add_flag("--cosim",
                   cosimFmu,
                   "specify that the fmu should run as a co-sim FMU if possible");
@@ -158,14 +165,15 @@ int FmiRunner::load()
             return errorTerminate(CORE_CONNECT_FAILURE);
         }
     }
-    fedInfo.coreName = core->getIdentifier();
     if (inputs.empty()) {
-        currentState = State::ERROR;
-        return -203;
+        return errorTerminate(MISSING_FILE);
     }
-    const std::string& inputFile = inputs.front();
+    const std::string inputFile = getFilePath(inputs.front());
+    if (inputFile.empty()) {
+        return errorTerminate(INVALID_FILE);
+    }
     auto ext = inputFile.substr(inputFile.find_last_of('.'));
-
+    fedInfo.coreName = core->getIdentifier();
     FmiLibrary fmi;
     if ((ext == ".fmu") || (ext == ".FMU")) {
         try {
@@ -179,7 +187,12 @@ int FmiRunner::load()
                     std::cout << "unable to create cosim object " << std::endl;
                     return errorTerminate(FMU_ERROR);
                 }
+                if (fedInfo.defName.empty()) {
+                    fedInfo.defName = obj->getName();
+                }
+
                 auto fed = std::make_unique<CoSimFederate>("", std::move(obj), fedInfo);
+
                 cosimFeds.push_back(std::move(fed));
             } else {
                 std::shared_ptr<fmi2ModelExchangeObject> obj =
@@ -188,12 +201,15 @@ int FmiRunner::load()
                     std::cout << "unable to create model exchange object " << std::endl;
                     return errorTerminate(FMU_ERROR);
                 }
-                auto fed = std::make_unique<FmiModelExchangeFederate>(std::move(obj), fedInfo);
+                if (fedInfo.defName.empty()) {
+                    fedInfo.defName = obj->getName();
+                }
+                auto fed = std::make_unique<FmiModelExchangeFederate>("", std::move(obj), fedInfo);
                 meFeds.push_back(std::move(fed));
             }
         }
         catch (const std::exception& e) {
-            std::cout << "error running fmu: " << e.what() << std::endl;
+            std::cout << "error creating federate fmu: " << e.what() << std::endl;
             return errorTerminate(FMU_ERROR);
         }
     } else if ((ext == ".json") || (ext == ".JSON")) {
@@ -206,34 +222,42 @@ int FmiRunner::load()
                 std::cout << "error running system " << e.what() << std::endl;
                 return errorTerminate(FILE_PROCESSING_ERROR);
             }
-        } else if (broker) {
+        } else {
             return errorTerminate(FILE_PROCESSING_ERROR);
         }
     } else if ((ext == ".toml") || (ext == ".TOML")) {
         tomlReaderElement system(inputFile);
         if (system.isValid()) {
             try {
-                loadFile(system);
+                const int lfile = loadFile(system);
+                if (lfile != 0) {
+                    errorTerminate(FILE_PROCESSING_ERROR);
+                    return lfile;
+                }
             }
             catch (const std::exception& e) {
                 std::cout << "error running system " << e.what() << std::endl;
                 return errorTerminate(FILE_PROCESSING_ERROR);
             }
-        } else if (broker) {
-            broker->forceTerminate();
+        } else {
+            return errorTerminate(FILE_PROCESSING_ERROR);
         }
     } else if ((ext == ".xml") || (ext == ".XML")) {
         tinyxml2ReaderElement system(inputFile);
         if (system.isValid()) {
             try {
-                loadFile(system);
+                const int lfile = loadFile(system);
+                if (lfile != 0) {
+                    errorTerminate(FILE_PROCESSING_ERROR);
+                    return lfile;
+                }
             }
             catch (const std::exception& e) {
                 std::cout << "error running system " << e.what() << std::endl;
                 return errorTerminate(FILE_PROCESSING_ERROR);
             }
-        } else if (broker) {
-            broker->forceTerminate();
+        } else {
+            return errorTerminate(FILE_PROCESSING_ERROR);
         }
     }
     currentState = State::LOADED;
@@ -287,11 +311,40 @@ int FmiRunner::initialize()
     if (currentState >= State::INITIALIZED) {
         return 0;
     }
+    std::vector<int> paramUsed(setParameters.size(), 0);
     for (auto& csFed : cosimFeds) {
         csFed->configure(stepTime);
+        int index = 0;
+        for (const auto& param : setParameters) {
+            auto eloc = param.find_first_of('=');
+            try {
+                csFed->set(param.substr(0, eloc), param.substr(eloc + 1));
+                paramUsed[index] = 1;
+            }
+            catch (const fmiDiscardException&) {
+            }
+            ++index;
+        }
     }
     for (auto& meFed : meFeds) {
         meFed->configure(stepTime);
+        for (const auto& param : setParameters) {
+            auto eloc = param.find_first_of('=');
+            int index = 0;
+            try {
+                meFed->set(param.substr(0, eloc), param.substr(eloc + 1));
+                paramUsed[index] = 1;
+            }
+            catch (const fmiDiscardException&) {
+            }
+            ++index;
+        }
+    }
+
+    for (int ii = 0; ii < paramUsed.size(); ++ii) {
+        if (paramUsed[ii] == 0) {
+            std::cout << "WARNING: " << setParameters[ii] << " is unused" << std::endl;
+        }
     }
     currentState = State::INITIALIZED;
     return 0;
@@ -313,17 +366,40 @@ int FmiRunner::close()
 
 int FmiRunner::errorTerminate(int errorCode)
 {
+    std::cout << "error terminate with code " << errorCode << std::endl;
     if (broker) {
         broker->forceTerminate();
         broker.reset();
-    }
-    if (core) {
+        if (core) {
+            if (!core->waitForDisconnect(std::chrono::milliseconds(150))) {
+                core->forceTerminate();
+            }
+            core.reset();
+        }
+    } else if (core) {
         core->forceTerminate();
         core.reset();
     }
     currentState = State::ERROR;
     returnCode = errorCode;
     return returnCode;
+}
+
+std::string FmiRunner::getFilePath(const std::string& file) const
+{
+    if (std::filesystem::exists(file)) {
+        return file;
+    }
+    if (!paths.empty()) {
+        for (const auto& pth : paths) {
+            std::filesystem::path libraryPath(pth);
+            libraryPath /= file;
+            if (std::filesystem::exists(libraryPath)) {
+                return libraryPath.string();
+            }
+        }
+    }
+    return {};
 }
 
 int FmiRunner::loadFile(readerElement& elem)
@@ -336,12 +412,21 @@ int FmiRunner::loadFile(readerElement& elem)
     std::vector<std::unique_ptr<FmiLibrary>> fmis;
     while (elem.isValid()) {
         auto fmilib = std::make_unique<FmiLibrary>();
-        auto str = elem.getAttributeText("fmu");
+        auto str = getFilePath(elem.getAttributeText("fmu"));
+        if (str.empty()) {
+            std::cout << "unable to locate file " << elem.getAttributeText("fmu") << std::endl;
+            return errorTerminate(MISSING_FILE);
+        }
         fmilib->loadFMU(str);
         if (fmilib->checkFlag(fmuCapabilityFlags::coSimulationCapable)) {
             std::shared_ptr<fmi2CoSimObject> obj =
                 fmilib->createCoSimulationObject(elem.getAttributeText("name"));
-            auto fed = std::make_unique<CoSimFederate>(obj->getName(), std::move(obj), fedInfo);
+            if (!obj) {
+                std::cout << "unable to create cosim object " << std::endl;
+                return errorTerminate(FMU_ERROR);
+            }
+            auto nm = obj->getName();
+            auto fed = std::make_unique<CoSimFederate>(nm, std::move(obj), fedInfo);
             elem.moveToFirstChild("parameters");
             while (elem.isValid()) {
                 const auto& str1 = elem.getFirstAttribute().getText();
@@ -365,7 +450,12 @@ int FmiRunner::loadFile(readerElement& elem)
         } else {
             std::shared_ptr<fmi2ModelExchangeObject> obj =
                 fmilib->createModelExchangeObject(elem.getAttributeText("name"));
-            auto fed = std::make_unique<FmiModelExchangeFederate>(std::move(obj), fedInfo);
+            if (!obj) {
+                std::cout << "unable to create model exchange object " << std::endl;
+                return errorTerminate(FMU_ERROR);
+            }
+            auto nm = obj->getName();
+            auto fed = std::make_unique<FmiModelExchangeFederate>(nm, std::move(obj), fedInfo);
             elem.moveToFirstChild("parameters");
             while (elem.isValid()) {
                 auto str1 = elem.getFirstAttribute().getText();

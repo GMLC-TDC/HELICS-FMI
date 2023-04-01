@@ -49,6 +49,39 @@ catch (const std::exception& e) {
     throw;
 }
 
+CoSimFederate::CoSimFederate(const std::string& name,
+                             helics::CoreApp& core,
+                             const std::string& fmu,
+                             const helics::FederateInfo& fedInfo):
+    fed(name, core, fedInfo)
+{
+    auto fmi = std::make_shared<FmiLibrary>();
+    if (!fmi->loadFMU(fmu)) {
+        throw(Error("CoSimFederate", "unable to load FMU", -101));
+    }
+
+    cs = fmi->createCoSimulationObject(name);
+    if (cs) {
+        input_list = cs->getInputNames();
+        output_list = cs->getOutputNames();
+    }
+}
+
+CoSimFederate::CoSimFederate(const std::string& name,
+                             std::shared_ptr<fmi2CoSimObject> obj,
+                             helics::CoreApp& core,
+                             const helics::FederateInfo& fedInfo)
+try : fed(name, core, fedInfo), cs(std::move(obj)) {
+    if (cs) {
+        input_list = cs->getInputNames();
+        output_list = cs->getOutputNames();
+    }
+}
+catch (const std::exception& e) {
+    std::cout << "error in constructor of federate2:" << e.what() << std::endl;
+    throw;
+}
+
 void CoSimFederate::configure(helics::Time step, helics::Time startTime)
 {
     timeBias = startTime;
@@ -204,9 +237,15 @@ void CoSimFederate::run(helics::Time stop)
 
     helics::Time currentTime = helics::timeZero;
     while (currentTime + timeBias <= stop) {
-        cs->doStep(static_cast<double>(currentTime + timeBias),
-                   static_cast<double>(stepTime),
-                   fmi2True);
+        try {
+            cs->doStep(static_cast<double>(currentTime + timeBias),
+                       static_cast<double>(stepTime),
+                       fmi2True);
+        }
+        catch (const fmiException& fe) {
+            fed.localError(56, fe.what());
+            break;
+        }
         currentTime = fed.requestNextStep();
         if (!pubs.empty()) {
             // get the values to publish

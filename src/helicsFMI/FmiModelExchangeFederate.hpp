@@ -23,11 +23,25 @@ class SolverInterface;
 class SolverMode;
 }  // namespace griddyn
 
+namespace helicsfmi {
 /** class defining a modelExchange federate*/
 class FmiModelExchangeFederate: public griddyn::SolvableObject {
   public:
-    FmiModelExchangeFederate(std::shared_ptr<fmi2ModelExchangeObject> obj,
+    FmiModelExchangeFederate(const std::string& name,
+                             const std::string& fmu,
                              const helics::FederateInfo& fedInfo);
+    FmiModelExchangeFederate(const std::string& name,
+                             std::shared_ptr<fmi2ModelExchangeObject> obj,
+                             const helics::FederateInfo& fedInfo);
+    FmiModelExchangeFederate(const std::string& name,
+                             helics::CoreApp& core,
+                             const std::string& fmu,
+                             const helics::FederateInfo& fedInfo);
+    FmiModelExchangeFederate(const std::string& name,
+                             std::shared_ptr<fmi2ModelExchangeObject> obj,
+                             helics::CoreApp& core,
+                             const helics::FederateInfo& fedInfo);
+
     virtual ~FmiModelExchangeFederate();
     /** configure the federate using the specified inputs and outputs*/
     void configure(helics::Time step, helics::Time start = helics::timeZero);
@@ -108,3 +122,5 @@ class FmiModelExchangeFederate: public griddyn::SolvableObject {
     double stepSize{0.01};  //!< the default step size of the simulation
     std::unique_ptr<griddyn::SolverInterface> solver;
 };
+
+}  // namespace helicsfmi

@@ -18,25 +18,30 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 /** base fmiException*/
 class fmiException: public std::exception {
+  public:
     virtual const char* what() const noexcept override { return "fmi Exception"; }
 };
 
 /** fmi exception for when fmiDiscard was returned*/
 class fmiDiscardException: public fmiException {
+  public:
     virtual const char* what() const noexcept override { return "return fmiDiscard"; }
 };
 /** fmi exception for when fmiWarning was returned*/
 class fmiWarningException: public fmiException {
+  public:
     virtual const char* what() const noexcept override { return "return fmiWarning"; }
 };
 
 /** fmi exception for when an error was returned*/
 class fmiErrorException: public fmiException {
+  public:
     virtual const char* what() const noexcept override { return "return fmiError"; }
 };
 
 /** fmi exception for when a fatal error was returned*/
 class fmiFatalException: public fmiException {
+  public:
     virtual const char* what() const noexcept override { return "return fmiFatal"; }
 };
 
