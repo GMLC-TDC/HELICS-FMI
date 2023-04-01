@@ -71,8 +71,7 @@ CoSimFederate::CoSimFederate(const std::string& name,
                              std::shared_ptr<fmi2CoSimObject> obj,
                              helics::CoreApp& core,
                              const helics::FederateInfo& fedInfo)
-try : fed(name, core, fedInfo),cs(std::move(obj)) {
-   
+try : fed(name, core, fedInfo), cs(std::move(obj)) {
     if (cs) {
         input_list = cs->getInputNames();
         output_list = cs->getOutputNames();

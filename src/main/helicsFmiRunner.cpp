@@ -190,9 +190,9 @@ int FmiRunner::load()
                 if (fedInfo.defName.empty()) {
                     fedInfo.defName = obj->getName();
                 }
-                
+
                 auto fed = std::make_unique<CoSimFederate>("", std::move(obj), fedInfo);
-                
+
                 cosimFeds.push_back(std::move(fed));
             } else {
                 std::shared_ptr<fmi2ModelExchangeObject> obj =

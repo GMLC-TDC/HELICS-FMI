@@ -48,7 +48,7 @@ catch (const std::exception& e) {
 }
 
 FmiModelExchangeFederate::FmiModelExchangeFederate(const std::string& name,
-    helics::CoreApp& core,
+                                                   helics::CoreApp& core,
                                                    const std::string& fmu,
                                                    const helics::FederateInfo& fedInfo):
     fed(name, core, fedInfo)
@@ -67,7 +67,7 @@ FmiModelExchangeFederate::FmiModelExchangeFederate(const std::string& name,
 
 FmiModelExchangeFederate::FmiModelExchangeFederate(const std::string& name,
                                                    std::shared_ptr<fmi2ModelExchangeObject> obj,
-    helics::CoreApp& core,
+                                                   helics::CoreApp& core,
                                                    const helics::FederateInfo& fedInfo)
 try : fed(name, core, fedInfo), me(std::move(obj)) {
     if (me) {
