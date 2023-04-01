@@ -174,7 +174,7 @@ int FmiRunner::load()
         return errorTerminate(INVALID_FILE);
     }
     auto ext = inputFile.substr(inputFile.find_last_of('.'));
-
+    fedInfo.coreName=core->getIdentifier();
     FmiLibrary fmi;
     if ((ext == ".fmu") || (ext == ".FMU")) {
         try {
@@ -216,7 +216,7 @@ int FmiRunner::load()
                 std::cout << "slept again now really starting creation of cosim federate" << std::endl;
                 
                 auto fed =
-                    std::make_unique<CoSimFederate>("", std::move(obj), *core, fedInfo);
+                    std::make_unique<CoSimFederate>("", std::move(obj), fedInfo);
                 std::cout << "fed is created" << std::endl;
                 cosimFeds.push_back(std::move(fed));
             } else {
@@ -231,7 +231,6 @@ int FmiRunner::load()
                 }
                 auto fed = std::make_unique<FmiModelExchangeFederate>("",
                                                                       std::move(obj),
-                                                                      core->getCopyofCorePointer(),
                                                                       fedInfo);
                 meFeds.push_back(std::move(fed));
             }
@@ -466,7 +465,7 @@ int FmiRunner::loadFile(readerElement& elem)
                 return errorTerminate(FMU_ERROR);
             }
             auto nm = obj->getName();
-            auto fed = std::make_unique<CoSimFederate>(nm, std::move(obj), *core, fedInfo);
+            auto fed = std::make_unique<CoSimFederate>(nm, std::move(obj), fedInfo);
             elem.moveToFirstChild("parameters");
             while (elem.isValid()) {
                 const auto& str1 = elem.getFirstAttribute().getText();
@@ -497,7 +496,6 @@ int FmiRunner::loadFile(readerElement& elem)
             auto nm = obj->getName();
             auto fed = std::make_unique<FmiModelExchangeFederate>(nm,
                                                                   std::move(obj),
-                                                                  core->getCopyofCorePointer(),
                                                                   fedInfo);
             elem.moveToFirstChild("parameters");
             while (elem.isValid()) {
