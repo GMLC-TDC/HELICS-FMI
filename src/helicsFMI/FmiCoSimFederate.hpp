@@ -11,16 +11,13 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "fmi/fmi_import/fmiObjects.h"
 #include "helics/ValueFederates.hpp"
 
-
-
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-namespace helics
-{
-    class CoreApp;
+namespace helics {
+class CoreApp;
 }
 
 namespace helicsfmi {
@@ -47,12 +44,12 @@ class CoSimFederate {
                   std::shared_ptr<fmi2CoSimObject> obj,
                   const helics::FederateInfo& fedInfo);
     CoSimFederate(const std::string& name,
-                  helics::CoreApp & cr,
+                  helics::CoreApp& cr,
                   const std::string& fmu,
                   const helics::FederateInfo& fedInfo);
     CoSimFederate(const std::string& name,
                   std::shared_ptr<fmi2CoSimObject> obj,
-                  helics::CoreApp & cr,
+                  helics::CoreApp& cr,
                   const helics::FederateInfo& fedInfo);
     /** configure the federate using the specified inputs and outputs*/
     void configure(helics::Time step, helics::Time start = helics::timeZero);
