@@ -72,11 +72,10 @@ CoSimFederate::CoSimFederate(const std::string& name,
                              helics::CoreApp& cr,
                              const helics::FederateInfo& fedInfo)
 try : cs(std::move(obj)) {
-    try
-    {
-        fed=helics::ValueFederate(name, cr, fedInfo);
+    try {
+        fed = helics::ValueFederate(name, cr, fedInfo);
     }
-    catch (const helics::HelicsException &e) {
+    catch (const helics::HelicsException& e) {
         std::cout << "error in constructor of federate:" << e.what() << std::endl;
         throw;
     }
