@@ -213,10 +213,10 @@ int FmiRunner::load()
                               << core->query("core", "current_state") << "\n";
                 }
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                std::cout << "slept again now really starting creation of cosim federate" << std::endl;
-                
-                auto fed =
-                    std::make_unique<CoSimFederate>("", std::move(obj), *core, fedInfo);
+                std::cout << "slept again now really starting creation of cosim federate"
+                          << std::endl;
+
+                auto fed = std::make_unique<CoSimFederate>("", std::move(obj), *core, fedInfo);
                 std::cout << "fed is created" << std::endl;
                 cosimFeds.push_back(std::move(fed));
             } else {
