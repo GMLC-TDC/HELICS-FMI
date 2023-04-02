@@ -24,7 +24,7 @@ target_include_directories(helics_fmi_test_base INTERFACE ${PROJECT_SOURCE_DIR}/
 
 set(fmi_test_sources fmiTests.cpp BouncingBallFMITests.cpp ResourceFMITests.cpp fmiFailureTests.cpp)
 set(helics_fmi_test_sources helicsFmiTests.cpp BouncingBallHelicsTests.cpp
-                            FeedthroughHelicsTests.cpp helicsFmiFailureTests.cpp
+                            FeedthroughHelicsTests.cpp ResourceHelicsTests.cpp helicsFmiFailureTests.cpp
 )
 if(WIN32)
     set(platform_fmi_tests WindowsTest1.cpp)
@@ -77,7 +77,7 @@ target_compile_definitions(
 # -----------------------------------------------------------------------------
 
 set(executable_test_sources exeTestHelper.cpp exeTestHelper.h helicsFmiExecutableTests.cpp
-                            RunnerTests.cpp
+                            RunnerTests.cpp ResourceExecutableTests.cpp
 )
 
 add_executable(helics_fmi_executable-tests ${executable_test_sources})

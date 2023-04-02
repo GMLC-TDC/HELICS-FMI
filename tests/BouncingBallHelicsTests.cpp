@@ -48,11 +48,7 @@ TEST(bouncingBall, checkPubsOutput)
 
     auto result = std::async(std::launch::async, [csFed]() { csFed->run(2.0); });
 
-    bool init = helics::waitForInit(&vFed, "bball", std::chrono::milliseconds(500));
-    if (!init) {
-        init = helics::waitForInit(&vFed, "bball", std::chrono::milliseconds(500));
-    }
-    EXPECT_TRUE(init);
+    vFed.enterInitializingModeIterative();
 
     auto qres = helics::vectorizeQueryResult(vFed.query("root", "publications"));
 
@@ -91,11 +87,7 @@ TEST(bouncingBall, checkPubsExtra)
 
     auto result = std::async(std::launch::async, [csFed]() { csFed->run(2.0); });
 
-    bool init = helics::waitForInit(&vFed, "bball", std::chrono::milliseconds(500));
-    if (!init) {
-        init = helics::waitForInit(&vFed, "bball", std::chrono::milliseconds(500));
-    }
-    EXPECT_TRUE(init);
+    vFed.enterInitializingModeIterative();
 
     auto qres = helics::vectorizeQueryResult(vFed.query("root", "publications"));
 

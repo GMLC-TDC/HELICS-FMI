@@ -49,11 +49,7 @@ TEST(feedthrough, checkIO)
 
     auto sync = std::async(std::launch::async, [csFed]() { csFed->run(2.0); });
 
-    bool init = helics::waitForInit(&vFed, "fthrough", std::chrono::milliseconds(500));
-    if (!init) {
-        init = helics::waitForInit(&vFed, "fthrough", std::chrono::milliseconds(500));
-    }
-    EXPECT_TRUE(init);
+    vFed.enterInitializingModeIterative();
 
     auto qres = helics::vectorizeQueryResult(vFed.query("fthrough", "publications"));
 
@@ -96,11 +92,7 @@ TEST(feedthrough, checkFeedthrough)
 
     auto sync = std::async(std::launch::async, [csFed]() { csFed->run(2.0); });
 
-    bool init = helics::waitForInit(&vFed, "fthrough", std::chrono::milliseconds(500));
-    if (!init) {
-        init = helics::waitForInit(&vFed, "fthrough", std::chrono::milliseconds(500));
-    }
-    EXPECT_TRUE(init);
+    vFed.enterInitializingModeIterative();
 
     auto qres = helics::vectorizeQueryResult(vFed.query("root", "publications"));
 
@@ -171,11 +163,7 @@ TEST(feedthrough, pubTypes)
 
     auto sync = std::async(std::launch::async, [csFed]() { csFed->run(2.0); });
 
-    bool init = helics::waitForInit(&vFed, "fthrough", std::chrono::milliseconds(500));
-    if (!init) {
-        init = helics::waitForInit(&vFed, "fthrough", std::chrono::milliseconds(500));
-    }
-    EXPECT_TRUE(init);
+    vFed.enterInitializingModeIterative();
 
     auto qres = helics::vectorizeQueryResult(vFed.query("root", "publications"));
 
