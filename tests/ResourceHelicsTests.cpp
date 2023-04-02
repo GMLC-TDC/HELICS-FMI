@@ -56,7 +56,7 @@ TEST(Resource, checkPubsOutput)
 
     auto& sub1 = vFed.registerSubscription(qres[0]);
     sub1.setDefault(561);
-    
+
     vFed.enterExecutingMode();
     auto time = vFed.requestTime(2.0);
     EXPECT_LT(time, 2.0);
@@ -64,7 +64,7 @@ TEST(Resource, checkPubsOutput)
     auto val = sub1.getValue<int>();
 
     EXPECT_NE(val, -20.0);
-    EXPECT_EQ(val,static_cast<int>('a'));
+    EXPECT_EQ(val, static_cast<int>('a'));
     vFed.finalize();
     result.get();
 }

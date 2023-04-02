@@ -5,19 +5,17 @@ for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
 All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "exeTestHelper.h"
 #include "helics/application_api/queryFunctions.hpp"
 #include "helicsFmiRunner.hpp"
-#include "exeTestHelper.h"
 
 #include "gtest/gtest.h"
 #include <filesystem>
 #include <future>
 
-
 static const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Resource.fmu";
 
 using helicsfmi::FmiRunner;
-
 
 TEST(Resource, simpleRun)
 {
@@ -49,7 +47,6 @@ TEST(Resource, checkPubsOutput)
     auto result = runner.runAsync();
 
     helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
-    
 
     fedInfo.coreInitString.clear();
 
@@ -63,7 +60,7 @@ TEST(Resource, checkPubsOutput)
 
     auto& sub1 = vFed.registerSubscription(qres[0]);
     sub1.setDefault(561);
-    
+
     vFed.enterExecutingMode();
     auto time = vFed.requestTime(2.0);
     EXPECT_LT(time, 2.0);
@@ -71,7 +68,7 @@ TEST(Resource, checkPubsOutput)
     auto val = sub1.getValue<int>();
 
     EXPECT_NE(val, -20.0);
-    EXPECT_EQ(val,static_cast<int>('a'));
+    EXPECT_EQ(val, static_cast<int>('a'));
     vFed.finalize();
     result.get();
 }
@@ -97,7 +94,6 @@ TEST(Resource, checkExePubsOutput)
 
     helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
 
-
     fedInfo.coreInitString.clear();
 
     helics::ValueFederate vFed("fed1", fedInfo);
@@ -118,7 +114,7 @@ TEST(Resource, checkExePubsOutput)
     auto val = sub1.getValue<int>();
 
     EXPECT_NE(val, -20.0);
-    EXPECT_EQ(val,static_cast<int>('a'));
+    EXPECT_EQ(val, static_cast<int>('a'));
     vFed.finalize();
     out.get();
 }
