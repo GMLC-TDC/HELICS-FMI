@@ -186,6 +186,8 @@ TEST(runnerTests, NoFile)
     FmiRunner runner;
     const int ret = runner.parse("--autobroker ");
     EXPECT_NE(ret, 0);
+    runner.close();
+    helics::cleanupHelicsLibrary();
 }
 
 TEST(runnerTests, nonExistingFile)
@@ -195,6 +197,8 @@ TEST(runnerTests, nonExistingFile)
     EXPECT_EQ(ret, 0);
     const int ret2 = runner.load();
     EXPECT_NE(ret, ret2);
+    runner.close();
+    helics::cleanupHelicsLibrary();
 }
 
 TEST(runnerTests, invalidZip)
@@ -205,6 +209,8 @@ TEST(runnerTests, invalidZip)
     ret = runner.load();
     EXPECT_NE(ret, 0);
     EXPECT_EQ(ret, FmiRunner::INVALID_FMU);
+    runner.close();
+    helics::cleanupHelicsLibrary();
 }
 
 TEST(runnerTests, invalidFMU)
@@ -214,6 +220,8 @@ TEST(runnerTests, invalidFMU)
     EXPECT_EQ(ret, 0);
     ret = runner.load();
     EXPECT_NE(ret, 0);
+    runner.close();
+    helics::cleanupHelicsLibrary();
 }
 
 TEST(runnerTests, missingSO)
@@ -225,4 +233,5 @@ TEST(runnerTests, missingSO)
     EXPECT_NE(ret, 0);
     runner.close();
     helics::cleanupHelicsLibrary();
+
 }
