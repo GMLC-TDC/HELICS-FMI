@@ -8,7 +8,6 @@
 # Livermore National Security, LLC.
 # ##################################################################################################
 
-
 # -----------------------------------------------------------------------------
 # fmi tests
 # -----------------------------------------------------------------------------
@@ -25,14 +24,11 @@ add_executable(fmi-tests ${fmi_test_sources})
 
 set_target_properties(fmi-tests PROPERTIES FOLDER tests)
 
-target_link_libraries(
-   fmi-tests PRIVATE helics_fmi_test_base
-)
+target_link_libraries(fmi-tests PRIVATE helics_fmi_test_base)
 
 target_link_libraries(fmi-tests PUBLIC fmiLibrary)
 
 add_test(NAME fmi-tests COMMAND fmi-tests --log_level=test_suite --report_level=short)
-
 
 target_compile_definitions(
     fmi-tests PRIVATE -DHELICS_BIN_LOC=\"${CMAKE_BINARY_DIR}/src/helics-fmi/\"

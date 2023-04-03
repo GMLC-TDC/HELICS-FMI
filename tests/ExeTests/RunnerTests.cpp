@@ -178,4 +178,3 @@ TEST(runnerTests, setfield2)
     auto str = fut.get();
     EXPECT_EQ(str, 0);
 }
-

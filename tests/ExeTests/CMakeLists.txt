@@ -16,8 +16,9 @@ set(executable_test_sources exeTestHelper.cpp exeTestHelper.h helicsFmiExecutabl
                             RunnerTests.cpp ResourceExecutableTests.cpp
 )
 
-set(executable_fail_test_sources exeTestHelper.cpp exeTestHelper.h exeFailureTests.cpp runnerFailureTests.cpp)
-
+set(executable_fail_test_sources exeTestHelper.cpp exeTestHelper.h exeFailureTests.cpp
+                                 runnerFailureTests.cpp
+)
 
 add_executable(helics_fmi_executable-tests ${executable_test_sources})
 add_executable(helics_fmi_fail_executable-tests ${executable_fail_test_sources})
@@ -27,7 +28,8 @@ target_compile_definitions(
 )
 
 target_compile_definitions(
-    helics_fmi_fail_executable-tests PRIVATE -DHELICS_EXE_LOC=\"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/\"
+    helics_fmi_fail_executable-tests
+    PRIVATE -DHELICS_EXE_LOC=\"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/\"
 )
 
 target_link_libraries(helics_fmi_executable-tests PUBLIC helicsFMI helicsFmiRunner)
@@ -38,7 +40,7 @@ add_test(NAME helics_fmi_executable-tests COMMAND helics_fmi_executable-tests
 )
 
 add_test(NAME helics_fmi_fail_executable-tests COMMAND helics_fmi_fail_executable-tests
-                                                  --log_level=test_suite --report_level=short
+                                                       --log_level=test_suite --report_level=short
 )
 
 set_target_properties(helics_fmi_executable-tests PROPERTIES FOLDER tests)
@@ -46,7 +48,6 @@ set_target_properties(helics_fmi_executable-tests PROPERTIES FOLDER tests)
 target_link_libraries(
     helics_fmi_executable-tests PRIVATE ${HELICS_FMI_HELICS_TARGET_APPS} helics_fmi_test_base
 )
-
 
 set_target_properties(helics_fmi_fail_executable-tests PROPERTIES FOLDER tests)
 

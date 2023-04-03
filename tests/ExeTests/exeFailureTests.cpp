@@ -14,7 +14,6 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 static const std::string inputDir = std::string(TEST_DIR) + "/";
 
-
 TEST(exeTests, nonExistingFile)
 {
     const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");

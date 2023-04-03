@@ -100,5 +100,3 @@ TEST(exeTests, dualFedAsyncZMQ)
     vFed.finalize();
     auto str = out.get();
 }
-
-

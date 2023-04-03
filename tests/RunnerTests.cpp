@@ -233,5 +233,4 @@ TEST(runnerTests, missingSO)
     EXPECT_NE(ret, 0);
     runner.close();
     helics::cleanupHelicsLibrary();
-
 }

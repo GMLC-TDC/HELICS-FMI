@@ -8,7 +8,6 @@
 # Livermore National Security, LLC.
 # ##################################################################################################
 
-
 # -----------------------------------------------------------------------------
 # helics fmi tests
 # -----------------------------------------------------------------------------
@@ -31,9 +30,6 @@ target_link_libraries(
     helics_fmi-tests PRIVATE ${HELICS_FMI_HELICS_TARGET_APPS} helics_fmi_test_base
 )
 
-
 target_link_libraries(helics_fmi-tests PUBLIC helicsFMI)
 
 add_test(NAME helics_fmi-tests COMMAND helics_fmi-tests --log_level=test_suite --report_level=short)
-
-
