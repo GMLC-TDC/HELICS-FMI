@@ -183,16 +183,14 @@ bool FmiLibrary::loadFMU(const std::string& fmuPath)
 
         // Check if the directory is read-only
         if ((status.permissions() & std::filesystem::perms::all) == std::filesystem::perms::none) {
-            
-            if (!std::filesystem::exists(fmuName.parent_path() / fmuName.stem()))
-            {
-                //if we are in a read only directory and the path doesn't exist then extract to temp directory
-                extractDirectory=std::filesystem::temp_directory_path()/fmuName.stem();
+            if (!std::filesystem::exists(fmuName.parent_path() / fmuName.stem())) {
+                // if we are in a read only directory and the path doesn't exist then extract to
+                // temp directory
+                extractDirectory = std::filesystem::temp_directory_path() / fmuName.stem();
             }
         } else {
             extractDirectory = fmuName.parent_path() / fmuName.stem();
         }
-        
     }
     return loadInformation();
 }
