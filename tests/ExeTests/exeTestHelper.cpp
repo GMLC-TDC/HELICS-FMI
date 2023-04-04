@@ -154,7 +154,7 @@ std::future<std::string> exeTestRunner::runCaptureOutputAsync(const std::string&
         std::string str((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
         str.append("execution returned ");
         str.append(std::to_string(ret) + "\n");
-        ret=remove(oFile.c_str());
+        ret = remove(oFile.c_str());
         return str;
     });
 }
