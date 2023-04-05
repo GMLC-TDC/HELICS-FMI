@@ -126,7 +126,7 @@ std::string exeTestRunner::runCaptureOutput(const std::string& args) const
         return "invalid executable";
     }
     const std::string rstr = exeString + " " + args + " > " + outFile + " 2>&1";
-    const int ret = system(rstr.c_str());
+    int ret = system(rstr.c_str());
 
     std::ifstream capture(outFile);
     std::string str((std::istreambuf_iterator<char>(capture)), std::istreambuf_iterator<char>());
@@ -134,7 +134,10 @@ std::string exeTestRunner::runCaptureOutput(const std::string& args) const
     str.append(exeString);
     str.append(" returned ");
     str.append(std::to_string(ret) + "\n");
-    remove(outFile.c_str());
+    ret = remove(outFile.c_str());
+    if (ret != 1) {
+        str.append(" failed to remove output file\n");
+    }
     return str;
 }
 
@@ -146,19 +149,7 @@ std::future<std::string> exeTestRunner::runCaptureOutputAsync(const std::string&
         prom.set_value("invalid executable");
         return fut;
     }
-    const std::string rstr = exeString + " " + args + " > " + outFile + " 2>&1";
-    const std::string oFile = outFile;
-    return std::async(std::launch::async, [rstr, oFile]() {
-        int ret = system(rstr.c_str());
-        std::ifstream outputFileStream(oFile);
-        std::string str((std::istreambuf_iterator<char>(outputFileStream)),
-                        std::istreambuf_iterator<char>());
-        str.append("execution returned ");
-        str.append(std::to_string(ret) + "\n");
-        ret = remove(oFile.c_str());
-        if (ret != 1) {
-            str.append(" failed to remove output file\n");
-        }
-        return str;
+    return std::async(std::launch::async, [this, args]() {
+        return runCaptureOutput(args);
     });
 }
