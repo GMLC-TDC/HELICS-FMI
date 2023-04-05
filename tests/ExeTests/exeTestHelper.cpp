@@ -150,11 +150,14 @@ std::future<std::string> exeTestRunner::runCaptureOutputAsync(const std::string&
     const std::string oFile = outFile;
     return std::async(std::launch::async, [rstr, oFile]() {
         int ret = system(rstr.c_str());
-        std::ifstream t(oFile);
-        std::string str((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
+        std::ifstream outputFileStream(oFile);
+        std::string str((std::istreambuf_iterator<char>(outputFileStream)), std::istreambuf_iterator<char>());
         str.append("execution returned ");
         str.append(std::to_string(ret) + "\n");
         ret = remove(oFile.c_str());
+        if (ret != 1) {
+            str.append(" failed to remove output file\n");
+        }
         return str;
     });
 }
