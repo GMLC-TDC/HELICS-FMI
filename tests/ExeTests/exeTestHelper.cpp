@@ -149,7 +149,5 @@ std::future<std::string> exeTestRunner::runCaptureOutputAsync(const std::string&
         prom.set_value("invalid executable");
         return fut;
     }
-    return std::async(std::launch::async, [this, args]() {
-        return runCaptureOutput(args);
-    });
+    return std::async(std::launch::async, [this, args]() { return runCaptureOutput(args); });
 }
