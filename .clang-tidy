@@ -71,6 +71,7 @@ WarningsAsErrors: "
   cert-*,
   -cert-err58-cpp,
   -cert-dcl50-cpp,
+  -cert-env33-c,
   portability-*,
   readability-*,
   -readability-magic-numbers,
