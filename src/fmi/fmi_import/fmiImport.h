@@ -141,10 +141,10 @@ class fmi2ModelExchangeObject;
 class fmi2CoSimObject;
 
 /** class instantiating a logger object that can be transferred easily and updated
-*/
+ */
 class FmiLogger: public std::enable_shared_from_this<FmiLogger> {
   public:
-    FmiLogger(): checkCode(validationCode){}
+    FmiLogger(): checkCode(validationCode) {}
     /** destructor
     @details this class is used by a shared C library as a pointer and memory reference
     there are cases where despite best intentions it might get used after being deleted
