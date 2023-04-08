@@ -56,9 +56,9 @@ class variableInformation {
     bool reinit = false;
     bool derivative = false;
     bool isAlias = false;
-    fmi_variability variability = fmi_variability::continuous;
-    fmi_causality causality = fmi_causality::local;
-    fmi_variable_type type = fmi_variable_type::real;
+    fmi_variability variability{fmi_variability::unknown};
+    fmi_causality causality{fmi_causality::unknown};
+    fmi_variable_type type{fmi_variable_type::unknown};
     double start = 0;
     double min = -1e48;
     double max = 1e48;
@@ -90,8 +90,8 @@ class fmiTypeDefinition {
     std::string unit;
     std::string displayUnit;
     fmi_variable_type type;
-    bool relativeQuantity = false;
-    bool unbounded = false;
+    bool relativeQuantity{false};
+    bool unbounded{false};
     double min;
     double max;
     double nominal;

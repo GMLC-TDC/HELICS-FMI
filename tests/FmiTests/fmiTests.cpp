@@ -46,7 +46,7 @@ TEST(loadtests, loadXML)
     EXPECT_EQ(info->getCounts(fmiVariableType::parameter), 2);
     EXPECT_EQ(info->getCounts(fmiVariableType::any), 8);
     EXPECT_EQ(info->getCounts(fmiVariableType::state), 2);
-    EXPECT_EQ(info->getCounts(fmiVariableType::local), 3);
+    EXPECT_EQ(info->getCounts(fmiVariableType::local), 2);
     EXPECT_EQ(info->getCounts(fmiVariableType::units), 3);
 
     EXPECT_EQ(info->getCounts(fmiVariableType::meObject), 1);

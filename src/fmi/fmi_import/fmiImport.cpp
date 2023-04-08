@@ -36,8 +36,9 @@ fmiCommonFunctions::fmiCommonFunctions(std::shared_ptr<boost::dll::shared_librar
     fmi2SetDebugLogging = lib->get<fmi2SetDebugLoggingTYPE>("fmi2SetDebugLogging");
 
     /* Creation and destruction of FMU instances and setting debug status */
-
-    fmi2FreeInstance = lib->get<fmi2FreeInstanceTYPE>("fmi2FreeInstance");
+    if (lib->has("fmi2FreeInstance")) {
+        fmi2FreeInstance = lib->get<fmi2FreeInstanceTYPE>("fmi2FreeInstance");
+    }
 
     /* Enter and exit initialization mode, terminate and reset */
     fmi2SetupExperiment = lib->get<fmi2SetupExperimentTYPE>("fmi2SetupExperiment");
@@ -115,7 +116,7 @@ fmiCoSimFunctions::fmiCoSimFunctions(std::shared_ptr<boost::dll::shared_library>
     fmi2GetStringStatus = lib->get<fmi2GetStringStatusTYPE>("fmi2GetStringStatus");
 }
 
-FmiLibrary::FmiLibrary()
+FmiLibrary::FmiLibrary(): logger(std::make_shared<FmiLogger>())
 {
     information = std::make_shared<fmiInfo>();
 }
@@ -290,6 +291,7 @@ std::unique_ptr<fmi2ModelExchangeObject>
                                           fmi2False);
         auto meobj = std::make_unique<fmi2ModelExchangeObject>(
             name, comp, information, commonFunctions, ModelExchangeFunctions);
+        meobj->setLogger(logger);
         ++mecount;
         return meobj;
     }
@@ -316,6 +318,7 @@ std::unique_ptr<fmi2CoSimObject> FmiLibrary::createCoSimulationObject(const std:
                                           fmi2False);
         auto csobj = std::make_unique<fmi2CoSimObject>(
             name, comp, information, commonFunctions, CoSimFunctions);
+        csobj->setLogger(logger);
         ++cosimcount;
         return csobj;
     }
@@ -434,15 +437,22 @@ void FmiLibrary::makeCallbackFunctions()
     callbacks->allocateMemory = &calloc;
     callbacks->freeMemory = &free;
     callbacks->logger = &loggerFunc;
-    callbacks->componentEnvironment = static_cast<void*>(this);
+    callbacks->componentEnvironment = static_cast<void*>(logger.get());
 }
 
-void FmiLibrary::logMessage(const std::string& message) const
+void FmiLogger::logMessage(std::string_view message) const
 {
     if (loggerCallback) {
         loggerCallback(message);
     } else {
         std::cout << message << std::endl;
+    }
+}
+
+void FmiLibrary::logMessage(std::string_view message) const
+{
+    if (logger && logger->check()) {
+        logger->logMessage(message);
     }
 }
 
@@ -463,9 +473,9 @@ void loggerFunc(fmi2ComponentEnvironment compEnv,
     va_end(arglist);
     temp.resize(std::min(static_cast<std::size_t>(stringSize), cStringBufferSize));
 
-    auto* fmilib = reinterpret_cast<FmiLibrary*>(compEnv);
-    if (fmilib != nullptr) {
-        fmilib->logMessage(temp);
+    auto* logger = reinterpret_cast<FmiLogger*>(compEnv);
+    if (logger != nullptr && logger->check()) {
+        logger->logMessage(temp);
     } else {
         std::cout << message << std::endl;
     }

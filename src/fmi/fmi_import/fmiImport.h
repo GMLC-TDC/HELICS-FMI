@@ -14,6 +14,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 
 class readerElement;
@@ -139,6 +140,32 @@ class fmiCoSimFunctions {
 class fmi2ModelExchangeObject;
 class fmi2CoSimObject;
 
+/** class instantiating a logger object that can be transferred easily and updated
+ */
+class FmiLogger: public std::enable_shared_from_this<FmiLogger> {
+  public:
+    FmiLogger(): checkCode(validationCode) {}
+    /** destructor
+    @details this class is used by a shared C library as a pointer and memory reference
+    there are cases where despite best intentions it might get used after being deleted
+    in which case to prevent the actual callback from being executed a memory sentinel is used
+    */
+    ~FmiLogger() { checkCode = 0; }
+    void setLoggerCallback(std::function<void(std::string_view)> logCallback)
+    {
+        loggerCallback = std::move(logCallback);
+    }
+    void logMessage(std::string_view message) const;
+    bool check() const { return checkCode == validationCode; }
+
+  private:
+    std::function<void(std::string_view)> loggerCallback;
+
+  public:
+    static constexpr int validationCode{0x2566'1FA2};
+    int checkCode{0};
+};
+
 /** @brief class for loading an fmu file information
  *@details class extracts and FMU if needed then searches for the xml file and loads the information
  */
@@ -191,11 +218,9 @@ class FmiLibrary {
     int getErrorCode() const { return errorCode; }
 
     static constexpr int invalidCount{-1};
-    void logMessage(const std::string& message) const;
-    void setLoggerCallback(std::function<void(const std::string& message)> logCallback)
-    {
-        loggerCallback = std::move(logCallback);
-    }
+    void logMessage(std::string_view message) const;
+
+    std::shared_ptr<FmiLogger> getLogger() const { return logger; }
 
   private:  // private functions
     bool loadInformation();
@@ -231,8 +256,7 @@ class FmiLibrary {
     std::shared_ptr<fmiCommonFunctions> commonFunctions;
     std::shared_ptr<fmiModelExchangeFunctions> ModelExchangeFunctions;
     std::shared_ptr<fmiCoSimFunctions> CoSimFunctions;
-
-    std::function<void(const std::string& message)> loggerCallback;
+    std::shared_ptr<FmiLogger> logger;
 };
 
 /** logging function to capture log messages

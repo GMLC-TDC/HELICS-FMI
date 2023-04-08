@@ -15,6 +15,39 @@ static const std::string inputDir = std::string(TEST_DIR) + "/";
 
 using helicsfmi::FmiRunner;
 
+static const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Resource.fmu";
+
+TEST(runnerTests, flagCheckFail)
+{
+    FmiRunner runner;
+    int ret = runner.parse(std::string("--autobroker --set unknown=45.6 ") + inputFile);
+    EXPECT_EQ(ret, 0);
+    ret = runner.load();
+    EXPECT_EQ(ret, 0);
+    std::cout << "running" << std::endl;
+    ret = runner.run();
+    EXPECT_NE(ret, 0);
+    std::cout << "run failed, now closing" << std::endl;
+    runner.close();
+    std::cout << "closed now cleanup" << std::endl;
+    helics::cleanupHelicsLibrary();
+    std::cout << "finished" << std::endl;
+}
+
+TEST(runnerTests, flagCheckPass)
+{
+    FmiRunner runner;
+    int ret = runner.parse(
+        std::string("--autobroker --set unknown=45.6 --flags=-exception_on_discard ") + inputFile);
+    EXPECT_EQ(ret, 0);
+    ret = runner.load();
+    EXPECT_EQ(ret, 0);
+    ret = runner.run();
+    EXPECT_EQ(ret, 0);
+    runner.close();
+    helics::cleanupHelicsLibrary();
+}
+
 TEST(runnerTests, NoFile)
 {
     FmiRunner runner;

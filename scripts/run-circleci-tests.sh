@@ -1,6 +1,9 @@
 #!/bin/bash
 tests=(
+    "/root/project/build/bin/fmi-tests --gtest_filter=-*ci_skip*"
     "/root/project/build/bin/helics_fmi-tests --gtest_filter=-*ci_skip*"
+    "/root/project/build/bin/helics_fmi_executable-tests --gtest_filter=-*ci_skip*"
+    "/root/project/build/bin/helics_fmi_fail_executable-tests --gtest_filter=-*ci_skip*"
 )
 
 SUMRESULT=0

@@ -75,6 +75,8 @@ class CoSimFederate {
     {
         cs->set(std::forward<Args>(args)...);
     }
+    /** set flags on the object or federate*/
+    bool setFlag(const std::string& flag, bool val);
     /** run the cosimulation*/
     void run(helics::Time stop);
     /** get the underlying HELICS federate*/
