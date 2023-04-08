@@ -24,14 +24,14 @@ TEST(runnerTests, flagCheckFail)
     EXPECT_EQ(ret, 0);
     ret = runner.load();
     EXPECT_EQ(ret, 0);
-    std::cout<<"running"<<std::endl;
+    std::cout << "running" << std::endl;
     ret = runner.run();
     EXPECT_NE(ret, 0);
-    std::cout<<"run failed, now closing"<<std::endl;
+    std::cout << "run failed, now closing" << std::endl;
     runner.close();
-    std::cout<<"closed now cleanup"<<std::endl;
+    std::cout << "closed now cleanup" << std::endl;
     helics::cleanupHelicsLibrary();
-    std::cout<<"finished"<<std::endl;
+    std::cout << "finished" << std::endl;
 }
 
 TEST(runnerTests, flagCheckPass)
@@ -101,5 +101,3 @@ TEST(runnerTests, missingSO)
     runner.close();
     helics::cleanupHelicsLibrary();
 }
-
-
