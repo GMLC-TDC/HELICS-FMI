@@ -49,3 +49,15 @@ TEST(exeTests, missingSO)
     auto out = hfmi.runAsync(std::string("--autobroker ") + inputDir + "missingSO.fmu");
     EXPECT_NE(out.get(), 0);
 }
+
+
+static const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Resource.fmu";
+
+TEST(exeTests, flagCheck)
+{
+    const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
+
+    /**test that things run to completion with auto broker*/
+    auto out = hfmi.run(std::string("--autobroker --set unknown=45.6 ") + inputFile);
+    EXPECT_NE(out, 0);
+}

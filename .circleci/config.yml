@@ -37,7 +37,7 @@ jobs:
     docker:
       - image: helics/buildenv:gcc12-builder
     environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-fsanitize=thread -g -O1 "  -DHELICS_FMI_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON  -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON'
+      CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-fsanitize=thread -g -O1 " -DCMAKE_C_FLAGS="-fsanitize=thread -g -O1 " -DHELICS_FMI_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON  -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON'
       TSAN_OPTIONS: 'second_deadlock_stack=1 suppressions=/root/project/.circleci/tsan_suppression.txt history_size=4'
 
     steps:
@@ -49,7 +49,7 @@ jobs:
     docker:
       - image: helics/buildenv:gcc12-builder
     environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-ggdb -fsanitize=address -fno-omit-frame-pointer -static-libstdc++ -static-libasan -lrt -g -O1 "  -DHELICS_FMI_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON'
+      CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-ggdb -fsanitize=address -fno-omit-frame-pointer -static-libstdc++ -static-libasan -lrt -g -O1 "  -DCMAKE_C_FLAGS="-ggdb -fsanitize=address -fno-omit-frame-pointer -g -O1 " -DHELICS_FMI_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON'
       ASAN_OPTIONS: 'alloc_dealloc_mismatch=0'
       LSAN_OPTIONS: 'suppressions=/root/project/.circleci/leak_suppression_gcc.txt'
     steps:
@@ -61,7 +61,7 @@ jobs:
     docker:
       - image: helics/buildenv:sanitizers-14
     environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=undefined,address -lc++ -lc++abi -fsanitize-address-use-after-scope -fsanitize-ignorelist=/root/project/.circleci/asan_suppression.txt -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1  -fsanitize-blacklist=/root/project/.circleci/asan_blacklist.txt"  -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
+      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=undefined,address -lc++ -lc++abi -fsanitize-address-use-after-scope -fsanitize-ignorelist=/root/project/.circleci/asan_suppression.txt -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1  -fsanitize-blacklist=/root/project/.circleci/asan_blacklist.txt" -DCMAKE_C_FLAGS="-fsanitize=undefined,address -fsanitize-address-use-after-scope -fsanitize-ignorelist=/root/project/.circleci/asan_suppression.txt -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1  -fsanitize-blacklist=/root/project/.circleci/asan_blacklist.txt" -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
       LSAN_OPTIONS: 'suppressions=/root/project/.circleci/leak_suppression.txt'
       UBSAN_OPTIONS: 'print_stacktrace=1 suppressions=/root/project/.circleci/ubsan_suppression.txt'
       ASAN_OPTIONS: 'alloc_dealloc_mismatch=0'
@@ -74,7 +74,7 @@ jobs:
     docker:
       - image: helics/buildenv:sanitizers-14
     environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=memory -nostdinc++ -nostdlib++ -L/root/develop/libcxx_msan/lib -lc++ -lc++abi -I/root/develop/libcxx_msan/include -I/root/develop/libcxx_msan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath,/root/develop/libcxx_msan/lib"  -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON -DHELICS_ZMQ_SUBPROJECT=ON -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
+      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=memory -nostdinc++ -nostdlib++ -L/root/develop/libcxx_msan/lib -lc++ -lc++abi -I/root/develop/libcxx_msan/include -I/root/develop/libcxx_msan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath,/root/develop/libcxx_msan/lib" -DCMAKE_C_FLAGS="-fsanitize=memory -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 " -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON -DHELICS_ZMQ_SUBPROJECT=ON -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
 
     steps:
       - checkout
@@ -85,7 +85,7 @@ jobs:
     docker:
       - image: helics/buildenv:sanitizers-14
     environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=thread -nostdinc++ -nostdlib++ -L/root/develop/libcxx_tsan/lib -lc++ -lc++abi -I/root/develop/libcxx_tsan/include -I/root/develop/libcxx_tsan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O2 -Wl,-rpath,/root/develop/libcxx_tsan/lib"  -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON -DHELICS_ZMQ_SUBPROJECT=ON -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
+      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=thread -nostdinc++ -nostdlib++ -L/root/develop/libcxx_tsan/lib -lc++ -lc++abi -I/root/develop/libcxx_tsan/include -I/root/develop/libcxx_tsan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O2 -Wl,-rpath,/root/develop/libcxx_tsan/lib" -DCMAKE_C_FLAGS="-fsanitize=thread -fno-omit-frame-pointer -g -O2 " -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON -DHELICS_ZMQ_SUBPROJECT=ON -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
       TSAN_OPTIONS: 'suppressions=/root/project/.circleci/tsan_suppression.txt'
     steps:
       - checkout

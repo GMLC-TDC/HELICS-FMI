@@ -28,8 +28,8 @@ class FmiRunner {
     std::string integrator{"cvode"};
     std::string integratorArgs;
     std::string brokerArgs;
-    helics::Time stepTime{0.001};
-    helics::Time stopTime = helics::Time::minVal();
+    helics::Time stepTime{ helics::Time::minVal() };
+    helics::Time stopTime{ helics::Time::minVal() };
     std::vector<std::string> inputs;
     std::vector<std::string> output_variables;
     std::vector<std::string> input_variables;
@@ -43,9 +43,11 @@ class FmiRunner {
     std::vector<std::unique_ptr<CoSimFederate>> cosimFeds;
     std::vector<std::unique_ptr<FmiModelExchangeFederate>> meFeds;
     std::vector<std::string> setParameters;
+    std::vector<std::string> flags;
     enum class State { CREATED, LOADED, INITIALIZED, RUNNING, CLOSED, ERROR };
     State currentState{State::CREATED};
     int returnCode{EXIT_SUCCESS};
+    int logLevel{HELICS_LOG_LEVEL_SUMMARY};
 
   public:
     enum ExitCodes : int {
@@ -57,6 +59,7 @@ class FmiRunner {
         INVALID_FMU = 55,
         FMU_ERROR = 56,
         INCORRECT_FMU = 57,
+        DISCARDED_PARAMETER_ERROR=62,
         CALL_NOT_ALLOWED_IN_CURRENT_STATE = 83
     };
 
