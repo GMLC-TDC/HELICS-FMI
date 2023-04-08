@@ -219,7 +219,7 @@ bool CoSimFederate::setFlag(const std::string& flag, bool val)
     if (cs->setFlag(flag, val)) {
         return true;
     }
-    int param = helics::getFlagIndex(flag);
+    const int param = helics::getFlagIndex(flag);
     if (param != HELICS_INVALID_OPTION_INDEX) {
         fed.setFlagOption(param, val);
         return true;

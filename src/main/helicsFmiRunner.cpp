@@ -466,8 +466,8 @@ int FmiRunner::loadFile(readerElement& elem)
                 std::cout << "unable to create cosim object " << std::endl;
                 return errorTerminate(FMU_ERROR);
             }
-            auto nm = obj->getName();
-            auto fed = std::make_unique<CoSimFederate>(nm, std::move(obj), fedInfo);
+            auto name = obj->getName();
+            auto fed = std::make_unique<CoSimFederate>(name, std::move(obj), fedInfo);
             elem.moveToFirstChild("parameters");
             while (elem.isValid()) {
                 const auto& str1 = elem.getFirstAttribute().getText();
@@ -495,8 +495,8 @@ int FmiRunner::loadFile(readerElement& elem)
                 std::cout << "unable to create model exchange object " << std::endl;
                 return errorTerminate(FMU_ERROR);
             }
-            auto nm = obj->getName();
-            auto fed = std::make_unique<FmiModelExchangeFederate>(nm, std::move(obj), fedInfo);
+            auto name = obj->getName();
+            auto fed = std::make_unique<FmiModelExchangeFederate>(name, std::move(obj), fedInfo);
             elem.moveToFirstChild("parameters");
             while (elem.isValid()) {
                 auto str1 = elem.getFirstAttribute().getText();
