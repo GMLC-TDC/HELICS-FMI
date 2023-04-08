@@ -12,10 +12,10 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <exception>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include <string_view>
 
 /** base fmiException*/
 class fmiException: public std::exception {
@@ -46,11 +46,8 @@ class fmiFatalException: public fmiException {
     virtual const char* what() const noexcept override { return "return fmiFatal"; }
 };
 
-
-
 /** base class containing the operation functions for working with an FMU*/
 class fmi2Object {
-  
   public:
     fmi2Object(const std::string& name,
                fmi2Component cmp,
@@ -225,11 +222,16 @@ class fmi2Object {
         return commonFunctions;
     }
 
-    std::shared_ptr<FmiLogger> getLogger() const{return logger;}
+    std::shared_ptr<FmiLogger> getLogger() const { return logger; }
 
-    void setLogger(std::shared_ptr<FmiLogger> logFunction){logger=std::move(logFunction); }
+    void setLogger(std::shared_ptr<FmiLogger> logFunction) { logger = std::move(logFunction); }
     /** set the logging callback*/
-    void setLoggingCallback(std::function<void(std::string_view)> callback) { if (logger) { logger->setLoggerCallback(std::move(callback)); } }
+    void setLoggingCallback(std::function<void(std::string_view)> callback)
+    {
+        if (logger) {
+            logger->setLoggerCallback(std::move(callback));
+        }
+    }
 
     fmi2Component getFmiComponent() const { return comp; }
     /** get the name of the object*/
@@ -250,12 +252,12 @@ class fmi2Object {
     void setDefaultOutputs();
 
   private:
-          /// flag indicating that an exception should be thrown when an input is discarded
-          bool exceptionOnDiscard{true};
-          /// flag indicating that an exception should be thrown on a fmiWarning
-          bool exceptionOnWarning{false};
-          /// @brief  flag indicating that the free function should not be called on destructor
-          bool noFree{false};
+    /// flag indicating that an exception should be thrown when an input is discarded
+    bool exceptionOnDiscard{true};
+    /// flag indicating that an exception should be thrown on a fmiWarning
+    bool exceptionOnWarning{false};
+    /// @brief  flag indicating that the free function should not be called on destructor
+    bool noFree{false};
     std::shared_ptr<const fmiCommonFunctions> commonFunctions;
     const std::string name;
     std::shared_ptr<FmiLogger> logger;

@@ -50,7 +50,6 @@ TEST(exeTests, missingSO)
     EXPECT_NE(out.get(), 0);
 }
 
-
 static const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Resource.fmu";
 
 TEST(exeTests, flagCheck)

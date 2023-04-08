@@ -216,14 +216,12 @@ double CoSimFederate::initialize(double stop, std::ofstream& ofile)
 
 bool CoSimFederate::setFlag(const std::string& flag, bool val)
 {
-    if (cs->setFlag(flag, val))
-    {
+    if (cs->setFlag(flag, val)) {
         return true;
     }
-    int param=helics::getFlagIndex(flag);
-    if (param != HELICS_INVALID_OPTION_INDEX)
-    {
-        fed.setFlagOption(param,val);
+    int param = helics::getFlagIndex(flag);
+    if (param != HELICS_INVALID_OPTION_INDEX) {
+        fed.setFlagOption(param, val);
         return true;
     }
     return false;
@@ -251,7 +249,7 @@ void CoSimFederate::run(helics::Time stop)
     cs->setMode(fmuMode::stepMode);
 
     helics::Time currentTime = helics::timeZero;
-    while (currentTime + timeBias+stepTime <= stop) {
+    while (currentTime + timeBias + stepTime <= stop) {
         try {
             cs->doStep(static_cast<double>(currentTime + timeBias),
                        static_cast<double>(stepTime),

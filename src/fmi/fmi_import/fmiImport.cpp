@@ -36,11 +36,10 @@ fmiCommonFunctions::fmiCommonFunctions(std::shared_ptr<boost::dll::shared_librar
     fmi2SetDebugLogging = lib->get<fmi2SetDebugLoggingTYPE>("fmi2SetDebugLogging");
 
     /* Creation and destruction of FMU instances and setting debug status */
-    if (lib->has("fmi2FreeInstance"))
-    {
+    if (lib->has("fmi2FreeInstance")) {
         fmi2FreeInstance = lib->get<fmi2FreeInstanceTYPE>("fmi2FreeInstance");
     }
-    
+
     /* Enter and exit initialization mode, terminate and reset */
     fmi2SetupExperiment = lib->get<fmi2SetupExperimentTYPE>("fmi2SetupExperiment");
     fmi2EnterInitializationMode =
@@ -117,7 +116,7 @@ fmiCoSimFunctions::fmiCoSimFunctions(std::shared_ptr<boost::dll::shared_library>
     fmi2GetStringStatus = lib->get<fmi2GetStringStatusTYPE>("fmi2GetStringStatus");
 }
 
-FmiLibrary::FmiLibrary():logger(std::make_shared<FmiLogger>())
+FmiLibrary::FmiLibrary(): logger(std::make_shared<FmiLogger>())
 {
     information = std::make_shared<fmiInfo>();
 }
@@ -452,8 +451,7 @@ void FmiLogger::logMessage(std::string_view message) const
 
 void FmiLibrary::logMessage(std::string_view message) const
 {
-    if (logger && logger->check())
-    {
+    if (logger && logger->check()) {
         logger->logMessage(message);
     }
 }

@@ -84,11 +84,11 @@ TEST(runnerTests, flagCheckFail)
     helics::cleanupHelicsLibrary();
 }
 
-
 TEST(runnerTests, flagCheckPass)
 {
     FmiRunner runner;
-    int ret = runner.parse(std::string("--autobroker --set unknown=45.6 --flags=-exception_on_discard ") + inputFile);
+    int ret = runner.parse(
+        std::string("--autobroker --set unknown=45.6 --flags=-exception_on_discard ") + inputFile);
     EXPECT_EQ(ret, 0);
     ret = runner.load();
     EXPECT_EQ(ret, 0);

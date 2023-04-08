@@ -20,11 +20,9 @@ fmi2Object::fmi2Object(const std::string& fmuname,
 
 fmi2Object::~fmi2Object()
 {
-    if (!noFree && commonFunctions->fmi2FreeInstance)
-    {
+    if (!noFree && commonFunctions->fmi2FreeInstance) {
         commonFunctions->fmi2FreeInstance(comp);
     }
-    
 }
 void fmi2Object::setupExperiment(fmi2Boolean toleranceDefined,
                                  fmi2Real tolerance,
@@ -186,41 +184,34 @@ void fmi2Object::set(const fmiVariable& param, const std::string& val)
 
 bool fmi2Object::setFlag(const std::string& param, bool val)
 {
-    if (param == "exception_on_discard")
-    {
-        exceptionOnDiscard=val;
+    if (param == "exception_on_discard") {
+        exceptionOnDiscard = val;
         return true;
     }
-    if (param == "exception_on_warning")
-    {
-        exceptionOnWarning=val;
+    if (param == "exception_on_warning") {
+        exceptionOnWarning = val;
         return true;
     }
-    if (param == "no_free")
-    {
-        noFree=val;
+    if (param == "no_free") {
+        noFree = val;
         return true;
     }
     auto ref = info->getVariableInfo(param);
     fmi2Status ret{fmi2Status::fmi2Discard};
-    switch (ref.type._value)
-    {
-    case fmi_variable_type::boolean: {
-        const fmi2Boolean val2 = val ? fmi2True : fmi2False;
-        ret = commonFunctions->fmi2SetBoolean(comp, &(ref.valueRef), 1, &val2);
+    switch (ref.type._value) {
+        case fmi_variable_type::boolean: {
+            const fmi2Boolean val2 = val ? fmi2True : fmi2False;
+            ret = commonFunctions->fmi2SetBoolean(comp, &(ref.valueRef), 1, &val2);
+        } break;
+        case fmi_variable_type::integer: {
+            const int val2 = val ? 1 : 0;
+            ret = commonFunctions->fmi2SetInteger(comp, &(ref.valueRef), 1, &val2);
+        } break;
+        default:
+            break;
     }
-                                   break;
-    case fmi_variable_type::integer:
-    {
-        const int val2 = val ? 1 : 0;
-        ret = commonFunctions->fmi2SetInteger(comp, &(ref.valueRef), 1, &val2);
-    }
-    break;
-    default:
-        break;
-    }
-        
-        return (ret==fmi2Status::fmi2OK);
+
+    return (ret == fmi2Status::fmi2OK);
 }
 
 void fmi2Object::getFMUState(fmi2FMUstate* FMUstate)

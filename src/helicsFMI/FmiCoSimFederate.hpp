@@ -35,6 +35,7 @@ class CoSimFederate {
     helics::Time timeBias{helics::timeZero};  //!< time shift for the federate
     std::string outputCaptureFile;
     bool captureOutput{false};
+
   public:
     CoSimFederate(const std::string& name,
                   const std::string& fmu,
@@ -75,7 +76,7 @@ class CoSimFederate {
         cs->set(std::forward<Args>(args)...);
     }
     /** set flags on the object or federate*/
-    bool setFlag(const std::string &flag,bool val);
+    bool setFlag(const std::string& flag, bool val);
     /** run the cosimulation*/
     void run(helics::Time stop);
     /** get the underlying HELICS federate*/

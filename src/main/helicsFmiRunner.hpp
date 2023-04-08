@@ -28,8 +28,8 @@ class FmiRunner {
     std::string integrator{"cvode"};
     std::string integratorArgs;
     std::string brokerArgs;
-    helics::Time stepTime{ helics::Time::minVal() };
-    helics::Time stopTime{ helics::Time::minVal() };
+    helics::Time stepTime{helics::Time::minVal()};
+    helics::Time stopTime{helics::Time::minVal()};
     std::vector<std::string> inputs;
     std::vector<std::string> output_variables;
     std::vector<std::string> input_variables;
@@ -59,7 +59,7 @@ class FmiRunner {
         INVALID_FMU = 55,
         FMU_ERROR = 56,
         INCORRECT_FMU = 57,
-        DISCARDED_PARAMETER_ERROR=62,
+        DISCARDED_PARAMETER_ERROR = 62,
         CALL_NOT_ALLOWED_IN_CURRENT_STATE = 83
     };
 

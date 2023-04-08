@@ -56,12 +56,12 @@ std::unique_ptr<CLI::App> FmiRunner::generateCLI()
     app->add_option("--step",
                     stepTime,
                     "the step size to use (specified in seconds or as a time string (10ms)");
-    auto *stopOpt=app->add_option(
+    auto* stopOpt = app->add_option(
         "--stop",
         stopTime,
         "the time to stop the simulation (specified in seconds or as a time string (10ms)");
 
-    CLI::deprecate_option(stopOpt,"please use '--stoptime' instead");
+    CLI::deprecate_option(stopOpt, "please use '--stoptime' instead");
 
     app->add_option("--brokerargs",
                     brokerArgs,
@@ -95,7 +95,11 @@ std::unique_ptr<CLI::App> FmiRunner::generateCLI()
     app->add_flag("!--modelexchange",
                   cosimFmu,
                   "specify that the fmu should run as a model exchange FMU if possible");
-    app->add_option("--flags",flags,"comma separated list of flags that will be passed to the cosimulation object, or the fmi object")->delimiter(',');
+    app->add_option(
+           "--flags",
+           flags,
+           "comma separated list of flags that will be passed to the cosimulation object, or the fmi object")
+        ->delimiter(',');
     fedInfo.injectParser(app.get());
 
     return app;
@@ -149,38 +153,29 @@ int FmiRunner::load()
         }
     }
     fedInfo.autobroker = false;
-    if (stepTime > helics::timeZero)
-    {
+    if (stepTime > helics::timeZero) {
         fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, stepTime);
-    }
-    else
-    {
-        stepTime=fedInfo.checkTimeProperty(HELICS_PROPERTY_TIME_PERIOD,0.001);
-        if (stepTime == 0.001)
-        {
+    } else {
+        stepTime = fedInfo.checkTimeProperty(HELICS_PROPERTY_TIME_PERIOD, 0.001);
+        if (stepTime == 0.001) {
             fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, stepTime);
         }
     }
 
-    if (stopTime > helics::timeZero)
-    {
+    if (stopTime > helics::timeZero) {
         fedInfo.setProperty(HELICS_PROPERTY_TIME_STOPTIME, stopTime);
-    }
-    else
-    {
-        stopTime=fedInfo.checkTimeProperty(HELICS_PROPERTY_TIME_STOPTIME,30.0);
-        if (stopTime == 30.0)
-        {
+    } else {
+        stopTime = fedInfo.checkTimeProperty(HELICS_PROPERTY_TIME_STOPTIME, 30.0);
+        if (stopTime == 30.0) {
             fedInfo.setProperty(HELICS_PROPERTY_TIME_STOPTIME, stopTime);
         }
     }
-    
 
     if (broker) {
         fedInfo.brokerPort = -1;
         fedInfo.broker = broker->getAddress();
     }
-    
+
     std::cout << "starting core with args " << helics::generateFullCoreInitString(fedInfo)
               << std::endl;
     core = std::make_unique<helics::CoreApp>(fedInfo.coreType,
@@ -288,28 +283,21 @@ int FmiRunner::load()
         }
     }
     currentState = State::LOADED;
-    for (const auto& flag : flags)
-    {
+    for (const auto& flag : flags) {
         bool used{false};
-        for (auto& fmu : cosimFeds)
-        {
-            if (flag.front() == '-')
-            {
-                used|=fmu->setFlag(flag.substr(1), false);
+        for (auto& fmu : cosimFeds) {
+            if (flag.front() == '-') {
+                used |= fmu->setFlag(flag.substr(1), false);
+            } else {
+                used |= fmu->setFlag(flag, true);
             }
-            else
-            {
-                used|=fmu->setFlag(flag,true);
-            }
-            //TODO(PT) do the same for meFeds once the method is added
+            // TODO(PT) do the same for meFeds once the method is added
         }
-        if (!used)
-        {
-            std::cout<<"flag "<<flag<<" was not recognized\n";
+        if (!used) {
+            std::cout << "flag " << flag << " was not recognized\n";
         }
     }
     return 0;
-    
 }
 
 int FmiRunner::run(helics::Time stop)
@@ -323,9 +311,8 @@ int FmiRunner::run(helics::Time stop)
             return ret;
         }
     }
-    if (stop < helics::timeZero)
-    {
-        stop=stopTime;
+    if (stop < helics::timeZero) {
+        stop = stopTime;
     }
     // load each of the fmu's into its own thread
     std::vector<std::thread> threads(cosimFeds.size() + meFeds.size());

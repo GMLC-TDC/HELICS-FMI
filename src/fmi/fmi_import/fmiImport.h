@@ -140,20 +140,21 @@ class fmiCoSimFunctions {
 class fmi2ModelExchangeObject;
 class fmi2CoSimObject;
 
-class FmiLogger :public std::enable_shared_from_this<FmiLogger>
-{
-public:
-    FmiLogger() :checkCode(validationCode) {};
-    ~FmiLogger(){checkCode=0;}
+class FmiLogger: public std::enable_shared_from_this<FmiLogger> {
+  public:
+    FmiLogger(): checkCode(validationCode){};
+    ~FmiLogger() { checkCode = 0; }
     void setLoggerCallback(std::function<void(std::string_view)> logCallback)
     {
         loggerCallback = std::move(logCallback);
     }
     void logMessage(std::string_view message) const;
-    bool check() const{return checkCode==validationCode;}
-private:
+    bool check() const { return checkCode == validationCode; }
+
+  private:
     std::function<void(std::string_view)> loggerCallback;
-public:
+
+  public:
     static constexpr int validationCode{0x2566'1FA2};
     int checkCode{0};
 };
@@ -211,8 +212,8 @@ class FmiLibrary {
 
     static constexpr int invalidCount{-1};
     void logMessage(std::string_view message) const;
-    
-    std::shared_ptr<FmiLogger> getLogger() const{return logger;}
+
+    std::shared_ptr<FmiLogger> getLogger() const { return logger; }
 
   private:  // private functions
     bool loadInformation();
@@ -249,7 +250,6 @@ class FmiLibrary {
     std::shared_ptr<fmiModelExchangeFunctions> ModelExchangeFunctions;
     std::shared_ptr<fmiCoSimFunctions> CoSimFunctions;
     std::shared_ptr<FmiLogger> logger;
-    
 };
 
 /** logging function to capture log messages
