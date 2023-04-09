@@ -17,10 +17,10 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE AND NOT HELICS_D
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
-project(HELICS_FMI VERSION 0.8.1)
+project(HELICS_FMI VERSION 0.8.2)
 
 # set (HELICS_FMI_VERSION_BUILD )
-set(HELICS_FMI_DATE "2023-03-24")
+set(HELICS_FMI_DATE "2023-04-09")
 set(HELICS_FMI_VERSION_UNDERSCORE
     "${HELICS_FMI_VERSION_MAJOR}_${HELICS_FMI_VERSION_MINOR}_${HELICS_FMI_VERSION_PATCH}"
 )
@@ -211,6 +211,10 @@ if(NOT HELICS_DISABLE_GIT_OPERATIONS)
         submod_update(ThirdParty/concurrency)
     endif()
 
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/reference/include/FMI2.h")
+        submod_update(ThirdParty/reference)
+    endif()
+    
     if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/stringOps.h")
         submod_update(ThirdParty/utilities)
     endif()

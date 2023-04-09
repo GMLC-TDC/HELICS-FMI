@@ -11,7 +11,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "fmiEnumDefinitions.h"
-#include "reference/include/fmi2TypesPlatform.h"
+#include "fmi2TypesPlatform.h"
 #include "units/units.hpp"
 #include "utilities/matrixDataOrdered.hpp"
 

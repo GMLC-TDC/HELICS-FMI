@@ -5,8 +5,6 @@ for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
 All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef FMI_ENUM_DEFINITIONS_H_
-#define FMI_ENUM_DEFINITIONS_H_
 #pragma once
 
 #include <string>
@@ -91,5 +89,3 @@ enum fmuPlatformSupport : int {
     macos,
     linux,
 };
-
-#endif
