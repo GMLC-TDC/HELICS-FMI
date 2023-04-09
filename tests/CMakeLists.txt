@@ -21,9 +21,7 @@ target_include_directories(helics_fmi_test_base INTERFACE ${PROJECT_SOURCE_DIR}/
 get_target_property(BDIR BouncingBall BINARY_DIR)
 message(STATUS "binary dir = ${BDIR}")
 target_compile_definitions(helics_fmi_test_base INTERFACE -DFMI_REFERENCE_DIR=\"${BDIR}/fmus/\")
-target_compile_definitions(
-    helics_fmi_test_base INTERFACE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/test_files/\"
-)
+target_compile_definitions(helics_fmi_test_base INTERFACE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/test_files/\")
 
 target_compile_definitions(
     helics_fmi_test_base INTERFACE -DHELICS_BIN_LOC=\"${CMAKE_BINARY_DIR}/src/helics-fmi/\"
@@ -32,3 +30,4 @@ target_compile_definitions(
 add_subdirectory(ExeTests)
 add_subdirectory(FmiTests)
 add_subdirectory(HelicsFmiTests)
+
