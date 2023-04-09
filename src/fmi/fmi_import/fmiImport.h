@@ -7,8 +7,8 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 
-#include "fmiInfo.h"
 #include "fmi2FunctionTypes.h"
+#include "fmiInfo.h"
 
 #include <filesystem>
 #include <functional>
