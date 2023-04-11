@@ -11,9 +11,9 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <filesystem>
 
-static const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "BouncingBall.fmu";
+static const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
 
-TEST(loadtests, ExtractFMU)
+TEST(feedthrough, ExtractFMU)
 {
     FmiLibrary fmi;
 
@@ -30,7 +30,7 @@ TEST(loadtests, ExtractFMU)
     std::filesystem::remove_all(dir);
 }
 
-TEST(loadtests, loadXML)
+TEST(feedthrough, loadXML)
 {
     auto fmi = std::make_shared<FmiLibrary>();
     EXPECT_NO_THROW(fmi->loadFMU(inputFile));
@@ -40,14 +40,14 @@ TEST(loadtests, loadXML)
     EXPECT_TRUE(info->checkFlag(modelExchangeCapable));
     EXPECT_TRUE(info->checkFlag(coSimulationCapable));
 
-    EXPECT_EQ(info->getString("modelName"), "BouncingBall");
-    EXPECT_EQ(info->getCounts(fmiVariableType::input), 0);
-    EXPECT_EQ(info->getCounts(fmiVariableType::output), 2);
-    EXPECT_EQ(info->getCounts(fmiVariableType::parameter), 2);
-    EXPECT_EQ(info->getCounts(fmiVariableType::any), 8);
-    EXPECT_EQ(info->getCounts(fmiVariableType::state), 2);
-    EXPECT_EQ(info->getCounts(fmiVariableType::local), 2);
-    EXPECT_EQ(info->getCounts(fmiVariableType::units), 3);
+    EXPECT_EQ(info->getString("modelName"), "Feedthrough");
+    EXPECT_EQ(info->getCounts(fmiVariableType::input), 5);
+    EXPECT_EQ(info->getCounts(fmiVariableType::output), 5);
+    EXPECT_EQ(info->getCounts(fmiVariableType::parameter), 3);
+    EXPECT_EQ(info->getCounts(fmiVariableType::any), 14);
+    EXPECT_EQ(info->getCounts(fmiVariableType::state), 0);
+    EXPECT_EQ(info->getCounts(fmiVariableType::local), 0);
+    EXPECT_EQ(info->getCounts(fmiVariableType::units), 0);
 
     EXPECT_EQ(info->getCounts(fmiVariableType::meObject), 1);
     EXPECT_EQ(info->getCounts(fmiVariableType::csObject), 1);
@@ -57,11 +57,57 @@ TEST(loadtests, loadXML)
 
     fmi.reset();
 
-    auto dir = std::string(FMI_REFERENCE_DIR) + "BouncingBall";
-    EXPECT_FALSE(std::filesystem::exists(dir));
 }
 
-TEST(loadtests, loadSharedME)
+bool variableCheck(const std::shared_ptr<fmiInfo>& info, const std::string& variableName, fmi_causality causality, fmi_variability variability, fmi_variable_type type)
+{
+    const auto& vinfo = info->getVariableInfo(variableName);
+    bool ret=true;
+    EXPECT_EQ(vinfo.causality, causality)<<std::to_string(ret=false)<<" "<<causality._to_string() << " does not match variable causality which is "<<vinfo.causality._to_string();
+    EXPECT_EQ(vinfo.variability, variability)<<std::to_string(ret=false)<<" "<<variability._to_string() << " does not match variable variability "<<vinfo.variability._to_string();
+    EXPECT_EQ(vinfo.type, type)<<std::to_string(ret=false)<<" "<<type._to_string() << " does not match variable type "<<vinfo.type._to_string();
+    return ret;
+}
+
+TEST(feedthrough, variableTypes)
+{
+    auto fmi = std::make_shared<FmiLibrary>();
+    EXPECT_NO_THROW(fmi->loadFMU(inputFile));
+
+    auto info = fmi->getInfo();
+    EXPECT_TRUE(variableCheck(info,"time",fmi_causality::independent,fmi_variability::continuous,fmi_variable_type::real));
+    {
+        const auto& vinfo = info->getVariableInfo("time");
+        EXPECT_EQ(vinfo.derivative, false);
+        EXPECT_EQ(vinfo.isAlias,false);
+    }
+    EXPECT_TRUE(variableCheck(info,"Float64_fixed_parameter",fmi_causality::parameter,fmi_variability::fixed,fmi_variable_type::real));
+    EXPECT_TRUE(variableCheck(info,"Float64_tunable_parameter",fmi_causality::parameter,fmi_variability::tunable,fmi_variable_type::real));
+    EXPECT_TRUE(variableCheck(info,"Float64_continuous_input",fmi_causality::input,fmi_variability::continuous,fmi_variable_type::real));
+    EXPECT_TRUE(variableCheck(info,"Float64_continuous_output",fmi_causality::output,fmi_variability::continuous,fmi_variable_type::real));
+
+    EXPECT_TRUE(variableCheck(info,"Float64_discrete_input",fmi_causality::input,fmi_variability::discrete,fmi_variable_type::real));
+    EXPECT_TRUE(variableCheck(info,"Float64_discrete_output",fmi_causality::output,fmi_variability::discrete,fmi_variable_type::real));
+
+    EXPECT_TRUE(variableCheck(info,"Int32_input",fmi_causality::input,fmi_variability::discrete,fmi_variable_type::integer));
+    EXPECT_TRUE(variableCheck(info,"Int32_output",fmi_causality::output,fmi_variability::discrete,fmi_variable_type::integer));
+
+    EXPECT_TRUE(variableCheck(info,"Boolean_input",fmi_causality::input,fmi_variability::discrete,fmi_variable_type::boolean));
+    EXPECT_TRUE(variableCheck(info,"Boolean_output",fmi_causality::output,fmi_variability::discrete,fmi_variable_type::boolean));
+
+    EXPECT_TRUE(variableCheck(info,"String_parameter",fmi_causality::parameter, fmi_variability::fixed, fmi_variable_type::string));
+
+    EXPECT_TRUE(variableCheck(info,"Enumeration_input",fmi_causality::input,fmi_variability::discrete,fmi_variable_type::enumeration));
+    EXPECT_TRUE(variableCheck(info,"Enumeration_output",fmi_causality::output,fmi_variability::discrete,fmi_variable_type::enumeration));
+
+
+    fmi->deleteFMUdirectory();
+
+    fmi.reset();
+}
+
+
+TEST(feedthrough, loadSharedME)
 {
     auto fmi = std::make_shared<FmiLibrary>();
     EXPECT_NO_THROW(fmi->loadFMU(inputFile));
@@ -79,7 +125,7 @@ TEST(loadtests, loadSharedME)
     fmi.reset();
 }
 
-TEST(loadtests, loadSharedCS)
+TEST(feedthrough, loadSharedCS)
 {
     auto fmi = std::make_shared<FmiLibrary>();
     EXPECT_NO_THROW(fmi->loadFMU(inputFile));
@@ -99,14 +145,14 @@ TEST(loadtests, loadSharedCS)
 
     fmi.reset();
 
-    auto dir = std::string(FMI_REFERENCE_DIR) + "BouncingBall";
+    auto dir = std::string(FMI_REFERENCE_DIR) + "feedthrough";
     // this is true since we didn'time open the directory in this test
     EXPECT_TRUE(std::filesystem::exists(dir));
 
     std::filesystem::remove_all(dir);
 }
 
-TEST(loadtests, runModeSequence)
+TEST(feedthrough, runModeSequence)
 {
     auto fmi = std::make_shared<FmiLibrary>();
     EXPECT_NO_THROW(fmi->loadFMU(inputFile));
@@ -134,7 +180,7 @@ TEST(loadtests, runModeSequence)
     fmi.reset();
 }
 
-TEST(loadtests, csExecution)
+TEST(feedthrough, csExecution)
 {
     auto fmi = std::make_shared<FmiLibrary>();
     EXPECT_NO_THROW(fmi->loadFMU(inputFile));
@@ -144,9 +190,8 @@ TEST(loadtests, csExecution)
     EXPECT_EQ(fmiObj->getName(), "model_cs");
 
     EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::instantiatedMode);
-    auto str = fmiObj->getInputNames();
-
     fmiObj->setupExperiment(false,0.0,0.0,true,11.0);
+
 
     fmiObj->setMode(fmuMode::initializationMode);
     EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::initializationMode);

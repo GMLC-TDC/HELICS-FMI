@@ -53,7 +53,7 @@ TEST(feedthrough, checkIO)
 
     auto qres = helics::vectorizeQueryResult(vFed.query("fthrough", "publications"));
 
-    EXPECT_EQ(qres.size(), 4U);
+    EXPECT_EQ(qres.size(), 5U);
 
     auto& sub1 = vFed.registerSubscription(qres[0]);
     sub1.setDefault(-20.0);
@@ -62,7 +62,7 @@ TEST(feedthrough, checkIO)
 
     qres = helics::vectorizeQueryResult(vFed.query("fthrough", "inputs"));
 
-    EXPECT_EQ(qres.size(), 4U);
+    EXPECT_EQ(qres.size(), 5U);
 
     vFed.enterExecutingMode();
     auto time = vFed.requestTime(2.0);
@@ -96,7 +96,7 @@ TEST(feedthrough, checkFeedthrough)
 
     auto qres = helics::vectorizeQueryResult(vFed.query("root", "publications"));
 
-    EXPECT_EQ(qres.size(), 4U);
+    EXPECT_EQ(qres.size(), 5U);
 
     auto& sub1 = vFed.registerSubscription(qres[0]);
     sub1.setDefault(-20.0);
@@ -109,7 +109,7 @@ TEST(feedthrough, checkFeedthrough)
 
     qres = helics::vectorizeQueryResult(vFed.query("fthrough", "inputs"));
 
-    EXPECT_EQ(qres.size(), 4U);
+    EXPECT_EQ(qres.size(), 5U);
     auto& pub1 = vFed.registerPublication<double>("");
     auto& pub2 = vFed.registerPublication<double>("");
     auto& pub3 = vFed.registerPublication<int>("");

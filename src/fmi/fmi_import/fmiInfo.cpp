@@ -532,6 +532,10 @@ void loadVariableInfo(std::shared_ptr<readerElement>& rd, variableInformation& v
             }
             att = rd->getNextAttribute();
         }
+        if (vInfo.variability == +fmi_variability::unknown)
+        {
+            vInfo.variability=fmi_variability::continuous;
+        }
         rd->moveToParent();
     } else if (rd->hasElement("Boolean")) {
         vInfo.type = fmi_variable_type::boolean;
@@ -542,6 +546,10 @@ void loadVariableInfo(std::shared_ptr<readerElement>& rd, variableInformation& v
                 vInfo.start = (att.getText() == "true") ? 1.0 : 0.0;
             }
             att = rd->getNextAttribute();
+        }
+        if (vInfo.variability == +fmi_variability::unknown)
+        {
+            vInfo.variability=fmi_variability::discrete;
         }
         rd->moveToParent();
     } else if (rd->hasElement("String")) {
@@ -563,14 +571,35 @@ void loadVariableInfo(std::shared_ptr<readerElement>& rd, variableInformation& v
             if (att.getName() == "start") {
                 vInfo.initial = att.getValue();
             } else if (att.getName() == "min") {
-                vInfo.min = att.getValue();
+                vInfo.declType = att.getValue();
             } else if (att.getName() == "max") {
                 vInfo.max = att.getValue();
             }
             att = rd->getNextAttribute();
         }
+        if (vInfo.variability == +fmi_variability::unknown)
+        {
+            vInfo.variability=fmi_variability::discrete;
+        }
         rd->moveToParent();
+    }else if (rd->hasElement("Enumeration")) {
+    vInfo.type = fmi_variable_type::enumeration;
+    rd->moveToFirstChild("Enumeration");
+    att = rd->getFirstAttribute();
+    while (att.isValid()) {
+        if (att.getName() == "start") {
+            vInfo.initial = att.getValue();
+        } else if (att.getName() == "declaredType") {
+            vInfo.declType = att.getValue();
+        }
+        att = rd->getNextAttribute();
     }
+    if (vInfo.variability == +fmi_variability::unknown)
+    {
+        vInfo.variability=fmi_variability::discrete;
+    }
+    rd->moveToParent();
+}
 }
 
 auto depkindNum(const std::string& depknd)

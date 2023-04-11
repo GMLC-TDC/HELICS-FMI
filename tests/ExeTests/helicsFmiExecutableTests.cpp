@@ -66,7 +66,7 @@ TEST(exeTests, dualFedAsyncZMQ)
     /**test that things run to completion with auto broker*/
     auto out = hfmi.runCaptureOutputAsync(
         std::string(
-            "--autobroker --coretype=zmq --step=0.1 --stop=2.0 --name=ftfed --brokerargs=\"-f2 --force --port=23808 --loglevel=trace\" ") +
+            "--autobroker --coretype=zmq --step=0.1 --stoptime=2.0 --name=ftfed --brokerargs=\"-f2 --force --port=23808 --loglevel=trace\" ") +
         ftFile);
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
     helics::ValueFederate vFed("fed1", "--coretype=zmq --forcenewcore --brokerport=23808");
@@ -78,7 +78,7 @@ TEST(exeTests, dualFedAsyncZMQ)
 
     qres = helics::vectorizeQueryResult(vFed.query("ftfed", "publications"));
 
-    EXPECT_EQ(qres.size(), 4U);
+    EXPECT_EQ(qres.size(), 5U);
 
     auto& sub1 = vFed.registerSubscription(qres[0]);
     sub1.setDefault(-20.0);
@@ -87,11 +87,11 @@ TEST(exeTests, dualFedAsyncZMQ)
 
     qres = helics::vectorizeQueryResult(vFed.query("ftfed", "inputs"));
 
-    EXPECT_EQ(qres.size(), 4U);
+    EXPECT_EQ(qres.size(), 5U);
 
     vFed.enterExecutingMode();
     auto time1 = vFed.requestTime(2.0);
-    EXPECT_LT(time1, 2.0);
+    EXPECT_LE(time1, 2.0);
 
     auto val = sub1.getValue<double>();
     auto val2 = sub2.getValue<double>();

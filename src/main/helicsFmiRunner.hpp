@@ -9,11 +9,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 #include "helics/application_api/FederateInfo.hpp"
 #include "helics/application_api/timeOperations.hpp"
-#include "helics/apps/BrokerApp.hpp"
-#include "helics/apps/CoreApp.hpp"
-#include "helics/external/CLI11/CLI11.hpp"
-#include "helicsFMI/FmiCoSimFederate.hpp"
-#include "helicsFMI/FmiModelExchangeFederate.hpp"
+
 
 #include <future>
 #include <memory>
@@ -21,8 +17,26 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 #include <vector>
 
+// Forward declarations
+namespace CLI
+{
+    class App;
+}
+
+namespace helics
+{
+    class CoreApp;
+    class BrokerApp;
+}
+
+class readerElement;
+
 namespace helicsfmi {
 
+    class CoSimFederate;
+    class FmiModelExchangeFederate;
+
+/// @brief  main runner class for helics-fmi
 class FmiRunner {
   private:
     std::string integrator{"cvode"};
@@ -38,8 +52,8 @@ class FmiRunner {
     std::vector<std::string> paths;
     bool cosimFmu{true};
     helics::FederateInfo fedInfo;
-    std::unique_ptr<helics::apps::BrokerApp> broker;
-    std::unique_ptr<helics::apps::CoreApp> core;
+    std::unique_ptr<helics::BrokerApp> broker;
+    std::unique_ptr<helics::CoreApp> core;
     std::vector<std::unique_ptr<CoSimFederate>> cosimFeds;
     std::vector<std::unique_ptr<FmiModelExchangeFederate>> meFeds;
     std::vector<std::string> setParameters;
@@ -64,6 +78,7 @@ class FmiRunner {
     };
 
     FmiRunner();
+    ~FmiRunner();
     std::unique_ptr<CLI::App> generateCLI();
     /** parse a string input*/
     int parse(const std::string& cliString);

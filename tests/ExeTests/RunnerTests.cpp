@@ -6,7 +6,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helics-fmi/helics-fmi-config.h"
-#include "helics/application_api/BrokerApp.hpp"
+
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/application_api/queryFunctions.hpp"
 #include "helicsFmiRunner.hpp"
@@ -59,7 +59,7 @@ TEST(runnerTests, dualFedZMQ)
     FmiRunner runner;
     runner.parse(
         std::string(
-            "--autobroker --coretype=zmq --step=0.1 --stop=2.0 --name=ftfed --brokerargs=\"-f2 \" ") +
+            "--autobroker --coretype=zmq --step=0.1s --stoptime=2.0s --name=ftfed --brokerargs=\"-f2 \" ") +
         ftFile);
     int ret = runner.load();
     ASSERT_EQ(ret, 0);
@@ -74,7 +74,7 @@ TEST(runnerTests, dualFedZMQ)
 
     auto qres = helics::vectorizeQueryResult(vFed.query("ftfed", "publications"));
 
-    ASSERT_EQ(qres.size(), 4U);
+    ASSERT_EQ(qres.size(), 5U);
 
     auto& sub1 = vFed.registerSubscription(qres[0]);
     sub1.setDefault(-20.0);
@@ -83,7 +83,7 @@ TEST(runnerTests, dualFedZMQ)
 
     qres = helics::vectorizeQueryResult(vFed.query("ftfed", "inputs"));
 
-    EXPECT_EQ(qres.size(), 4U);
+    EXPECT_EQ(qres.size(), 5U);
 
     vFed.enterExecutingMode();
     auto time1 = vFed.requestTime(2.0);
@@ -104,7 +104,7 @@ TEST(runnerTests, setfield)
     FmiRunner runner;
     runner.parse(
         std::string(
-            R"(--autobroker  --coretype=zmq --step=0.1 --stop=2.0 --name=bbfed --set h=4 --brokerargs="-f2 --name=sf1broker " )") +
+            R"(--autobroker  --coretype=zmq --step=0.1s --stoptime=2.0s --name=bbfed --set h=4 --brokerargs="-f2 --name=sf1broker " )") +
         bballFile);
     int ret = runner.load();
     ASSERT_EQ(ret, 0);
@@ -144,7 +144,7 @@ TEST(runnerTests, setfield2)
     FmiRunner runner;
     runner.parse(
         std::string(
-            "--autobroker --coretype=zmq  --step=0.1 --stop=2.0 --name=bbfed --set h=5;v=2 --brokerargs=\"-f2 --name=sf2broker \" ") +
+            "--autobroker --coretype=zmq  --step=0.1s --stoptime=2.0s --name=bbfed --set h=5;v=2 --brokerargs=\"-f2 --name=sf2broker \" ") +
         bballFile);
     int ret = runner.load();
     ASSERT_EQ(ret, 0);
