@@ -214,7 +214,7 @@ if(NOT HELICS_DISABLE_GIT_OPERATIONS)
     if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/reference/include/FMI2.h")
         submod_update(ThirdParty/reference)
     endif()
-    
+
     if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/stringOps.h")
         submod_update(ThirdParty/utilities)
     endif()
