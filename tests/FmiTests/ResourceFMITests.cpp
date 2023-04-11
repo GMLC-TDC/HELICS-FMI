@@ -143,7 +143,7 @@ TEST(resource, csExecution)
     ASSERT_TRUE(fmiObj);
     EXPECT_EQ(fmiObj->getName(), "model_cs");
 
-    fmiObj->setupExperiment(false,0.0,0.0,true,11.0);
+    fmiObj->setupExperiment(false, 0.0, 0.0, true, 11.0);
 
     EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::instantiatedMode);
     auto str = fmiObj->getInputNames();

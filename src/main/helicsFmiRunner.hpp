@@ -10,7 +10,6 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/FederateInfo.hpp"
 #include "helics/application_api/timeOperations.hpp"
 
-
 #include <future>
 #include <memory>
 #include <string>
@@ -18,23 +17,21 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 // Forward declarations
-namespace CLI
-{
-    class App;
+namespace CLI {
+class App;
 }
 
-namespace helics
-{
-    class CoreApp;
-    class BrokerApp;
-}
+namespace helics {
+class CoreApp;
+class BrokerApp;
+}  // namespace helics
 
 class readerElement;
 
 namespace helicsfmi {
 
-    class CoSimFederate;
-    class FmiModelExchangeFederate;
+class CoSimFederate;
+class FmiModelExchangeFederate;
 
 /// @brief  main runner class for helics-fmi
 class FmiRunner {

@@ -6,9 +6,9 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helics-fmi/helics-fmi-config.h"
+#include "helics/application_api/Federate.hpp"
 #include "helicsFmiRunner.hpp"
 
-#include "helics/application_api/Federate.hpp"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 

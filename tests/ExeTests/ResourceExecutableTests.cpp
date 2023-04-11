@@ -6,10 +6,10 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "exeTestHelper.h"
+#include "helics/application_api/CoreApp.hpp"
+#include "helics/application_api/ValueFederate.hpp"
 #include "helics/application_api/queryFunctions.hpp"
 #include "helicsFmiRunner.hpp"
-#include "helics/application_api/ValueFederate.hpp"
-#include "helics/application_api/CoreApp.hpp"
 
 #include "gtest/gtest.h"
 #include <filesystem>
