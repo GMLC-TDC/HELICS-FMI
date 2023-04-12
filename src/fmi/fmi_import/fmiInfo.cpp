@@ -68,7 +68,7 @@ bool fmiInfo::checkFlag(fmuCapabilityFlags flag) const
 
 int fmiInfo::getCounts(fmiVariableType countType) const
 {
-    std::size_t cnt{ static_cast<std::size_t>(-1)};
+    std::size_t cnt{static_cast<std::size_t>(-1)};
     switch (countType) {
         case fmiVariableType::meObject:
             cnt = checkFlag(modelExchangeCapable) ? 1 : 0;
@@ -161,7 +161,7 @@ const variableInformation& fmiInfo::getVariableInfo(const std::string& variableN
     if (variablefind == variableLookup.end()) {
         return emptyVI;
     }
-    return variables[variablefind->second]; 
+    return variables[variablefind->second];
 }
 
 const variableInformation& fmiInfo::getVariableInfo(unsigned int index) const
@@ -169,7 +169,7 @@ const variableInformation& fmiInfo::getVariableInfo(unsigned int index) const
     if (index >= variables.size()) {
         return emptyVI;
     }
-    return variables[index];   
+    return variables[index];
 }
 
 fmiVariableSet fmiInfo::getReferenceSet(const std::vector<std::string>& variableList) const
@@ -188,7 +188,7 @@ fmiVariableSet fmiInfo::getVariableSet(const std::string& variable) const
 {
     auto vref = getVariableInfo(variable);
     if (vref.valueRef > 0) {
-        return { vref.valueRef };
+        return {vref.valueRef};
     }
     return emptyVset;
 }
@@ -198,7 +198,7 @@ fmiVariableSet fmiInfo::getVariableSet(unsigned int index) const
     if (index >= variables.size()) {
         return emptyVset;
     }
-    return { variables[index].valueRef };
+    return {variables[index].valueRef};
 }
 
 fmiVariableSet fmiInfo::getOutputReference() const
@@ -359,7 +359,7 @@ void fmiInfo::loadUnitInformation(std::shared_ptr<readerElement>& reader)
     reader->bookmark();
     reader->moveToFirstChild("UnitDefinitions");
     reader->moveToFirstChild("Unit");
-    int vcount{ 0 };
+    int vcount{0};
     while (reader->isValid()) {
         reader->moveToNextSibling("Unit");
         ++vcount;
@@ -368,7 +368,7 @@ void fmiInfo::loadUnitInformation(std::shared_ptr<readerElement>& reader)
     reader->moveToParent();
     // now load the variables
     reader->moveToFirstChild("Unit");
-    int index{ 0 };
+    int index{0};
     while (reader->isValid()) {
         loadUnitInfo(reader, units[index]);
         reader->moveToNextSibling("Unit");
@@ -419,7 +419,7 @@ void loadUnitInfo(std::shared_ptr<readerElement>& reader, fmiUnit& unitInfo)
     }
     [[maybe_unused]] auto def = units::unit_from_string(unitInfo.name);
     units::precise_unit build = units::precise::one;
-    for (const auto &udef : unitInfo.baseUnits) {
+    for (const auto& udef : unitInfo.baseUnits) {
         auto fnd = baseUnitMap.find(udef.name);
         if (fnd != baseUnitMap.end()) {
             build = build * fnd->second.pow(static_cast<int>(udef.factor));
@@ -620,8 +620,8 @@ static const std::string depString("dependencies");
 static const std::string depKindString("dependenciesKind");
 
 static void loadDependencies(std::shared_ptr<readerElement>& reader,
-                      std::vector<int>& store,
-                      matrixData<int>& depData)
+                             std::vector<int>& store,
+                             matrixData<int>& depData)
 {
     reader->moveToFirstChild(unknownString);
     while (reader->isValid()) {
@@ -681,8 +681,7 @@ void fmiInfo::loadStructure(std::shared_ptr<readerElement>& reader)
 bool checkType(const variableInformation& info, fmi_variable_type type, fmi_causality caus)
 {
     if (info.causality != caus) {
-        if ((info.causality != +fmi_causality::input) ||
-              (caus != +fmi_causality::parameter)) {
+        if ((info.causality != +fmi_causality::input) || (caus != +fmi_causality::parameter)) {
             return false;
         }
     }

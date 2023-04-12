@@ -72,8 +72,9 @@ bool variableCheck(const std::shared_ptr<fmiInfo>& info,
     EXPECT_EQ(vinfo.variability, variability)
         << std::to_string(static_cast<int>(ret = false)) << " " << variability._to_string()
         << " does not match variable variability " << vinfo.variability._to_string();
-    EXPECT_EQ(vinfo.type, type) << std::to_string(static_cast<int>(ret = false)) << " " << type._to_string()
-                                << " does not match variable type " << vinfo.type._to_string();
+    EXPECT_EQ(vinfo.type, type) << std::to_string(static_cast<int>(ret = false)) << " "
+                                << type._to_string() << " does not match variable type "
+                                << vinfo.type._to_string();
     return ret;
 }
 
