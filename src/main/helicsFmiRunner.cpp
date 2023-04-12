@@ -11,7 +11,6 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "formatInterpreters/jsonReaderElement.h"
 #include "formatInterpreters/tinyxml2ReaderElement.h"
 #include "formatInterpreters/tomlReaderElement.h"
-#include "gmlc/utilities/timeStringOps.hpp"
 #include "helics-fmi/helics-fmi-config.h"
 
 #include "helics/core/Core.hpp"
@@ -394,7 +393,7 @@ int FmiRunner::initialize()
         }
     }
 
-    for (int ii = 0; ii < paramUsed.size(); ++ii) {
+    for (std::size_t ii = 0; ii < paramUsed.size(); ++ii) {
         if (paramUsed[ii] == 0) {
             std::cout << "WARNING: " << setParameters[ii] << " is unused" << std::endl;
         }
