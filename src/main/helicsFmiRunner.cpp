@@ -12,15 +12,13 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "formatInterpreters/tinyxml2ReaderElement.h"
 #include "formatInterpreters/tomlReaderElement.h"
 #include "helics-fmi/helics-fmi-config.h"
-
-#include "helics/core/Core.hpp"
 #include "helics/application_api/BrokerApp.hpp"
 #include "helics/application_api/CoreApp.hpp"
-
+#include "helics/core/Core.hpp"
+#include "helics/core/helicsCLI11.hpp"
 #include "helics/core/helicsVersion.hpp"
 #include "helicsFMI/FmiCoSimFederate.hpp"
 #include "helicsFMI/FmiModelExchangeFederate.hpp"
-#include "helics/core/helicsCLI11.hpp"
 
 #include <filesystem>
 #include <iostream>
@@ -34,7 +32,7 @@ FmiRunner::FmiRunner()
     fedInfo.separator = '.';
 }
 
-FmiRunner::~FmiRunner()=default;
+FmiRunner::~FmiRunner() = default;
 
 std::unique_ptr<CLI::App> FmiRunner::generateCLI()
 {
@@ -321,9 +319,8 @@ int FmiRunner::run(helics::Time stop)
     if (stop < helics::timeZero) {
         stop = stopTime;
     }
-    if (stop < stepTime)
-    {
-        std::cout<<"stoptime < steptime check values\n";
+    if (stop < stepTime) {
+        std::cout << "stoptime < steptime check values\n";
     }
     // load each of the fmu's into its own thread
     std::vector<std::thread> threads(cosimFeds.size() + meFeds.size());

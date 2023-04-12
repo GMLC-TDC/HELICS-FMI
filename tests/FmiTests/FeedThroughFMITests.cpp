@@ -56,16 +56,24 @@ TEST(feedthrough, loadXML)
     fmi->deleteFMUdirectory();
 
     fmi.reset();
-
 }
 
-bool variableCheck(const std::shared_ptr<fmiInfo>& info, const std::string& variableName, fmi_causality causality, fmi_variability variability, fmi_variable_type type)
+bool variableCheck(const std::shared_ptr<fmiInfo>& info,
+                   const std::string& variableName,
+                   fmi_causality causality,
+                   fmi_variability variability,
+                   fmi_variable_type type)
 {
     const auto& vinfo = info->getVariableInfo(variableName);
-    bool ret=true;
-    EXPECT_EQ(vinfo.causality, causality)<<std::to_string(ret=false)<<" "<<causality._to_string() << " does not match variable causality which is "<<vinfo.causality._to_string();
-    EXPECT_EQ(vinfo.variability, variability)<<std::to_string(ret=false)<<" "<<variability._to_string() << " does not match variable variability "<<vinfo.variability._to_string();
-    EXPECT_EQ(vinfo.type, type)<<std::to_string(ret=false)<<" "<<type._to_string() << " does not match variable type "<<vinfo.type._to_string();
+    bool ret = true;
+    EXPECT_EQ(vinfo.causality, causality)
+        << std::to_string(ret = false) << " " << causality._to_string()
+        << " does not match variable causality which is " << vinfo.causality._to_string();
+    EXPECT_EQ(vinfo.variability, variability)
+        << std::to_string(ret = false) << " " << variability._to_string()
+        << " does not match variable variability " << vinfo.variability._to_string();
+    EXPECT_EQ(vinfo.type, type) << std::to_string(ret = false) << " " << type._to_string()
+                                << " does not match variable type " << vinfo.type._to_string();
     return ret;
 }
 
@@ -75,37 +83,91 @@ TEST(feedthrough, variableTypes)
     EXPECT_NO_THROW(fmi->loadFMU(inputFile));
 
     auto info = fmi->getInfo();
-    EXPECT_TRUE(variableCheck(info,"time",fmi_causality::independent,fmi_variability::continuous,fmi_variable_type::real));
+    EXPECT_TRUE(variableCheck(info,
+                              "time",
+                              fmi_causality::independent,
+                              fmi_variability::continuous,
+                              fmi_variable_type::real));
     {
         const auto& vinfo = info->getVariableInfo("time");
         EXPECT_EQ(vinfo.derivative, false);
-        EXPECT_EQ(vinfo.isAlias,false);
+        EXPECT_EQ(vinfo.isAlias, false);
     }
-    EXPECT_TRUE(variableCheck(info,"Float64_fixed_parameter",fmi_causality::parameter,fmi_variability::fixed,fmi_variable_type::real));
-    EXPECT_TRUE(variableCheck(info,"Float64_tunable_parameter",fmi_causality::parameter,fmi_variability::tunable,fmi_variable_type::real));
-    EXPECT_TRUE(variableCheck(info,"Float64_continuous_input",fmi_causality::input,fmi_variability::continuous,fmi_variable_type::real));
-    EXPECT_TRUE(variableCheck(info,"Float64_continuous_output",fmi_causality::output,fmi_variability::continuous,fmi_variable_type::real));
+    EXPECT_TRUE(variableCheck(info,
+                              "Float64_fixed_parameter",
+                              fmi_causality::parameter,
+                              fmi_variability::fixed,
+                              fmi_variable_type::real));
+    EXPECT_TRUE(variableCheck(info,
+                              "Float64_tunable_parameter",
+                              fmi_causality::parameter,
+                              fmi_variability::tunable,
+                              fmi_variable_type::real));
+    EXPECT_TRUE(variableCheck(info,
+                              "Float64_continuous_input",
+                              fmi_causality::input,
+                              fmi_variability::continuous,
+                              fmi_variable_type::real));
+    EXPECT_TRUE(variableCheck(info,
+                              "Float64_continuous_output",
+                              fmi_causality::output,
+                              fmi_variability::continuous,
+                              fmi_variable_type::real));
 
-    EXPECT_TRUE(variableCheck(info,"Float64_discrete_input",fmi_causality::input,fmi_variability::discrete,fmi_variable_type::real));
-    EXPECT_TRUE(variableCheck(info,"Float64_discrete_output",fmi_causality::output,fmi_variability::discrete,fmi_variable_type::real));
+    EXPECT_TRUE(variableCheck(info,
+                              "Float64_discrete_input",
+                              fmi_causality::input,
+                              fmi_variability::discrete,
+                              fmi_variable_type::real));
+    EXPECT_TRUE(variableCheck(info,
+                              "Float64_discrete_output",
+                              fmi_causality::output,
+                              fmi_variability::discrete,
+                              fmi_variable_type::real));
 
-    EXPECT_TRUE(variableCheck(info,"Int32_input",fmi_causality::input,fmi_variability::discrete,fmi_variable_type::integer));
-    EXPECT_TRUE(variableCheck(info,"Int32_output",fmi_causality::output,fmi_variability::discrete,fmi_variable_type::integer));
+    EXPECT_TRUE(variableCheck(info,
+                              "Int32_input",
+                              fmi_causality::input,
+                              fmi_variability::discrete,
+                              fmi_variable_type::integer));
+    EXPECT_TRUE(variableCheck(info,
+                              "Int32_output",
+                              fmi_causality::output,
+                              fmi_variability::discrete,
+                              fmi_variable_type::integer));
 
-    EXPECT_TRUE(variableCheck(info,"Boolean_input",fmi_causality::input,fmi_variability::discrete,fmi_variable_type::boolean));
-    EXPECT_TRUE(variableCheck(info,"Boolean_output",fmi_causality::output,fmi_variability::discrete,fmi_variable_type::boolean));
+    EXPECT_TRUE(variableCheck(info,
+                              "Boolean_input",
+                              fmi_causality::input,
+                              fmi_variability::discrete,
+                              fmi_variable_type::boolean));
+    EXPECT_TRUE(variableCheck(info,
+                              "Boolean_output",
+                              fmi_causality::output,
+                              fmi_variability::discrete,
+                              fmi_variable_type::boolean));
 
-    EXPECT_TRUE(variableCheck(info,"String_parameter",fmi_causality::parameter, fmi_variability::fixed, fmi_variable_type::string));
+    EXPECT_TRUE(variableCheck(info,
+                              "String_parameter",
+                              fmi_causality::parameter,
+                              fmi_variability::fixed,
+                              fmi_variable_type::string));
 
-    EXPECT_TRUE(variableCheck(info,"Enumeration_input",fmi_causality::input,fmi_variability::discrete,fmi_variable_type::enumeration));
-    EXPECT_TRUE(variableCheck(info,"Enumeration_output",fmi_causality::output,fmi_variability::discrete,fmi_variable_type::enumeration));
-
+    EXPECT_TRUE(variableCheck(info,
+                              "Enumeration_input",
+                              fmi_causality::input,
+                              fmi_variability::discrete,
+                              fmi_variable_type::enumeration));
+    EXPECT_TRUE(variableCheck(info,
+                              "Enumeration_output",
+                              fmi_causality::output,
+                              fmi_variability::discrete,
+                              fmi_variable_type::enumeration));
 
     fmi->deleteFMUdirectory();
 
     fmi.reset();
 }
-
 
 TEST(feedthrough, loadSharedME)
 {
@@ -190,8 +252,7 @@ TEST(feedthrough, csExecution)
     EXPECT_EQ(fmiObj->getName(), "model_cs");
 
     EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::instantiatedMode);
-    fmiObj->setupExperiment(false,0.0,0.0,true,11.0);
-
+    fmiObj->setupExperiment(false, 0.0, 0.0, true, 11.0);
 
     fmiObj->setMode(fmuMode::initializationMode);
     EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::initializationMode);

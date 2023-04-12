@@ -144,8 +144,7 @@ TEST(bouncingBall, csExecution)
     EXPECT_EQ(fmiObj->getName(), "model_cs");
 
     EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::instantiatedMode);
-    fmiObj->setupExperiment(false,0.0,0.0,true,11.0);
-
+    fmiObj->setupExperiment(false, 0.0, 0.0, true, 11.0);
 
     fmiObj->setMode(fmuMode::initializationMode);
     EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::initializationMode);

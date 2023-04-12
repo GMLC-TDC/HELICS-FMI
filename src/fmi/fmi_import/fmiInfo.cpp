@@ -532,9 +532,8 @@ void loadVariableInfo(std::shared_ptr<readerElement>& rd, variableInformation& v
             }
             att = rd->getNextAttribute();
         }
-        if (vInfo.variability == +fmi_variability::unknown)
-        {
-            vInfo.variability=fmi_variability::continuous;
+        if (vInfo.variability == +fmi_variability::unknown) {
+            vInfo.variability = fmi_variability::continuous;
         }
         rd->moveToParent();
     } else if (rd->hasElement("Boolean")) {
@@ -547,9 +546,8 @@ void loadVariableInfo(std::shared_ptr<readerElement>& rd, variableInformation& v
             }
             att = rd->getNextAttribute();
         }
-        if (vInfo.variability == +fmi_variability::unknown)
-        {
-            vInfo.variability=fmi_variability::discrete;
+        if (vInfo.variability == +fmi_variability::unknown) {
+            vInfo.variability = fmi_variability::discrete;
         }
         rd->moveToParent();
     } else if (rd->hasElement("String")) {
@@ -577,29 +575,27 @@ void loadVariableInfo(std::shared_ptr<readerElement>& rd, variableInformation& v
             }
             att = rd->getNextAttribute();
         }
-        if (vInfo.variability == +fmi_variability::unknown)
-        {
-            vInfo.variability=fmi_variability::discrete;
+        if (vInfo.variability == +fmi_variability::unknown) {
+            vInfo.variability = fmi_variability::discrete;
         }
         rd->moveToParent();
-    }else if (rd->hasElement("Enumeration")) {
-    vInfo.type = fmi_variable_type::enumeration;
-    rd->moveToFirstChild("Enumeration");
-    att = rd->getFirstAttribute();
-    while (att.isValid()) {
-        if (att.getName() == "start") {
-            vInfo.initial = att.getValue();
-        } else if (att.getName() == "declaredType") {
-            vInfo.declType = att.getValue();
+    } else if (rd->hasElement("Enumeration")) {
+        vInfo.type = fmi_variable_type::enumeration;
+        rd->moveToFirstChild("Enumeration");
+        att = rd->getFirstAttribute();
+        while (att.isValid()) {
+            if (att.getName() == "start") {
+                vInfo.initial = att.getValue();
+            } else if (att.getName() == "declaredType") {
+                vInfo.declType = att.getValue();
+            }
+            att = rd->getNextAttribute();
         }
-        att = rd->getNextAttribute();
+        if (vInfo.variability == +fmi_variability::unknown) {
+            vInfo.variability = fmi_variability::discrete;
+        }
+        rd->moveToParent();
     }
-    if (vInfo.variability == +fmi_variability::unknown)
-    {
-        vInfo.variability=fmi_variability::discrete;
-    }
-    rd->moveToParent();
-}
 }
 
 auto depkindNum(const std::string& depknd)
