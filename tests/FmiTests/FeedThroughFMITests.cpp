@@ -11,7 +11,8 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <filesystem>
 
-static const std::string inputFile = std::string(FMI_REFERENCE_DIR) + "Feedthrough.fmu";
+static const std::string fmuName="Feedthrough";
+static const std::string inputFile = std::string(FMI_REFERENCE_DIR) + fmuName+".fmu";
 
 TEST(feedthrough, ExtractFMU)
 {
@@ -23,7 +24,7 @@ TEST(feedthrough, ExtractFMU)
     EXPECT_TRUE(fmi.isXmlLoaded());
     EXPECT_FALSE(fmi.isSoLoaded());
 
-    auto dir = std::string(FMI_REFERENCE_DIR) + "BouncingBall";
+    auto dir = std::string(FMI_REFERENCE_DIR) + fmuName;
     EXPECT_TRUE(std::filesystem::exists(dir));
 
     fmi.close();
@@ -40,7 +41,7 @@ TEST(feedthrough, loadXML)
     EXPECT_TRUE(info->checkFlag(modelExchangeCapable));
     EXPECT_TRUE(info->checkFlag(coSimulationCapable));
 
-    EXPECT_EQ(info->getString("modelName"), "Feedthrough");
+    EXPECT_EQ(info->getString("modelName"), fmuName);
     EXPECT_EQ(info->getCounts(fmiVariableType::input), 5);
     EXPECT_EQ(info->getCounts(fmiVariableType::output), 5);
     EXPECT_EQ(info->getCounts(fmiVariableType::parameter), 3);
@@ -208,7 +209,7 @@ TEST(feedthrough, loadSharedCS)
 
     fmi.reset();
 
-    auto dir = std::string(FMI_REFERENCE_DIR) + "feedthrough";
+    auto dir = std::string(FMI_REFERENCE_DIR) + fmuName;
     // this is true since we didn'time open the directory in this test
     EXPECT_TRUE(std::filesystem::exists(dir));
 
