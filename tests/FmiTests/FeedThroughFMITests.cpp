@@ -67,12 +67,12 @@ bool variableCheck(const std::shared_ptr<fmiInfo>& info,
     const auto& vinfo = info->getVariableInfo(variableName);
     bool ret = true;
     EXPECT_EQ(vinfo.causality, causality)
-        << std::to_string(ret = false) << " " << causality._to_string()
+        << std::to_string(static_cast<int>(ret = false)) << " " << causality._to_string()
         << " does not match variable causality which is " << vinfo.causality._to_string();
     EXPECT_EQ(vinfo.variability, variability)
-        << std::to_string(ret = false) << " " << variability._to_string()
+        << std::to_string(static_cast<int>(ret = false)) << " " << variability._to_string()
         << " does not match variable variability " << vinfo.variability._to_string();
-    EXPECT_EQ(vinfo.type, type) << std::to_string(ret = false) << " " << type._to_string()
+    EXPECT_EQ(vinfo.type, type) << std::to_string(static_cast<int>(ret = false)) << " " << type._to_string()
                                 << " does not match variable type " << vinfo.type._to_string();
     return ret;
 }

@@ -144,7 +144,7 @@ TEST(bouncingBall, csExecution)
     EXPECT_EQ(fmiObj->getName(), "model_cs");
 
     EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::instantiatedMode);
-    fmiObj->setupExperiment(false, 0.0, 0.0, true, 11.0);
+    fmiObj->setupExperiment(fmi2False, 0.0, 0.0, fmi2True, 11.0);
 
     fmiObj->setMode(fmuMode::initializationMode);
     EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::initializationMode);
@@ -155,7 +155,7 @@ TEST(bouncingBall, csExecution)
 
     double time = 0;
     while (time < 10.0) {
-        EXPECT_NO_THROW(fmiObj->doStep(time, 1.0, true));
+        EXPECT_NO_THROW(fmiObj->doStep(time, 1.0, fmi2True));
         time = time + 1.0;
     }
     fmiObj->setMode(fmuMode::terminated);

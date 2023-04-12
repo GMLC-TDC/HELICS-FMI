@@ -167,7 +167,7 @@ TEST(feedthrough, pubTypes)
 
     auto qres = helics::vectorizeQueryResult(vFed.query("root", "publications"));
 
-    EXPECT_EQ(qres.size(), 4U);
+    EXPECT_EQ(qres.size(), 5U);
 
     auto& sub1 = vFed.registerSubscription(qres[0]);
     sub1.setDefault(-20.0);
