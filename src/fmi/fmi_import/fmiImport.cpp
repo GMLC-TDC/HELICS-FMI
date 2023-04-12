@@ -239,6 +239,10 @@ bool FmiLibrary::loadInformation()
     // load the resources directory location if it exists
     if (exists(extractDirectory / "resources")) {
         resourceDir = extractDirectory / "resources";
+        if (resourceDir.is_relative())
+        {
+            resourceDir=std::filesystem::absolute(resourceDir);
+        }
     } else {
         resourceDir = "";
     }

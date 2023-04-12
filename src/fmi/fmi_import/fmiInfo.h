@@ -181,8 +181,8 @@ class fmiInfo {
     int eventIndicators{0};  //!< number of event indicators
   public:
     fmiInfo();
-    explicit fmiInfo(const std::string& fileFile);
-    int loadFile(const std::string& filefile);
+    explicit fmiInfo(const std::string& fileName);
+    int loadFile(const std::string& fileName);
     /** check if a given flag is set*/
     bool checkFlag(fmuCapabilityFlags flag) const;
 
