@@ -344,7 +344,6 @@ void tomlReaderElement::moveToNextSibling(const std::string& siblingName)
         }
         current->clear();
     } else {
-        const toml::value uval;
         auto val = toml::find_or(current->getElement(), siblingName, uval);
         if (!val.is_uninitialized()) {
             current = std::make_shared<tomlElement>(uval, siblingName);

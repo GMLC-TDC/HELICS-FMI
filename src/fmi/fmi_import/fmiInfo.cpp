@@ -24,17 +24,17 @@ fmiInfo::fmiInfo(const std::string& fileName)
 
 int fmiInfo::loadFile(const std::string& fileName)
 {
-    std::shared_ptr<readerElement> rd = std::make_shared<tinyxml2ReaderElement>(fileName);
-    if (!rd->isValid()) {
+    std::shared_ptr<readerElement> reader = std::make_shared<tinyxml2ReaderElement>(fileName);
+    if (!reader->isValid()) {
         return (-1);
     }
     headerInfo["xmlfile"] = fileName;
     headerInfo["xmlfilename"] = fileName;
 
-    loadFmiHeader(rd);
-    loadUnitInformation(rd);
-    loadVariables(rd);
-    loadStructure(rd);
+    loadFmiHeader(reader);
+    loadUnitInformation(reader);
+    loadVariables(reader);
+    loadStructure(reader);
     return 0;
 }
 
@@ -68,7 +68,7 @@ bool fmiInfo::checkFlag(fmuCapabilityFlags flag) const
 
 int fmiInfo::getCounts(fmiVariableType countType) const
 {
-    size_t cnt = size_t(-1);
+    std::size_t cnt{static_cast<std::size_t>(-1)};
     switch (countType) {
         case fmiVariableType::meObject:
             cnt = checkFlag(modelExchangeCapable) ? 1 : 0;
@@ -114,7 +114,7 @@ int fmiInfo::getCounts(fmiVariableType countType) const
             break;
     }
 
-    if (cnt == size_t(-1)) {
+    if (cnt == static_cast<std::size_t>(-1)) {
         return (-1);
     }
     return static_cast<int>(cnt);
@@ -125,11 +125,10 @@ static const std::string emptyString{};
 const std::string& fmiInfo::getString(const std::string& field) const
 {
     auto fnd = headerInfo.find(field);
-    if (fnd != headerInfo.end()) {
-        return fnd->second;
-    } else {
+    if (fnd == headerInfo.end()) {
         return emptyString;
     }
+    return fnd->second;
 }
 
 double fmiInfo::getReal(const std::string& field) const
@@ -159,26 +158,24 @@ static const fmiVariableSet emptyVset;
 const variableInformation& fmiInfo::getVariableInfo(const std::string& variableName) const
 {
     auto variablefind = variableLookup.find(variableName);
-    if (variablefind != variableLookup.end()) {
-        return variables[variablefind->second];
-    } else {
+    if (variablefind == variableLookup.end()) {
         return emptyVI;
     }
+    return variables[variablefind->second];
 }
 
 const variableInformation& fmiInfo::getVariableInfo(unsigned int index) const
 {
-    if (index < variables.size()) {
-        return variables[index];
-    } else {
+    if (index >= variables.size()) {
         return emptyVI;
     }
+    return variables[index];
 }
 
 fmiVariableSet fmiInfo::getReferenceSet(const std::vector<std::string>& variableList) const
 {
     fmiVariableSet vset;
-    for (auto& vname : variableList) {
+    for (const auto& vname : variableList) {
         auto vref = getVariableInfo(vname);
         if (vref.valueRef > 0) {
             vset.push(vref.valueRef);
@@ -191,24 +188,24 @@ fmiVariableSet fmiInfo::getVariableSet(const std::string& variable) const
 {
     auto vref = getVariableInfo(variable);
     if (vref.valueRef > 0) {
-        return fmiVariableSet(vref.valueRef);
+        return {vref.valueRef};
     }
     return emptyVset;
 }
 
 fmiVariableSet fmiInfo::getVariableSet(unsigned int index) const
 {
-    if (index < variables.size()) {
-        return fmiVariableSet(variables[index].valueRef);
+    if (index >= variables.size()) {
+        return emptyVset;
     }
-    return emptyVset;
+    return {variables[index].valueRef};
 }
 
 fmiVariableSet fmiInfo::getOutputReference() const
 {
     fmiVariableSet vset;
     vset.reserve(outputs.size());
-    for (auto& outInd : outputs) {
+    for (const auto& outInd : outputs) {
         vset.push(variables[outInd].valueRef);
     }
     return vset;
@@ -218,7 +215,7 @@ fmiVariableSet fmiInfo::getInputReference() const
 {
     fmiVariableSet vset;
     vset.reserve(inputs.size());
-    for (auto& inInd : inputs) {
+    for (const auto& inInd : inputs) {
         vset.push(variables[inInd].valueRef);
     }
     return vset;
@@ -228,12 +225,12 @@ std::vector<std::string> fmiInfo::getVariableNames(const std::string& type) cons
 {
     std::vector<std::string> vnames;
     if (type == "state") {
-        for (auto& varIndex : states) {
+        for (const auto& varIndex : states) {
             vnames.push_back(variables[varIndex].name);
         }
     } else {
         auto caus = fmi_causality::_from_string(type.c_str());
-        for (auto& var : variables) {
+        for (const auto& var : variables) {
             if ((caus._value == fmi_causality::any) || (var.causality == caus)) {
                 vnames.push_back(var.name);
             }
@@ -285,26 +282,26 @@ const std::vector<std::pair<index_t, int>>& fmiInfo::getUnknownDependencies(int 
     return unknownDep.getSet(variableIndex);
 }
 
-void fmiInfo::loadFmiHeader(std::shared_ptr<readerElement>& rd)
+void fmiInfo::loadFmiHeader(std::shared_ptr<readerElement>& reader)
 {
-    auto att = rd->getFirstAttribute();
+    auto att = reader->getFirstAttribute();
     while (att.isValid()) {
         headerInfo.emplace(att.getName(), att.getText());
         auto lcname = convertToLowerCase(att.getName());
         if (lcname != att.getName()) {
             headerInfo.emplace(convertToLowerCase(att.getName()), att.getText());
         }
-        att = rd->getNextAttribute();
+        att = reader->getNextAttribute();
     }
     // get the fmi version information
     auto versionFind = headerInfo.find("fmiversion");
     if (versionFind != headerInfo.end()) {
         fmiVersion = std::stod(versionFind->second);
     }
-    if (rd->hasElement("ModelExchange")) {
+    if (reader->hasElement("ModelExchange")) {
         capabilities.set(modelExchangeCapable, true);
-        rd->moveToFirstChild("ModelExchange");
-        att = rd->getFirstAttribute();
+        reader->moveToFirstChild("ModelExchange");
+        att = reader->getFirstAttribute();
         while (att.isValid()) {
             if (att.getName() == "modelIdentifier") {
                 headerInfo["MEIdentifier"] = att.getText();
@@ -313,14 +310,14 @@ void fmiInfo::loadFmiHeader(std::shared_ptr<readerElement>& rd)
                 loadFmuFlag(capabilities, att);
             }
 
-            att = rd->getNextAttribute();
+            att = reader->getNextAttribute();
         }
-        rd->moveToParent();
+        reader->moveToParent();
     }
-    if (rd->hasElement("CoSimulation")) {
-        rd->moveToFirstChild("CoSimulation");
+    if (reader->hasElement("CoSimulation")) {
+        reader->moveToFirstChild("CoSimulation");
         capabilities.set(coSimulationCapable, true);
-        att = rd->getFirstAttribute();
+        att = reader->getFirstAttribute();
         while (att.isValid()) {
             if (att.getName() == "modelIdentifier") {
                 headerInfo["CoSimIdentifier"] = att.getText();
@@ -331,13 +328,13 @@ void fmiInfo::loadFmiHeader(std::shared_ptr<readerElement>& rd)
                 loadFmuFlag(capabilities, att);
             }
 
-            att = rd->getNextAttribute();
+            att = reader->getNextAttribute();
         }
-        rd->moveToParent();
+        reader->moveToParent();
     }
-    if (rd->hasElement("DefaultExperiment")) {
-        rd->moveToFirstChild("DefaultExperiment");
-        att = rd->getFirstAttribute();
+    if (reader->hasElement("DefaultExperiment")) {
+        reader->moveToFirstChild("DefaultExperiment");
+        att = reader->getFirstAttribute();
         while (att.isValid()) {
             if (att.getName() == "startTime") {
                 defaultExpirement.startTime = att.getValue();
@@ -349,38 +346,38 @@ void fmiInfo::loadFmiHeader(std::shared_ptr<readerElement>& rd)
                 defaultExpirement.tolerance = att.getValue();
             }
 
-            att = rd->getNextAttribute();
+            att = reader->getNextAttribute();
         }
-        rd->moveToParent();
+        reader->moveToParent();
     }
 }
 
-void loadUnitInfo(std::shared_ptr<readerElement>& rd, fmiUnit& unitInfo);
+void loadUnitInfo(std::shared_ptr<readerElement>& reader, fmiUnit& unitInfo);
 
-void fmiInfo::loadUnitInformation(std::shared_ptr<readerElement>& rd)
+void fmiInfo::loadUnitInformation(std::shared_ptr<readerElement>& reader)
 {
-    rd->bookmark();
-    rd->moveToFirstChild("UnitDefinitions");
-    rd->moveToFirstChild("Unit");
-    int vcount = 0;
-    while (rd->isValid()) {
-        rd->moveToNextSibling("Unit");
+    reader->bookmark();
+    reader->moveToFirstChild("UnitDefinitions");
+    reader->moveToFirstChild("Unit");
+    int vcount{0};
+    while (reader->isValid()) {
+        reader->moveToNextSibling("Unit");
         ++vcount;
     }
     units.resize(vcount);
-    rd->moveToParent();
+    reader->moveToParent();
     // now load the variables
-    rd->moveToFirstChild("Unit");
-    int kk = 0;
-    while (rd->isValid()) {
-        loadUnitInfo(rd, units[kk]);
-        rd->moveToNextSibling("Unit");
-        ++kk;
+    reader->moveToFirstChild("Unit");
+    int index{0};
+    while (reader->isValid()) {
+        loadUnitInfo(reader, units[index]);
+        reader->moveToNextSibling("Unit");
+        ++index;
     }
-    rd->restore();
+    reader->restore();
 }
 
-void loadUnitInfo(std::shared_ptr<readerElement>& rd, fmiUnit& unitInfo)
+void loadUnitInfo(std::shared_ptr<readerElement>& reader, fmiUnit& unitInfo)
 {
     static std::map<std::string_view, units::precise_unit> baseUnitMap{{"m", units::precise::m},
                                                                        {"s", units::precise::s},
@@ -391,10 +388,10 @@ void loadUnitInfo(std::shared_ptr<readerElement>& rd, fmiUnit& unitInfo)
                                                                        {"K",
                                                                         units::precise::candela},
                                                                        {"A", units::precise::A}};
-    unitInfo.name = rd->getAttributeText("name");
-    if (rd->hasElement("BaseUnit")) {
-        rd->moveToFirstChild("BaseUnit");
-        auto att = rd->getFirstAttribute();
+    unitInfo.name = reader->getAttributeText("name");
+    if (reader->hasElement("BaseUnit")) {
+        reader->moveToFirstChild("BaseUnit");
+        auto att = reader->getFirstAttribute();
         while (att.isValid()) {
             if (att.getName() == "offset") {
                 unitInfo.offset = att.getValue();
@@ -403,26 +400,26 @@ void loadUnitInfo(std::shared_ptr<readerElement>& rd, fmiUnit& unitInfo)
             } else {
                 unitInfo.baseUnits.emplace_back(att.getName(), att.getValue());
             }
-            att = rd->getNextAttribute();
+            att = reader->getNextAttribute();
         }
-        rd->moveToParent();
+        reader->moveToParent();
     }
 
-    if (rd->hasElement("DisplayUnit")) {
-        rd->moveToFirstChild("DisplayUnit");
-        while (rd->isValid()) {
+    if (reader->hasElement("DisplayUnit")) {
+        reader->moveToFirstChild("DisplayUnit");
+        while (reader->isValid()) {
             unitDef Dunit;
-            Dunit.name = rd->getAttributeText("name");
-            Dunit.factor = rd->getAttributeValue("factor");
-            Dunit.offset = rd->getAttributeValue("offset");
+            Dunit.name = reader->getAttributeText("name");
+            Dunit.factor = reader->getAttributeValue("factor");
+            Dunit.offset = reader->getAttributeValue("offset");
             unitInfo.displayUnits.push_back(Dunit);
-            rd->moveToNextSibling("DisplayUnit");
+            reader->moveToNextSibling("DisplayUnit");
         }
-        rd->moveToParent();
+        reader->moveToParent();
     }
-    auto def = units::unit_from_string(unitInfo.name);
+    [[maybe_unused]] auto def = units::unit_from_string(unitInfo.name);
     units::precise_unit build = units::precise::one;
-    for (auto udef : unitInfo.baseUnits) {
+    for (const auto& udef : unitInfo.baseUnits) {
         auto fnd = baseUnitMap.find(udef.name);
         if (fnd != baseUnitMap.end()) {
             build = build * fnd->second.pow(static_cast<int>(udef.factor));
@@ -432,10 +429,10 @@ void loadUnitInfo(std::shared_ptr<readerElement>& rd, fmiUnit& unitInfo)
 }
 
 /** load a single variable information from the XML
-@param[in] rd the readerElement to load from
+@param[in] reader the readerElement to load from
 @param[out] vInfo the variable information to store the data to
 */
-void loadVariableInfo(std::shared_ptr<readerElement>& rd, variableInformation& vInfo);
+static void loadVariableInfo(std::shared_ptr<readerElement>& reader, variableInformation& vInfo);
 
 /*
 valueReference="100663424"
@@ -445,56 +442,56 @@ variability="tunable"
 
 static const std::string ScalarVString("ScalarVariable");
 
-void fmiInfo::loadVariables(std::shared_ptr<readerElement>& rd)
+void fmiInfo::loadVariables(std::shared_ptr<readerElement>& reader)
 {
-    rd->bookmark();
-    rd->moveToFirstChild("ModelVariables");
+    reader->bookmark();
+    reader->moveToFirstChild("ModelVariables");
     // Loop over the variables to be able to allocate memory efficiently later on
-    rd->moveToFirstChild(ScalarVString);
+    reader->moveToFirstChild(ScalarVString);
     int vcount = 0;
 
-    while (rd->isValid()) {
+    while (reader->isValid()) {
         ++vcount;
-        rd->moveToNextSibling(ScalarVString);
+        reader->moveToNextSibling(ScalarVString);
     }
     variables.resize(vcount);
-    rd->moveToParent();
+    reader->moveToParent();
     // now load the variables
-    rd->moveToFirstChild(ScalarVString);
-    int kk = 0;
-    while (rd->isValid()) {
-        loadVariableInfo(rd, variables[kk]);
-        variables[kk].index = kk;
-        auto res = variableLookup.emplace(variables[kk].name, kk);
+    reader->moveToFirstChild(ScalarVString);
+    int index = 0;
+    while (reader->isValid()) {
+        loadVariableInfo(reader, variables[index]);
+        variables[index].index = index;
+        auto res = variableLookup.emplace(variables[index].name, index);
         if (!res.second) {  // if we failed on the emplace operation, then we need to override
             // this should be unusual but it is possible
-            variableLookup[variables[kk].name] = kk;
+            variableLookup[variables[index].name] = index;
         }
         // this one may fail and that is ok since this is a secondary detection mechanism for purely
         // lower case parameters and may not be needed
-        variableLookup.emplace(convertToLowerCase(variables[kk].name), kk);
-        switch (variables[kk].causality) {
+        variableLookup.emplace(convertToLowerCase(variables[index].name), index);
+        switch (variables[index].causality) {
             case fmi_causality::parameter:
-                parameters.push_back(kk);
+                parameters.push_back(index);
                 break;
             case fmi_causality::local:
-                local.push_back(kk);
+                local.push_back(index);
                 break;
             case fmi_causality::input:
-                inputs.push_back(kk);
+                inputs.push_back(index);
                 break;
             default:
                 break;
         }
-        rd->moveToNextSibling(ScalarVString);
-        ++kk;
+        reader->moveToNextSibling(ScalarVString);
+        ++index;
     }
-    rd->restore();
+    reader->restore();
 }
 
-void loadVariableInfo(std::shared_ptr<readerElement>& rd, variableInformation& vInfo)
+static void loadVariableInfo(std::shared_ptr<readerElement>& reader, variableInformation& vInfo)
 {
-    auto att = rd->getFirstAttribute();
+    auto att = reader->getFirstAttribute();
     while (att.isValid()) {
         if (att.getName() == "name") {
             vInfo.name = att.getText();
@@ -509,12 +506,12 @@ void loadVariableInfo(std::shared_ptr<readerElement>& rd, variableInformation& v
         } else if (att.getName() == "initial") {
             vInfo.initial = att.getText();
         }
-        att = rd->getNextAttribute();
+        att = reader->getNextAttribute();
     }
-    if (rd->hasElement("Real")) {
+    if (reader->hasElement("Real")) {
         vInfo.type = fmi_variable_type::real;
-        rd->moveToFirstChild("Real");
-        att = rd->getFirstAttribute();
+        reader->moveToFirstChild("Real");
+        att = reader->getFirstAttribute();
         while (att.isValid()) {
             if (att.getName() == "declaredType") {
                 vInfo.declType = att.getText();
@@ -530,46 +527,71 @@ void loadVariableInfo(std::shared_ptr<readerElement>& rd, variableInformation& v
             } else if (att.getName() == "max") {
                 vInfo.max = att.getValue();
             }
-            att = rd->getNextAttribute();
+            att = reader->getNextAttribute();
         }
-        rd->moveToParent();
-    } else if (rd->hasElement("Boolean")) {
+        if (vInfo.variability == +fmi_variability::unknown) {
+            vInfo.variability = fmi_variability::continuous;
+        }
+        reader->moveToParent();
+    } else if (reader->hasElement("Boolean")) {
         vInfo.type = fmi_variable_type::boolean;
-        rd->moveToFirstChild("Boolean");
-        att = rd->getFirstAttribute();
+        reader->moveToFirstChild("Boolean");
+        att = reader->getFirstAttribute();
         while (att.isValid()) {
             if (att.getName() == "start") {
                 vInfo.start = (att.getText() == "true") ? 1.0 : 0.0;
             }
-            att = rd->getNextAttribute();
+            att = reader->getNextAttribute();
         }
-        rd->moveToParent();
-    } else if (rd->hasElement("String")) {
+        if (vInfo.variability == +fmi_variability::unknown) {
+            vInfo.variability = fmi_variability::discrete;
+        }
+        reader->moveToParent();
+    } else if (reader->hasElement("String")) {
         vInfo.type = fmi_variable_type::string;
-        rd->moveToFirstChild("String");
-        att = rd->getFirstAttribute();
+        reader->moveToFirstChild("String");
+        att = reader->getFirstAttribute();
         while (att.isValid()) {
             if (att.getName() == "start") {
                 vInfo.initial = att.getText();
             }
-            att = rd->getNextAttribute();
+            att = reader->getNextAttribute();
         }
-        rd->moveToParent();
-    } else if (rd->hasElement("Integer")) {
+        reader->moveToParent();
+    } else if (reader->hasElement("Integer")) {
         vInfo.type = fmi_variable_type::integer;
-        rd->moveToFirstChild("Integer");
-        att = rd->getFirstAttribute();
+        reader->moveToFirstChild("Integer");
+        att = reader->getFirstAttribute();
         while (att.isValid()) {
             if (att.getName() == "start") {
                 vInfo.initial = att.getValue();
             } else if (att.getName() == "min") {
-                vInfo.min = att.getValue();
+                vInfo.declType = att.getValue();
             } else if (att.getName() == "max") {
                 vInfo.max = att.getValue();
             }
-            att = rd->getNextAttribute();
+            att = reader->getNextAttribute();
         }
-        rd->moveToParent();
+        if (vInfo.variability == +fmi_variability::unknown) {
+            vInfo.variability = fmi_variability::discrete;
+        }
+        reader->moveToParent();
+    } else if (reader->hasElement("Enumeration")) {
+        vInfo.type = fmi_variable_type::enumeration;
+        reader->moveToFirstChild("Enumeration");
+        att = reader->getFirstAttribute();
+        while (att.isValid()) {
+            if (att.getName() == "start") {
+                vInfo.initial = att.getValue();
+            } else if (att.getName() == "declaredType") {
+                vInfo.declType = att.getValue();
+            }
+            att = reader->getNextAttribute();
+        }
+        if (vInfo.variability == +fmi_variability::unknown) {
+            vInfo.variability = fmi_variability::discrete;
+        }
+        reader->moveToParent();
     }
 }
 
@@ -597,77 +619,76 @@ static const std::string unknownString("Unknown");
 static const std::string depString("dependencies");
 static const std::string depKindString("dependenciesKind");
 
-void loadDependencies(std::shared_ptr<readerElement>& rd,
-                      std::vector<int>& store,
-                      matrixData<int>& depData)
+static void loadDependencies(std::shared_ptr<readerElement>& reader,
+                             std::vector<int>& store,
+                             matrixData<int>& depData)
 {
-    rd->moveToFirstChild(unknownString);
-    while (rd->isValid()) {
-        auto att = rd->getAttribute("index");
-        auto attDep = rd->getAttribute(depString);
-        auto attDepKind = rd->getAttribute(depKindString);
-        index_t row = static_cast<index_t>(att.getValue());
+    reader->moveToFirstChild(unknownString);
+    while (reader->isValid()) {
+        auto att = reader->getAttribute("index");
+        auto attDep = reader->getAttribute(depString);
+        auto attDepKind = reader->getAttribute(depKindString);
+        auto row = static_cast<index_t>(att.getValue());
         auto dep = gmlc::utilities::str2vector<int>(attDep.getText(), 0, " ");
         auto depknd = (attDepKind.isValid()) ?
             gmlc::utilities::stringOps::splitline(
                 attDepKind.getText(), " ", gmlc::utilities::stringOps::delimiter_compression::on) :
             gmlc::utilities::stringVector();
         store.push_back(row - 1);
-        auto validdepkind = (depknd.size() > 0);
+        auto validdepkind = !depknd.empty();
         for (size_t kk = 0; kk < dep.size(); ++kk) {
             if (dep[kk] > 0) {
                 depData.assign(row - 1, dep[kk] - 1, (validdepkind) ? (depkindNum(depknd[kk])) : 1);
             }
         }
-        rd->moveToNextSibling(unknownString);
+        reader->moveToNextSibling(unknownString);
     }
-    rd->moveToParent();
+    reader->moveToParent();
 }
 
-void fmiInfo::loadStructure(std::shared_ptr<readerElement>& rd)
+void fmiInfo::loadStructure(std::shared_ptr<readerElement>& reader)
 {
-    rd->bookmark();
+    reader->bookmark();
     // get the output dependencies
     outputDep.setRowLimit(static_cast<index_t>(variables.size()));
-    rd->moveToFirstChild("ModelStructure");
+    reader->moveToFirstChild("ModelStructure");
 
-    rd->moveToFirstChild("Outputs");
-    if (rd->isValid()) {
-        loadDependencies(rd, outputs, outputDep);
+    reader->moveToFirstChild("Outputs");
+    if (reader->isValid()) {
+        loadDependencies(reader, outputs, outputDep);
     }
-    rd->moveToParent();
+    reader->moveToParent();
     // get the derivative dependencies
-    rd->moveToFirstChild("Derivatives");
+    reader->moveToFirstChild("Derivatives");
     derivDep.setRowLimit(static_cast<index_t>(variables.size()));
-    if (rd->isValid()) {
-        loadDependencies(rd, deriv, derivDep);
+    if (reader->isValid()) {
+        loadDependencies(reader, deriv, derivDep);
         for (auto& der : deriv) {
             states.push_back(variables[der].derivativeIndex);
         }
     }
 
-    rd->moveToParent();
+    reader->moveToParent();
     // get the initial unknowns dependencies
     unknownDep.setRowLimit(static_cast<index_t>(variables.size()));
-    rd->moveToFirstChild("InitialUnknowns");
-    if (rd->isValid()) {
-        loadDependencies(rd, initUnknown, unknownDep);
+    reader->moveToFirstChild("InitialUnknowns");
+    if (reader->isValid()) {
+        loadDependencies(reader, initUnknown, unknownDep);
     }
-    rd->restore();
+    reader->restore();
 }
 
 bool checkType(const variableInformation& info, fmi_variable_type type, fmi_causality caus)
 {
-    if (!(info.causality == caus)) {
-        if (!((info.causality._value == fmi_causality::input) &&
-              (caus._value == fmi_causality::parameter))) {
+    if (info.causality != caus) {
+        if ((info.causality != +fmi_causality::input) || (caus != +fmi_causality::parameter)) {
             return false;
         }
     }
     if (info.type == type) {
         return true;
     }
-    if (type._value == fmi_variable_type::numeric) {
+    if (type == +fmi_variable_type::numeric) {
         switch (info.type) {
             case fmi_variable_type::boolean:
             case fmi_variable_type::integer:

@@ -89,7 +89,7 @@ jobs:
 
       - task: PublishBuildArtifacts@1
         inputs:
-          pathToPublish: 'build/_deps/ref_fmu-build/fmus'
+          pathToPublish: 'build/tests/fmus/fmus'
           artifactName: fmus
 
   - job: Windows

@@ -10,7 +10,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../FMI2/fmi2TypesPlatform.h"
+#include "fmi2TypesPlatform.h"
 #include "fmiEnumDefinitions.h"
 #include "units/units.hpp"
 #include "utilities/matrixDataOrdered.hpp"
@@ -181,8 +181,8 @@ class fmiInfo {
     int eventIndicators{0};  //!< number of event indicators
   public:
     fmiInfo();
-    explicit fmiInfo(const std::string& xmlFile);
-    int loadFile(const std::string& xmlfile);
+    explicit fmiInfo(const std::string& fileName);
+    int loadFile(const std::string& fileName);
     /** check if a given flag is set*/
     bool checkFlag(fmuCapabilityFlags flag) const;
 
@@ -222,10 +222,10 @@ class fmiInfo {
     const std::vector<std::pair<index_t, int>>& getUnknownDependencies(int variableIndex) const;
 
   private:
-    void loadFmiHeader(std::shared_ptr<readerElement>& rd);
-    void loadVariables(std::shared_ptr<readerElement>& rd);
-    void loadUnitInformation(std::shared_ptr<readerElement>& rd);
-    void loadStructure(std::shared_ptr<readerElement>& rd);
+    void loadFmiHeader(std::shared_ptr<readerElement>& reader);
+    void loadVariables(std::shared_ptr<readerElement>& reader);
+    void loadUnitInformation(std::shared_ptr<readerElement>& reader);
+    void loadStructure(std::shared_ptr<readerElement>& reader);
 };
 
 enum class fmuMode {

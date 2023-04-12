@@ -6,6 +6,8 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "exeTestHelper.h"
+#include "helics/application_api/CoreApp.hpp"
+#include "helics/application_api/ValueFederate.hpp"
 #include "helics/application_api/queryFunctions.hpp"
 #include "helicsFmiRunner.hpp"
 
@@ -37,7 +39,7 @@ TEST(Resource, checkPubsOutput)
     FmiRunner runner;
     runner.parse(
         std::string(
-            "--autobroker --coretype=zmq --step=0.1 --stop=1.0 --name=reserouce  --brokerargs=\"-f2 --name=r1broker\" ") +
+            "--autobroker --coretype=zmq --step=0.1s --stoptime=1.0s --name=reserouce  --brokerargs=\"-f2 --name=r1broker\" ") +
         inputFile);
     int ret = runner.load();
     ASSERT_EQ(ret, 0);
@@ -89,7 +91,7 @@ TEST(Resource, checkExePubsOutput)
     /**test that things run to completion with auto broker*/
     auto out = hfmi.runCaptureOutputAsync(
         std::string(
-            "--autobroker --coretype=zmq --step=0.1 --stop=2.0 --name=ftfed --brokerargs=\"-f2 \" ") +
+            "--autobroker --coretype=zmq --step=0.1s --stoptime=2.0s --name=ftfed --brokerargs=\"-f2 \" ") +
         inputFile);
 
     helics::FederateInfo fedInfo(helics::CoreType::ZMQ);

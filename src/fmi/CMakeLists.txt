@@ -34,3 +34,7 @@ endif(UNIX)
 add_library(fmiLibrary ${fmiImport_sources} ${fmiImport_headers})
 
 target_link_libraries(fmiLibrary formatInterpreter utilities units::units ${CMAKE_DL_LIBS})
+
+target_include_directories(
+    fmiLibrary SYSTEM PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/reference/include>
+)

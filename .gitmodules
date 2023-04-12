@@ -22,3 +22,6 @@
 [submodule "ThirdParty/toml"]
 	path = ThirdParty/toml
 	url = ../../ToruNiina/toml11
+[submodule "ThirdParty/reference"]
+	path = ThirdParty/reference
+	url = https://github.com/modelica/Reference-FMUs

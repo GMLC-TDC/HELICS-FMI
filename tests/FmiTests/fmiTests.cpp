@@ -146,6 +146,8 @@ TEST(loadtests, csExecution)
     EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::instantiatedMode);
     auto str = fmiObj->getInputNames();
 
+    fmiObj->setupExperiment(fmi2False, 0.0, 0.0, fmi2True, 11.0);
+
     fmiObj->setMode(fmuMode::initializationMode);
     EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::initializationMode);
 

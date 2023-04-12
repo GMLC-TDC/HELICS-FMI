@@ -7,7 +7,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 
-#include "../FMI2/fmi2FunctionTypes.h"
+#include "fmi2FunctionTypes.h"
 #include "fmiInfo.h"
 
 #include <filesystem>
@@ -179,7 +179,7 @@ class FmiLibrary {
     explicit FmiLibrary(const std::string& fmuPath);
     /** construct an fmilibrary object from the fmu path
     @param[in] fmuPath the path to the fmu
-    @param[in] extractLoc the folder location to extract the FMU
+    @param[in] extractPath the folder location to extract the FMU
     */
     FmiLibrary(const std::string& fmuPath, const std::string& extractPath);
     /** check if the xml file for the fmu has been loaded
