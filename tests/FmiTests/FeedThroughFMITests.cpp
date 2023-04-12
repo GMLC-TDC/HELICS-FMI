@@ -11,8 +11,8 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <filesystem>
 
-static const std::string fmuName="Feedthrough";
-static const std::string inputFile = std::string(FMI_REFERENCE_DIR) + fmuName+".fmu";
+static const std::string fmuName = "Feedthrough";
+static const std::string inputFile = std::string(FMI_REFERENCE_DIR) + fmuName + ".fmu";
 
 TEST(feedthrough, ExtractFMU)
 {
