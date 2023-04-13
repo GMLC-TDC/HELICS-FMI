@@ -15,14 +15,14 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 using gmlc::utilities::convertToLowerCase;
 
-fmiInfo::fmiInfo() {}
+FmiInfo::FmiInfo() {}
 
-fmiInfo::fmiInfo(const std::string& fileName)
+FmiInfo::FmiInfo(const std::string& fileName)
 {
     loadFile(fileName);
 }
 
-int fmiInfo::loadFile(const std::string& fileName)
+int FmiInfo::loadFile(const std::string& fileName)
 {
     std::shared_ptr<readerElement> reader = std::make_shared<tinyxml2ReaderElement>(fileName);
     if (!reader->isValid()) {
@@ -61,12 +61,12 @@ void loadFmuFlag(std::bitset<32>& capabilities, const readerAttribute& att)
     }
 }
 
-bool fmiInfo::checkFlag(fmuCapabilityFlags flag) const
+bool FmiInfo::checkFlag(fmuCapabilityFlags flag) const
 {
     return capabilities[flag];
 }
 
-int fmiInfo::getCounts(fmiVariableType countType) const
+int FmiInfo::getCounts(fmiVariableType countType) const
 {
     std::size_t cnt{static_cast<std::size_t>(-1)};
     switch (countType) {
@@ -122,7 +122,7 @@ int fmiInfo::getCounts(fmiVariableType countType) const
 
 static const std::string emptyString{};
 
-const std::string& fmiInfo::getString(const std::string& field) const
+const std::string& FmiInfo::getString(const std::string& field) const
 {
     auto fnd = headerInfo.find(field);
     if (fnd == headerInfo.end()) {
@@ -131,7 +131,7 @@ const std::string& fmiInfo::getString(const std::string& field) const
     return fnd->second;
 }
 
-double fmiInfo::getReal(const std::string& field) const
+double FmiInfo::getReal(const std::string& field) const
 {
     auto fld = convertToLowerCase(field);
     if (fld == "version") {
@@ -152,10 +152,10 @@ double fmiInfo::getReal(const std::string& field) const
     return (-1.0e-48);
 }
 
-static const variableInformation emptyVI{};
-static const fmiVariableSet emptyVset;
+static const VariableInformation emptyVI{};
+static const FmiVariableSet emptyVset;
 
-const variableInformation& fmiInfo::getVariableInfo(const std::string& variableName) const
+const VariableInformation& FmiInfo::getVariableInfo(const std::string& variableName) const
 {
     auto variablefind = variableLookup.find(variableName);
     if (variablefind == variableLookup.end()) {
@@ -164,7 +164,7 @@ const variableInformation& fmiInfo::getVariableInfo(const std::string& variableN
     return variables[variablefind->second];
 }
 
-const variableInformation& fmiInfo::getVariableInfo(unsigned int index) const
+const VariableInformation& FmiInfo::getVariableInfo(unsigned int index) const
 {
     if (index >= variables.size()) {
         return emptyVI;
@@ -172,9 +172,9 @@ const variableInformation& fmiInfo::getVariableInfo(unsigned int index) const
     return variables[index];
 }
 
-fmiVariableSet fmiInfo::getReferenceSet(const std::vector<std::string>& variableList) const
+FmiVariableSet FmiInfo::getReferenceSet(const std::vector<std::string>& variableList) const
 {
-    fmiVariableSet vset;
+    FmiVariableSet vset;
     for (const auto& vname : variableList) {
         auto vref = getVariableInfo(vname);
         if (vref.valueRef > 0) {
@@ -184,7 +184,7 @@ fmiVariableSet fmiInfo::getReferenceSet(const std::vector<std::string>& variable
     return vset;
 }
 
-fmiVariableSet fmiInfo::getVariableSet(const std::string& variable) const
+FmiVariableSet FmiInfo::getVariableSet(const std::string& variable) const
 {
     auto vref = getVariableInfo(variable);
     if (vref.valueRef > 0) {
@@ -193,7 +193,7 @@ fmiVariableSet fmiInfo::getVariableSet(const std::string& variable) const
     return emptyVset;
 }
 
-fmiVariableSet fmiInfo::getVariableSet(unsigned int index) const
+FmiVariableSet FmiInfo::getVariableSet(unsigned int index) const
 {
     if (index >= variables.size()) {
         return emptyVset;
@@ -201,9 +201,9 @@ fmiVariableSet fmiInfo::getVariableSet(unsigned int index) const
     return {variables[index].valueRef};
 }
 
-fmiVariableSet fmiInfo::getOutputReference() const
+FmiVariableSet FmiInfo::getOutputReference() const
 {
-    fmiVariableSet vset;
+    FmiVariableSet vset;
     vset.reserve(outputs.size());
     for (const auto& outInd : outputs) {
         vset.push(variables[outInd].valueRef);
@@ -211,9 +211,9 @@ fmiVariableSet fmiInfo::getOutputReference() const
     return vset;
 }
 
-fmiVariableSet fmiInfo::getInputReference() const
+FmiVariableSet FmiInfo::getInputReference() const
 {
-    fmiVariableSet vset;
+    FmiVariableSet vset;
     vset.reserve(inputs.size());
     for (const auto& inInd : inputs) {
         vset.push(variables[inInd].valueRef);
@@ -221,7 +221,7 @@ fmiVariableSet fmiInfo::getInputReference() const
     return vset;
 }
 
-std::vector<std::string> fmiInfo::getVariableNames(const std::string& type) const
+std::vector<std::string> FmiInfo::getVariableNames(const std::string& type) const
 {
     std::vector<std::string> vnames;
     if (type == "state") {
@@ -242,7 +242,7 @@ std::vector<std::string> fmiInfo::getVariableNames(const std::string& type) cons
 
 static const std::vector<int> emptyVec;
 
-const std::vector<int>& fmiInfo::getVariableIndices(const std::string& type) const
+const std::vector<int>& FmiInfo::getVariableIndices(const std::string& type) const
 {
     if (type == "state") {
         return states;
@@ -269,20 +269,20 @@ const std::vector<int>& fmiInfo::getVariableIndices(const std::string& type) con
 }
 
 /** get the variable indices of the derivative dependencies*/
-const std::vector<std::pair<index_t, int>>& fmiInfo::getDerivDependencies(int variableIndex) const
+const std::vector<std::pair<index_t, int>>& FmiInfo::getDerivDependencies(int variableIndex) const
 {
     return derivDep.getSet(variableIndex);
 }
-const std::vector<std::pair<index_t, int>>& fmiInfo::getOutputDependencies(int variableIndex) const
+const std::vector<std::pair<index_t, int>>& FmiInfo::getOutputDependencies(int variableIndex) const
 {
     return outputDep.getSet(variableIndex);
 }
-const std::vector<std::pair<index_t, int>>& fmiInfo::getUnknownDependencies(int variableIndex) const
+const std::vector<std::pair<index_t, int>>& FmiInfo::getUnknownDependencies(int variableIndex) const
 {
     return unknownDep.getSet(variableIndex);
 }
 
-void fmiInfo::loadFmiHeader(std::shared_ptr<readerElement>& reader)
+void FmiInfo::loadFmiHeader(std::shared_ptr<readerElement>& reader)
 {
     auto att = reader->getFirstAttribute();
     while (att.isValid()) {
@@ -352,9 +352,9 @@ void fmiInfo::loadFmiHeader(std::shared_ptr<readerElement>& reader)
     }
 }
 
-void loadUnitInfo(std::shared_ptr<readerElement>& reader, fmiUnit& unitInfo);
+void loadUnitInfo(std::shared_ptr<readerElement>& reader, FmiUnit& unitInfo);
 
-void fmiInfo::loadUnitInformation(std::shared_ptr<readerElement>& reader)
+void FmiInfo::loadUnitInformation(std::shared_ptr<readerElement>& reader)
 {
     reader->bookmark();
     reader->moveToFirstChild("UnitDefinitions");
@@ -377,7 +377,7 @@ void fmiInfo::loadUnitInformation(std::shared_ptr<readerElement>& reader)
     reader->restore();
 }
 
-void loadUnitInfo(std::shared_ptr<readerElement>& reader, fmiUnit& unitInfo)
+void loadUnitInfo(std::shared_ptr<readerElement>& reader, FmiUnit& unitInfo)
 {
     static std::map<std::string_view, units::precise_unit> baseUnitMap{{"m", units::precise::m},
                                                                        {"s", units::precise::s},
@@ -408,7 +408,7 @@ void loadUnitInfo(std::shared_ptr<readerElement>& reader, fmiUnit& unitInfo)
     if (reader->hasElement("DisplayUnit")) {
         reader->moveToFirstChild("DisplayUnit");
         while (reader->isValid()) {
-            unitDef Dunit;
+            FmiUnitDef Dunit;
             Dunit.name = reader->getAttributeText("name");
             Dunit.factor = reader->getAttributeValue("factor");
             Dunit.offset = reader->getAttributeValue("offset");
@@ -432,7 +432,7 @@ void loadUnitInfo(std::shared_ptr<readerElement>& reader, fmiUnit& unitInfo)
 @param[in] reader the readerElement to load from
 @param[out] vInfo the variable information to store the data to
 */
-static void loadVariableInfo(std::shared_ptr<readerElement>& reader, variableInformation& vInfo);
+static void loadVariableInfo(std::shared_ptr<readerElement>& reader, VariableInformation& vInfo);
 
 /*
 valueReference="100663424"
@@ -442,7 +442,7 @@ variability="tunable"
 
 static const std::string ScalarVString("ScalarVariable");
 
-void fmiInfo::loadVariables(std::shared_ptr<readerElement>& reader)
+void FmiInfo::loadVariables(std::shared_ptr<readerElement>& reader)
 {
     reader->bookmark();
     reader->moveToFirstChild("ModelVariables");
@@ -489,7 +489,7 @@ void fmiInfo::loadVariables(std::shared_ptr<readerElement>& reader)
     reader->restore();
 }
 
-static void loadVariableInfo(std::shared_ptr<readerElement>& reader, variableInformation& vInfo)
+static void loadVariableInfo(std::shared_ptr<readerElement>& reader, VariableInformation& vInfo)
 {
     auto att = reader->getFirstAttribute();
     while (att.isValid()) {
@@ -646,7 +646,7 @@ static void loadDependencies(std::shared_ptr<readerElement>& reader,
     reader->moveToParent();
 }
 
-void fmiInfo::loadStructure(std::shared_ptr<readerElement>& reader)
+void FmiInfo::loadStructure(std::shared_ptr<readerElement>& reader)
 {
     reader->bookmark();
     // get the output dependencies
@@ -678,7 +678,7 @@ void fmiInfo::loadStructure(std::shared_ptr<readerElement>& reader)
     reader->restore();
 }
 
-bool checkType(const variableInformation& info, fmi_variable_type type, fmi_causality caus)
+bool checkType(const VariableInformation& info, fmi_variable_type type, fmi_causality caus)
 {
     if (info.causality != caus) {
         if ((info.causality != +fmi_causality::input) || (caus != +fmi_causality::parameter)) {

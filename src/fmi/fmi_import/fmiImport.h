@@ -198,7 +198,7 @@ class FmiLibrary {
     @return true if the fmu was loaded false otherwise
     */
     bool loadFMU(const std::string& fmuPath, const std::string& extractLoc);
-    std::shared_ptr<fmiInfo> getInfo() const { return information; }
+    std::shared_ptr<FmiInfo> getInfo() const { return information; }
     void close();
     const std::string& getName() const { return modelName; }
     int getCounts(fmiVariableType countType) const;
@@ -243,7 +243,7 @@ class FmiLibrary {
     std::string modelName;  //!< the name of the model
     int mecount = 0;  //!< counter for the number of created model exchange objects
     int cosimcount = 0;  //!< counter for the number of created co-simulation objects
-    std::shared_ptr<fmiInfo>
+    std::shared_ptr<FmiInfo>
         information;  //!< an object containing information derived from the FMU XML file
 
     int errorCode{0};  //!< code indicating error source

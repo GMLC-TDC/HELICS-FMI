@@ -10,7 +10,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 fmi2ModelExchangeObject::fmi2ModelExchangeObject(
     const std::string& fmuname,
     fmi2Component cmp,
-    std::shared_ptr<const fmiInfo> keyInfo,
+    std::shared_ptr<const FmiInfo> keyInfo,
     std::shared_ptr<const fmiCommonFunctions> comFunc,
     std::shared_ptr<const fmiModelExchangeFunctions> meFunc):
     fmi2Object(fmuname, cmp, keyInfo, comFunc),
@@ -23,15 +23,15 @@ fmi2ModelExchangeObject::fmi2ModelExchangeObject(
     }
 }
 
-void fmi2ModelExchangeObject::setMode(fmuMode mode)
+void fmi2ModelExchangeObject::setMode(FmuMode mode)
 {
     fmi2Status ret = fmi2Error;
     switch (currentMode) {
-        case fmuMode::instantiatedMode:
-        case fmuMode::initializationMode:
+        case FmuMode::INSTANTIATED:
+        case FmuMode::INITIALIZATION:
 
-            if (mode == fmuMode::continuousTimeMode) {
-                fmi2Object::setMode(fmuMode::eventMode);
+            if (mode == FmuMode::CONTINUOUS_TIME) {
+                fmi2Object::setMode(FmuMode::EVENT);
                 if (numStates > 0) {
                     ret = ModelExchangeFunctions->fmi2EnterContinuousTimeMode(comp);
                 } else {
@@ -41,15 +41,15 @@ void fmi2ModelExchangeObject::setMode(fmuMode mode)
                 fmi2Object::setMode(mode);
             }
             break;
-        case fmuMode::continuousTimeMode:
-            if (mode == fmuMode::eventMode) {
+        case FmuMode::CONTINUOUS_TIME:
+            if (mode == FmuMode::EVENT) {
                 ret = ModelExchangeFunctions->fmi2EnterEventMode(comp);
             }
             break;
-        case fmuMode::eventMode:
-            if (mode == fmuMode::eventMode) {
+        case FmuMode::EVENT:
+            if (mode == FmuMode::EVENT) {
                 ret = ModelExchangeFunctions->fmi2EnterEventMode(comp);
-            } else if (mode == fmuMode::continuousTimeMode) {
+            } else if (mode == FmuMode::CONTINUOUS_TIME) {
                 if (numStates > 0) {
                     ret = ModelExchangeFunctions->fmi2EnterContinuousTimeMode(comp);
                 } else {

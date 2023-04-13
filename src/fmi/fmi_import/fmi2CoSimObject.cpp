@@ -31,7 +31,7 @@ static const auto& derivOrder = *derivOrderBlock;
 
 fmi2CoSimObject::fmi2CoSimObject(const std::string& fmuname,
                                  fmi2Component cmp,
-                                 std::shared_ptr<const fmiInfo> keyInfo,
+                                 std::shared_ptr<const FmiInfo> keyInfo,
                                  std::shared_ptr<const fmiCommonFunctions> comFunc,
                                  std::shared_ptr<const fmiCoSimFunctions> csFunc):
     fmi2Object(fmuname, cmp, std::move(keyInfo), std::move(comFunc)),
@@ -65,12 +65,12 @@ void fmi2CoSimObject::getOutputDerivatives(int /*order*/, fmi2Real /*dOdt*/[]) c
 }
 void fmi2CoSimObject::doStep(fmi2Real currentCommunicationPoint,
                              fmi2Real communicationStepSize,
-                             fmi2Boolean noSetFMUStatePriorToCurrentPoint)
+                             bool noSetFMUStatePriorToCurrentPoint)
 {
     auto ret = CoSimFunctions->fmi2DoStep(comp,
                                           currentCommunicationPoint,
                                           communicationStepSize,
-                                          noSetFMUStatePriorToCurrentPoint);
+                                          noSetFMUStatePriorToCurrentPoint?fmi2True:fmi2False);
     if (ret != fmi2Status::fmi2OK) {
         if (ret == fmi2Status::fmi2Pending) {
             stepPending = true;
@@ -131,14 +131,14 @@ std::string fmi2CoSimObject::getStatus() const
     return "";
 }
 
-void fmi2CoSimObject::setMode(fmuMode mode)
+void fmi2CoSimObject::setMode(FmuMode mode)
 {
     // handle a few mixed modes
-    if (mode == fmuMode::continuousTimeMode) {
-        mode = fmuMode::stepMode;
+    if (mode == FmuMode::CONTINUOUS_TIME) {
+        mode = FmuMode::STEP;
     }
-    if (mode == fmuMode::eventMode) {
-        mode = fmuMode::stepMode;
+    if (mode == FmuMode::EVENT) {
+        mode = FmuMode::STEP;
     }
     fmi2Object::setMode(mode);
 }

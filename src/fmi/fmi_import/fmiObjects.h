@@ -51,20 +51,20 @@ class fmi2Object {
   public:
     fmi2Object(const std::string& name,
                fmi2Component cmp,
-               std::shared_ptr<const fmiInfo> info,
+               std::shared_ptr<const FmiInfo> info,
                std::shared_ptr<const fmiCommonFunctions> comFunc);
     virtual ~fmi2Object();
-    void setupExperiment(fmi2Boolean toleranceDefined,
+    void setupExperiment(bool toleranceDefined,
                          fmi2Real tolerance,
                          fmi2Real startTime,
-                         fmi2Boolean stopTimeDefined,
+                         bool stopTimeDefined,
                          fmi2Real stopTime);
-    virtual void setMode(fmuMode newMode);
-    fmuMode getCurrentMode() const;
+    virtual void setMode(FmuMode newMode);
+    FmuMode getCurrentMode() const;
     void reset();
 
     template<typename T>
-    T get(const fmiVariable& param) const
+    T get(const FmiVariable& param) const
     {
         fmi2Status retval = fmi2Status::fmi2Discard;
         if constexpr (std::is_arithmetic_v<T>) {
@@ -128,13 +128,13 @@ class fmi2Object {
         return get<T>(info->getVariableInfo(param));
     }
 
-    void get(const fmiVariableSet& vrset, fmi2Real[]) const;
-    void get(const fmiVariableSet& vrset, fmi2Integer[]) const;
-    void get(const fmiVariableSet& vrset, fmi2String[]) const;
+    void get(const FmiVariableSet& vrset, fmi2Real[]) const;
+    void get(const FmiVariableSet& vrset, fmi2Integer[]) const;
+    void get(const FmiVariableSet& vrset, fmi2String[]) const;
 
-    void set(const fmiVariableSet& vrset, fmi2Integer[]);
+    void set(const FmiVariableSet& vrset, fmi2Integer[]);
 
-    void set(const fmiVariableSet& vrset, fmi2Real[]);
+    void set(const FmiVariableSet& vrset, fmi2Real[]);
 
     template<typename T>
     void set(const std::string& param, T&& val)
@@ -142,11 +142,11 @@ class fmi2Object {
         set(info->getVariableInfo(param), std::forward<T>(val));
     }
 
-    void set(const fmiVariable& param, const char* val);
-    void set(const fmiVariable& param, const std::string& val);
+    void set(const FmiVariable& param, const char* val);
+    void set(const FmiVariable& param, const std::string& val);
 
     template<typename T>
-    void set(const fmiVariable& param, T val)
+    void set(const FmiVariable& param, T val)
     {
         fmi2Status ret = fmi2Status::fmi2Discard;
         switch (param.type._value) {
@@ -196,21 +196,21 @@ class fmi2Object {
     void setOutputVariables(const std::vector<int>& outIndices);
     void setInputVariables(const std::vector<std::string>& inNames);
     void setInputVariables(const std::vector<int>& inIndices);
-    const fmiVariable& addOutputVariable(const std::string& outputName);
-    const fmiVariable& addOutputVariable(int index);
-    const fmiVariable& addInputVariable(const std::string& inputName);
-    const fmiVariable& addInputVariable(int index);
+    const FmiVariable& addOutputVariable(const std::string& outputName);
+    const FmiVariable& addOutputVariable(int index);
+    const FmiVariable& addInputVariable(const std::string& inputName);
+    const FmiVariable& addInputVariable(int index);
 
-    fmiVariableSet getVariableSet(const std::string& variable) const;
-    fmiVariableSet getVariableSet(int index) const;
+    FmiVariableSet getVariableSet(const std::string& variable) const;
+    FmiVariableSet getVariableSet(int index) const;
 
-    const fmiInfo& fmuInformation() const { return *info; }
+    const FmiInfo& fmuInformation() const { return *info; }
 
     int inputSize() const { return static_cast<int>(activeInputs.size()); }
     int outputSize() const { return static_cast<int>(activeOutputs.size()); }
 
-    const fmiVariable& getInput(int index) const;
-    const fmiVariable& getOutput(int index) const;
+    const FmiVariable& getInput(int index) const;
+    const FmiVariable& getOutput(int index) const;
 
     std::vector<std::string> getOutputNames() const;
     std::vector<std::string> getInputNames() const;
@@ -239,11 +239,11 @@ class fmi2Object {
 
   protected:
     fmi2Component comp;
-    fmuMode currentMode = fmuMode::instantiatedMode;
-    std::shared_ptr<const fmiInfo> info;
+    FmuMode currentMode = FmuMode::INSTANTIATED;
+    std::shared_ptr<const FmiInfo> info;
 
-    std::vector<fmiVariable> activeInputs;
-    std::vector<fmiVariable> activeOutputs;
+    std::vector<FmiVariable> activeInputs;
+    std::vector<FmiVariable> activeOutputs;
 
     void handleNonOKReturnValues(fmi2Status retval) const;
     /** set the inputs to all the defined inputs*/
@@ -272,7 +272,7 @@ class fmi2ModelExchangeObject: public fmi2Object {
   public:
     fmi2ModelExchangeObject(const std::string& name,
                             fmi2Component cmp,
-                            std::shared_ptr<const fmiInfo> info,
+                            std::shared_ptr<const FmiInfo> info,
                             std::shared_ptr<const fmiCommonFunctions> comFunc,
                             std::shared_ptr<const fmiModelExchangeFunctions> MEFunc);
     void newDiscreteStates(fmi2EventInfo* fmi2eventInfo);
@@ -303,7 +303,7 @@ class fmi2ModelExchangeObject: public fmi2Object {
     void getNominalsOfContinuousStates(fmi2Real nominalValues[]) const;
     /** set the operating state of the FMU
      */
-    virtual void setMode(fmuMode mode) override;
+    virtual void setMode(FmuMode mode) override;
     /** get the number of the states*/
     size_t getNumberOfStates() const { return numStates; }
     /** get the number of indicators*/
@@ -332,7 +332,7 @@ class fmi2CoSimObject: public fmi2Object {
     /**constructor*/
     fmi2CoSimObject(const std::string& name,
                     fmi2Component cmp,
-                    std::shared_ptr<const fmiInfo> info,
+                    std::shared_ptr<const FmiInfo> info,
                     std::shared_ptr<const fmiCommonFunctions> comFunc,
                     std::shared_ptr<const fmiCoSimFunctions> csFunc);
     /** set the input derivatives of particular order
@@ -352,7 +352,7 @@ class fmi2CoSimObject: public fmi2Object {
     */
     void doStep(fmi2Real currentCommunicationPoint,
                 fmi2Real communicationStepSize,
-                fmi2Boolean noSetFMUStatePriorToCurrentPoint);
+                bool noSetFMUStatePriorToCurrentPoint);
     /** cancel a pending time step*/
     void cancelStep();
     fmi2Real getLastStepTime() const;
@@ -365,7 +365,7 @@ class fmi2CoSimObject: public fmi2Object {
     }
     /** set the operating state of the FMU
      */
-    virtual void setMode(fmuMode mode) override;
+    virtual void setMode(FmuMode mode) override;
 
   private:
     std::shared_ptr<const fmiCoSimFunctions> CoSimFunctions;

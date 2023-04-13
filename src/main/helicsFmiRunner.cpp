@@ -149,7 +149,6 @@ int FmiRunner::load()
                     return errorTerminate(BROKER_CONNECT_FAILURE);
                 }
             }
-
             std::cout << "started autobroker with args \"" << args << "\"" << std::endl;
         }
         catch (const std::exception& e) {

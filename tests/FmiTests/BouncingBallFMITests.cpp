@@ -70,11 +70,11 @@ TEST(bouncingBall, loadSharedME)
     ASSERT_TRUE(fmiObj);
     EXPECT_EQ(fmiObj->getName(), "model1");
 
-    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::instantiatedMode);
+    EXPECT_EQ(fmiObj->getCurrentMode(), FmuMode::INSTANTIATED);
     auto str = fmiObj->getInputNames();
 
-    fmiObj->setMode(fmuMode::terminated);
-    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::terminated);
+    fmiObj->setMode(FmuMode::TERMINATED);
+    EXPECT_EQ(fmiObj->getCurrentMode(), FmuMode::TERMINATED);
     fmiObj.reset();
     fmi.reset();
 }
@@ -88,11 +88,11 @@ TEST(bouncingBall, loadSharedCS)
     ASSERT_TRUE(fmiObj);
     EXPECT_EQ(fmiObj->getName(), "model_cs");
 
-    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::instantiatedMode);
+    EXPECT_EQ(fmiObj->getCurrentMode(), FmuMode::INSTANTIATED);
     auto str = fmiObj->getInputNames();
 
-    fmiObj->setMode(fmuMode::terminated);
-    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::terminated);
+    fmiObj->setMode(FmuMode::TERMINATED);
+    EXPECT_EQ(fmiObj->getCurrentMode(), FmuMode::TERMINATED);
     fmiObj.reset();
 
     fmi->deleteFMUdirectory();
@@ -115,18 +115,18 @@ TEST(bouncingBall, runModeSequence)
     ASSERT_TRUE(fmiObj);
     EXPECT_EQ(fmiObj->getName(), "model_cs");
 
-    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::instantiatedMode);
+    EXPECT_EQ(fmiObj->getCurrentMode(), FmuMode::INSTANTIATED);
     auto str = fmiObj->getInputNames();
 
-    fmiObj->setMode(fmuMode::initializationMode);
-    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::initializationMode);
+    fmiObj->setMode(FmuMode::INITIALIZATION);
+    EXPECT_EQ(fmiObj->getCurrentMode(), FmuMode::INITIALIZATION);
 
-    fmiObj->setMode(fmuMode::continuousTimeMode);  // this mode is not valid for cosim object so
+    fmiObj->setMode(FmuMode::CONTINUOUS_TIME);  // this mode is not valid for cosim object so
                                                    // going to stepMode
-    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::stepMode);
+    EXPECT_EQ(fmiObj->getCurrentMode(), FmuMode::STEP);
 
-    fmiObj->setMode(fmuMode::terminated);
-    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::terminated);
+    fmiObj->setMode(FmuMode::TERMINATED);
+    EXPECT_EQ(fmiObj->getCurrentMode(), FmuMode::TERMINATED);
     fmiObj.reset();
 
     fmi->deleteFMUdirectory();
@@ -143,23 +143,23 @@ TEST(bouncingBall, csExecution)
     ASSERT_TRUE(fmiObj);
     EXPECT_EQ(fmiObj->getName(), "model_cs");
 
-    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::instantiatedMode);
+    EXPECT_EQ(fmiObj->getCurrentMode(), FmuMode::INSTANTIATED);
     fmiObj->setupExperiment(fmi2False, 0.0, 0.0, fmi2True, 11.0);
 
-    fmiObj->setMode(fmuMode::initializationMode);
-    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::initializationMode);
+    fmiObj->setMode(FmuMode::INITIALIZATION);
+    EXPECT_EQ(fmiObj->getCurrentMode(), FmuMode::INITIALIZATION);
 
-    fmiObj->setMode(fmuMode::continuousTimeMode);  // this mode is not valid for cosim object so
+    fmiObj->setMode(FmuMode::CONTINUOUS_TIME);  // this mode is not valid for cosim object so
                                                    // going to stepMode
-    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::stepMode);
+    EXPECT_EQ(fmiObj->getCurrentMode(), FmuMode::STEP);
 
     double time = 0;
     while (time < 10.0) {
         EXPECT_NO_THROW(fmiObj->doStep(time, 1.0, fmi2True));
         time = time + 1.0;
     }
-    fmiObj->setMode(fmuMode::terminated);
-    EXPECT_EQ(fmiObj->getCurrentMode(), fmuMode::terminated);
+    fmiObj->setMode(FmuMode::TERMINATED);
+    EXPECT_EQ(fmiObj->getCurrentMode(), FmuMode::TERMINATED);
     fmiObj.reset();
 
     fmi->deleteFMUdirectory();
