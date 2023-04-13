@@ -97,9 +97,9 @@ void fmi2ModelExchangeObject::setTime(fmi2Real time)
         }
     }
 }
-void fmi2ModelExchangeObject::setStates(const fmi2Real x[])
+void fmi2ModelExchangeObject::setStates(const fmi2Real states[])
 {
-    auto ret = ModelExchangeFunctions->fmi2SetContinuousStates(comp, x, numStates);
+    auto ret = ModelExchangeFunctions->fmi2SetContinuousStates(comp, states, numStates);
     if (ret != fmi2Status::fmi2OK) {
         handleNonOKReturnValues(ret);
     }

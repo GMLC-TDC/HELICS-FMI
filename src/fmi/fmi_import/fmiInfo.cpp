@@ -176,7 +176,7 @@ FmiVariableSet FmiInfo::getReferenceSet(const std::vector<std::string>& variable
 {
     FmiVariableSet vset;
     for (const auto& vname : variableList) {
-        const auto &vref = getVariableInfo(vname);
+        const auto& vref = getVariableInfo(vname);
         if (vref.valueRef > 0) {
             vset.push(vref.valueRef);
         }
@@ -186,7 +186,7 @@ FmiVariableSet FmiInfo::getReferenceSet(const std::vector<std::string>& variable
 
 FmiVariableSet FmiInfo::getVariableSet(const std::string& variable) const
 {
-    const auto &vref = getVariableInfo(variable);
+    const auto& vref = getVariableInfo(variable);
     if (vref.valueRef > 0) {
         return {vref.valueRef};
     }

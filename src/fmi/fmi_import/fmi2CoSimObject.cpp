@@ -70,7 +70,7 @@ void fmi2CoSimObject::doStep(fmi2Real currentCommunicationPoint,
     auto ret = CoSimFunctions->fmi2DoStep(comp,
                                           currentCommunicationPoint,
                                           communicationStepSize,
-                                          noSetFMUStatePriorToCurrentPoint?fmi2True:fmi2False);
+                                          noSetFMUStatePriorToCurrentPoint ? fmi2True : fmi2False);
     if (ret != fmi2Status::fmi2OK) {
         if (ret == fmi2Status::fmi2Pending) {
             stepPending = true;

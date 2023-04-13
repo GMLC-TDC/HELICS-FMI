@@ -30,8 +30,12 @@ void fmi2Object::setupExperiment(bool toleranceDefined,
                                  bool stopTimeDefined,
                                  fmi2Real stopTime)
 {
-    auto ret = commonFunctions->fmi2SetupExperiment(
-        comp, toleranceDefined?fmi2True:fmi2False, tolerance, startTime, stopTimeDefined?fmi2True:fmi2False, stopTime);
+    auto ret = commonFunctions->fmi2SetupExperiment(comp,
+                                                    toleranceDefined ? fmi2True : fmi2False,
+                                                    tolerance,
+                                                    startTime,
+                                                    stopTimeDefined ? fmi2True : fmi2False,
+                                                    stopTime);
     if (ret != fmi2Status::fmi2OK) {
         handleNonOKReturnValues(ret);
     }
@@ -87,8 +91,7 @@ void fmi2Object::setMode(FmuMode mode)
                     break;
                 case FmuMode::EVENT:
                 case FmuMode::STEP:
-                    fmi2Object::setMode(
-                        FmuMode::INITIALIZATION);  // go into initialization first
+                    fmi2Object::setMode(FmuMode::INITIALIZATION);  // go into initialization first
                     ret = commonFunctions->fmi2ExitInitializationMode(comp);
             }
             break;
@@ -196,7 +199,7 @@ bool fmi2Object::setFlag(const std::string& param, bool val)
         noFree = val;
         return true;
     }
-    auto &ref = info->getVariableInfo(param);
+    const auto& ref = info->getVariableInfo(param);
     fmi2Status ret{fmi2Status::fmi2Discard};
     switch (ref.type._value) {
         case fmi_variable_type::boolean: {

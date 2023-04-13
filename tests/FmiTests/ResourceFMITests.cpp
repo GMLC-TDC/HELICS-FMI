@@ -122,7 +122,7 @@ TEST(resource, runModeSequence)
     EXPECT_EQ(fmiObj->getCurrentMode(), FmuMode::INITIALIZATION);
 
     fmiObj->setMode(FmuMode::CONTINUOUS_TIME);  // this mode is not valid for cosim object so
-                                                   // going to stepMode
+                                                // going to stepMode
     EXPECT_EQ(fmiObj->getCurrentMode(), FmuMode::STEP);
 
     fmiObj->setMode(FmuMode::TERMINATED);
@@ -152,7 +152,7 @@ TEST(resource, csExecution)
     EXPECT_EQ(fmiObj->getCurrentMode(), FmuMode::INITIALIZATION);
 
     fmiObj->setMode(FmuMode::CONTINUOUS_TIME);  // this mode is not valid for cosim object so
-                                                   // going to stepMode
+                                                // going to stepMode
     EXPECT_EQ(fmiObj->getCurrentMode(), FmuMode::STEP);
 
     double time = 0;
