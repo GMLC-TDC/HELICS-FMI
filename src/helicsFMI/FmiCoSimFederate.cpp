@@ -186,7 +186,7 @@ double CoSimFederate::initialize(double stop, std::ofstream& ofile)
     }
 
     cs->setupExperiment(
-        fmi2False, 0, static_cast<double>(timeBias), 1, static_cast<double>(timeBias + stop));
+        false, 0, static_cast<double>(timeBias), true, static_cast<double>(timeBias + stop));
     auto cmd = fed.getCommand();
     while (!cmd.first.empty()) {
         runCommand(cmd.first);

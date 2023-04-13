@@ -120,10 +120,10 @@ class FmiVariableSet {
     FmiVariableSet();
     FmiVariableSet(fmi2ValueReference newvr);
     FmiVariableSet(const FmiVariableSet& vset);
-    FmiVariableSet(FmiVariableSet&& vset);
+    FmiVariableSet(FmiVariableSet&& vset) noexcept;
 
     FmiVariableSet& operator=(const FmiVariableSet& other);
-    FmiVariableSet& operator=(FmiVariableSet&& other);
+    FmiVariableSet& operator=(FmiVariableSet&& other) noexcept;
 
     const fmi2ValueReference* getValueRef() const;
     size_t getVRcount() const;

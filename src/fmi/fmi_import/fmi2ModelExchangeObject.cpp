@@ -13,8 +13,8 @@ fmi2ModelExchangeObject::fmi2ModelExchangeObject(
     std::shared_ptr<const FmiInfo> keyInfo,
     std::shared_ptr<const fmiCommonFunctions> comFunc,
     std::shared_ptr<const fmiModelExchangeFunctions> meFunc):
-    fmi2Object(fmuname, cmp, keyInfo, comFunc),
-    ModelExchangeFunctions(meFunc)
+    fmi2Object(fmuname, cmp, std::move(keyInfo), std::move(comFunc)),
+    ModelExchangeFunctions(std::move(meFunc))
 {
     numIndicators = info->getCounts(fmiVariableType::event);
     numStates = info->getCounts(fmiVariableType::state);
@@ -118,17 +118,17 @@ void fmi2ModelExchangeObject::getEventIndicators(fmi2Real eventIndicators[]) con
         handleNonOKReturnValues(ret);
     }
 }
-void fmi2ModelExchangeObject::getStates(fmi2Real x[]) const
+void fmi2ModelExchangeObject::getStates(fmi2Real states[]) const
 {
-    auto ret = ModelExchangeFunctions->fmi2GetContinuousStates(comp, x, numStates);
+    auto ret = ModelExchangeFunctions->fmi2GetContinuousStates(comp, states, numStates);
     if (ret != fmi2Status::fmi2OK) {
         handleNonOKReturnValues(ret);
     }
 }
-void fmi2ModelExchangeObject::getNominalsOfContinuousStates(fmi2Real x_nominal[]) const
+void fmi2ModelExchangeObject::getNominalsOfContinuousStates(fmi2Real nominalValues[]) const
 {
     auto ret =
-        ModelExchangeFunctions->fmi2GetNominalsOfContinuousStates(comp, x_nominal, numStates);
+        ModelExchangeFunctions->fmi2GetNominalsOfContinuousStates(comp, nominalValues, numStates);
     if (ret != fmi2Status::fmi2OK) {
         handleNonOKReturnValues(ret);
     }

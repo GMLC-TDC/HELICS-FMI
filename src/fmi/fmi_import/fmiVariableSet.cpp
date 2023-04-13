@@ -14,11 +14,11 @@ FmiVariableSet::FmiVariableSet() = default;
 FmiVariableSet::FmiVariableSet(fmi2ValueReference newvr): vrset({newvr}) {}
 FmiVariableSet::FmiVariableSet(const FmiVariableSet& vset) = default;
 
-FmiVariableSet::FmiVariableSet(FmiVariableSet&& vset) = default;
+FmiVariableSet::FmiVariableSet(FmiVariableSet&& vset) noexcept = default;
 
 FmiVariableSet& FmiVariableSet::operator=(const FmiVariableSet& other) = default;
 
-FmiVariableSet& FmiVariableSet::operator=(FmiVariableSet&& other) = default;
+FmiVariableSet& FmiVariableSet::operator=(FmiVariableSet&& other) noexcept = default;
 
 const fmi2ValueReference* FmiVariableSet::getValueRef() const
 {
@@ -58,6 +58,6 @@ void FmiVariableSet::clear()
 
 void FmiVariableSet::remove(fmi2ValueReference rmvr)
 {
-    auto rm = std::remove(vrset.begin(), vrset.end(), rmvr);
-    vrset.erase(rm, vrset.end());
+    auto removeIndex = std::remove(vrset.begin(), vrset.end(), rmvr);
+    vrset.erase(removeIndex, vrset.end());
 }
