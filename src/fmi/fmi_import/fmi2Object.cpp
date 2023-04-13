@@ -196,7 +196,7 @@ bool fmi2Object::setFlag(const std::string& param, bool val)
         noFree = val;
         return true;
     }
-    auto ref = info->getVariableInfo(param);
+    auto &ref = info->getVariableInfo(param);
     fmi2Status ret{fmi2Status::fmi2Discard};
     switch (ref.type._value) {
         case fmi_variable_type::boolean: {

@@ -176,7 +176,7 @@ FmiVariableSet FmiInfo::getReferenceSet(const std::vector<std::string>& variable
 {
     FmiVariableSet vset;
     for (const auto& vname : variableList) {
-        auto vref = getVariableInfo(vname);
+        const auto &vref = getVariableInfo(vname);
         if (vref.valueRef > 0) {
             vset.push(vref.valueRef);
         }
@@ -186,7 +186,7 @@ FmiVariableSet FmiInfo::getReferenceSet(const std::vector<std::string>& variable
 
 FmiVariableSet FmiInfo::getVariableSet(const std::string& variable) const
 {
-    auto vref = getVariableInfo(variable);
+    const auto &vref = getVariableInfo(variable);
     if (vref.valueRef > 0) {
         return {vref.valueRef};
     }
@@ -630,7 +630,7 @@ static void loadDependencies(std::shared_ptr<readerElement>& reader,
         auto attDepKind = reader->getAttribute(depKindString);
         auto row = static_cast<index_t>(att.getValue());
         auto dep = gmlc::utilities::str2vector<int>(attDep.getText(), 0, " ");
-        auto depknd = (attDepKind.isValid()) ?
+        gmlc::utilities::stringVector depknd = (attDepKind.isValid()) ?
             gmlc::utilities::stringOps::splitline(
                 attDepKind.getText(), " ", gmlc::utilities::stringOps::delimiter_compression::on) :
             gmlc::utilities::stringVector();
