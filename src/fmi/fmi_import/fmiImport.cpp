@@ -118,7 +118,7 @@ fmiCoSimFunctions::fmiCoSimFunctions(std::shared_ptr<boost::dll::shared_library>
 
 FmiLibrary::FmiLibrary(): logger(std::make_shared<FmiLogger>())
 {
-    information = std::make_shared<fmiInfo>();
+    information = std::make_shared<FmiInfo>();
 }
 
 FmiLibrary::FmiLibrary(const std::string& fmuPath): FmiLibrary()
@@ -129,7 +129,7 @@ FmiLibrary::FmiLibrary(const std::string& fmuPath): FmiLibrary()
 FmiLibrary::FmiLibrary(const std::string& fmuPath, const std::string& extractPath):
     extractDirectory(extractPath), fmuName(fmuPath)
 {
-    information = std::make_shared<fmiInfo>();
+    information = std::make_shared<FmiInfo>();
     if (!exists(extractDirectory)) {
         create_directories(extractDirectory);
     }

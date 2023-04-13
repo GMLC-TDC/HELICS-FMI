@@ -186,14 +186,14 @@ double CoSimFederate::initialize(double stop, std::ofstream& ofile)
     }
 
     cs->setupExperiment(
-        fmi2False, 0, static_cast<double>(timeBias), 1, static_cast<double>(timeBias + stop));
+        false, 0, static_cast<double>(timeBias), true, static_cast<double>(timeBias + stop));
     auto cmd = fed.getCommand();
     while (!cmd.first.empty()) {
         runCommand(cmd.first);
         cmd = fed.getCommand();
     }
     fed.enterInitializingMode();
-    cs->setMode(fmuMode::initializationMode);
+    cs->setMode(FmuMode::INITIALIZATION);
     if (captureOutput) {
         ofile << "time,";
         for (auto& pub : pubs) {
@@ -246,7 +246,7 @@ void CoSimFederate::run(helics::Time stop)
         }
         fed.enterExecutingMode();
     }
-    cs->setMode(fmuMode::stepMode);
+    cs->setMode(FmuMode::STEP);
 
     helics::Time currentTime = helics::timeZero;
     while (currentTime + timeBias + stepTime <= stop) {

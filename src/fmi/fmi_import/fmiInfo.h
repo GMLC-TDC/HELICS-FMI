@@ -32,7 +32,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 /** data class containing the default experiment information*/
-class fmuDefaultExpirement {
+class FmuDefaultExpirement {
   public:
     double startTime = 0.0;
     double stopTime = 0.0;
@@ -41,7 +41,7 @@ class fmuDefaultExpirement {
 };
 
 /** data class containing information about a variable*/
-class variableInformation {
+class VariableInformation {
   public:
     int index = -1;
     int derivativeIndex = -1;
@@ -64,25 +64,25 @@ class variableInformation {
     double max = 1e48;
 };
 
-class unitDef {
+class FmiUnitDef {
   public:
     std::string name;
     double factor{1.0};
     double offset{0.0};
-    unitDef() = default;
-    unitDef(std::string_view n, double mult): name(n), factor(mult) {}
+    FmiUnitDef() = default;
+    FmiUnitDef(std::string_view n, double mult): name(n), factor(mult) {}
 };
 
 /** data class for storing fmi unit information*/
-class fmiUnit: public unitDef {
+class FmiUnit: public FmiUnitDef {
   public:
-    std::vector<unitDef> baseUnits;
-    std::vector<unitDef> displayUnits;
+    std::vector<FmiUnitDef> baseUnits;
+    std::vector<FmiUnitDef> displayUnits;
     units::precise_unit unitValue;
 };
 
 /**data class matching the definition of an FMI type*/
-class fmiTypeDefinition {
+class FmiTypeDefinition {
   public:
     std::string name;
     std::string description;
@@ -98,32 +98,32 @@ class fmiTypeDefinition {
 };
 
 /** class defining a single variable */
-class fmiVariable {
+class FmiVariable {
   public:
     fmi2ValueReference vRef{static_cast<fmi2ValueReference>(-1)};
     fmi_variable_type type{fmi_variable_type::unknown};
     int index{-1};
-    fmiVariable() = default;
-    fmiVariable(fmi2ValueReference ref, fmi_variable_type type1, int startIndex):
+    FmiVariable() = default;
+    FmiVariable(fmi2ValueReference ref, fmi_variable_type type1, int startIndex):
         vRef{ref}, type(type1), index{startIndex}
     {
     }
-    fmiVariable(const variableInformation& var):
+    FmiVariable(const VariableInformation& var):
         vRef{var.valueRef}, type(var.type), index(var.index)
     {
     }
 };
 
 /** class for storing references to fmi variables*/
-class fmiVariableSet {
+class FmiVariableSet {
   public:
-    fmiVariableSet();
-    fmiVariableSet(fmi2ValueReference newvr);
-    fmiVariableSet(const fmiVariableSet& vset);
-    fmiVariableSet(fmiVariableSet&& vset);
+    FmiVariableSet();
+    FmiVariableSet(fmi2ValueReference newvr);
+    FmiVariableSet(const FmiVariableSet& vset);
+    FmiVariableSet(FmiVariableSet&& vset) noexcept;
 
-    fmiVariableSet& operator=(const fmiVariableSet& other);
-    fmiVariableSet& operator=(fmiVariableSet&& other);
+    FmiVariableSet& operator=(const FmiVariableSet& other);
+    FmiVariableSet& operator=(FmiVariableSet&& other) noexcept;
 
     const fmi2ValueReference* getValueRef() const;
     size_t getVRcount() const;
@@ -135,7 +135,7 @@ class fmiVariableSet {
     /** add a variable set the existing variable set*
     @param[in] vset the variableSet to add
     */
-    void push(const fmiVariableSet& vset);
+    void push(const FmiVariableSet& vset);
     /** reserve a set amount of space in the set
     @param[in] newSize the number of elements to reserve*/
     void reserve(size_t newSize);
@@ -150,16 +150,16 @@ class fmiVariableSet {
 
 class readerElement;
 /** class to extract and store the information in an FMU XML file*/
-class fmiInfo {
+class FmiInfo {
   private:
     std::map<std::string, std::string> headerInfo;  //!< the header information contained in strings
     double fmiVersion{0.0};  //!< the fmi version used
     // int numberOfEvents;  //!< the number of defined events
     int maxOrder{0};  //!< the maximum derivative order for CoSimulation FMU's
     std::bitset<32> capabilities;  //!< bitset containing the capabilities of the FMU
-    std::vector<variableInformation> variables;  //!< information all the defined variables
-    std::vector<fmiUnit> units;  //!< all the units defined in the FMU
-    fmuDefaultExpirement
+    std::vector<VariableInformation> variables;  //!< information all the defined variables
+    std::vector<FmiUnit> units;  //!< all the units defined in the FMU
+    FmuDefaultExpirement
         defaultExpirement;  //!< the information about the specified default experiment
 
     std::map<std::string, int>
@@ -180,13 +180,13 @@ class fmiInfo {
     std::vector<int> inputs;  //!< a list of the inputs
     int eventIndicators{0};  //!< number of event indicators
   public:
-    fmiInfo();
-    explicit fmiInfo(const std::string& fileName);
+    FmiInfo();
+    explicit FmiInfo(const std::string& fileName);
     int loadFile(const std::string& fileName);
     /** check if a given flag is set*/
     bool checkFlag(fmuCapabilityFlags flag) const;
 
-    const fmuDefaultExpirement& getExperiment() const { return defaultExpirement; }
+    const FmuDefaultExpirement& getExperiment() const { return defaultExpirement; }
     /** get the counts for various items in a fmu
     @param[in] countType the type of counts to get
     @return the count*/
@@ -194,18 +194,18 @@ class fmiInfo {
     const std::string& getString(const std::string& field) const;
     /** get a Real variable by name*/
     double getReal(const std::string& field) const;
-    const variableInformation& getVariableInfo(const std::string& variableName) const;
-    const variableInformation& getVariableInfo(unsigned int index) const;
+    const VariableInformation& getVariableInfo(const std::string& variableName) const;
+    const VariableInformation& getVariableInfo(unsigned int index) const;
     /** get a set of variables for the specified parameters*/
-    fmiVariableSet getReferenceSet(const std::vector<std::string>& variableList) const;
+    FmiVariableSet getReferenceSet(const std::vector<std::string>& variableList) const;
     /** get a variable set with a single member*/
-    fmiVariableSet getVariableSet(const std::string& variable) const;
+    FmiVariableSet getVariableSet(const std::string& variable) const;
     /** get a variable set with a single member based on index*/
-    fmiVariableSet getVariableSet(unsigned int index) const;
+    FmiVariableSet getVariableSet(unsigned int index) const;
     /** get a set of the current outputs*/
-    fmiVariableSet getOutputReference() const;
+    FmiVariableSet getOutputReference() const;
     /** get a set of the current inputs*/
-    fmiVariableSet getInputReference() const;
+    FmiVariableSet getInputReference() const;
     /** get a list of variable names by type
     @param[in] type the type of variable
     @return a vector of strings with the names of the variables
@@ -228,14 +228,14 @@ class fmiInfo {
     void loadStructure(std::shared_ptr<readerElement>& reader);
 };
 
-enum class fmuMode {
-    instantiatedMode,
-    initializationMode,
-    continuousTimeMode,
-    eventMode,
-    stepMode,  //!< step Mode is a synonym for event mode that make more sense for cosimulation
-    terminated,
-    error,
+enum class FmuMode {
+    INSTANTIATED,
+    INITIALIZATION,
+    CONTINUOUS_TIME,
+    EVENT,
+    STEP,  //!< step Mode is a synonym for event mode that make more sense for cosimulation
+    TERMINATED,
+    ERROR,
 };
 
-bool checkType(const variableInformation& info, fmi_variable_type type, fmi_causality caus);
+bool checkType(const VariableInformation& info, fmi_variable_type type, fmi_causality caus);

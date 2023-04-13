@@ -147,7 +147,7 @@ void FmiModelExchangeFederate::run(helics::Time stop)
     }
 
     fed.enterInitializingMode();
-    me->setMode(fmuMode::initializationMode);
+    me->setMode(FmuMode::INITIALIZATION);
 
     if (!pubs.empty()) {
         for (std::size_t ii = 0; ii < pubs.size(); ++ii) {
@@ -168,7 +168,7 @@ void FmiModelExchangeFederate::run(helics::Time stop)
         }
         fed.enterExecutingMode();
     }
-    me->setMode(fmuMode::continuousTimeMode);
+    me->setMode(FmuMode::CONTINUOUS_TIME);
 
     helics::Time currentTime = helics::timeZero;
     while (currentTime <= stop) {
