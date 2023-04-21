@@ -18,6 +18,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <cstdarg>
 #include <iostream>
 #include <map>
+#include <sstream>
 
 using path = std::filesystem::path;
 
@@ -443,10 +444,10 @@ void FmiLibrary::makeCallbackFunctions()
     callbacks->componentEnvironment = static_cast<void*>(logger.get());
 }
 
-void FmiLogger::logMessage(std::string_view message) const
+void FmiLogger::logMessage(std::string_view category, std::string_view message) const
 {
     if (loggerCallback) {
-        loggerCallback(message);
+        loggerCallback(category, message);
     } else {
         std::cout << message << std::endl;
     }
@@ -455,11 +456,11 @@ void FmiLogger::logMessage(std::string_view message) const
 void FmiLibrary::logMessage(std::string_view message) const
 {
     if (logger && logger->check()) {
-        logger->logMessage(message);
+        logger->logMessage("",message);
     }
 }
 
-static constexpr std::size_t cStringBufferSize{1000};
+static constexpr std::size_t cStringBufferSize{1024};
 
 void loggerFunc(fmi2ComponentEnvironment compEnv,
                 [[maybe_unused]] fmi2String instanceName,
@@ -478,8 +479,10 @@ void loggerFunc(fmi2ComponentEnvironment compEnv,
 
     auto* logger = reinterpret_cast<FmiLogger*>(compEnv);
     if (logger != nullptr && logger->check()) {
-        logger->logMessage(temp);
+        std::stringstream logstream;
+        logstream<<instanceName<<"("<<status<<"):"<<temp;
+        logger->logMessage(category,logstream.str());
     } else {
-        std::cout << message << std::endl;
+        std::cout <<instanceName<<"("<<status<<"):"<<temp<<std::endl;
     }
 }

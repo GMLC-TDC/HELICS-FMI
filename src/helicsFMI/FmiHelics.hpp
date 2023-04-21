@@ -49,4 +49,7 @@ void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index);
 /** set the default values of a fmi input to be the helics default so there isn't value problems*/
 void setDefault(helics::Input& inp, fmi2Object* fmiObj, std::size_t index);
 
+/** generate a helics log level from an FMI category description*/
+int fmiCategory2HelicsLogLevel(std::string_view category);
+
 }  // namespace helicsfmi

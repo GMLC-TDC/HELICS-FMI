@@ -19,12 +19,51 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/helicsVersion.hpp"
 #include "helicsFMI/FmiCoSimFederate.hpp"
 #include "helicsFMI/FmiModelExchangeFederate.hpp"
+#include <fmt/format.h>
 
 #include <filesystem>
 #include <iostream>
 #include <thread>
 
 namespace helicsfmi {
+
+
+#define LOG_ERROR(message) runnerLog(HELICS_LOG_LEVEL_ERROR, message)
+#define LOG_WARNING(message) runnerLog(HELICS_LOG_LEVEL_WARNING, message)
+
+#    define LOG_SUMMARY( message)                                                        \
+        if (logLevel >= HELICS_LOG_LEVEL_SUMMARY) {                                                   \
+            runnerLog(HELICS_LOG_LEVEL_SUMMARY,message);                                  \
+        }
+
+#    define LOG_CONNECTIONS(message)          \
+        if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {                                                   \
+            runnerLog(HELICS_LOG_LEVEL_CONNECTIONS,message);                                  \
+        }
+
+#    define LOG_INTERFACES(message)                \
+        if (logLevel >= HELICS_LOG_LEVEL_INTERFACES) {                                                   \
+            runnerLog(HELICS_LOG_LEVEL_INTERFACES,message);                                  \
+        }
+
+#        define LOG_TIMING(message)                 \
+        if (logLevel >= HELICS_LOG_LEVEL_TIMING) {                                                   \
+            runnerLog(HELICS_LOG_LEVEL_TIMING,message);                                  \
+        }
+#        define LOG_DATA_MESSAGES(message)            \
+        if (logLevel >= HELICS_LOG_LEVEL_DATA) {                                                   \
+            runnerLog(HELICS_LOG_LEVEL_DATA,message);                                  \
+        }
+#        define LOG_DEBUG_MESSAGES( message)              \
+        if (logLevel >= HELICS_LOG_LEVEL_DEBUG) {                                                   \
+            runnerLog(HELICS_LOG_LEVEL_DEBUG,message);                                  \
+        }
+
+
+#        define LOG_TRACE(message)                \
+        if (logLevel >= HELICS_LOG_LEVEL_TRACE) {                                                   \
+            runnerLog(HELICS_LOG_LEVEL_TRACE,message);                                  \
+        }
 
 FmiRunner::FmiRunner()
 {
@@ -145,14 +184,14 @@ int FmiRunner::load()
             broker = std::make_unique<helics::BrokerApp>(fedInfo.coreType, args);
             if (!broker->isConnected()) {
                 if (!broker->connect()) {
-                    std::cerr << "broker failed to connect" << std::endl;
+                    LOG_ERROR("broker failed to connect");
                     return errorTerminate(BROKER_CONNECT_FAILURE);
                 }
             }
-            std::cout << "started autobroker with args \"" << args << "\"" << std::endl;
+            LOG_SUMMARY(fmt::format("started autobroker with args \"{}\"",args));
         }
         catch (const std::exception& e) {
-            std::cerr << "error generating broker :" << e.what() << std::endl;
+            LOG_ERROR(fmt::format("error generating broker :{}",e.what()));
             return errorTerminate(BROKER_CONNECT_FAILURE);
         }
     }
@@ -179,18 +218,18 @@ int FmiRunner::load()
         fedInfo.brokerPort = -1;
         fedInfo.broker = broker->getAddress();
     }
-
-    std::cout << "starting core with args " << helics::generateFullCoreInitString(fedInfo)
-              << std::endl;
+    LOG_SUMMARY(fmt::format("starting core with args {}",helics::generateFullCoreInitString(fedInfo)));
+    
     core = std::make_unique<helics::CoreApp>(fedInfo.coreType,
                                              helics::generateFullCoreInitString(fedInfo));
     if (!core->isConnected()) {
         if (!core->connect()) {
             core.reset();
-            std::cerr << "core failed to connect" << std::endl;
+            LOG_ERROR("core failed to connect");
             return errorTerminate(CORE_CONNECT_FAILURE);
         }
     }
+    crptr=core->getCopyofCorePointer();
     if (inputs.empty()) {
         return errorTerminate(MISSING_FILE);
     }
@@ -204,13 +243,13 @@ int FmiRunner::load()
     if ((ext == ".fmu") || (ext == ".FMU")) {
         try {
             if (!fmi.loadFMU(inputFile)) {
-                std::cout << "error loading fmu: error code=" << fmi.getErrorCode() << std::endl;
+                LOG_ERROR(fmt::format("error loading fmu: error code={}",fmi.getErrorCode()));
                 return errorTerminate(INVALID_FMU);
             }
             if (cosimFmu && fmi.checkFlag(fmuCapabilityFlags::coSimulationCapable)) {
                 std::shared_ptr<fmi2CoSimObject> obj = fmi.createCoSimulationObject("obj1");
                 if (!obj) {
-                    std::cout << "unable to create cosim object " << std::endl;
+                    LOG_ERROR("unable to create cosim object ");
                     return errorTerminate(FMU_ERROR);
                 }
                 if (fedInfo.defName.empty()) {
@@ -224,7 +263,7 @@ int FmiRunner::load()
                 std::shared_ptr<fmi2ModelExchangeObject> obj =
                     fmi.createModelExchangeObject("obj1");
                 if (!obj) {
-                    std::cout << "unable to create model exchange object " << std::endl;
+                    LOG_ERROR("unable to create model exchange object");
                     return errorTerminate(FMU_ERROR);
                 }
                 if (fedInfo.defName.empty()) {
@@ -235,7 +274,7 @@ int FmiRunner::load()
             }
         }
         catch (const std::exception& e) {
-            std::cout << "error creating federate fmu: " << e.what() << std::endl;
+            LOG_ERROR(fmt::format("error creating federate fmu: {}",e.what()));
             return errorTerminate(FMU_ERROR);
         }
     } else if ((ext == ".json") || (ext == ".JSON")) {
@@ -245,7 +284,7 @@ int FmiRunner::load()
                 loadFile(system);
             }
             catch (const std::exception& e) {
-                std::cout << "error running system " << e.what() << std::endl;
+                LOG_ERROR(fmt::format("error loading system ",e.what()));
                 return errorTerminate(FILE_PROCESSING_ERROR);
             }
         } else {
@@ -262,7 +301,7 @@ int FmiRunner::load()
                 }
             }
             catch (const std::exception& e) {
-                std::cout << "error running system " << e.what() << std::endl;
+                LOG_ERROR(fmt::format("error loading system ",e.what()));
                 return errorTerminate(FILE_PROCESSING_ERROR);
             }
         } else {
@@ -279,7 +318,7 @@ int FmiRunner::load()
                 }
             }
             catch (const std::exception& e) {
-                std::cout << "error running system " << e.what() << std::endl;
+                LOG_ERROR(fmt::format("error loading system ",e.what()));
                 return errorTerminate(FILE_PROCESSING_ERROR);
             }
         } else {
@@ -295,10 +334,10 @@ int FmiRunner::load()
             } else {
                 used |= fmu->setFlag(flag, true);
             }
-            // TODO(PT) do the same for meFeds once the method is added
         }
+        // TODO(PT) do the same for meFeds once the method is added
         if (!used) {
-            std::cout << "flag " << flag << " was not recognized\n";
+            LOG_WARNING(fmt::format("flag {} was not recognized ",flag));
         }
     }
     return 0;
@@ -319,7 +358,7 @@ int FmiRunner::run(helics::Time stop)
         stop = stopTime;
     }
     if (stop < stepTime) {
-        std::cout << "stoptime < steptime check values\n";
+        LOG_WARNING(fmt::format("stoptime ({}) < steptime ({}), please check values ",static_cast<double>(stop),static_cast<double>(stepTime)));
     }
     // load each of the fmu's into its own thread
     std::vector<std::thread> threads(cosimFeds.size() + meFeds.size());
@@ -391,7 +430,7 @@ int FmiRunner::initialize()
 
     for (std::size_t ii = 0; ii < paramUsed.size(); ++ii) {
         if (paramUsed[ii] == 0) {
-            std::cout << "WARNING: " << setParameters[ii] << " is unused" << std::endl;
+            LOG_WARNING(fmt::format("parameter ({}) is unused ",setParameters[ii]));
         }
     }
     currentState = State::INITIALIZED;
@@ -407,6 +446,8 @@ int FmiRunner::close()
     }
     if (core) {
         core->waitForDisconnect();
+        crptr.reset();
+        core.reset();
     }
     currentState = State::CLOSED;
     return 0;
@@ -414,7 +455,7 @@ int FmiRunner::close()
 
 int FmiRunner::errorTerminate(int errorCode)
 {
-    std::cout << "error terminate with code " << errorCode << std::endl;
+    LOG_ERROR(fmt::format("error terminate with code {}",errorCode));
     if (broker) {
         broker->forceTerminate();
         broker.reset();
@@ -422,10 +463,12 @@ int FmiRunner::errorTerminate(int errorCode)
             if (!core->waitForDisconnect(std::chrono::milliseconds(150))) {
                 core->forceTerminate();
             }
+            crptr.reset();
             core.reset();
         }
     } else if (core) {
         core->forceTerminate();
+        crptr.reset();
         core.reset();
     }
     currentState = State::ERROR;
@@ -450,6 +493,30 @@ std::string FmiRunner::getFilePath(const std::string& file) const
     return {};
 }
 
+void FmiRunner::runnerLog(int loggingLevel, std::string_view message)
+{
+    if (loggingLevel > logLevel)
+    {
+        return;
+    }
+    if (core)
+    {
+        crptr->logMessage(helics::gLocalCoreId,logLevel,message);
+    }
+    else if (broker)
+    {
+        broker->sendCommand("log",message);
+    }
+    else if (logLevel <= HELICS_LOG_LEVEL_WARNING)
+    {
+        std::cerr<<message<<std::endl;
+    }
+    else
+    {
+        std::cout<<message<<'\n';
+    }
+}
+
 int FmiRunner::loadFile(readerElement& elem)
 {
     if (elem.hasAttribute("stoptime")) {
@@ -462,7 +529,7 @@ int FmiRunner::loadFile(readerElement& elem)
         auto fmilib = std::make_unique<FmiLibrary>();
         auto str = getFilePath(elem.getAttributeText("fmu"));
         if (str.empty()) {
-            std::cout << "unable to locate file " << elem.getAttributeText("fmu") << std::endl;
+            LOG_ERROR(fmt::format("unable to locate file {}" ,elem.getAttributeText("fmu")));
             return errorTerminate(MISSING_FILE);
         }
         fmilib->loadFMU(str);
@@ -470,7 +537,7 @@ int FmiRunner::loadFile(readerElement& elem)
             std::shared_ptr<fmi2CoSimObject> obj =
                 fmilib->createCoSimulationObject(elem.getAttributeText("name"));
             if (!obj) {
-                std::cout << "unable to create cosim object " << std::endl;
+                LOG_ERROR("unable to create cosim object");
                 return errorTerminate(FMU_ERROR);
             }
             auto name = obj->getName();
@@ -499,7 +566,7 @@ int FmiRunner::loadFile(readerElement& elem)
             std::shared_ptr<fmi2ModelExchangeObject> obj =
                 fmilib->createModelExchangeObject(elem.getAttributeText("name"));
             if (!obj) {
-                std::cout << "unable to create model exchange object " << std::endl;
+                LOG_ERROR("unable to create model exchange object ");
                 return errorTerminate(FMU_ERROR);
             }
             auto name = obj->getName();

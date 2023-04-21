@@ -82,6 +82,15 @@ catch (const std::exception& e) {
     throw;
 }
 
+void CoSimFederate::loadFMUInformation()
+{
+    if (cs) {
+        
+        cs->getLogger()->setLoggerCallback([this](std::string_view category, std::string_view message) {fed.logMessage(fmiCategory2HelicsLogLevel(category), message); });
+        input_list = cs->getInputNames();
+        output_list = cs->getOutputNames();
+    }
+}
 void CoSimFederate::configure(helics::Time step, helics::Time startTime)
 {
     timeBias = startTime;
@@ -225,6 +234,11 @@ bool CoSimFederate::setFlag(const std::string& flag, bool val)
         return true;
     }
     return false;
+}
+
+void CoSimFederate::logMessage(int helicsLogLevel, std::string_view message)
+{
+    fed.logMessage(helicsLogLevel,message);
 }
 
 void CoSimFederate::run(helics::Time stop)

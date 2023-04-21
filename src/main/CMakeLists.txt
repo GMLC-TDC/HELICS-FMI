@@ -16,6 +16,7 @@ add_library(helicsFmiRunner STATIC ${helics-fmi_sources} ${helics-fmi_headers})
 add_executable(helics-fmi helics-fmi-main.cpp)
 
 target_link_libraries(helicsFmiRunner PUBLIC helicsFMI)
+target_link_libraries(helicsFmiRunner PRIVATE fmt::fmt)
 target_include_directories(helicsFmiRunner PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(helics-fmi PUBLIC helicsFmiRunner)
