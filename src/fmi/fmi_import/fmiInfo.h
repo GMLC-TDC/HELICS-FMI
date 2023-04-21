@@ -115,10 +115,8 @@ class FmiVariable {
     }
 };
 
-
-class FmiLogCategories
-{
-public:
+class FmiLogCategories {
+  public:
     std::vector<std::string> categories;
     std::vector<std::string> descriptions;
 };
@@ -168,25 +166,20 @@ class FmiInfo {
     std::bitset<32> capabilities;  //!< bitset containing the capabilities of the FMU
     std::vector<VariableInformation> variables;  //!< information all the defined variables
     std::vector<FmiUnit> units;  //!< all the units defined in the FMU
-    std::vector<FmiTypeDefinition> types; //!< the types defined by the FMU
+    std::vector<FmiTypeDefinition> types;  //!< the types defined by the FMU
     /// Log Category information from the FMU
     FmiLogCategories logCategories;
     /// the information about the specified default experiment
-    FmuDefaultExpirement
-        defaultExpirement;  
+    FmuDefaultExpirement defaultExpirement;
 
-                            /// map translating strings to indices into the variables array      
-    std::map<std::string, int>
-        variableLookup;  
-                         /// the output dependency information
-    matrixDataOrdered<sparse_ordering::row_ordered, int>
-        outputDep;
+    /// map translating strings to indices into the variables array
+    std::map<std::string, int> variableLookup;
+    /// the output dependency information
+    matrixDataOrdered<sparse_ordering::row_ordered, int> outputDep;
     /// the derivative dependency information
-    matrixDataOrdered<sparse_ordering::row_ordered, int>
-        derivDep;
+    matrixDataOrdered<sparse_ordering::row_ordered, int> derivDep;
     /// the initial unknown dependency information
-    matrixDataOrdered<sparse_ordering::row_ordered, int>
-        unknownDep;  
+    matrixDataOrdered<sparse_ordering::row_ordered, int> unknownDep;
     std::vector<int> outputs;  //!< a list of the output indices
     std::vector<int> parameters;  //!< a list of all the parameters
     std::vector<int> local;  //!< a list of the local variables
@@ -242,7 +235,7 @@ class FmiInfo {
     void loadVariables(std::shared_ptr<readerElement>& reader);
     void loadUnitInformation(std::shared_ptr<readerElement>& reader);
     void loadTypeInformation(std::shared_ptr<readerElement>& reader);
-    void loadLoggingInformation(std::shared_ptr<readerElement> &reader);
+    void loadLoggingInformation(std::shared_ptr<readerElement>& reader);
     void loadStructure(std::shared_ptr<readerElement>& reader);
 };
 

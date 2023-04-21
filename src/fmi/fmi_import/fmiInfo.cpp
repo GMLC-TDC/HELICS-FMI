@@ -432,7 +432,6 @@ static void loadUnitInfo(std::shared_ptr<readerElement>& reader, FmiUnit& unitIn
 
 static void loadTypeInfo(std::shared_ptr<readerElement>& reader, FmiTypeDefinition& typeInfo);
 
-
 void FmiInfo::loadTypeInformation(std::shared_ptr<readerElement>& reader)
 {
     reader->bookmark();
@@ -461,15 +460,12 @@ void FmiInfo::loadLoggingInformation(std::shared_ptr<readerElement>& reader)
     reader->bookmark();
     reader->moveToFirstChild("LogCategories");
     reader->moveToFirstChild("Category");
-    
+
     while (reader->isValid()) {
         logCategories.categories.push_back(reader->getAttributeText("name"));
-        if (reader->hasAttribute("description"))
-        {
+        if (reader->hasAttribute("description")) {
             logCategories.descriptions.push_back(reader->getAttributeText("description"));
-        }
-        else
-        {
+        } else {
             logCategories.descriptions.push_back("");
         }
         reader->moveToNextSibling("Category");
@@ -479,15 +475,13 @@ void FmiInfo::loadLoggingInformation(std::shared_ptr<readerElement>& reader)
 
 static void loadTypeInfo(std::shared_ptr<readerElement>& reader, FmiTypeDefinition& typeInfo)
 {
-    
     typeInfo.name = reader->getAttributeText("name");
-    if (reader->hasAttribute("description"))
-    {
-        typeInfo.description=reader->getAttributeText("description");
+    if (reader->hasAttribute("description")) {
+        typeInfo.description = reader->getAttributeText("description");
     }
-    
+
     if (reader->hasElement("Real")) {
-        typeInfo.type=fmi_variable_type::real;
+        typeInfo.type = fmi_variable_type::real;
         reader->moveToFirstChild("Real");
         auto att = reader->getFirstAttribute();
         while (att.isValid()) {
@@ -497,9 +491,9 @@ static void loadTypeInfo(std::shared_ptr<readerElement>& reader, FmiTypeDefiniti
                 typeInfo.unit = att.getText();
             } else if (att.getName() == "displayUnit") {
                 typeInfo.displayUnit = att.getText();
-                
+
             } else if (att.getName() == "relativeQuantity") {
-                typeInfo.relativeQuantity = att.getValue()!=0;
+                typeInfo.relativeQuantity = att.getValue() != 0;
 
             } else if (att.getName() == "min") {
                 typeInfo.min = att.getValue();
@@ -510,35 +504,31 @@ static void loadTypeInfo(std::shared_ptr<readerElement>& reader, FmiTypeDefiniti
             } else if (att.getName() == "nominal") {
                 typeInfo.unit = att.getValue();
 
-           } else if (att.getName() == "unbounded") {
-            typeInfo.unbounded =att.getValue()!=0;
-
-          }
+            } else if (att.getName() == "unbounded") {
+                typeInfo.unbounded = att.getValue() != 0;
+            }
             att = reader->getNextAttribute();
         }
         reader->moveToParent();
-    }
-    else if (reader->hasElement("Integer")) {
-        typeInfo.type=fmi_variable_type::integer;
+    } else if (reader->hasElement("Integer")) {
+        typeInfo.type = fmi_variable_type::integer;
         reader->moveToFirstChild("Integer");
         auto att = reader->getFirstAttribute();
         while (att.isValid()) {
             if (att.getName() == "quantity") {
                 typeInfo.quantity = att.getText();
-           
+
             } else if (att.getName() == "min") {
                 typeInfo.min = att.getValue();
 
-            }
-            else if (att.getName() == "max") {
+            } else if (att.getName() == "max") {
                 typeInfo.max = att.getValue();
             }
             att = reader->getNextAttribute();
         }
         reader->moveToParent();
-    }
-    else if (reader->hasElement("Enumeration")) {
-        typeInfo.type=fmi_variable_type::enumeration;
+    } else if (reader->hasElement("Enumeration")) {
+        typeInfo.type = fmi_variable_type::enumeration;
         reader->moveToFirstChild("Enumeration");
         auto att = reader->getFirstAttribute();
         while (att.isValid()) {
@@ -548,12 +538,10 @@ static void loadTypeInfo(std::shared_ptr<readerElement>& reader, FmiTypeDefiniti
             att = reader->getNextAttribute();
         }
         reader->moveToParent();
-    }
-    else if (reader->hasElement("String")) {
-        typeInfo.type=fmi_variable_type::string;
-    }
-    else if (reader->hasElement("Boolean")) {
-        typeInfo.type=fmi_variable_type::boolean;
+    } else if (reader->hasElement("String")) {
+        typeInfo.type = fmi_variable_type::string;
+    } else if (reader->hasElement("Boolean")) {
+        typeInfo.type = fmi_variable_type::boolean;
     }
 }
 /** load a single variable information from the XML

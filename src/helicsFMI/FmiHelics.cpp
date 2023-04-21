@@ -124,18 +124,18 @@ void setDefault(helics::Input& inp, fmi2Object* fmiObj, std::size_t index)
     }
 }
 
-static const std::unordered_map<std::string_view, int> logLevelsTranslation
-{ {"logEvents",HELICS_LOG_LEVEL_DEBUG},
-    {"logSingularLinearSystems",HELICS_LOG_LEVEL_DATA},
-    {"logNonLinearSystems",HELICS_LOG_LEVEL_DATA},
-    {"logDynamicStateSelection",HELICS_LOG_LEVEL_DATA},
-    {"logStatusWarning",HELICS_LOG_LEVEL_WARNING},
-    {"logStatusDiscard",HELICS_LOG_LEVEL_WARNING},
-    {"logStatusError",HELICS_LOG_LEVEL_ERROR},
-    {"logStatusFatal",HELICS_LOG_LEVEL_ERROR},
-    {"logStatusPending",HELICS_LOG_LEVEL_TIMING},
-    {"logAll",HELICS_LOG_LEVEL_DEBUG},
-// the rest are HELICS logging levels
+static const std::unordered_map<std::string_view, int> logLevelsTranslation{
+    {"logEvents", HELICS_LOG_LEVEL_DEBUG},
+    {"logSingularLinearSystems", HELICS_LOG_LEVEL_DATA},
+    {"logNonLinearSystems", HELICS_LOG_LEVEL_DATA},
+    {"logDynamicStateSelection", HELICS_LOG_LEVEL_DATA},
+    {"logStatusWarning", HELICS_LOG_LEVEL_WARNING},
+    {"logStatusDiscard", HELICS_LOG_LEVEL_WARNING},
+    {"logStatusError", HELICS_LOG_LEVEL_ERROR},
+    {"logStatusFatal", HELICS_LOG_LEVEL_ERROR},
+    {"logStatusPending", HELICS_LOG_LEVEL_TIMING},
+    {"logAll", HELICS_LOG_LEVEL_DEBUG},
+    // the rest are HELICS logging levels
     {"error", HELICS_LOG_LEVEL_ERROR},
     {"profiling", HELICS_LOG_LEVEL_PROFILING},
     {"warning", HELICS_LOG_LEVEL_WARNING},
@@ -178,18 +178,15 @@ static const std::unordered_map<std::string_view, int> logLevelsTranslation
 
 int fmiCategory2HelicsLogLevel(std::string_view category)
 {
-    auto llevel=logLevelsTranslation.find(category);
-    if (llevel != logLevelsTranslation.end())
-    {
+    auto llevel = logLevelsTranslation.find(category);
+    if (llevel != logLevelsTranslation.end()) {
         return llevel->second;
     }
-    if (category.find("arning") != std::string::npos)
-    {
-        //first letter is missing, capitalization shouldn't matter and there isn't much confusion
+    if (category.find("arning") != std::string::npos) {
+        // first letter is missing, capitalization shouldn't matter and there isn't much confusion
         return HELICS_LOG_LEVEL_WARNING;
     }
-    if (category.find("rror") != std::string::npos)
-    {
+    if (category.find("rror") != std::string::npos) {
         return HELICS_LOG_LEVEL_ERROR;
     }
     return HELICS_LOG_LEVEL_DEBUG;

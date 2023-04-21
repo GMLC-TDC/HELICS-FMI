@@ -82,7 +82,8 @@ class CoSimFederate {
     /** get the underlying HELICS federate*/
     helics::ValueFederate* operator->() { return &fed; }
 
-    void logMessage(int logLevel,std::string_view message);
+    void logMessage(int logLevel, std::string_view message);
+
   private:
     double initialize(double stop, std::ofstream& ofile);
     void loadFMUInformation();

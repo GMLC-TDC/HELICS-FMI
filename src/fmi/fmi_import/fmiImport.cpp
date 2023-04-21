@@ -456,7 +456,7 @@ void FmiLogger::logMessage(std::string_view category, std::string_view message) 
 void FmiLibrary::logMessage(std::string_view message) const
 {
     if (logger && logger->check()) {
-        logger->logMessage("",message);
+        logger->logMessage("", message);
     }
 }
 
@@ -480,9 +480,9 @@ void loggerFunc(fmi2ComponentEnvironment compEnv,
     auto* logger = reinterpret_cast<FmiLogger*>(compEnv);
     if (logger != nullptr && logger->check()) {
         std::stringstream logstream;
-        logstream<<instanceName<<"("<<status<<"):"<<temp;
-        logger->logMessage(category,logstream.str());
+        logstream << instanceName << "(" << status << "):" << temp;
+        logger->logMessage(category, logstream.str());
     } else {
-        std::cout <<instanceName<<"("<<status<<"):"<<temp<<std::endl;
+        std::cout << instanceName << "(" << status << "):" << temp << std::endl;
     }
 }
