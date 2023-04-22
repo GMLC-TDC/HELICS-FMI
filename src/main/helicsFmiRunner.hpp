@@ -89,7 +89,7 @@ class FmiRunner {
     int close();
 
   private:
-    void runnerLog(int logLevel, std::string_view message);
+    void runnerLog(int loggingLevel, std::string_view message);
     int loadFile(readerElement& elem);
     int errorTerminate(int errorCode);
     /// @brief  find the full path for a file name

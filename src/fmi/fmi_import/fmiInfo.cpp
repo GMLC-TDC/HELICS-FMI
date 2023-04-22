@@ -466,7 +466,7 @@ void FmiInfo::loadLoggingInformation(std::shared_ptr<readerElement>& reader)
         if (reader->hasAttribute("description")) {
             logCategories.descriptions.push_back(reader->getAttributeText("description"));
         } else {
-            logCategories.descriptions.push_back("");
+            logCategories.descriptions.emplace_back();
         }
         reader->moveToNextSibling("Category");
     }

@@ -334,7 +334,13 @@ int FmiRunner::load()
                 used |= fmu->setFlag(flag, true);
             }
         }
-        // TODO(PT) do the same for meFeds once the method is added
+        for (auto& fmu : meFeds) {
+            if (flag.front() == '-') {
+                used |= fmu->setFlag(flag.substr(1), false);
+            } else {
+                used |= fmu->setFlag(flag, true);
+            }
+        }
         if (!used) {
             LOG_WARNING(fmt::format("flag {} was not recognized ", flag));
         }

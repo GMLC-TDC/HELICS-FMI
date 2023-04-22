@@ -35,7 +35,7 @@ class CoSimFederate {
     helics::Time timeBias{helics::timeZero};  //!< time shift for the federate
     std::string outputCaptureFile;
     bool captureOutput{false};
-
+    int logLevel{HELICS_LOG_LEVEL_SUMMARY};
   public:
     CoSimFederate(const std::string& name,
                   const std::string& fmu,
