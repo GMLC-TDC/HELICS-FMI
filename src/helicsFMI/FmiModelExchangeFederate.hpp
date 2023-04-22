@@ -115,7 +115,8 @@ class FmiModelExchangeFederate: public griddyn::SolvableObject {
                                   const double diffState[],
                                   const double deriv[],
                                   const griddyn::solverMode& sMode) noexcept override;
-private:
+
+  private:
     void loadFMUInformation();
 
     helics::ValueFederate fed;  //!< the federate

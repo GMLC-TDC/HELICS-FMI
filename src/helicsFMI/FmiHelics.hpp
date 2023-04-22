@@ -26,35 +26,35 @@ namespace helicsfmi {
 
 #define LOG_SUMMARY(message)                                                                       \
     if (logLevel >= HELICS_LOG_LEVEL_SUMMARY) {                                                    \
-        logMessage(HELICS_LOG_LEVEL_SUMMARY, message);                                              \
+        logMessage(HELICS_LOG_LEVEL_SUMMARY, message);                                             \
     }
 
 #define LOG_CONNECTIONS(message)                                                                   \
     if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {                                                \
-        logMessage(HELICS_LOG_LEVEL_CONNECTIONS, message);                                          \
+        logMessage(HELICS_LOG_LEVEL_CONNECTIONS, message);                                         \
     }
 
 #define LOG_INTERFACES(message)                                                                    \
     if (logLevel >= HELICS_LOG_LEVEL_INTERFACES) {                                                 \
-        logMessage(HELICS_LOG_LEVEL_INTERFACES, message);                                           \
+        logMessage(HELICS_LOG_LEVEL_INTERFACES, message);                                          \
     }
 
 #define LOG_TIMING(message)                                                                        \
     if (logLevel >= HELICS_LOG_LEVEL_TIMING) {                                                     \
-        logMessage(HELICS_LOG_LEVEL_TIMING, message);                                               \
+        logMessage(HELICS_LOG_LEVEL_TIMING, message);                                              \
     }
 #define LOG_DATA_MESSAGES(message)                                                                 \
     if (logLevel >= HELICS_LOG_LEVEL_DATA) {                                                       \
-        logMessage(HELICS_LOG_LEVEL_DATA, message);                                                 \
+        logMessage(HELICS_LOG_LEVEL_DATA, message);                                                \
     }
 #define LOG_DEBUG_MESSAGES(message)                                                                \
     if (logLevel >= HELICS_LOG_LEVEL_DEBUG) {                                                      \
-        logMessage(HELICS_LOG_LEVEL_DEBUG, message);                                                \
+        logMessage(HELICS_LOG_LEVEL_DEBUG, message);                                               \
     }
 
 #define LOG_TRACE(message)                                                                         \
     if (logLevel >= HELICS_LOG_LEVEL_TRACE) {                                                      \
-        logMessage(HELICS_LOG_LEVEL_TRACE, message);                                                \
+        logMessage(HELICS_LOG_LEVEL_TRACE, message);                                               \
     }
 
 // All errors derive from this one

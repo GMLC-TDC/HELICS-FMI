@@ -54,7 +54,6 @@ FmiModelExchangeFederate::FmiModelExchangeFederate(const std::string& name,
 
     me = fmi->createModelExchangeObject(name);
     loadFMUInformation();
-
 }
 
 FmiModelExchangeFederate::FmiModelExchangeFederate(const std::string& name,
@@ -71,7 +70,6 @@ catch (const std::exception& e) {
 
 FmiModelExchangeFederate::~FmiModelExchangeFederate() = default;
 
-
 void FmiModelExchangeFederate::loadFMUInformation()
 {
     if (me) {
@@ -87,7 +85,7 @@ void FmiModelExchangeFederate::loadFMUInformation()
 void FmiModelExchangeFederate::configure(helics::Time step, helics::Time startTime)
 {
     timeBias = startTime;
-    logLevel=fed.getIntegerProperty(HELICS_PROPERTY_INT_LOG_LEVEL);
+    logLevel = fed.getIntegerProperty(HELICS_PROPERTY_INT_LOG_LEVEL);
     for (const auto& input : input_list) {
         inputs.emplace_back(&fed, input);
     }
@@ -137,7 +135,6 @@ void FmiModelExchangeFederate::addConnection(const std::string& conn)
 {
     connections.push_back(conn);
 }
-
 
 bool FmiModelExchangeFederate::setFlag(const std::string& flag, bool val)
 {

@@ -101,13 +101,13 @@ TEST(exeTests, dualFedAsyncZMQ)
     auto str = out.get();
 }
 
-
 TEST(exeTests, singleFedLogging1)
 {
     const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
 
     /**test that things run to completion with auto broker*/
-    auto out = hfmi.runCaptureOutput(std::string("--autobroker --loglevel=interfaces --name=bb1 ") + bballFile);
+    auto out = hfmi.runCaptureOutput(std::string("--autobroker --loglevel=interfaces --name=bb1 ") +
+                                     bballFile);
     EXPECT_THAT(out, HasSubstr("bb1.h"));
     EXPECT_THAT(out, HasSubstr("2 publications"));
 }
