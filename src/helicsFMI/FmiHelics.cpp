@@ -56,7 +56,7 @@ void publishOutput(helics::Publication& pub, fmi2Object* fmiObj, std::size_t ind
             pub.publish(val != fmi2False);
             [[unlikely]] if (logValues)
             {
-               fmiObj->logMessage("data",fmt::format("publishing {} to {}",val,pub.getName()));
+                fmiObj->logMessage("data", fmt::format("publishing {} to {}", val, pub.getName()));
             }
         } break;
         case fmi_variable_type::integer:
@@ -65,7 +65,7 @@ void publishOutput(helics::Publication& pub, fmi2Object* fmiObj, std::size_t ind
             pub.publish(val);
             [[unlikely]] if (logValues)
             {
-                fmiObj->logMessage("data",fmt::format("publishing {} to {}",val,pub.getName()));
+                fmiObj->logMessage("data", fmt::format("publishing {} to {}", val, pub.getName()));
             }
         } break;
         case fmi_variable_type::real:
@@ -74,7 +74,7 @@ void publishOutput(helics::Publication& pub, fmi2Object* fmiObj, std::size_t ind
             pub.publish(val);
             [[unlikely]] if (logValues)
             {
-                fmiObj->logMessage("data",fmt::format("publishing {} to {}",val,pub.getName()));
+                fmiObj->logMessage("data", fmt::format("publishing {} to {}", val, pub.getName()));
             }
         } break;
         case fmi_variable_type::string:
@@ -83,16 +83,15 @@ void publishOutput(helics::Publication& pub, fmi2Object* fmiObj, std::size_t ind
             pub.publish(val);
             [[unlikely]] if (logValues)
             {
-                fmiObj->logMessage("data",fmt::format("publishing {} to {}",val,pub.getName()));
+                fmiObj->logMessage("data", fmt::format("publishing {} to {}", val, pub.getName()));
             }
         } break;
     }
 }
 
-void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index,bool logValues)
+void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index, bool logValues)
 {
-    if (!inp.isUpdated())
-    {
+    if (!inp.isUpdated()) {
         return;
     }
     const auto& var = fmiObj->getInput(static_cast<int>(index));
@@ -102,7 +101,7 @@ void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index,bool lo
             fmiObj->set(var, val);
             [[unlikely]] if (logValues)
             {
-                fmiObj->logMessage("data",fmt::format("received {} for {}",val,inp.getName()));
+                fmiObj->logMessage("data", fmt::format("received {} for {}", val, inp.getName()));
             }
         } break;
         case fmi_variable_type::integer:
@@ -111,7 +110,7 @@ void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index,bool lo
             fmiObj->set(var, val);
             [[unlikely]] if (logValues)
             {
-                fmiObj->logMessage("data",fmt::format("received {} for {}",val,inp.getName()));
+                fmiObj->logMessage("data", fmt::format("received {} for {}", val, inp.getName()));
             }
         } break;
         case fmi_variable_type::real:
@@ -120,7 +119,7 @@ void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index,bool lo
             fmiObj->set(var, val);
             [[unlikely]] if (logValues)
             {
-                fmiObj->logMessage("data",fmt::format("received {} for {}",val,inp.getName()));
+                fmiObj->logMessage("data", fmt::format("received {} for {}", val, inp.getName()));
             }
         } break;
         case fmi_variable_type::string:
@@ -129,7 +128,7 @@ void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index,bool lo
             fmiObj->set(var, val);
             [[unlikely]] if (logValues)
             {
-                fmiObj->logMessage("data",fmt::format("received {} for {}",val,inp.getName()));
+                fmiObj->logMessage("data", fmt::format("received {} for {}", val, inp.getName()));
             }
         } break;
     }

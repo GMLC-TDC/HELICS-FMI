@@ -79,9 +79,12 @@ std::string_view getHelicsTypeString(fmi_variable_type type);
 helics::DataType getHelicsType(fmi_variable_type type);
 
 /** publish output data to a helics publication*/
-void publishOutput(helics::Publication& pub, fmi2Object* fmiObj, std::size_t index, bool logValues=false);
+void publishOutput(helics::Publication& pub,
+                   fmi2Object* fmiObj,
+                   std::size_t index,
+                   bool logValues = false);
 /** direct helics input data to an input*/
-void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index, bool logValues=false);
+void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index, bool logValues = false);
 /** set the default values of a fmi input to be the helics default so there isn't value problems*/
 void setDefault(helics::Input& inp, fmi2Object* fmiObj, std::size_t index);
 

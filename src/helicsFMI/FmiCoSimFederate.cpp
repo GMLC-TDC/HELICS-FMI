@@ -255,7 +255,7 @@ void CoSimFederate::run(helics::Time stop)
     if (result == helics::IterationResult::ITERATING) {
         if (!inputs.empty()) {
             for (std::size_t ii = 0; ii < inputs.size(); ++ii) {
-                helicsfmi::grabInput(inputs[ii], cs.get(), ii,logLevel>=HELICS_LOG_LEVEL_DATA);
+                helicsfmi::grabInput(inputs[ii], cs.get(), ii, logLevel >= HELICS_LOG_LEVEL_DATA);
             }
         }
         fed.enterExecutingMode();
@@ -277,13 +277,13 @@ void CoSimFederate::run(helics::Time stop)
         if (!pubs.empty()) {
             // get the values to publish
             for (std::size_t ii = 0; ii < pubs.size(); ++ii) {
-                helicsfmi::publishOutput(pubs[ii], cs.get(), ii,logLevel>=HELICS_LOG_LEVEL_DATA);
+                helicsfmi::publishOutput(pubs[ii], cs.get(), ii, logLevel >= HELICS_LOG_LEVEL_DATA);
             }
         }
         if (!inputs.empty()) {
             // load the inputs
             for (std::size_t ii = 0; ii < inputs.size(); ++ii) {
-                helicsfmi::grabInput(inputs[ii], cs.get(), ii,logLevel>=HELICS_LOG_LEVEL_DATA);
+                helicsfmi::grabInput(inputs[ii], cs.get(), ii, logLevel >= HELICS_LOG_LEVEL_DATA);
             }
         }
         /* if (captureOutput) {

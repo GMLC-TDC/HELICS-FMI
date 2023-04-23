@@ -112,7 +112,6 @@ TEST(exeTests, singleFedLoggingInterfaces)
     EXPECT_THAT(out, HasSubstr("2 publications"));
 }
 
-
 TEST(exeTests, dualFedLoggingData)
 {
     helics::cleanupHelicsLibrary();
@@ -127,8 +126,6 @@ TEST(exeTests, dualFedLoggingData)
     helics::ValueFederate vFed("fed1", "--coretype=zmq --forcenewcore ");
 
     vFed.enterInitializingModeIterative();
-
-   
 
     auto qres = helics::vectorizeQueryResult(vFed.query("ftfedlog", "publications"));
 

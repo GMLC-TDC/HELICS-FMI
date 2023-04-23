@@ -222,7 +222,7 @@ class fmi2Object {
         return commonFunctions;
     }
 
-    const std::shared_ptr<FmiLogger> & getLogger() const { return logger; }
+    const std::shared_ptr<FmiLogger>& getLogger() const { return logger; }
 
     void setLogger(std::shared_ptr<FmiLogger> logFunction) { logger = std::move(logFunction); }
     /** set the logging callback*/
@@ -235,9 +235,8 @@ class fmi2Object {
 
     void logMessage(std::string_view category, std::string_view message)
     {
-        if (logger)
-        {
-            logger->logMessage(category,message);
+        if (logger) {
+            logger->logMessage(category, message);
         }
     }
     fmi2Component getFmiComponent() const { return comp; }
