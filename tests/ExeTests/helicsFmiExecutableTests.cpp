@@ -101,7 +101,7 @@ TEST(exeTests, dualFedAsyncZMQ)
     auto str = out.get();
 }
 
-TEST(exeTests, singleFedLogging1)
+TEST(exeTests, singleFedLoggingInterfaces)
 {
     const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
 
@@ -110,4 +110,48 @@ TEST(exeTests, singleFedLogging1)
                                      bballFile);
     EXPECT_THAT(out, HasSubstr("bb1.h"));
     EXPECT_THAT(out, HasSubstr("2 publications"));
+}
+
+
+TEST(exeTests, dualFedLoggingData)
+{
+    helics::cleanupHelicsLibrary();
+    const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
+
+    /**test that things run to completion with auto broker*/
+    auto out = hfmi.runCaptureOutputAsync(
+        std::string(
+            "--autobroker --coretype=zmq --step=0.1 --loglevel=data --stoptime=2.0 --name=ftfedlog --brokerargs=\"-f2 \" ") +
+        ftFile);
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    helics::ValueFederate vFed("fed1", "--coretype=zmq --forcenewcore ");
+
+    vFed.enterInitializingModeIterative();
+
+   
+
+    auto qres = helics::vectorizeQueryResult(vFed.query("ftfedlog", "publications"));
+
+    EXPECT_EQ(qres.size(), 5U);
+
+    auto& sub1 = vFed.registerSubscription(qres[0]);
+    sub1.setDefault(-20.0);
+    auto& sub2 = vFed.registerSubscription(qres[1]);
+    sub2.setDefault(-20.0);
+
+    qres = helics::vectorizeQueryResult(vFed.query("ftfedlog", "inputs"));
+    auto& pub1 = vFed.registerPublication<double>("");
+
+    pub1.addInputTarget(qres[0]);
+
+    vFed.enterExecutingMode();
+    auto time1 = vFed.requestTime(2.0);
+    EXPECT_LE(time1, 2.0);
+    pub1.publish(87.63);
+
+    vFed.finalize();
+    auto str = out.get();
+
+    EXPECT_THAT(str, HasSubstr("received 87.63"));
+    EXPECT_THAT(str, HasSubstr("publishing 87.63"));
 }

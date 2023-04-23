@@ -7,6 +7,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 
 #include "FmiHelics.hpp"
 
+#include <fmt/format.h>
 #include <unordered_map>
 
 namespace helicsfmi {
@@ -46,54 +47,90 @@ helics::DataType getHelicsType(fmi_variable_type type)
     }
 }
 
-void publishOutput(helics::Publication& pub, fmi2Object* fmiObj, std::size_t index)
+void publishOutput(helics::Publication& pub, fmi2Object* fmiObj, std::size_t index, bool logValues)
 {
     const auto& var = fmiObj->getOutput(static_cast<int>(index));
     switch (var.type) {
         case fmi_variable_type::boolean: {
             auto val = fmiObj->get<fmi2Boolean>(var);
             pub.publish(val != fmi2False);
+            [[unlikely]] if (logValues)
+            {
+               fmiObj->logMessage("data",fmt::format("publishing {} to {}",val,pub.getName()));
+            }
         } break;
         case fmi_variable_type::integer:
         case fmi_variable_type::enumeration: {
             auto val = fmiObj->get<std::int64_t>(var);
             pub.publish(val);
+            [[unlikely]] if (logValues)
+            {
+                fmiObj->logMessage("data",fmt::format("publishing {} to {}",val,pub.getName()));
+            }
         } break;
         case fmi_variable_type::real:
         case fmi_variable_type::numeric: {
             auto val = fmiObj->get<double>(var);
             pub.publish(val);
+            [[unlikely]] if (logValues)
+            {
+                fmiObj->logMessage("data",fmt::format("publishing {} to {}",val,pub.getName()));
+            }
         } break;
         case fmi_variable_type::string:
         default: {
             auto val = fmiObj->get<std::string_view>(var);
             pub.publish(val);
+            [[unlikely]] if (logValues)
+            {
+                fmiObj->logMessage("data",fmt::format("publishing {} to {}",val,pub.getName()));
+            }
         } break;
     }
 }
 
-void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index)
+void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index,bool logValues)
 {
+    if (!inp.isUpdated())
+    {
+        return;
+    }
     const auto& var = fmiObj->getInput(static_cast<int>(index));
     switch (var.type) {
         case fmi_variable_type::boolean: {
             auto val = inp.getValue<fmi2Boolean>();
             fmiObj->set(var, val);
+            [[unlikely]] if (logValues)
+            {
+                fmiObj->logMessage("data",fmt::format("received {} for {}",val,inp.getName()));
+            }
         } break;
         case fmi_variable_type::integer:
         case fmi_variable_type::enumeration: {
             auto val = inp.getValue<fmi2Integer>();
             fmiObj->set(var, val);
+            [[unlikely]] if (logValues)
+            {
+                fmiObj->logMessage("data",fmt::format("received {} for {}",val,inp.getName()));
+            }
         } break;
         case fmi_variable_type::real:
         case fmi_variable_type::numeric: {
             auto val = inp.getValue<fmi2Real>();
             fmiObj->set(var, val);
+            [[unlikely]] if (logValues)
+            {
+                fmiObj->logMessage("data",fmt::format("received {} for {}",val,inp.getName()));
+            }
         } break;
         case fmi_variable_type::string:
         default: {
             auto val = inp.getValue<std::string>();
             fmiObj->set(var, val);
+            [[unlikely]] if (logValues)
+            {
+                fmiObj->logMessage("data",fmt::format("received {} for {}",val,inp.getName()));
+            }
         } break;
     }
 }

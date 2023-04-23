@@ -508,7 +508,7 @@ void FmiRunner::runnerLog(int loggingLevel, std::string_view message)
     if (core) {
         crptr->logMessage(helics::gLocalCoreId, logLevel, message);
     } else if (broker) {
-        broker->sendCommand("log", message);
+        broker->sendCommand("broker",fmt::format("log {}", message));
     } else if (logLevel <= HELICS_LOG_LEVEL_WARNING) {
         std::cerr << message << std::endl;
     } else {
