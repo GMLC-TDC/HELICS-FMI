@@ -60,12 +60,21 @@ class FmiModelExchangeFederate: public griddyn::SolvableObject {
     /** run the cosimulation*/
     void run(helics::Time stop);
 
+    /** get the underlying HELICS federate*/
+    helics::ValueFederate* operator->() { return &fed; }
+
+    void logMessage(int logLevel, std::string_view message);
+
     /** set a parameter*/
     template<typename... Args>
     void set(Args&&... args)
     {
         me->set(std::forward<Args>(args)...);
     }
+
+    /** set flags on the object or federate*/
+    bool setFlag(const std::string& flag, bool val);
+
     virtual solver_index_type jacobianSize(const griddyn::solverMode& sMode) const override;
 
     virtual void guessCurrentValue(double time,
@@ -108,6 +117,8 @@ class FmiModelExchangeFederate: public griddyn::SolvableObject {
                                   const griddyn::solverMode& sMode) noexcept override;
 
   private:
+    void loadFMUInformation();
+
     helics::ValueFederate fed;  //!< the federate
     std::shared_ptr<fmi2ModelExchangeObject> me;  //!< the model exchange object
 
@@ -121,6 +132,7 @@ class FmiModelExchangeFederate: public griddyn::SolvableObject {
     std::vector<helics::Input> inputs;  //!< known subscriptions
     double stepSize{0.01};  //!< the default step size of the simulation
     std::unique_ptr<griddyn::SolverInterface> solver;
+    int logLevel{HELICS_LOG_LEVEL_SUMMARY};
 };
 
 }  // namespace helicsfmi

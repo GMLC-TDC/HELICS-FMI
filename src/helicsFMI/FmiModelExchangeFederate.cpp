@@ -27,20 +27,14 @@ FmiModelExchangeFederate::FmiModelExchangeFederate(const std::string& name,
     }
 
     me = fmi->createModelExchangeObject(name);
-    if (me) {
-        input_list = me->getInputNames();
-        output_list = me->getOutputNames();
-    }
+    loadFMUInformation();
 }
 
 FmiModelExchangeFederate::FmiModelExchangeFederate(const std::string& name,
                                                    std::shared_ptr<fmi2ModelExchangeObject> obj,
                                                    const helics::FederateInfo& fedInfo)
 try : fed(name, fedInfo), me(std::move(obj)) {
-    if (me) {
-        input_list = me->getInputNames();
-        output_list = me->getOutputNames();
-    }
+    loadFMUInformation();
 }
 catch (const std::exception& e) {
     std::cout << "error in constructor of federate:" << e.what() << std::endl;
@@ -59,10 +53,7 @@ FmiModelExchangeFederate::FmiModelExchangeFederate(const std::string& name,
     }
 
     me = fmi->createModelExchangeObject(name);
-    if (me) {
-        input_list = me->getInputNames();
-        output_list = me->getOutputNames();
-    }
+    loadFMUInformation();
 }
 
 FmiModelExchangeFederate::FmiModelExchangeFederate(const std::string& name,
@@ -70,10 +61,7 @@ FmiModelExchangeFederate::FmiModelExchangeFederate(const std::string& name,
                                                    helics::CoreApp& core,
                                                    const helics::FederateInfo& fedInfo)
 try : fed(name, core, fedInfo), me(std::move(obj)) {
-    if (me) {
-        input_list = me->getInputNames();
-        output_list = me->getOutputNames();
-    }
+    loadFMUInformation();
 }
 catch (const std::exception& e) {
     std::cout << "error in constructor of federate:" << e.what() << std::endl;
@@ -82,9 +70,22 @@ catch (const std::exception& e) {
 
 FmiModelExchangeFederate::~FmiModelExchangeFederate() = default;
 
+void FmiModelExchangeFederate::loadFMUInformation()
+{
+    if (me) {
+        me->getLogger()->setLoggerCallback(
+            [this](std::string_view category, std::string_view message) {
+                fed.logMessage(fmiCategory2HelicsLogLevel(category), message);
+            });
+        input_list = me->getInputNames();
+        output_list = me->getOutputNames();
+    }
+}
+
 void FmiModelExchangeFederate::configure(helics::Time step, helics::Time startTime)
 {
     timeBias = startTime;
+    logLevel = fed.getIntegerProperty(HELICS_PROPERTY_INT_LOG_LEVEL);
     for (const auto& input : input_list) {
         inputs.emplace_back(&fed, input);
     }
@@ -135,6 +136,24 @@ void FmiModelExchangeFederate::addConnection(const std::string& conn)
     connections.push_back(conn);
 }
 
+bool FmiModelExchangeFederate::setFlag(const std::string& flag, bool val)
+{
+    if (me->setFlag(flag, val)) {
+        return true;
+    }
+    const int param = helics::getFlagIndex(flag);
+    if (param != HELICS_INVALID_OPTION_INDEX) {
+        fed.setFlagOption(param, val);
+        return true;
+    }
+    return false;
+}
+
+void FmiModelExchangeFederate::logMessage(int helicsLogLevel, std::string_view message)
+{
+    fed.logMessage(helicsLogLevel, message);
+}
+
 void FmiModelExchangeFederate::run(helics::Time stop)
 {
     const auto& def = me->fmuInformation().getExperiment();
@@ -151,7 +170,7 @@ void FmiModelExchangeFederate::run(helics::Time stop)
 
     if (!pubs.empty()) {
         for (std::size_t ii = 0; ii < pubs.size(); ++ii) {
-            helicsfmi::publishOutput(pubs[ii], me.get(), ii);
+            helicsfmi::publishOutput(pubs[ii], me.get(), ii, logLevel >= HELICS_LOG_LEVEL_DATA);
         }
     }
     if (!inputs.empty()) {
@@ -163,7 +182,7 @@ void FmiModelExchangeFederate::run(helics::Time stop)
     if (result == helics::IterationResult::ITERATING) {
         if (!inputs.empty()) {
             for (std::size_t ii = 0; ii < inputs.size(); ++ii) {
-                helicsfmi::grabInput(inputs[ii], me.get(), ii);
+                helicsfmi::grabInput(inputs[ii], me.get(), ii, logLevel >= HELICS_LOG_LEVEL_DATA);
             }
         }
         fed.enterExecutingMode();
@@ -180,13 +199,13 @@ void FmiModelExchangeFederate::run(helics::Time stop)
         if (!pubs.empty()) {
             // get the values to publish
             for (std::size_t ii = 0; ii < pubs.size(); ++ii) {
-                helicsfmi::publishOutput(pubs[ii], me.get(), ii);
+                helicsfmi::publishOutput(pubs[ii], me.get(), ii, logLevel >= HELICS_LOG_LEVEL_DATA);
             }
         }
         if (!inputs.empty()) {
             // load the inputs
             for (std::size_t ii = 0; ii < inputs.size(); ++ii) {
-                helicsfmi::grabInput(inputs[ii], me.get(), ii);
+                helicsfmi::grabInput(inputs[ii], me.get(), ii, logLevel >= HELICS_LOG_LEVEL_DATA);
             }
         }
     }

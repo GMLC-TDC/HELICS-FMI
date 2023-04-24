@@ -12,6 +12,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/stringConversion.h"
 
 #include <algorithm>
+#include <fmt/format.h>
 #include <fstream>
 #include <iostream>
 #include <utility>
@@ -29,23 +30,17 @@ CoSimFederate::CoSimFederate(const std::string& name,
     }
 
     cs = fmi->createCoSimulationObject(name);
-    if (cs) {
-        input_list = cs->getInputNames();
-        output_list = cs->getOutputNames();
-    }
+    loadFMUInformation();
 }
 
 CoSimFederate::CoSimFederate(const std::string& name,
                              std::shared_ptr<fmi2CoSimObject> obj,
                              const helics::FederateInfo& fedInfo)
 try : fed(name, fedInfo), cs(std::move(obj)) {
-    if (cs) {
-        input_list = cs->getInputNames();
-        output_list = cs->getOutputNames();
-    }
+    loadFMUInformation();
 }
 catch (const std::exception& e) {
-    std::cout << "error in constructor of federate:" << e.what() << std::endl;
+    std::cerr << "error in constructor of federate:" << e.what() << std::endl;
     throw;
 }
 
@@ -61,10 +56,7 @@ CoSimFederate::CoSimFederate(const std::string& name,
     }
 
     cs = fmi->createCoSimulationObject(name);
-    if (cs) {
-        input_list = cs->getInputNames();
-        output_list = cs->getOutputNames();
-    }
+    loadFMUInformation();
 }
 
 CoSimFederate::CoSimFederate(const std::string& name,
@@ -72,24 +64,34 @@ CoSimFederate::CoSimFederate(const std::string& name,
                              helics::CoreApp& core,
                              const helics::FederateInfo& fedInfo)
 try : fed(name, core, fedInfo), cs(std::move(obj)) {
+    loadFMUInformation();
+}
+catch (const std::exception& e) {
+    std::cerr << "error in constructor of federate2:" << e.what() << std::endl;
+    throw;
+}
+
+void CoSimFederate::loadFMUInformation()
+{
     if (cs) {
+        cs->getLogger()->setLoggerCallback(
+            [this](std::string_view category, std::string_view message) {
+                fed.logMessage(fmiCategory2HelicsLogLevel(category), message);
+            });
         input_list = cs->getInputNames();
         output_list = cs->getOutputNames();
     }
 }
-catch (const std::exception& e) {
-    std::cout << "error in constructor of federate2:" << e.what() << std::endl;
-    throw;
-}
-
 void CoSimFederate::configure(helics::Time step, helics::Time startTime)
 {
     timeBias = startTime;
+    logLevel = fed.getIntegerProperty(HELICS_PROPERTY_INT_LOG_LEVEL);
     for (const auto& input : input_list) {
         const auto& inputInfo = cs->addInputVariable(input);
         if (inputInfo.index >= 0) {
             auto iType = helicsfmi::getHelicsType(inputInfo.type);
             inputs.emplace_back(&fed, input, iType);
+            LOG_INTERFACES(fmt::format("created input {}", inputs.back().getName()));
         } else {
             fed.logWarningMessage(input + " is not a recognized input");
         }
@@ -100,6 +102,7 @@ void CoSimFederate::configure(helics::Time step, helics::Time startTime)
         if (outputInfo.index >= 0) {
             auto iType = helicsfmi::getHelicsType(outputInfo.type);
             pubs.emplace_back(&fed, output, iType);
+            LOG_INTERFACES(fmt::format("created publication {}", pubs.back().getName()));
         } else {
             fed.logWarningMessage(output + " is not a recognized output");
         }
@@ -116,6 +119,10 @@ void CoSimFederate::configure(helics::Time step, helics::Time startTime)
     }
     fed.setProperty(HELICS_PROPERTY_TIME_PERIOD, step);
     stepTime = step;
+    LOG_SUMMARY(fmt::format("\n  co sim federate:\n\t{} inputs\n\t{} publications\n\tstep size={}",
+                            inputs.size(),
+                            pubs.size(),
+                            static_cast<double>(stepTime)));
 }
 
 void CoSimFederate::setInputs(std::vector<std::string> input_names)
@@ -159,6 +166,7 @@ void CoSimFederate::runCommand(const std::string& command)
     auto cvec = gmlc::utilities::stringOps::splitlineQuotes(
         command, " ,;:", "\"'`", gmlc::utilities::stringOps::delimiter_compression::on);
     if (cvec[0] == "set") {
+        LOG_DATA_MESSAGES(fmt::format("set command {}={}", cvec[1], cvec[2]));
         auto val =
             gmlc::utilities::numeric_conversionComplete<double>(cvec[2], helics::invalidDouble);
         if (val != helics::invalidDouble) {
@@ -211,6 +219,7 @@ double CoSimFederate::initialize(double stop, std::ofstream& ofile)
             helicsfmi::setDefault(inputs[ii], cs.get(), ii);
         }
     }
+    LOG_TIMING("initializing");
     return stop;
 }
 
@@ -227,6 +236,11 @@ bool CoSimFederate::setFlag(const std::string& flag, bool val)
     return false;
 }
 
+void CoSimFederate::logMessage(int helicsLogLevel, std::string_view message)
+{
+    fed.logMessage(helicsLogLevel, message);
+}
+
 void CoSimFederate::run(helics::Time stop)
 {
     std::ofstream ofile;
@@ -241,7 +255,7 @@ void CoSimFederate::run(helics::Time stop)
     if (result == helics::IterationResult::ITERATING) {
         if (!inputs.empty()) {
             for (std::size_t ii = 0; ii < inputs.size(); ++ii) {
-                helicsfmi::grabInput(inputs[ii], cs.get(), ii);
+                helicsfmi::grabInput(inputs[ii], cs.get(), ii, logLevel >= HELICS_LOG_LEVEL_DATA);
             }
         }
         fed.enterExecutingMode();
@@ -263,13 +277,13 @@ void CoSimFederate::run(helics::Time stop)
         if (!pubs.empty()) {
             // get the values to publish
             for (std::size_t ii = 0; ii < pubs.size(); ++ii) {
-                helicsfmi::publishOutput(pubs[ii], cs.get(), ii);
+                helicsfmi::publishOutput(pubs[ii], cs.get(), ii, logLevel >= HELICS_LOG_LEVEL_DATA);
             }
         }
         if (!inputs.empty()) {
             // load the inputs
             for (std::size_t ii = 0; ii < inputs.size(); ++ii) {
-                helicsfmi::grabInput(inputs[ii], cs.get(), ii);
+                helicsfmi::grabInput(inputs[ii], cs.get(), ii, logLevel >= HELICS_LOG_LEVEL_DATA);
             }
         }
         /* if (captureOutput) {

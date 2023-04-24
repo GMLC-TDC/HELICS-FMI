@@ -24,6 +24,7 @@ class App;
 namespace helics {
 class CoreApp;
 class BrokerApp;
+class Core;
 }  // namespace helics
 
 class readerElement;
@@ -59,6 +60,7 @@ class FmiRunner {
     State currentState{State::CREATED};
     int returnCode{EXIT_SUCCESS};
     int logLevel{HELICS_LOG_LEVEL_SUMMARY};
+    std::shared_ptr<helics::Core> crptr;
 
   public:
     enum ExitCodes : int {
@@ -87,6 +89,7 @@ class FmiRunner {
     int close();
 
   private:
+    void runnerLog(int loggingLevel, std::string_view message);
     int loadFile(readerElement& elem);
     int errorTerminate(int errorCode);
     /// @brief  find the full path for a file name

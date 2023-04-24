@@ -222,17 +222,23 @@ class fmi2Object {
         return commonFunctions;
     }
 
-    std::shared_ptr<FmiLogger> getLogger() const { return logger; }
+    const std::shared_ptr<FmiLogger>& getLogger() const { return logger; }
 
     void setLogger(std::shared_ptr<FmiLogger> logFunction) { logger = std::move(logFunction); }
     /** set the logging callback*/
-    void setLoggingCallback(std::function<void(std::string_view)> callback)
+    void setLoggingCallback(std::function<void(std::string_view, std::string_view)> callback)
     {
         if (logger) {
             logger->setLoggerCallback(std::move(callback));
         }
     }
 
+    void logMessage(std::string_view category, std::string_view message)
+    {
+        if (logger) {
+            logger->logMessage(category, message);
+        }
+    }
     fmi2Component getFmiComponent() const { return comp; }
     /** get the name of the object*/
     const std::string& getName() const { return name; }

@@ -151,15 +151,15 @@ class FmiLogger: public std::enable_shared_from_this<FmiLogger> {
     in which case to prevent the actual callback from being executed a memory sentinel is used
     */
     ~FmiLogger() { checkCode = 0; }
-    void setLoggerCallback(std::function<void(std::string_view)> logCallback)
+    void setLoggerCallback(std::function<void(std::string_view, std::string_view)> logCallback)
     {
         loggerCallback = std::move(logCallback);
     }
-    void logMessage(std::string_view message) const;
+    void logMessage(std::string_view logCategory, std::string_view message) const;
     bool check() const { return checkCode == validationCode; }
 
   private:
-    std::function<void(std::string_view)> loggerCallback;
+    std::function<void(std::string_view logCategory, std::string_view)> loggerCallback;
 
   public:
     static constexpr int validationCode{0x2566'1FA2};
