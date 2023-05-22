@@ -228,37 +228,45 @@ int fmiCategory2HelicsLogLevel(std::string_view category)
     return HELICS_LOG_LEVEL_DEBUG;
 }
 
-static const std::unordered_map<std::string_view,FileType> typeMap
-{{"fmu",FileType::fmu},{"FMU",FileType::fmu},{"Fmu",FileType::fmu},
-    {"json",FileType::json},{"JSON",FileType::json},{"Json",FileType::json},{"jsn",FileType::json},{"JSN",FileType::json},
-    {"toml",FileType::toml},{"TOML",FileType::toml},{"Toml",FileType::toml},{"tml",FileType::toml},{"toml",FileType::toml},
-    {"xml",FileType::xml},{"XML",FileType::xml},{"Xml",FileType::xml},
-    {"ssp",FileType::ssp},{"SSP",FileType::ssp},{"Ssp",FileType::ssp}};
+static const std::unordered_map<std::string_view, FileType> typeMap{{"fmu", FileType::fmu},
+                                                                    {"FMU", FileType::fmu},
+                                                                    {"Fmu", FileType::fmu},
+                                                                    {"json", FileType::json},
+                                                                    {"JSON", FileType::json},
+                                                                    {"Json", FileType::json},
+                                                                    {"jsn", FileType::json},
+                                                                    {"JSN", FileType::json},
+                                                                    {"toml", FileType::toml},
+                                                                    {"TOML", FileType::toml},
+                                                                    {"Toml", FileType::toml},
+                                                                    {"tml", FileType::toml},
+                                                                    {"toml", FileType::toml},
+                                                                    {"xml", FileType::xml},
+                                                                    {"XML", FileType::xml},
+                                                                    {"Xml", FileType::xml},
+                                                                    {"ssp", FileType::ssp},
+                                                                    {"SSP", FileType::ssp},
+                                                                    {"Ssp", FileType::ssp}};
 
 FileType getFileType(std::string_view fileName)
 {
     auto nschar = fileName.find_first_not_of(" \n\t");
-    if (nschar == std::string_view::npos)
-    {
+    if (nschar == std::string_view::npos) {
         return FileType::none;
     }
-    auto loc=fileName.find_last_of('.');
-    if (loc > fileName.size()-5)
-    {
-        if (fileName[nschar] == '{')
-        {
+    auto loc = fileName.find_last_of('.');
+    if (loc > fileName.size() - 5) {
+        if (fileName[nschar] == '{') {
             return FileType::rawJson;
         }
-        if (fileName[nschar] == '<')
-        {
+        if (fileName[nschar] == '<') {
             return FileType::rawXML;
         }
         return FileType::unrecognized;
     }
-    std::string_view type=fileName.substr(loc+1);
-    auto fnd=typeMap.find(type);
-    if (fnd != typeMap.end())
-    {
+    std::string_view type = fileName.substr(loc + 1);
+    auto fnd = typeMap.find(type);
+    if (fnd != typeMap.end()) {
         return fnd->second;
     }
     return FileType::unrecognized;

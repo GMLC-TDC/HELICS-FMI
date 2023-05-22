@@ -43,17 +43,19 @@ class CoSimFederate {
                   const helics::FederateInfo& fedInfo);
     CoSimFederate(std::string_view name,
                   std::shared_ptr<fmi2CoSimObject> obj,
-                  const helics::FederateInfo& fedInfo,const std::string &configFile="");
-    CoSimFederate(std::string_view  name,
+                  const helics::FederateInfo& fedInfo,
+                  const std::string& configFile = "");
+    CoSimFederate(std::string_view name,
                   helics::CoreApp& core,
                   const std::string& configFile,
                   const helics::FederateInfo& fedInfo);
     CoSimFederate(std::string_view name,
                   std::shared_ptr<fmi2CoSimObject> obj,
                   helics::CoreApp& core,
-                  const helics::FederateInfo& fedInfo,const std::string &configFile="");
+                  const helics::FederateInfo& fedInfo,
+                  const std::string& configFile = "");
     /** configure the federate connections from a configuration file*/
-    void loadFromFile(const std::string &configFile);
+    void loadFromFile(const std::string& configFile);
     /** configure the federate using the specified inputs and outputs*/
     void configure(helics::Time step, helics::Time start = helics::timeZero);
     /** set a string list of inputs*/

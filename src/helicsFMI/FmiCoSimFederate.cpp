@@ -12,11 +12,11 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/stringConversion.h"
 
 #include <algorithm>
+#include <filesystem>
 #include <fmt/format.h>
 #include <fstream>
 #include <iostream>
 #include <utility>
-#include <filesystem>
 
 namespace helicsfmi {
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
@@ -30,7 +30,8 @@ CoSimFederate::CoSimFederate(std::string_view name,
 
 CoSimFederate::CoSimFederate(std::string_view name,
                              std::shared_ptr<fmi2CoSimObject> obj,
-                             const helics::FederateInfo& fedInfo, const std::string &configFile)
+                             const helics::FederateInfo& fedInfo,
+                             const std::string& configFile)
 try : fed(name, fedInfo), cs(std::move(obj)) {
     loadFromFile(configFile);
 }
@@ -51,7 +52,8 @@ CoSimFederate::CoSimFederate(std::string_view name,
 CoSimFederate::CoSimFederate(std::string_view name,
                              std::shared_ptr<fmi2CoSimObject> obj,
                              helics::CoreApp& core,
-                             const helics::FederateInfo& fedInfo,const std::string &configFile)
+                             const helics::FederateInfo& fedInfo,
+                             const std::string& configFile)
 try : fed(name, core, fedInfo), cs(std::move(obj)) {
     loadFromFile(configFile);
 }
@@ -62,10 +64,9 @@ catch (const std::exception& e) {
 
 void CoSimFederate::loadFromFile(const std::string& configFile)
 {
-    auto ftype=getFileType(configFile);
+    auto ftype = getFileType(configFile);
 
-    if (!cs && ftype==FileType::fmu)
-    {
+    if (!cs && ftype == FileType::fmu) {
         auto fmi = std::make_shared<FmiLibrary>();
         if (!fmi->loadFMU(configFile)) {
             throw(Error("CoSimFederate", "unable to load FMU", -101));
@@ -74,21 +75,20 @@ void CoSimFederate::loadFromFile(const std::string& configFile)
         cs = fmi->createCoSimulationObject(fed.getName());
     }
 
-    switch (ftype)
-    {
-    case FileType::json:
-    case FileType::rawJson:
-    case FileType::toml:
-        fed.registerInterfaces(configFile);
-        break;
-    case FileType::fmu:
-        break;
-    case FileType::none:
-        break;
-    case FileType::xml:
-        break;
-    case FileType::unrecognized:
-        throw(Error("CoSimFederate", "unrecognized file type", -102));
+    switch (ftype) {
+        case FileType::json:
+        case FileType::rawJson:
+        case FileType::toml:
+            fed.registerInterfaces(configFile);
+            break;
+        case FileType::fmu:
+            break;
+        case FileType::none:
+            break;
+        case FileType::xml:
+            break;
+        case FileType::unrecognized:
+            throw(Error("CoSimFederate", "unrecognized file type", -102));
     }
     loadFMUInformation();
 }
@@ -107,14 +107,14 @@ void CoSimFederate::loadFMUInformation()
 
 static inline int getUnused(const std::vector<int>& usedList)
 {
-    auto ind=std::find(usedList.begin(),usedList.end(),0);
-    return ind-usedList.begin();
+    auto ind = std::find(usedList.begin(), usedList.end(), 0);
+    return ind - usedList.begin();
 }
 
 static inline int findMatch(const std::vector<std::string>& list, const std::string& match)
 {
-    auto ind=std::find(list.begin(),list.end(),match);
-    return ind-list.begin();
+    auto ind = std::find(list.begin(), list.end(), match);
+    return ind - list.begin();
 }
 
 void CoSimFederate::configure(helics::Time step, helics::Time startTime)
@@ -122,45 +122,35 @@ void CoSimFederate::configure(helics::Time step, helics::Time startTime)
     timeBias = startTime;
     logLevel = fed.getIntegerProperty(HELICS_PROPERTY_INT_LOG_LEVEL);
 
-    int icount=fed.getInputCount();
-    std::vector<int> input_list_used(input_list.size(),0);
+    int icount = fed.getInputCount();
+    std::vector<int> input_list_used(input_list.size(), 0);
     // get the already configured inputs
-    for (int ii = 0; ii < icount; ++ii)
-    {
-        auto &inp=fed.getInput(ii);
-        auto &iname=inp.getInfo();
-        if (!iname.empty())
-        {
-            const auto& inputInfo= cs->addInputVariable(iname);
+    for (int ii = 0; ii < icount; ++ii) {
+        auto& inp = fed.getInput(ii);
+        auto& iname = inp.getInfo();
+        if (!iname.empty()) {
+            const auto& inputInfo = cs->addInputVariable(iname);
             if (inputInfo.index >= 0) {
                 auto index = findMatch(input_list, iname);
-                if (index < input_list.size())
-                {
+                if (index < input_list.size()) {
                     input_list_used[ii] = 1;
                 }
-            }
-            else
-            {
+            } else {
                 fed.logWarningMessage(iname + " is not a recognized input");
                 continue;
             }
-        }
-        else
-        {
-            auto index=getUnused(input_list_used);
-            if (index < input_list.size())
-            {
+        } else {
+            auto index = getUnused(input_list_used);
+            if (index < input_list.size()) {
                 cs->addInputVariable(input_list[index]);
-                input_list_used[ii]=1;
+                input_list_used[ii] = 1;
             }
         }
         inputs.push_back(inp);
-
     }
-    int jj=0;
+    int jj = 0;
     for (const auto& input : input_list) {
-        if (input_list_used[jj] > 0)
-        {
+        if (input_list_used[jj] > 0) {
             continue;
         }
         const auto& inputInfo = cs->addInputVariable(input);
@@ -173,46 +163,36 @@ void CoSimFederate::configure(helics::Time step, helics::Time startTime)
         }
     }
 
-    int ocount=fed.getPublicationCount();
-    std::vector<int> output_list_used(output_list.size(),0);
+    int ocount = fed.getPublicationCount();
+    std::vector<int> output_list_used(output_list.size(), 0);
     // get the already configured inputs
-    for (int ii = 0; ii < ocount; ++ii)
-    {
-        auto &pub=fed.getPublication(ii);
-        auto &iname=pub.getInfo();
-        if (!iname.empty())
-        {
-            const auto& outputInfo= cs->addOutputVariable(iname);
+    for (int ii = 0; ii < ocount; ++ii) {
+        auto& pub = fed.getPublication(ii);
+        auto& iname = pub.getInfo();
+        if (!iname.empty()) {
+            const auto& outputInfo = cs->addOutputVariable(iname);
             if (outputInfo.index >= 0) {
                 auto index = findMatch(output_list, iname);
-                if (index < output_list.size())
-                {
+                if (index < output_list.size()) {
                     output_list_used[ii] = 1;
                 }
-            }
-            else
-            {
+            } else {
                 fed.logWarningMessage(iname + " is not a recognized output");
                 continue;
             }
-        }
-        else
-        {
-            auto index=getUnused(output_list_used);
-            if (index < output_list.size())
-            {
+        } else {
+            auto index = getUnused(output_list_used);
+            if (index < output_list.size()) {
                 cs->addOutputVariable(output_list[index]);
-                output_list_used[ii]=1;
+                output_list_used[ii] = 1;
             }
         }
-       pubs.push_back(pub);
-
+        pubs.push_back(pub);
     }
-    jj=0;
+    jj = 0;
 
     for (const auto& output : output_list) {
-        if (output_list_used[jj] > 0)
-        {
+        if (output_list_used[jj] > 0) {
             continue;
         }
         const auto& outputInfo = cs->addOutputVariable(output);

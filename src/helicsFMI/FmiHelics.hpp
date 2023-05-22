@@ -91,9 +91,8 @@ void setDefault(helics::Input& inp, fmi2Object* fmiObj, std::size_t index);
 /** generate a helics log level from an FMI category description*/
 int fmiCategory2HelicsLogLevel(std::string_view category);
 
-enum class FileType :std::int32_t
-{
-    none=0,
+enum class FileType : std::int32_t {
+    none = 0,
     unrecognized,
     fmu,
     json,
