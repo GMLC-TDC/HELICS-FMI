@@ -40,7 +40,7 @@ class FmiRunner {
     std::string integrator{"cvode"};
     std::string integratorArgs;
     std::string brokerArgs;
-    helics::Time stepTime{helics::Time::minVal()};
+    helics::Time stepTime{1.0};
     helics::Time stopTime{helics::Time::minVal()};
     std::vector<std::string> inputs;
     std::vector<std::string> output_variables;

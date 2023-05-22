@@ -280,7 +280,23 @@ int FmiRunner::load()
         jsonReaderElement system(inputFile);
         if (system.isValid()) {
             try {
-                loadFile(system);
+                fedInfo.loadInfoFromJson(inputFile);
+                const int lfile =loadFile(system);
+                if (lfile != 0) {
+                    errorTerminate(FILE_PROCESSING_ERROR);
+                    return lfile;
+                }
+                if (cosimFeds.size()+meFeds.size() == 1)
+                {
+                    if (!cosimFeds.empty())
+                    {
+                        cosimFeds.front()->loadFromFile(inputFile);
+                    }
+                    else
+                    {
+                        //meFeds.front()->loadFromFile(inputFile)
+                    }
+                }
             }
             catch (const std::exception& e) {
                 LOG_ERROR(fmt::format("error loading system ", e.what()));
@@ -293,10 +309,22 @@ int FmiRunner::load()
         tomlReaderElement system(inputFile);
         if (system.isValid()) {
             try {
+                fedInfo.loadInfoFromToml(inputFile);
                 const int lfile = loadFile(system);
                 if (lfile != 0) {
                     errorTerminate(FILE_PROCESSING_ERROR);
                     return lfile;
+                }
+                if (cosimFeds.size()+meFeds.size() == 1)
+                {
+                    if (!cosimFeds.empty())
+                    {
+                        cosimFeds.front()->loadFromFile(inputFile);
+                    }
+                    else
+                    {
+                        //meFeds.front()->loadFromFile(inputFile)
+                    }
                 }
             }
             catch (const std::exception& e) {
@@ -521,6 +549,7 @@ int FmiRunner::loadFile(readerElement& elem)
     if (elem.hasAttribute("stoptime")) {
         stopTime = elem.getAttributeValue("stoptime");
     }
+    
     elem.moveToFirstChild("fmus");
 
     std::vector<std::unique_ptr<FmiLibrary>> fmis;
@@ -540,7 +569,18 @@ int FmiRunner::loadFile(readerElement& elem)
                 return errorTerminate(FMU_ERROR);
             }
             auto name = obj->getName();
-            auto fed = std::make_unique<CoSimFederate>(name, std::move(obj), fedInfo);
+            
+            std::unique_ptr<CoSimFederate> fed;
+            if (elem.hasAttribute("config"))
+            {
+                auto cfile=elem.getAttributeText("config");
+                auto localFedInfo=fedInfo;
+                fed = std::make_unique<CoSimFederate>(name, std::move(obj), localFedInfo,cfile);
+            }
+            else
+            {
+                fed = std::make_unique<CoSimFederate>(name, std::move(obj), fedInfo);
+            }
             elem.moveToFirstChild("parameters");
             while (elem.isValid()) {
                 const auto& str1 = elem.getFirstAttribute().getText();
@@ -555,10 +595,15 @@ int FmiRunner::loadFile(readerElement& elem)
                 }
             }
             elem.moveToParent();
+            helics::Time stepTime{1.0};
+            if (elem.hasAttribute("steptime"))
+            {
+                stepTime=elem.getAttributeValue("steptime");
+            }
             if (elem.hasAttribute("starttime")) {
-                fed->configure(1.0, elem.getAttributeValue("starttime"));
+                fed->configure(stepTime, elem.getAttributeValue("starttime"));
             } else {
-                fed->configure(1.0);
+                fed->configure(stepTime);
             }
             cosimFeds.push_back(std::move(fed));
         } else {
