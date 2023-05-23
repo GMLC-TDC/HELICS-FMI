@@ -54,7 +54,7 @@ void publishOutput(helics::Publication& pub, fmi2Object* fmiObj, std::size_t ind
         case fmi_variable_type::boolean: {
             auto val = fmiObj->get<fmi2Boolean>(var);
             pub.publish(val != fmi2False);
-            [[unlikely]] if (logValues)
+            if (logValues)
             {
                 fmiObj->logMessage("data", fmt::format("publishing {} to {}", val, pub.getName()));
             }
@@ -63,7 +63,7 @@ void publishOutput(helics::Publication& pub, fmi2Object* fmiObj, std::size_t ind
         case fmi_variable_type::enumeration: {
             auto val = fmiObj->get<std::int64_t>(var);
             pub.publish(val);
-            [[unlikely]] if (logValues)
+            if (logValues)
             {
                 fmiObj->logMessage("data", fmt::format("publishing {} to {}", val, pub.getName()));
             }
@@ -72,7 +72,7 @@ void publishOutput(helics::Publication& pub, fmi2Object* fmiObj, std::size_t ind
         case fmi_variable_type::numeric: {
             auto val = fmiObj->get<double>(var);
             pub.publish(val);
-            [[unlikely]] if (logValues)
+            if (logValues)
             {
                 fmiObj->logMessage("data", fmt::format("publishing {} to {}", val, pub.getName()));
             }
@@ -81,7 +81,7 @@ void publishOutput(helics::Publication& pub, fmi2Object* fmiObj, std::size_t ind
         default: {
             auto val = fmiObj->get<std::string_view>(var);
             pub.publish(val);
-            [[unlikely]] if (logValues)
+            if (logValues)
             {
                 fmiObj->logMessage("data", fmt::format("publishing {} to {}", val, pub.getName()));
             }
@@ -99,7 +99,7 @@ void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index, bool l
         case fmi_variable_type::boolean: {
             auto val = inp.getValue<fmi2Boolean>();
             fmiObj->set(var, val);
-            [[unlikely]] if (logValues)
+            if (logValues)
             {
                 fmiObj->logMessage("data", fmt::format("received {} for {}", val, inp.getName()));
             }
@@ -108,7 +108,7 @@ void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index, bool l
         case fmi_variable_type::enumeration: {
             auto val = inp.getValue<fmi2Integer>();
             fmiObj->set(var, val);
-            [[unlikely]] if (logValues)
+           if (logValues)
             {
                 fmiObj->logMessage("data", fmt::format("received {} for {}", val, inp.getName()));
             }
@@ -117,7 +117,7 @@ void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index, bool l
         case fmi_variable_type::numeric: {
             auto val = inp.getValue<fmi2Real>();
             fmiObj->set(var, val);
-            [[unlikely]] if (logValues)
+            if (logValues)
             {
                 fmiObj->logMessage("data", fmt::format("received {} for {}", val, inp.getName()));
             }
@@ -126,7 +126,7 @@ void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index, bool l
         default: {
             auto val = inp.getValue<std::string>();
             fmiObj->set(var, val);
-            [[unlikely]] if (logValues)
+            if (logValues)
             {
                 fmiObj->logMessage("data", fmt::format("received {} for {}", val, inp.getName()));
             }
@@ -255,7 +255,7 @@ FileType getFileType(std::string_view fileName)
         return FileType::none;
     }
     auto loc = fileName.find_last_of('.');
-    if (loc > fileName.size() - 5) {
+    if (loc < fileName.size() - 5) {
         if (fileName[nschar] == '{') {
             return FileType::rawJson;
         }
