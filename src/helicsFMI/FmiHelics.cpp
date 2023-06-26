@@ -54,8 +54,7 @@ void publishOutput(helics::Publication& pub, fmi2Object* fmiObj, std::size_t ind
         case fmi_variable_type::boolean: {
             auto val = fmiObj->get<fmi2Boolean>(var);
             pub.publish(val != fmi2False);
-            if (logValues)
-            {
+            if (logValues) {
                 fmiObj->logMessage("data", fmt::format("publishing {} to {}", val, pub.getName()));
             }
         } break;
@@ -63,8 +62,7 @@ void publishOutput(helics::Publication& pub, fmi2Object* fmiObj, std::size_t ind
         case fmi_variable_type::enumeration: {
             auto val = fmiObj->get<std::int64_t>(var);
             pub.publish(val);
-            if (logValues)
-            {
+            if (logValues) {
                 fmiObj->logMessage("data", fmt::format("publishing {} to {}", val, pub.getName()));
             }
         } break;
@@ -72,8 +70,7 @@ void publishOutput(helics::Publication& pub, fmi2Object* fmiObj, std::size_t ind
         case fmi_variable_type::numeric: {
             auto val = fmiObj->get<double>(var);
             pub.publish(val);
-            if (logValues)
-            {
+            if (logValues) {
                 fmiObj->logMessage("data", fmt::format("publishing {} to {}", val, pub.getName()));
             }
         } break;
@@ -81,8 +78,7 @@ void publishOutput(helics::Publication& pub, fmi2Object* fmiObj, std::size_t ind
         default: {
             auto val = fmiObj->get<std::string_view>(var);
             pub.publish(val);
-            if (logValues)
-            {
+            if (logValues) {
                 fmiObj->logMessage("data", fmt::format("publishing {} to {}", val, pub.getName()));
             }
         } break;
@@ -99,8 +95,7 @@ void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index, bool l
         case fmi_variable_type::boolean: {
             auto val = inp.getValue<fmi2Boolean>();
             fmiObj->set(var, val);
-            if (logValues)
-            {
+            if (logValues) {
                 fmiObj->logMessage("data", fmt::format("received {} for {}", val, inp.getName()));
             }
         } break;
@@ -108,8 +103,7 @@ void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index, bool l
         case fmi_variable_type::enumeration: {
             auto val = inp.getValue<fmi2Integer>();
             fmiObj->set(var, val);
-           if (logValues)
-            {
+            if (logValues) {
                 fmiObj->logMessage("data", fmt::format("received {} for {}", val, inp.getName()));
             }
         } break;
@@ -117,8 +111,7 @@ void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index, bool l
         case fmi_variable_type::numeric: {
             auto val = inp.getValue<fmi2Real>();
             fmiObj->set(var, val);
-            if (logValues)
-            {
+            if (logValues) {
                 fmiObj->logMessage("data", fmt::format("received {} for {}", val, inp.getName()));
             }
         } break;
@@ -126,8 +119,7 @@ void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index, bool l
         default: {
             auto val = inp.getValue<std::string>();
             fmiObj->set(var, val);
-            if (logValues)
-            {
+            if (logValues) {
                 fmiObj->logMessage("data", fmt::format("received {} for {}", val, inp.getName()));
             }
         } break;
