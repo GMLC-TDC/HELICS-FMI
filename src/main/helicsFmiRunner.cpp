@@ -131,6 +131,7 @@ std::unique_ptr<CLI::App> FmiRunner::generateCLI()
                     paths,
                     "Specify additional search paths for the fmu's or configuration files")
         ->check(CLI::ExistingPath);
+    app->add_option("--extractpath",extractPath,"the file location in which to extract the FMU")->check(CLI::ExistingDirectory);
     app->add_flag("--cosim",
                   cosimFmu,
                   "specify that the fmu should run as a co-sim FMU if possible");
@@ -241,7 +242,7 @@ int FmiRunner::load()
     FmiLibrary fmi;
     if ((ext == ".fmu") || (ext == ".FMU")) {
         try {
-            if (!fmi.loadFMU(inputFile)) {
+            if (!fmi.loadFMU(inputFile,extractPath)) {
                 LOG_ERROR(fmt::format("error loading fmu: error code={}", fmi.getErrorCode()));
                 return errorTerminate(INVALID_FMU);
             }
@@ -541,7 +542,9 @@ int FmiRunner::loadFile(readerElement& elem)
     if (elem.hasAttribute("stoptime")) {
         stopTime = elem.getAttributeValue("stoptime");
     }
-
+    if (elem.hasAttribute("extractpath")) {
+        extractPath=elem.getAttributeText("extractpath");
+    }
     elem.moveToFirstChild("fmus");
 
     std::vector<std::unique_ptr<FmiLibrary>> fmis;
@@ -552,7 +555,7 @@ int FmiRunner::loadFile(readerElement& elem)
             LOG_ERROR(fmt::format("unable to locate file {}", elem.getAttributeText("fmu")));
             return errorTerminate(MISSING_FILE);
         }
-        fmilib->loadFMU(str);
+        fmilib->loadFMU(str,extractPath);
         if (fmilib->checkFlag(fmuCapabilityFlags::coSimulationCapable)) {
             std::shared_ptr<fmi2CoSimObject> obj =
                 fmilib->createCoSimulationObject(elem.getAttributeText("name"));

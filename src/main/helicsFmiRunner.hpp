@@ -48,6 +48,7 @@ class FmiRunner {
     std::vector<std::string> connections;
     //!< paths to find the fmu or other files
     std::vector<std::string> paths;
+    std::string extractPath;
     bool cosimFmu{true};
     helics::FederateInfo fedInfo;
     std::unique_ptr<helics::BrokerApp> broker;

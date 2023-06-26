@@ -1,0 +1,15 @@
+{
+"autobroker":true,
+"coretype":"zmq",
+"steptime":"0.1s",
+"stoptime":"2.0s",
+"brokerargs":"-f2 --name sf3broker ",
+"fmus":[
+"fmu":"BouncingBall.fmu",
+"name":"bbfed",
+"parameters": {
+    "h":5,
+    "v":2
+    }
+ ]
+}

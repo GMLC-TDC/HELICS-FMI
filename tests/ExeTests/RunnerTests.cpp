@@ -52,6 +52,27 @@ TEST(runnerTests, singleFedAsyncZMQ)
     ret = runner.close();
     EXPECT_EQ(ret, 0);
 }
+
+TEST(runnerTests, singleFedExtractLoc)
+{
+    FmiRunner runner;
+    auto folderpath=std::filesystem::path(FMI_REFERENCE_DIR)/"test1";
+    ASSERT_TRUE(std::filesystem::create_directory(folderpath));
+    runner.parse(std::string("--autobroker --core=zmq --extractpath=") +folderpath.string()+" "+ftFile);
+    /**test that things run to completion with auto broker*/
+    int ret = runner.load();
+    ASSERT_EQ(ret, 0);
+    ret = runner.initialize();
+    ASSERT_EQ(ret, 0);
+    ret = runner.run();
+    ASSERT_EQ(ret, 0);
+    EXPECT_TRUE(std::filesystem::exists(folderpath/"Feedthrough"));
+
+    ret = runner.close();
+    EXPECT_EQ(ret, 0);
+
+    std::filesystem::remove_all(folderpath);
+}
 //
 TEST(runnerTests, dualFedZMQ)
 {
