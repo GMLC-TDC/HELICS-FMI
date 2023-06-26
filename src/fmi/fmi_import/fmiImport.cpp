@@ -199,8 +199,7 @@ bool FmiLibrary::loadFMU(const std::string& fmuPath)
 
 bool FmiLibrary::loadFMU(const std::string& fmuPath, const std::string& extractLoc)
 {
-    if (extractLoc.empty())
-    {
+    if (extractLoc.empty()) {
         return loadFMU(fmuPath);
     }
     extractDirectory = extractLoc;
@@ -210,7 +209,6 @@ bool FmiLibrary::loadFMU(const std::string& fmuPath, const std::string& extractL
         extractDirectory = extractDirectory / fmuName.stem();
     }
 
-    
     return loadInformation();
 }
 
