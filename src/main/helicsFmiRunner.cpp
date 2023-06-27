@@ -170,6 +170,28 @@ int FmiRunner::load()
     if (currentState >= State::LOADED) {
         return (currentState == State::ERROR) ? returnCode : EXIT_SUCCESS;
     }
+    if (inputs.empty()) {
+        return errorTerminate(MISSING_FILE);
+    }
+    const std::string inputFile = getFilePath(inputs.front());
+    if (inputFile.empty()) {
+        return errorTerminate(INVALID_FILE);
+    }
+    auto ext = inputFile.substr(inputFile.find_last_of('.'));
+    try
+    {
+        if ((ext == ".json") || (ext == ".JSON"))
+        {
+            fedInfo.loadInfoFromJson(inputFile);
+        }
+        else if ((ext == ".toml") || (ext == ".TOML")) {
+            fedInfo.loadInfoFromToml(inputFile);
+        }
+    }
+    catch (const std::exception& e) {
+        LOG_ERROR(fmt::format("error loading federateInfo from file ", e.what()));
+        return errorTerminate(FILE_PROCESSING_ERROR);
+    }
     if (fedInfo.autobroker) {
         try {
             std::string args = brokerArgs;
@@ -230,14 +252,7 @@ int FmiRunner::load()
         }
     }
     crptr = core->getCopyofCorePointer();
-    if (inputs.empty()) {
-        return errorTerminate(MISSING_FILE);
-    }
-    const std::string inputFile = getFilePath(inputs.front());
-    if (inputFile.empty()) {
-        return errorTerminate(INVALID_FILE);
-    }
-    auto ext = inputFile.substr(inputFile.find_last_of('.'));
+    
     fedInfo.coreName = core->getIdentifier();
     FmiLibrary fmi;
     if ((ext == ".fmu") || (ext == ".FMU")) {
@@ -281,7 +296,6 @@ int FmiRunner::load()
         jsonReaderElement system(inputFile);
         if (system.isValid()) {
             try {
-                fedInfo.loadInfoFromJson(inputFile);
                 const int lfile = loadFile(system);
                 if (lfile != 0) {
                     errorTerminate(FILE_PROCESSING_ERROR);
@@ -306,7 +320,6 @@ int FmiRunner::load()
         tomlReaderElement system(inputFile);
         if (system.isValid()) {
             try {
-                fedInfo.loadInfoFromToml(inputFile);
                 const int lfile = loadFile(system);
                 if (lfile != 0) {
                     errorTerminate(FILE_PROCESSING_ERROR);
@@ -539,8 +552,11 @@ void FmiRunner::runnerLog(int loggingLevel, std::string_view message)
 
 int FmiRunner::loadFile(readerElement& elem)
 {
-    if (elem.hasAttribute("stoptime")) {
-        stopTime = elem.getAttributeValue("stoptime");
+    if (stopTime==helics::Time::minVal() && elem.hasAttribute("stop")) {
+        stopTime = loadTimeFromString(elem.getAttributeText("stop"),time_units::s);
+    }
+    if (stepTime==1.0 && elem.hasAttribute("step")) {
+        stepTime = loadTimeFromString(elem.getAttributeText("step"),time_units::s);
     }
     if (elem.hasAttribute("extractpath")) {
         extractPath=elem.getAttributeText("extractpath");
@@ -575,26 +591,53 @@ int FmiRunner::loadFile(readerElement& elem)
             }
             elem.moveToFirstChild("parameters");
             while (elem.isValid()) {
-                const auto& str1 = elem.getFirstAttribute().getText();
-                auto attr = elem.getNextAttribute();
-
-                elem.moveToNextSibling("parameters");
-                const double val = attr.getValue();
-                if (val != readerNullVal) {
-                    fed->set(str1, val);
-                } else {
-                    fed->set(str1, attr.getText());
+                auto attr=elem.getFirstAttribute();
+                if (attr.getName() == "field")
+                {
+                    const std::string &str1 = attr.getText();
+                    if (!str1.empty())
+                    {
+                        double val = elem.getAttributeValue("value");
+                        if (val != readerNullVal) {
+                            fed->set(str1, val);
+                        }
+                        else {
+                            fed->set(str1, elem.getAttributeText("value"));
+                        }
+                    }
                 }
+                else
+                {
+                    while (attr.isValid())
+                    {
+                        const std::string &str1 = attr.getName();
+                        if (!str1.empty())
+                        {
+                            double val = attr.getValue();
+                            if (val != readerNullVal) {
+                                fed->set(str1, val);
+                            }
+                            else {
+                                fed->set(str1, attr.getText());
+                            }
+                        }
+                        attr=elem.getNextAttribute();
+                    }
+                }
+                
+                
+                elem.moveToNextSibling("parameters");
+                
             }
             elem.moveToParent();
-            helics::Time stepTime{1.0};
+            helics::Time localStepTime{stepTime};
             if (elem.hasAttribute("steptime")) {
-                stepTime = elem.getAttributeValue("steptime");
+                localStepTime = loadTimeFromString(elem.getAttributeText("steptime"),time_units::s);
             }
             if (elem.hasAttribute("starttime")) {
-                fed->configure(stepTime, elem.getAttributeValue("starttime"));
+                fed->configure(localStepTime,loadTimeFromString( elem.getAttributeText("starttime"),time_units::s));
             } else {
-                fed->configure(stepTime);
+                fed->configure(localStepTime);
             }
             cosimFeds.push_back(std::move(fed));
         } else {
@@ -611,6 +654,15 @@ int FmiRunner::loadFile(readerElement& elem)
                 auto str1 = elem.getFirstAttribute().getText();
                 auto str2 = elem.getNextAttribute().getText();
                 elem.moveToNextSibling("parameters");
+                fed->set(str1, str2);
+            }
+            elem.moveToParent();
+            elem.moveToFirstChild("parameters");
+            elem.moveToFirstChild();
+            while (elem.isValid()) {
+                auto str1 = elem.getName();
+                auto str2 = elem.getText();
+                elem.moveToNextSibling();
                 fed->set(str1, str2);
             }
             elem.moveToParent();

@@ -46,7 +46,7 @@ add_test(NAME helics_fmi_fail_executable-tests COMMAND helics_fmi_fail_executabl
 set_target_properties(helics_fmi_executable-tests PROPERTIES FOLDER tests)
 
 target_link_libraries(
-    helics_fmi_executable-tests PRIVATE ${HELICS_FMI_HELICS_TARGET_APPS} helics_fmi_test_base
+    helics_fmi_executable-tests PRIVATE ${HELICS_FMI_HELICS_TARGET_APPS} helics_fmi_test_base fmt::fmt
 )
 
 set_target_properties(helics_fmi_fail_executable-tests PROPERTIES FOLDER tests)
