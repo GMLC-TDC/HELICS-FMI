@@ -13,9 +13,9 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <filesystem>
+#include <fmt/format.h>
 #include <future>
 #include <thread>
-#include <fmt/format.h>
 
 // using ::testing::HasSubstr;
 
@@ -201,14 +201,13 @@ TEST(runnerTests, setfield2)
     EXPECT_EQ(str, 0);
 }
 
-
 static const std::string testFile = std::string(TEST_DIR) + "test1.json";
 
 TEST(runnerTests, setfieldFile)
 {
     helics::cleanupHelicsLibrary();
     FmiRunner runner;
-    runner.parse( fmt::format("--fmupath={} {}",FMI_REFERENCE_DIR,testFile));
+    runner.parse(fmt::format("--fmupath={} {}", FMI_REFERENCE_DIR, testFile));
     int ret = runner.load();
     ASSERT_EQ(ret, 0);
     ret = runner.initialize();

@@ -179,13 +179,10 @@ int FmiRunner::load()
         return errorTerminate(INVALID_FILE);
     }
     auto ext = inputFile.substr(inputFile.find_last_of('.'));
-    try
-    {
-        if ((ext == ".json") || (ext == ".JSON"))
-        {
+    try {
+        if ((ext == ".json") || (ext == ".JSON")) {
             fedInfo.loadInfoFromJson(inputFile);
-        }
-        else if ((ext == ".toml") || (ext == ".TOML")) {
+        } else if ((ext == ".toml") || (ext == ".TOML")) {
             fedInfo.loadInfoFromToml(inputFile);
         }
     }
@@ -253,7 +250,7 @@ int FmiRunner::load()
         }
     }
     crptr = core->getCopyofCorePointer();
-    
+
     fedInfo.coreName = core->getIdentifier();
     FmiLibrary fmi;
     if ((ext == ".fmu") || (ext == ".FMU")) {
@@ -553,11 +550,11 @@ void FmiRunner::runnerLog(int loggingLevel, std::string_view message)
 
 int FmiRunner::loadFile(readerElement& elem)
 {
-    if (stopTime==helics::Time::minVal() && elem.hasAttribute("stop")) {
-        stopTime = loadTimeFromString(elem.getAttributeText("stop"),time_units::s);
+    if (stopTime == helics::Time::minVal() && elem.hasAttribute("stop")) {
+        stopTime = loadTimeFromString(elem.getAttributeText("stop"), time_units::s);
     }
-    if (stepTime==1.0 && elem.hasAttribute("step")) {
-        stepTime = loadTimeFromString(elem.getAttributeText("step"),time_units::s);
+    if (stepTime == 1.0 && elem.hasAttribute("step")) {
+        stepTime = loadTimeFromString(elem.getAttributeText("step"), time_units::s);
     }
     if (elem.hasAttribute("extractpath")) {
         extractPath = elem.getAttributeText("extractpath");
@@ -592,51 +589,44 @@ int FmiRunner::loadFile(readerElement& elem)
             }
             elem.moveToFirstChild("parameters");
             while (elem.isValid()) {
-                auto attr=elem.getFirstAttribute();
-                if (attr.getName() == "field")
-                {
-                    const std::string &str1 = attr.getText();
-                    if (!str1.empty())
-                    {
+                auto attr = elem.getFirstAttribute();
+                if (attr.getName() == "field") {
+                    const std::string& str1 = attr.getText();
+                    if (!str1.empty()) {
                         double val = elem.getAttributeValue("value");
                         if (val != readerNullVal) {
                             fed->set(str1, val);
-                        }
-                        else {
+                        } else {
                             fed->set(str1, elem.getAttributeText("value"));
                         }
                     }
-                }
-                else
-                {
-                    while (attr.isValid())
-                    {
-                        const std::string &str1 = attr.getName();
-                        if (!str1.empty())
-                        {
+                } else {
+                    while (attr.isValid()) {
+                        const std::string& str1 = attr.getName();
+                        if (!str1.empty()) {
                             double val = attr.getValue();
                             if (val != readerNullVal) {
                                 fed->set(str1, val);
-                            }
-                            else {
+                            } else {
                                 fed->set(str1, attr.getText());
                             }
                         }
-                        attr=elem.getNextAttribute();
+                        attr = elem.getNextAttribute();
                     }
                 }
-                
-                
+
                 elem.moveToNextSibling("parameters");
-                
             }
             elem.moveToParent();
             helics::Time localStepTime{stepTime};
             if (elem.hasAttribute("steptime")) {
-                localStepTime = loadTimeFromString(elem.getAttributeText("steptime"),time_units::s);
+                localStepTime =
+                    loadTimeFromString(elem.getAttributeText("steptime"), time_units::s);
             }
             if (elem.hasAttribute("starttime")) {
-                fed->configure(localStepTime,loadTimeFromString( elem.getAttributeText("starttime"),time_units::s));
+                fed->configure(localStepTime,
+                               loadTimeFromString(elem.getAttributeText("starttime"),
+                                                  time_units::s));
             } else {
                 fed->configure(localStepTime);
             }
