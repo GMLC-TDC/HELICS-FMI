@@ -14,6 +14,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "helics-fmi/helics-fmi-config.h"
 #include "helics/application_api/BrokerApp.hpp"
 #include "helics/application_api/CoreApp.hpp"
+#include "helics/core/core-exceptions.hpp"
 #include "helics/core/Core.hpp"
 #include "helics/core/helicsCLI11.hpp"
 #include "helics/core/helicsVersion.hpp"
@@ -186,8 +187,8 @@ int FmiRunner::load()
             fedInfo.loadInfoFromToml(inputFile);
         }
     }
-    catch (const std::exception& e) {
-        LOG_ERROR(fmt::format("error loading federateInfo from file ", e.what()));
+    catch (const helics::HelicsException& e) {
+        LOG_ERROR(fmt::format("error loading federateInfo from file :{}", e.what()));
         return errorTerminate(FILE_PROCESSING_ERROR);
     }
     if (fedInfo.autobroker) {
@@ -215,23 +216,6 @@ int FmiRunner::load()
         }
     }
     fedInfo.autobroker = false;
-    if (stepTime > helics::timeZero) {
-        fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, stepTime);
-    } else {
-        stepTime = fedInfo.checkTimeProperty(HELICS_PROPERTY_TIME_PERIOD, 0.001);
-        if (stepTime == 0.001) {
-            fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, stepTime);
-        }
-    }
-
-    if (stopTime > helics::timeZero) {
-        fedInfo.setProperty(HELICS_PROPERTY_TIME_STOPTIME, stopTime);
-    } else {
-        stopTime = fedInfo.checkTimeProperty(HELICS_PROPERTY_TIME_STOPTIME, 30.0);
-        if (stopTime == 30.0) {
-            fedInfo.setProperty(HELICS_PROPERTY_TIME_STOPTIME, stopTime);
-        }
-    }
 
     if (broker) {
         fedInfo.brokerPort = -1;
@@ -254,6 +238,23 @@ int FmiRunner::load()
     fedInfo.coreName = core->getIdentifier();
     FmiLibrary fmi;
     if ((ext == ".fmu") || (ext == ".FMU")) {
+        if (stepTime > helics::timeZero) {
+            fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, stepTime);
+        } else {
+            stepTime = fedInfo.checkTimeProperty(HELICS_PROPERTY_TIME_PERIOD, 0.001);
+            if (stepTime == 0.001) {
+                fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, stepTime);
+            }
+        }
+
+        if (stopTime > helics::timeZero) {
+            fedInfo.setProperty(HELICS_PROPERTY_TIME_STOPTIME, stopTime);
+        } else {
+            stopTime = fedInfo.checkTimeProperty(HELICS_PROPERTY_TIME_STOPTIME, 30.0);
+            if (stopTime == 30.0) {
+                fedInfo.setProperty(HELICS_PROPERTY_TIME_STOPTIME, stopTime);
+            }
+        }
         try {
             if (!fmi.loadFMU(inputFile, extractPath)) {
                 LOG_ERROR(fmt::format("error loading fmu: error code={}", fmi.getErrorCode()));
@@ -555,6 +556,23 @@ int FmiRunner::loadFile(readerElement& elem)
     }
     if (stepTime == 1.0 && elem.hasAttribute("step")) {
         stepTime = loadTimeFromString(elem.getAttributeText("step"), time_units::s);
+    }
+    if (stepTime > helics::timeZero) {
+        fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, stepTime);
+    } else {
+        stepTime = fedInfo.checkTimeProperty(HELICS_PROPERTY_TIME_PERIOD, 0.001);
+        if (stepTime == 0.001) {
+            fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, stepTime);
+        }
+    }
+
+    if (stopTime > helics::timeZero) {
+        fedInfo.setProperty(HELICS_PROPERTY_TIME_STOPTIME, stopTime);
+    } else {
+        stopTime = fedInfo.checkTimeProperty(HELICS_PROPERTY_TIME_STOPTIME, 30.0);
+        if (stopTime == 30.0) {
+            fedInfo.setProperty(HELICS_PROPERTY_TIME_STOPTIME, stopTime);
+        }
     }
     if (elem.hasAttribute("extractpath")) {
         extractPath = elem.getAttributeText("extractpath");

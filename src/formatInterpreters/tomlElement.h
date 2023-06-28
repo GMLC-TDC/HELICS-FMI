@@ -37,7 +37,7 @@ class tomlElement {
     int count() const { return (arraytype) ? static_cast<int>(element.size()) : 1; }
     bool isNull() const
     {
-        return (arraytype) ? element[arrayIndex].is_uninitialized() : element.is_uninitialized();
+        return (arraytype) ? arrayIndex>=static_cast<int>(element.size()) || element[arrayIndex].is_uninitialized() : element.is_uninitialized();
     }
 
   private:

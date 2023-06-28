@@ -201,10 +201,50 @@ TEST(runnerTests, setfield2)
     EXPECT_EQ(str, 0);
 }
 
-static const std::string testFile = std::string(TEST_DIR) + "test1.json";
 
-TEST(runnerTests, setfieldFile)
+
+TEST(runnerTests, setfieldFileJson)
 {
+    static const std::string testFile = std::string(TEST_DIR) + "test1.json";
+    helics::cleanupHelicsLibrary();
+    FmiRunner runner;
+    runner.parse(fmt::format("--fmupath={} {}", FMI_REFERENCE_DIR, testFile));
+    int ret = runner.load();
+    ASSERT_EQ(ret, 0);
+    ret = runner.initialize();
+    ASSERT_EQ(ret, 0);
+
+    auto fut = runner.runAsync();
+
+    helics::ValueFederate vFed("fed1", "--coretype=zmq --forcenewcore");
+
+    vFed.enterInitializingModeIterative();
+
+    auto qres = helics::vectorizeQueryResult(vFed.query("bbfed", "publications"));
+
+    ASSERT_EQ(qres.size(), 2U);
+
+    auto& sub1 = vFed.registerSubscription(qres[0]);
+    sub1.setDefault(-20.0);
+    auto& sub2 = vFed.registerSubscription(qres[1]);
+    sub2.setDefault(-20.0);
+
+    vFed.enterExecutingMode();
+    auto time1 = vFed.requestTime(2.0);
+    EXPECT_LT(time1, 2.0);
+
+    auto val = sub1.getValue<double>();
+    auto val2 = sub2.getValue<double>();
+    EXPECT_GT(val, 5.0);
+    EXPECT_LT(val2, 2.0);
+    vFed.finalize();
+    auto str = fut.get();
+    EXPECT_EQ(str, 0);
+}
+
+TEST(runnerTests, setfieldFileToml)
+{
+    static const std::string testFile = std::string(TEST_DIR) + "test1.toml";
     helics::cleanupHelicsLibrary();
     FmiRunner runner;
     runner.parse(fmt::format("--fmupath={} {}", FMI_REFERENCE_DIR, testFile));

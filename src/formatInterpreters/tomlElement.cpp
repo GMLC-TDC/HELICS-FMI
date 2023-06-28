@@ -23,7 +23,7 @@ tomlElement::tomlElement(toml::value vElement, std::string newName):
         arraytype = true;
         arrayIndex = 0;
         while ((arrayIndex < static_cast<int>(element.size())) &&
-               (!element[arrayIndex].is_uninitialized())) {
+               (element[arrayIndex].is_uninitialized())) {
             ++arrayIndex;
         }
     }

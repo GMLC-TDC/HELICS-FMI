@@ -68,8 +68,8 @@ bool tomlReaderElement::loadFile(const std::string& fileName)
     try {
         auto vres = helicsfmi::fileops::loadToml(fileName);
         doc = std::make_shared<tomlElement>(vres, fileName);
-        current = doc;
         clear();
+        current = doc;
         return true;
     }
     catch (const std::invalid_argument& e) {
@@ -83,8 +83,8 @@ bool tomlReaderElement::parse(const std::string& inputString)
     try {
         auto vres = helicsfmi::fileops::loadTomlStr(inputString);
         doc = std::make_shared<tomlElement>(vres, inputString);
-        current = doc;
         clear();
+        current = doc;
         return true;
     }
     catch (const std::invalid_argument& e) {
@@ -141,7 +141,7 @@ bool tomlReaderElement::hasAttribute(const std::string& attributeName) const
     }
 
     auto val = toml::find_or(current->getElement(), attributeName, uval);
-    if (!val.is_uninitialized()) {
+    if (val.is_uninitialized()) {
         return false;
     }
     return (!(val.is_array() || val.is_table()));
@@ -150,7 +150,7 @@ bool tomlReaderElement::hasAttribute(const std::string& attributeName) const
 bool tomlReaderElement::hasElement(const std::string& elementName) const
 {
     auto val = toml::find_or(current->getElement(), elementName, uval);
-    if (!val.is_uninitialized()) {
+    if (val.is_uninitialized()) {
         return false;
     }
     return (val.is_array() || val.is_table());
@@ -173,7 +173,17 @@ readerAttribute tomlReaderElement::getFirstAttribute()
 
     while (attIterator != elementEnd) {
         if (isAttribute(attIterator->second)) {
-            return {attIterator->first, attIterator->second.as_string()};
+            switch (attIterator->second.type())
+            {
+            case toml::value_t::integer:
+                return {attIterator->first,std::to_string(attIterator->second.as_integer())};
+            case toml::value_t::floating:
+                return {attIterator->first,std::to_string(attIterator->second.as_floating())};
+            case toml::value_t::string:
+                return {attIterator->first, attIterator->second.as_string()};
+            case toml::value_t::boolean:
+                return {attIterator->first,std::to_string(attIterator->second.as_boolean())};
+            }
         }
         ++attIterator;
         ++iteratorCount;
@@ -202,7 +212,17 @@ readerAttribute tomlReaderElement::getNextAttribute()
     ++iteratorCount;
     while (attIterator != elementEnd) {
         if (isAttribute(attIterator->second)) {
-            return {attIterator->first, attIterator->second.as_string()};
+            switch (attIterator->second.type())
+            {
+            case toml::value_t::integer:
+                return {attIterator->first,std::to_string(attIterator->second.as_integer())};
+            case toml::value_t::floating:
+                return {attIterator->first,std::to_string(attIterator->second.as_floating())};
+            case toml::value_t::string:
+                return {attIterator->first, attIterator->second.as_string()};
+            case toml::value_t::boolean:
+                return {attIterator->first,std::to_string(attIterator->second.as_boolean())};
+            }
         }
         ++attIterator;
         ++iteratorCount;
@@ -280,12 +300,12 @@ void tomlReaderElement::moveToFirstChild(const std::string& childName)
         return;
     }
     auto val = toml::find_or(current->getElement(), childName, uval);
-    if (!val.is_uninitialized()) {
+    if (val.is_uninitialized()) {
         current = std::make_shared<tomlElement>(uval, childName);
     }
 
     parents.push_back(current);
-    current->clear();
+    current=std::make_shared<tomlElement>(val, childName);
 }
 
 void tomlReaderElement::moveToNextSibling()
@@ -345,7 +365,7 @@ void tomlReaderElement::moveToNextSibling(const std::string& siblingName)
         current->clear();
     } else {
         auto val = toml::find_or(current->getElement(), siblingName, uval);
-        if (!val.is_uninitialized()) {
+        if (val.is_uninitialized()) {
             current = std::make_shared<tomlElement>(uval, siblingName);
         }
     }
