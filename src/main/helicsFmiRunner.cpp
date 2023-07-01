@@ -191,7 +191,7 @@ int FmiRunner::load()
         LOG_ERROR(fmt::format("error loading federateInfo from file :{}", e.what()));
         return errorTerminate(FILE_PROCESSING_ERROR);
     }
-    if (int result = startBroker() != 0)
+    if (const int result = startBroker();result != 0)
     {
         return result;
     }
@@ -266,69 +266,22 @@ int FmiRunner::load()
             return errorTerminate(FMU_ERROR);
         }
     } else if ((ext == ".json") || (ext == ".JSON")) {
-        jsonReaderElement system(inputFile);
-        if (system.isValid()) {
-            try {
-                const int lfile = loadFile(system);
-                if (lfile != 0) {
-                    errorTerminate(FILE_PROCESSING_ERROR);
-                    return lfile;
-                }
-                if (cosimFeds.size() + meFeds.size() == 1) {
-                    if (!cosimFeds.empty()) {
-                        cosimFeds.front()->loadFromFile(inputFile);
-                    } else {
-                        // meFeds.front()->loadFromFile(inputFile)
-                    }
-                }
-            }
-            catch (const std::exception& e) {
-                LOG_ERROR(fmt::format("error loading system ", e.what()));
-                return errorTerminate(FILE_PROCESSING_ERROR);
-            }
-        } else {
-            return errorTerminate(FILE_PROCESSING_ERROR);
+        int result=loadSystemFile(jsonReaderElement(inputFile),inputFile);
+        if (result != EXIT_SUCCESS)
+        {
+            return result;
         }
     } else if ((ext == ".toml") || (ext == ".TOML")) {
-        tomlReaderElement system(inputFile);
-        if (system.isValid()) {
-            try {
-                const int lfile = loadFile(system);
-                if (lfile != 0) {
-                    errorTerminate(FILE_PROCESSING_ERROR);
-                    return lfile;
-                }
-                if (cosimFeds.size() + meFeds.size() == 1) {
-                    if (!cosimFeds.empty()) {
-                        cosimFeds.front()->loadFromFile(inputFile);
-                    } else {
-                        // meFeds.front()->loadFromFile(inputFile)
-                    }
-                }
-            }
-            catch (const std::exception& e) {
-                LOG_ERROR(fmt::format("error loading system ", e.what()));
-                return errorTerminate(FILE_PROCESSING_ERROR);
-            }
-        } else {
-            return errorTerminate(FILE_PROCESSING_ERROR);
+        int result=loadSystemFile(tomlReaderElement(inputFile),inputFile);
+        if (result != EXIT_SUCCESS)
+        {
+            return result;
         }
     } else if ((ext == ".xml") || (ext == ".XML")) {
-        tinyxml2ReaderElement system(inputFile);
-        if (system.isValid()) {
-            try {
-                const int lfile = loadFile(system);
-                if (lfile != 0) {
-                    errorTerminate(FILE_PROCESSING_ERROR);
-                    return lfile;
-                }
-            }
-            catch (const std::exception& e) {
-                LOG_ERROR(fmt::format("error loading system ", e.what()));
-                return errorTerminate(FILE_PROCESSING_ERROR);
-            }
-        } else {
-            return errorTerminate(FILE_PROCESSING_ERROR);
+        int result=loadSystemFile(tinyxml2ReaderElement(inputFile),inputFile);
+        if (result != EXIT_SUCCESS)
+        {
+            return result;
         }
     }
     currentState = State::LOADED;
@@ -352,7 +305,34 @@ int FmiRunner::load()
             LOG_WARNING(fmt::format("flag {} was not recognized ", flag));
         }
     }
-    return 0;
+    return EXIT_SUCCESS;
+}
+
+int FmiRunner::loadSystemFile(readerElement& system, const std::string &inputFile)
+{
+    if (system.isValid()) {
+        try {
+            const int lfile = loadFile(system);
+            if (lfile != EXIT_SUCCESS) {
+                errorTerminate(FILE_PROCESSING_ERROR);
+                return lfile;
+            }
+            if (cosimFeds.size() + meFeds.size() == 1) {
+                if (!cosimFeds.empty()) {
+                    cosimFeds.front()->loadFromFile(inputFile);
+                } else {
+                    // meFeds.front()->loadFromFile(inputFile)
+                }
+            }
+        }
+        catch (const std::exception& e) {
+            LOG_ERROR(fmt::format("error loading system ", e.what()));
+            return errorTerminate(FILE_PROCESSING_ERROR);
+        }
+    } else {
+        return errorTerminate(FILE_PROCESSING_ERROR);
+    }
+    return EXIT_SUCCESS;
 }
 
 int FmiRunner::run(helics::Time stop)
@@ -391,7 +371,7 @@ int FmiRunner::run(helics::Time stop)
         core->forceTerminate();
     }
     currentState = State::RUNNING;
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 std::future<int> FmiRunner::runAsync(helics::Time stop)
@@ -408,7 +388,7 @@ int FmiRunner::initialize()
         }
     }
     if (currentState >= State::INITIALIZED) {
-        return 0;
+        return EXIT_SUCCESS;
     }
     std::vector<int> paramUsed(setParameters.size(), 0);
     for (auto& csFed : cosimFeds) {
@@ -448,7 +428,7 @@ int FmiRunner::initialize()
         }
     }
     currentState = State::INITIALIZED;
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 int FmiRunner::close()
@@ -464,7 +444,7 @@ int FmiRunner::close()
         core.reset();
     }
     currentState = State::CLOSED;
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 int FmiRunner::errorTerminate(int errorCode)
@@ -540,7 +520,7 @@ int FmiRunner::startBroker()
         fedInfo.brokerPort = -1;
         fedInfo.broker = broker->getAddress();
     }
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 void FmiRunner::runnerLog(int loggingLevel, std::string_view message)

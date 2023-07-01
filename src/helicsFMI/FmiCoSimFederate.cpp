@@ -120,7 +120,7 @@ void CoSimFederate::configure(helics::Time step, helics::Time startTime)
     timeBias = startTime;
     logLevel = fed.getIntegerProperty(HELICS_PROPERTY_INT_LOG_LEVEL);
 
-    int icount = fed.getInputCount();
+    const int icount = fed.getInputCount();
     std::vector<int> input_list_used(input_list.size(), 0);
     // get the already configured inputs
     for (int ii = 0; ii < icount; ++ii) {
