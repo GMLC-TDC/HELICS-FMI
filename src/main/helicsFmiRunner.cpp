@@ -487,7 +487,6 @@ std::string FmiRunner::getFilePath(const std::string& file) const
     return {};
 }
 
-
 int FmiRunner::startBroker()
 {
     if (fedInfo.autobroker) {

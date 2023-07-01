@@ -174,14 +174,15 @@ readerAttribute tomlReaderElement::getFirstAttribute()
     while (attIterator != elementEnd) {
         if (isAttribute(attIterator->second)) {
             switch (attIterator->second.type()) {
-            case toml::value_t::integer:
+                case toml::value_t::integer:
                     return {attIterator->first, std::to_string(attIterator->second.as_integer())};
-            case toml::value_t::floating:
+                case toml::value_t::floating:
                     return {attIterator->first, std::to_string(attIterator->second.as_floating())};
-            case toml::value_t::string:
-                return {attIterator->first, attIterator->second.as_string()};
-            case toml::value_t::boolean:
-                return {attIterator->first,attIterator->second.as_boolean()?"true":"false"};
+                case toml::value_t::string:
+                    return {attIterator->first, attIterator->second.as_string()};
+                case toml::value_t::boolean:
+                    return {attIterator->first,
+                            attIterator->second.as_boolean() ? "true" : "false"};
             }
         }
         ++attIterator;
@@ -212,14 +213,15 @@ readerAttribute tomlReaderElement::getNextAttribute()
     while (attIterator != elementEnd) {
         if (isAttribute(attIterator->second)) {
             switch (attIterator->second.type()) {
-            case toml::value_t::integer:
+                case toml::value_t::integer:
                     return {attIterator->first, std::to_string(attIterator->second.as_integer())};
-            case toml::value_t::floating:
+                case toml::value_t::floating:
                     return {attIterator->first, std::to_string(attIterator->second.as_floating())};
-            case toml::value_t::string:
-                return {attIterator->first, attIterator->second.as_string()};
-            case toml::value_t::boolean:
-                return {attIterator->first,attIterator->second.as_boolean()?"true":"false"};
+                case toml::value_t::string:
+                    return {attIterator->first, attIterator->second.as_string()};
+                case toml::value_t::boolean:
+                    return {attIterator->first,
+                            attIterator->second.as_boolean() ? "true" : "false"};
             }
         }
         ++attIterator;

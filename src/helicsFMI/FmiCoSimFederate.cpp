@@ -154,8 +154,7 @@ void CoSimFederate::configure(helics::Time step, helics::Time startTime)
                 auto iType = helicsfmi::getHelicsType(inputInfo.type);
                 inputs.emplace_back(&fed, input, iType);
                 LOG_INTERFACES(fmt::format("created input {}", inputs.back().getName()));
-            }
-            else {
+            } else {
                 fed.logWarningMessage(input + " is not a recognized input");
             }
         }
@@ -188,7 +187,7 @@ void CoSimFederate::configure(helics::Time step, helics::Time startTime)
         }
         pubs.push_back(pub);
     }
-   int outIndex = 0;
+    int outIndex = 0;
 
     for (const auto& output : output_list) {
         if (output_list_used[outIndex] == 0) {
@@ -197,8 +196,7 @@ void CoSimFederate::configure(helics::Time step, helics::Time startTime)
                 auto iType = helicsfmi::getHelicsType(outputInfo.type);
                 pubs.emplace_back(&fed, output, iType);
                 LOG_INTERFACES(fmt::format("created publication {}", pubs.back().getName()));
-            }
-            else {
+            } else {
                 fed.logWarningMessage(output + " is not a recognized output");
             }
         }
