@@ -97,6 +97,8 @@ class FmiRunner {
     /// @param file the filename
     /// @return a string with the full file path
     [[nodiscard]] std::string getFilePath(const std::string& file) const;
+
+    int startBroker();
 };
 
 }  // namespace helicsfmi

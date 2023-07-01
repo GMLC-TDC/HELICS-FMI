@@ -191,35 +191,9 @@ int FmiRunner::load()
         LOG_ERROR(fmt::format("error loading federateInfo from file :{}", e.what()));
         return errorTerminate(FILE_PROCESSING_ERROR);
     }
-    if (fedInfo.autobroker) {
-        try {
-            std::string args = brokerArgs;
-            if (!fedInfo.brokerInitString.empty()) {
-                if (!args.empty()) {
-                    args.push_back(' ');
-                }
-                args.append(fedInfo.brokerInitString);
-                fedInfo.brokerInitString.clear();
-            }
-            broker = std::make_unique<helics::BrokerApp>(fedInfo.coreType, args);
-            if (!broker->isConnected()) {
-                if (!broker->connect()) {
-                    LOG_ERROR("broker failed to connect");
-                    return errorTerminate(BROKER_CONNECT_FAILURE);
-                }
-            }
-            LOG_SUMMARY(fmt::format("started autobroker with args \"{}\"", args));
-        }
-        catch (const std::exception& e) {
-            LOG_ERROR(fmt::format("error generating broker :{}", e.what()));
-            return errorTerminate(BROKER_CONNECT_FAILURE);
-        }
-    }
-    fedInfo.autobroker = false;
-
-    if (broker) {
-        fedInfo.brokerPort = -1;
-        fedInfo.broker = broker->getAddress();
+    if (int result = startBroker() != 0)
+    {
+        return result;
     }
     LOG_SUMMARY(
         fmt::format("starting core with args {}", helics::generateFullCoreInitString(fedInfo)));
@@ -533,6 +507,42 @@ std::string FmiRunner::getFilePath(const std::string& file) const
     return {};
 }
 
+
+int FmiRunner::startBroker()
+{
+    if (fedInfo.autobroker) {
+        try {
+            std::string args = brokerArgs;
+            if (!fedInfo.brokerInitString.empty()) {
+                if (!args.empty()) {
+                    args.push_back(' ');
+                }
+                args.append(fedInfo.brokerInitString);
+                fedInfo.brokerInitString.clear();
+            }
+            broker = std::make_unique<helics::BrokerApp>(fedInfo.coreType, args);
+            if (!broker->isConnected()) {
+                if (!broker->connect()) {
+                    LOG_ERROR("broker failed to connect");
+                    return errorTerminate(BROKER_CONNECT_FAILURE);
+                }
+            }
+            LOG_SUMMARY(fmt::format("started autobroker with args \"{}\"", args));
+        }
+        catch (const std::exception& e) {
+            LOG_ERROR(fmt::format("error generating broker :{}", e.what()));
+            return errorTerminate(BROKER_CONNECT_FAILURE);
+        }
+    }
+    fedInfo.autobroker = false;
+
+    if (broker) {
+        fedInfo.brokerPort = -1;
+        fedInfo.broker = broker->getAddress();
+    }
+    return 0;
+}
+
 void FmiRunner::runnerLog(int loggingLevel, std::string_view message)
 {
     if (loggingLevel > logLevel) {
@@ -611,7 +621,7 @@ int FmiRunner::loadFile(readerElement& elem)
                 if (attr.getName() == "field") {
                     const std::string& str1 = attr.getText();
                     if (!str1.empty()) {
-                        double val = elem.getAttributeValue("value");
+                        const double val = elem.getAttributeValue("value");
                         if (val != readerNullVal) {
                             fed->set(str1, val);
                         } else {
@@ -622,7 +632,7 @@ int FmiRunner::loadFile(readerElement& elem)
                     while (attr.isValid()) {
                         const std::string& str1 = attr.getName();
                         if (!str1.empty()) {
-                            double val = attr.getValue();
+                            const double val = attr.getValue();
                             if (val != readerNullVal) {
                                 fed->set(str1, val);
                             } else {

@@ -182,7 +182,7 @@ readerAttribute tomlReaderElement::getFirstAttribute()
             case toml::value_t::string:
                 return {attIterator->first, attIterator->second.as_string()};
             case toml::value_t::boolean:
-                return {attIterator->first,std::to_string(attIterator->second.as_boolean())};
+                return {attIterator->first,attIterator->second.as_boolean()?"true":"false"};
             }
         }
         ++attIterator;
@@ -221,7 +221,7 @@ readerAttribute tomlReaderElement::getNextAttribute()
             case toml::value_t::string:
                 return {attIterator->first, attIterator->second.as_string()};
             case toml::value_t::boolean:
-                return {attIterator->first,std::to_string(attIterator->second.as_boolean())};
+                return {attIterator->first,attIterator->second.as_boolean()?"true":"false"};
             }
         }
         ++attIterator;

@@ -82,9 +82,7 @@ void CoSimFederate::loadFromFile(const std::string& configFile)
             fed.registerInterfaces(configFile);
             break;
         case FileType::fmu:
-            break;
         case FileType::none:
-            break;
         case FileType::xml:
             break;
         case FileType::unrecognized:
@@ -127,7 +125,7 @@ void CoSimFederate::configure(helics::Time step, helics::Time startTime)
     // get the already configured inputs
     for (int ii = 0; ii < icount; ++ii) {
         auto& inp = fed.getInput(ii);
-        auto& iname = inp.getInfo();
+        const auto& iname = inp.getInfo();
         if (!iname.empty()) {
             const auto& inputInfo = cs->addInputVariable(iname);
             if (inputInfo.index >= 0) {
@@ -148,27 +146,28 @@ void CoSimFederate::configure(helics::Time step, helics::Time startTime)
         }
         inputs.push_back(inp);
     }
-    int jj = 0;
+    int inputIndex = 0;
     for (const auto& input : input_list) {
-        if (input_list_used[jj] > 0) {
-            continue;
+        if (input_list_used[inputIndex] == 0) {
+            const auto& inputInfo = cs->addInputVariable(input);
+            if (inputInfo.index >= 0) {
+                auto iType = helicsfmi::getHelicsType(inputInfo.type);
+                inputs.emplace_back(&fed, input, iType);
+                LOG_INTERFACES(fmt::format("created input {}", inputs.back().getName()));
+            }
+            else {
+                fed.logWarningMessage(input + " is not a recognized input");
+            }
         }
-        const auto& inputInfo = cs->addInputVariable(input);
-        if (inputInfo.index >= 0) {
-            auto iType = helicsfmi::getHelicsType(inputInfo.type);
-            inputs.emplace_back(&fed, input, iType);
-            LOG_INTERFACES(fmt::format("created input {}", inputs.back().getName()));
-        } else {
-            fed.logWarningMessage(input + " is not a recognized input");
-        }
+        ++inputIndex;
     }
 
-    int ocount = fed.getPublicationCount();
+    const int ocount = fed.getPublicationCount();
     std::vector<int> output_list_used(output_list.size(), 0);
     // get the already configured inputs
     for (int ii = 0; ii < ocount; ++ii) {
         auto& pub = fed.getPublication(ii);
-        auto& iname = pub.getInfo();
+        const auto& iname = pub.getInfo();
         if (!iname.empty()) {
             const auto& outputInfo = cs->addOutputVariable(iname);
             if (outputInfo.index >= 0) {
@@ -189,20 +188,21 @@ void CoSimFederate::configure(helics::Time step, helics::Time startTime)
         }
         pubs.push_back(pub);
     }
-    jj = 0;
+   int outIndex = 0;
 
     for (const auto& output : output_list) {
-        if (output_list_used[jj] > 0) {
-            continue;
+        if (output_list_used[outIndex] == 0) {
+            const auto& outputInfo = cs->addOutputVariable(output);
+            if (outputInfo.index >= 0) {
+                auto iType = helicsfmi::getHelicsType(outputInfo.type);
+                pubs.emplace_back(&fed, output, iType);
+                LOG_INTERFACES(fmt::format("created publication {}", pubs.back().getName()));
+            }
+            else {
+                fed.logWarningMessage(output + " is not a recognized output");
+            }
         }
-        const auto& outputInfo = cs->addOutputVariable(output);
-        if (outputInfo.index >= 0) {
-            auto iType = helicsfmi::getHelicsType(outputInfo.type);
-            pubs.emplace_back(&fed, output, iType);
-            LOG_INTERFACES(fmt::format("created publication {}", pubs.back().getName()));
-        } else {
-            fed.logWarningMessage(output + " is not a recognized output");
-        }
+        ++outIndex;
     }
 
     const auto& def = cs->fmuInformation().getExperiment();

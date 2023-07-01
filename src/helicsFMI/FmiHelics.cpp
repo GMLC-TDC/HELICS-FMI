@@ -256,7 +256,7 @@ FileType getFileType(std::string_view fileName)
         }
         return FileType::unrecognized;
     }
-    std::string_view type = fileName.substr(loc + 1);
+    auto type = fileName.substr(loc + 1);
     auto fnd = typeMap.find(type);
     if (fnd != typeMap.end()) {
         return fnd->second;
