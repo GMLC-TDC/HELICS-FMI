@@ -191,8 +191,7 @@ int FmiRunner::load()
         LOG_ERROR(fmt::format("error loading federateInfo from file :{}", e.what()));
         return errorTerminate(FILE_PROCESSING_ERROR);
     }
-    if (int result = startBroker() != 0)
-    {
+    if (int result = startBroker() != 0) {
         return result;
     }
     LOG_SUMMARY(
@@ -506,7 +505,6 @@ std::string FmiRunner::getFilePath(const std::string& file) const
     }
     return {};
 }
-
 
 int FmiRunner::startBroker()
 {
