@@ -266,19 +266,19 @@ int FmiRunner::load()
         }
     } else if ((ext == ".json") || (ext == ".JSON")) {
         jsonReaderElement system(inputFile);
-        int result = loadSystemFile(system, inputFile);
+        const int result = loadSystemFile(system, inputFile);
         if (result != EXIT_SUCCESS) {
             return result;
         }
     } else if ((ext == ".toml") || (ext == ".TOML")) {
         tomlReaderElement system(inputFile);
-        int result = loadSystemFile(system, inputFile);
+        const int result = loadSystemFile(system, inputFile);
         if (result != EXIT_SUCCESS) {
             return result;
         }
     } else if ((ext == ".xml") || (ext == ".XML")) {
         tinyxml2ReaderElement system(inputFile);
-        int result = loadSystemFile(system, inputFile);
+        const int result = loadSystemFile(system, inputFile);
         if (result != EXIT_SUCCESS) {
             return result;
         }
