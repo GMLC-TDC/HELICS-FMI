@@ -201,8 +201,6 @@ TEST(runnerTests, setfield2)
     EXPECT_EQ(str, 0);
 }
 
-
-
 TEST(runnerTests, setfieldFileJson)
 {
     static const std::string testFile = std::string(TEST_DIR) + "test1.json";

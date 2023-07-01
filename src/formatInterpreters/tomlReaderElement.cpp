@@ -173,12 +173,11 @@ readerAttribute tomlReaderElement::getFirstAttribute()
 
     while (attIterator != elementEnd) {
         if (isAttribute(attIterator->second)) {
-            switch (attIterator->second.type())
-            {
+            switch (attIterator->second.type()) {
             case toml::value_t::integer:
-                return {attIterator->first,std::to_string(attIterator->second.as_integer())};
+                    return {attIterator->first, std::to_string(attIterator->second.as_integer())};
             case toml::value_t::floating:
-                return {attIterator->first,std::to_string(attIterator->second.as_floating())};
+                    return {attIterator->first, std::to_string(attIterator->second.as_floating())};
             case toml::value_t::string:
                 return {attIterator->first, attIterator->second.as_string()};
             case toml::value_t::boolean:
@@ -212,12 +211,11 @@ readerAttribute tomlReaderElement::getNextAttribute()
     ++iteratorCount;
     while (attIterator != elementEnd) {
         if (isAttribute(attIterator->second)) {
-            switch (attIterator->second.type())
-            {
+            switch (attIterator->second.type()) {
             case toml::value_t::integer:
-                return {attIterator->first,std::to_string(attIterator->second.as_integer())};
+                    return {attIterator->first, std::to_string(attIterator->second.as_integer())};
             case toml::value_t::floating:
-                return {attIterator->first,std::to_string(attIterator->second.as_floating())};
+                    return {attIterator->first, std::to_string(attIterator->second.as_floating())};
             case toml::value_t::string:
                 return {attIterator->first, attIterator->second.as_string()};
             case toml::value_t::boolean:
@@ -305,7 +303,7 @@ void tomlReaderElement::moveToFirstChild(const std::string& childName)
     }
 
     parents.push_back(current);
-    current=std::make_shared<tomlElement>(val, childName);
+    current = std::make_shared<tomlElement>(val, childName);
 }
 
 void tomlReaderElement::moveToNextSibling()
