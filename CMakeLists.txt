@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-cmake_minimum_required(VERSION 3.17...3.25)
+cmake_minimum_required(VERSION 3.17...3.26)
 
 # Install dependencies using vcpkg if VCPKG_ROOT is set and no CMake Toolchain file is given vcpkg
 # installation on a system doesn't set VCPKG_ROOT, so setting it should be like an opt-in for users
@@ -20,7 +20,7 @@ endif()
 project(HELICS_FMI VERSION 0.9.0)
 
 # set (HELICS_FMI_VERSION_BUILD )
-set(HELICS_FMI_DATE "2023-05-19")
+set(HELICS_FMI_DATE "2023-07-01")
 set(HELICS_FMI_VERSION_UNDERSCORE
     "${HELICS_FMI_VERSION_MAJOR}_${HELICS_FMI_VERSION_MINOR}_${HELICS_FMI_VERSION_PATCH}"
 )
