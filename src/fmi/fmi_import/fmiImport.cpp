@@ -199,8 +199,16 @@ bool FmiLibrary::loadFMU(const std::string& fmuPath)
 
 bool FmiLibrary::loadFMU(const std::string& fmuPath, const std::string& extractLoc)
 {
+    if (extractLoc.empty()) {
+        return loadFMU(fmuPath);
+    }
     extractDirectory = extractLoc;
     fmuName = fmuPath;
+    auto xmlfile = extractDirectory / "modelDescription.xml";
+    if (!exists(xmlfile)) {
+        extractDirectory = extractDirectory / fmuName.stem();
+    }
+
     return loadInformation();
 }
 

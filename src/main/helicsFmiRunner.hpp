@@ -40,7 +40,7 @@ class FmiRunner {
     std::string integrator{"cvode"};
     std::string integratorArgs;
     std::string brokerArgs;
-    helics::Time stepTime{helics::Time::minVal()};
+    helics::Time stepTime{1.0};
     helics::Time stopTime{helics::Time::minVal()};
     std::vector<std::string> inputs;
     std::vector<std::string> output_variables;
@@ -48,6 +48,7 @@ class FmiRunner {
     std::vector<std::string> connections;
     //!< paths to find the fmu or other files
     std::vector<std::string> paths;
+    std::string extractPath;
     bool cosimFmu{true};
     helics::FederateInfo fedInfo;
     std::unique_ptr<helics::BrokerApp> broker;
@@ -96,6 +97,9 @@ class FmiRunner {
     /// @param file the filename
     /// @return a string with the full file path
     [[nodiscard]] std::string getFilePath(const std::string& file) const;
+
+    int startBroker();
+    int loadSystemFile(readerElement& system, const std::string& inputFile);
 };
 
 }  // namespace helicsfmi

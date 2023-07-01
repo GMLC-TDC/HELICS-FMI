@@ -54,8 +54,7 @@ void publishOutput(helics::Publication& pub, fmi2Object* fmiObj, std::size_t ind
         case fmi_variable_type::boolean: {
             auto val = fmiObj->get<fmi2Boolean>(var);
             pub.publish(val != fmi2False);
-            [[unlikely]] if (logValues)
-            {
+            if (logValues) {
                 fmiObj->logMessage("data", fmt::format("publishing {} to {}", val, pub.getName()));
             }
         } break;
@@ -63,8 +62,7 @@ void publishOutput(helics::Publication& pub, fmi2Object* fmiObj, std::size_t ind
         case fmi_variable_type::enumeration: {
             auto val = fmiObj->get<std::int64_t>(var);
             pub.publish(val);
-            [[unlikely]] if (logValues)
-            {
+            if (logValues) {
                 fmiObj->logMessage("data", fmt::format("publishing {} to {}", val, pub.getName()));
             }
         } break;
@@ -72,8 +70,7 @@ void publishOutput(helics::Publication& pub, fmi2Object* fmiObj, std::size_t ind
         case fmi_variable_type::numeric: {
             auto val = fmiObj->get<double>(var);
             pub.publish(val);
-            [[unlikely]] if (logValues)
-            {
+            if (logValues) {
                 fmiObj->logMessage("data", fmt::format("publishing {} to {}", val, pub.getName()));
             }
         } break;
@@ -81,8 +78,7 @@ void publishOutput(helics::Publication& pub, fmi2Object* fmiObj, std::size_t ind
         default: {
             auto val = fmiObj->get<std::string_view>(var);
             pub.publish(val);
-            [[unlikely]] if (logValues)
-            {
+            if (logValues) {
                 fmiObj->logMessage("data", fmt::format("publishing {} to {}", val, pub.getName()));
             }
         } break;
@@ -99,8 +95,7 @@ void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index, bool l
         case fmi_variable_type::boolean: {
             auto val = inp.getValue<fmi2Boolean>();
             fmiObj->set(var, val);
-            [[unlikely]] if (logValues)
-            {
+            if (logValues) {
                 fmiObj->logMessage("data", fmt::format("received {} for {}", val, inp.getName()));
             }
         } break;
@@ -108,8 +103,7 @@ void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index, bool l
         case fmi_variable_type::enumeration: {
             auto val = inp.getValue<fmi2Integer>();
             fmiObj->set(var, val);
-            [[unlikely]] if (logValues)
-            {
+            if (logValues) {
                 fmiObj->logMessage("data", fmt::format("received {} for {}", val, inp.getName()));
             }
         } break;
@@ -117,8 +111,7 @@ void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index, bool l
         case fmi_variable_type::numeric: {
             auto val = inp.getValue<fmi2Real>();
             fmiObj->set(var, val);
-            [[unlikely]] if (logValues)
-            {
+            if (logValues) {
                 fmiObj->logMessage("data", fmt::format("received {} for {}", val, inp.getName()));
             }
         } break;
@@ -126,8 +119,7 @@ void grabInput(helics::Input& inp, fmi2Object* fmiObj, std::size_t index, bool l
         default: {
             auto val = inp.getValue<std::string>();
             fmiObj->set(var, val);
-            [[unlikely]] if (logValues)
-            {
+            if (logValues) {
                 fmiObj->logMessage("data", fmt::format("received {} for {}", val, inp.getName()));
             }
         } break;
@@ -226,6 +218,50 @@ int fmiCategory2HelicsLogLevel(std::string_view category)
         return HELICS_LOG_LEVEL_ERROR;
     }
     return HELICS_LOG_LEVEL_DEBUG;
+}
+
+static const std::unordered_map<std::string_view, FileType> typeMap{{"fmu", FileType::fmu},
+                                                                    {"FMU", FileType::fmu},
+                                                                    {"Fmu", FileType::fmu},
+                                                                    {"json", FileType::json},
+                                                                    {"JSON", FileType::json},
+                                                                    {"Json", FileType::json},
+                                                                    {"jsn", FileType::json},
+                                                                    {"JSN", FileType::json},
+                                                                    {"toml", FileType::toml},
+                                                                    {"TOML", FileType::toml},
+                                                                    {"Toml", FileType::toml},
+                                                                    {"tml", FileType::toml},
+                                                                    {"toml", FileType::toml},
+                                                                    {"xml", FileType::xml},
+                                                                    {"XML", FileType::xml},
+                                                                    {"Xml", FileType::xml},
+                                                                    {"ssp", FileType::ssp},
+                                                                    {"SSP", FileType::ssp},
+                                                                    {"Ssp", FileType::ssp}};
+
+FileType getFileType(std::string_view fileName)
+{
+    auto nschar = fileName.find_first_not_of(" \n\t");
+    if (nschar == std::string_view::npos) {
+        return FileType::none;
+    }
+    auto loc = fileName.find_last_of('.');
+    if (loc < fileName.size() - 5) {
+        if (fileName[nschar] == '{') {
+            return FileType::rawJson;
+        }
+        if (fileName[nschar] == '<') {
+            return FileType::rawXML;
+        }
+        return FileType::unrecognized;
+    }
+    auto type = fileName.substr(loc + 1);
+    auto fnd = typeMap.find(type);
+    if (fnd != typeMap.end()) {
+        return fnd->second;
+    }
+    return FileType::unrecognized;
 }
 
 }  // namespace helicsfmi

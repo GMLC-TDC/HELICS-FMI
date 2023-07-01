@@ -15,6 +15,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/BrokerApp.hpp"
 #include "helics/application_api/CoreApp.hpp"
 #include "helics/core/Core.hpp"
+#include "helics/core/core-exceptions.hpp"
 #include "helics/core/helicsCLI11.hpp"
 #include "helics/core/helicsVersion.hpp"
 #include "helicsFMI/FmiCoSimFederate.hpp"
@@ -131,6 +132,8 @@ std::unique_ptr<CLI::App> FmiRunner::generateCLI()
                     paths,
                     "Specify additional search paths for the fmu's or configuration files")
         ->check(CLI::ExistingPath);
+    app->add_option("--extractpath", extractPath, "the file location in which to extract the FMU")
+        ->check(CLI::ExistingDirectory);
     app->add_flag("--cosim",
                   cosimFmu,
                   "specify that the fmu should run as a co-sim FMU if possible");
@@ -169,52 +172,27 @@ int FmiRunner::load()
     if (currentState >= State::LOADED) {
         return (currentState == State::ERROR) ? returnCode : EXIT_SUCCESS;
     }
-    if (fedInfo.autobroker) {
-        try {
-            std::string args = brokerArgs;
-            if (!fedInfo.brokerInitString.empty()) {
-                if (!args.empty()) {
-                    args.push_back(' ');
-                }
-                args.append(fedInfo.brokerInitString);
-                fedInfo.brokerInitString.clear();
-            }
-            broker = std::make_unique<helics::BrokerApp>(fedInfo.coreType, args);
-            if (!broker->isConnected()) {
-                if (!broker->connect()) {
-                    LOG_ERROR("broker failed to connect");
-                    return errorTerminate(BROKER_CONNECT_FAILURE);
-                }
-            }
-            LOG_SUMMARY(fmt::format("started autobroker with args \"{}\"", args));
-        }
-        catch (const std::exception& e) {
-            LOG_ERROR(fmt::format("error generating broker :{}", e.what()));
-            return errorTerminate(BROKER_CONNECT_FAILURE);
+    if (inputs.empty()) {
+        return errorTerminate(MISSING_FILE);
+    }
+    const std::string inputFile = getFilePath(inputs.front());
+    if (inputFile.empty()) {
+        return errorTerminate(INVALID_FILE);
+    }
+    auto ext = inputFile.substr(inputFile.find_last_of('.'));
+    try {
+        if ((ext == ".json") || (ext == ".JSON")) {
+            fedInfo.loadInfoFromJson(inputFile);
+        } else if ((ext == ".toml") || (ext == ".TOML")) {
+            fedInfo.loadInfoFromToml(inputFile);
         }
     }
-    fedInfo.autobroker = false;
-    if (stepTime > helics::timeZero) {
-        fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, stepTime);
-    } else {
-        stepTime = fedInfo.checkTimeProperty(HELICS_PROPERTY_TIME_PERIOD, 0.001);
-        if (stepTime == 0.001) {
-            fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, stepTime);
-        }
+    catch (const helics::HelicsException& e) {
+        LOG_ERROR(fmt::format("error loading federateInfo from file :{}", e.what()));
+        return errorTerminate(FILE_PROCESSING_ERROR);
     }
-
-    if (stopTime > helics::timeZero) {
-        fedInfo.setProperty(HELICS_PROPERTY_TIME_STOPTIME, stopTime);
-    } else {
-        stopTime = fedInfo.checkTimeProperty(HELICS_PROPERTY_TIME_STOPTIME, 30.0);
-        if (stopTime == 30.0) {
-            fedInfo.setProperty(HELICS_PROPERTY_TIME_STOPTIME, stopTime);
-        }
-    }
-
-    if (broker) {
-        fedInfo.brokerPort = -1;
-        fedInfo.broker = broker->getAddress();
+    if (const int result = startBroker(); result != 0) {
+        return result;
     }
     LOG_SUMMARY(
         fmt::format("starting core with args {}", helics::generateFullCoreInitString(fedInfo)));
@@ -229,19 +207,29 @@ int FmiRunner::load()
         }
     }
     crptr = core->getCopyofCorePointer();
-    if (inputs.empty()) {
-        return errorTerminate(MISSING_FILE);
-    }
-    const std::string inputFile = getFilePath(inputs.front());
-    if (inputFile.empty()) {
-        return errorTerminate(INVALID_FILE);
-    }
-    auto ext = inputFile.substr(inputFile.find_last_of('.'));
+
     fedInfo.coreName = core->getIdentifier();
     FmiLibrary fmi;
     if ((ext == ".fmu") || (ext == ".FMU")) {
+        if (stepTime > helics::timeZero) {
+            fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, stepTime);
+        } else {
+            stepTime = fedInfo.checkTimeProperty(HELICS_PROPERTY_TIME_PERIOD, 0.001);
+            if (stepTime == 0.001) {
+                fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, stepTime);
+            }
+        }
+
+        if (stopTime > helics::timeZero) {
+            fedInfo.setProperty(HELICS_PROPERTY_TIME_STOPTIME, stopTime);
+        } else {
+            stopTime = fedInfo.checkTimeProperty(HELICS_PROPERTY_TIME_STOPTIME, 30.0);
+            if (stopTime == 30.0) {
+                fedInfo.setProperty(HELICS_PROPERTY_TIME_STOPTIME, stopTime);
+            }
+        }
         try {
-            if (!fmi.loadFMU(inputFile)) {
+            if (!fmi.loadFMU(inputFile, extractPath)) {
                 LOG_ERROR(fmt::format("error loading fmu: error code={}", fmi.getErrorCode()));
                 return errorTerminate(INVALID_FMU);
             }
@@ -278,50 +266,21 @@ int FmiRunner::load()
         }
     } else if ((ext == ".json") || (ext == ".JSON")) {
         jsonReaderElement system(inputFile);
-        if (system.isValid()) {
-            try {
-                loadFile(system);
-            }
-            catch (const std::exception& e) {
-                LOG_ERROR(fmt::format("error loading system ", e.what()));
-                return errorTerminate(FILE_PROCESSING_ERROR);
-            }
-        } else {
-            return errorTerminate(FILE_PROCESSING_ERROR);
+        const int result = loadSystemFile(system, inputFile);
+        if (result != EXIT_SUCCESS) {
+            return result;
         }
     } else if ((ext == ".toml") || (ext == ".TOML")) {
         tomlReaderElement system(inputFile);
-        if (system.isValid()) {
-            try {
-                const int lfile = loadFile(system);
-                if (lfile != 0) {
-                    errorTerminate(FILE_PROCESSING_ERROR);
-                    return lfile;
-                }
-            }
-            catch (const std::exception& e) {
-                LOG_ERROR(fmt::format("error loading system ", e.what()));
-                return errorTerminate(FILE_PROCESSING_ERROR);
-            }
-        } else {
-            return errorTerminate(FILE_PROCESSING_ERROR);
+        const int result = loadSystemFile(system, inputFile);
+        if (result != EXIT_SUCCESS) {
+            return result;
         }
     } else if ((ext == ".xml") || (ext == ".XML")) {
         tinyxml2ReaderElement system(inputFile);
-        if (system.isValid()) {
-            try {
-                const int lfile = loadFile(system);
-                if (lfile != 0) {
-                    errorTerminate(FILE_PROCESSING_ERROR);
-                    return lfile;
-                }
-            }
-            catch (const std::exception& e) {
-                LOG_ERROR(fmt::format("error loading system ", e.what()));
-                return errorTerminate(FILE_PROCESSING_ERROR);
-            }
-        } else {
-            return errorTerminate(FILE_PROCESSING_ERROR);
+        const int result = loadSystemFile(system, inputFile);
+        if (result != EXIT_SUCCESS) {
+            return result;
         }
     }
     currentState = State::LOADED;
@@ -345,7 +304,34 @@ int FmiRunner::load()
             LOG_WARNING(fmt::format("flag {} was not recognized ", flag));
         }
     }
-    return 0;
+    return EXIT_SUCCESS;
+}
+
+int FmiRunner::loadSystemFile(readerElement& system, const std::string& inputFile)
+{
+    if (system.isValid()) {
+        try {
+            const int lfile = loadFile(system);
+            if (lfile != EXIT_SUCCESS) {
+                errorTerminate(FILE_PROCESSING_ERROR);
+                return lfile;
+            }
+            if (cosimFeds.size() + meFeds.size() == 1) {
+                if (!cosimFeds.empty()) {
+                    cosimFeds.front()->loadFromFile(inputFile);
+                } else {
+                    // meFeds.front()->loadFromFile(inputFile)
+                }
+            }
+        }
+        catch (const std::exception& e) {
+            LOG_ERROR(fmt::format("error loading system ", e.what()));
+            return errorTerminate(FILE_PROCESSING_ERROR);
+        }
+    } else {
+        return errorTerminate(FILE_PROCESSING_ERROR);
+    }
+    return EXIT_SUCCESS;
 }
 
 int FmiRunner::run(helics::Time stop)
@@ -384,7 +370,7 @@ int FmiRunner::run(helics::Time stop)
         core->forceTerminate();
     }
     currentState = State::RUNNING;
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 std::future<int> FmiRunner::runAsync(helics::Time stop)
@@ -401,7 +387,7 @@ int FmiRunner::initialize()
         }
     }
     if (currentState >= State::INITIALIZED) {
-        return 0;
+        return EXIT_SUCCESS;
     }
     std::vector<int> paramUsed(setParameters.size(), 0);
     for (auto& csFed : cosimFeds) {
@@ -441,7 +427,7 @@ int FmiRunner::initialize()
         }
     }
     currentState = State::INITIALIZED;
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 int FmiRunner::close()
@@ -457,7 +443,7 @@ int FmiRunner::close()
         core.reset();
     }
     currentState = State::CLOSED;
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 int FmiRunner::errorTerminate(int errorCode)
@@ -500,6 +486,41 @@ std::string FmiRunner::getFilePath(const std::string& file) const
     return {};
 }
 
+int FmiRunner::startBroker()
+{
+    if (fedInfo.autobroker) {
+        try {
+            std::string args = brokerArgs;
+            if (!fedInfo.brokerInitString.empty()) {
+                if (!args.empty()) {
+                    args.push_back(' ');
+                }
+                args.append(fedInfo.brokerInitString);
+                fedInfo.brokerInitString.clear();
+            }
+            broker = std::make_unique<helics::BrokerApp>(fedInfo.coreType, args);
+            if (!broker->isConnected()) {
+                if (!broker->connect()) {
+                    LOG_ERROR("broker failed to connect");
+                    return errorTerminate(BROKER_CONNECT_FAILURE);
+                }
+            }
+            LOG_SUMMARY(fmt::format("started autobroker with args \"{}\"", args));
+        }
+        catch (const std::exception& e) {
+            LOG_ERROR(fmt::format("error generating broker :{}", e.what()));
+            return errorTerminate(BROKER_CONNECT_FAILURE);
+        }
+    }
+    fedInfo.autobroker = false;
+
+    if (broker) {
+        fedInfo.brokerPort = -1;
+        fedInfo.broker = broker->getAddress();
+    }
+    return EXIT_SUCCESS;
+}
+
 void FmiRunner::runnerLog(int loggingLevel, std::string_view message)
 {
     if (loggingLevel > logLevel) {
@@ -518,8 +539,31 @@ void FmiRunner::runnerLog(int loggingLevel, std::string_view message)
 
 int FmiRunner::loadFile(readerElement& elem)
 {
-    if (elem.hasAttribute("stoptime")) {
-        stopTime = elem.getAttributeValue("stoptime");
+    if (stopTime == helics::Time::minVal() && elem.hasAttribute("stop")) {
+        stopTime = loadTimeFromString(elem.getAttributeText("stop"), time_units::s);
+    }
+    if (stepTime == 1.0 && elem.hasAttribute("step")) {
+        stepTime = loadTimeFromString(elem.getAttributeText("step"), time_units::s);
+    }
+    if (stepTime > helics::timeZero) {
+        fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, stepTime);
+    } else {
+        stepTime = fedInfo.checkTimeProperty(HELICS_PROPERTY_TIME_PERIOD, 0.001);
+        if (stepTime == 0.001) {
+            fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, stepTime);
+        }
+    }
+
+    if (stopTime > helics::timeZero) {
+        fedInfo.setProperty(HELICS_PROPERTY_TIME_STOPTIME, stopTime);
+    } else {
+        stopTime = fedInfo.checkTimeProperty(HELICS_PROPERTY_TIME_STOPTIME, 30.0);
+        if (stopTime == 30.0) {
+            fedInfo.setProperty(HELICS_PROPERTY_TIME_STOPTIME, stopTime);
+        }
+    }
+    if (elem.hasAttribute("extractpath")) {
+        extractPath = elem.getAttributeText("extractpath");
     }
     elem.moveToFirstChild("fmus");
 
@@ -531,7 +575,7 @@ int FmiRunner::loadFile(readerElement& elem)
             LOG_ERROR(fmt::format("unable to locate file {}", elem.getAttributeText("fmu")));
             return errorTerminate(MISSING_FILE);
         }
-        fmilib->loadFMU(str);
+        fmilib->loadFMU(str, extractPath);
         if (fmilib->checkFlag(fmuCapabilityFlags::coSimulationCapable)) {
             std::shared_ptr<fmi2CoSimObject> obj =
                 fmilib->createCoSimulationObject(elem.getAttributeText("name"));
@@ -540,25 +584,57 @@ int FmiRunner::loadFile(readerElement& elem)
                 return errorTerminate(FMU_ERROR);
             }
             auto name = obj->getName();
-            auto fed = std::make_unique<CoSimFederate>(name, std::move(obj), fedInfo);
+
+            std::unique_ptr<CoSimFederate> fed;
+            if (elem.hasAttribute("config")) {
+                auto cfile = elem.getAttributeText("config");
+                auto localFedInfo = fedInfo;
+                fed = std::make_unique<CoSimFederate>(name, std::move(obj), localFedInfo, cfile);
+            } else {
+                fed = std::make_unique<CoSimFederate>(name, std::move(obj), fedInfo);
+            }
             elem.moveToFirstChild("parameters");
             while (elem.isValid()) {
-                const auto& str1 = elem.getFirstAttribute().getText();
-                auto attr = elem.getNextAttribute();
+                auto attr = elem.getFirstAttribute();
+                if (attr.getName() == "field") {
+                    const std::string& str1 = attr.getText();
+                    if (!str1.empty()) {
+                        const double val = elem.getAttributeValue("value");
+                        if (val != readerNullVal) {
+                            fed->set(str1, val);
+                        } else {
+                            fed->set(str1, elem.getAttributeText("value"));
+                        }
+                    }
+                } else {
+                    while (attr.isValid()) {
+                        const std::string& str1 = attr.getName();
+                        if (!str1.empty()) {
+                            const double val = attr.getValue();
+                            if (val != readerNullVal) {
+                                fed->set(str1, val);
+                            } else {
+                                fed->set(str1, attr.getText());
+                            }
+                        }
+                        attr = elem.getNextAttribute();
+                    }
+                }
 
                 elem.moveToNextSibling("parameters");
-                const double val = attr.getValue();
-                if (val != readerNullVal) {
-                    fed->set(str1, val);
-                } else {
-                    fed->set(str1, attr.getText());
-                }
             }
             elem.moveToParent();
+            helics::Time localStepTime{stepTime};
+            if (elem.hasAttribute("steptime")) {
+                localStepTime =
+                    loadTimeFromString(elem.getAttributeText("steptime"), time_units::s);
+            }
             if (elem.hasAttribute("starttime")) {
-                fed->configure(1.0, elem.getAttributeValue("starttime"));
+                fed->configure(localStepTime,
+                               loadTimeFromString(elem.getAttributeText("starttime"),
+                                                  time_units::s));
             } else {
-                fed->configure(1.0);
+                fed->configure(localStepTime);
             }
             cosimFeds.push_back(std::move(fed));
         } else {
@@ -575,6 +651,15 @@ int FmiRunner::loadFile(readerElement& elem)
                 auto str1 = elem.getFirstAttribute().getText();
                 auto str2 = elem.getNextAttribute().getText();
                 elem.moveToNextSibling("parameters");
+                fed->set(str1, str2);
+            }
+            elem.moveToParent();
+            elem.moveToFirstChild("parameters");
+            elem.moveToFirstChild();
+            while (elem.isValid()) {
+                auto str1 = elem.getName();
+                auto str2 = elem.getText();
+                elem.moveToNextSibling();
                 fed->set(str1, str2);
             }
             elem.moveToParent();

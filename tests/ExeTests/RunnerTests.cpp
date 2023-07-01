@@ -13,6 +13,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <filesystem>
+#include <fmt/format.h>
 #include <future>
 #include <thread>
 
@@ -51,6 +52,28 @@ TEST(runnerTests, singleFedAsyncZMQ)
     ASSERT_EQ(ret, 0);
     ret = runner.close();
     EXPECT_EQ(ret, 0);
+}
+
+TEST(runnerTests, singleFedExtractLoc)
+{
+    FmiRunner runner;
+    auto folderpath = std::filesystem::path(FMI_REFERENCE_DIR) / "test1";
+    ASSERT_TRUE(std::filesystem::create_directory(folderpath));
+    runner.parse(std::string("--autobroker --core=zmq --extractpath=") + folderpath.string() + " " +
+                 ftFile);
+    /**test that things run to completion with auto broker*/
+    int ret = runner.load();
+    ASSERT_EQ(ret, 0);
+    ret = runner.initialize();
+    ASSERT_EQ(ret, 0);
+    ret = runner.run();
+    ASSERT_EQ(ret, 0);
+    EXPECT_TRUE(std::filesystem::exists(folderpath / "Feedthrough"));
+
+    ret = runner.close();
+    EXPECT_EQ(ret, 0);
+
+    std::filesystem::remove_all(folderpath);
 }
 //
 TEST(runnerTests, dualFedZMQ)
@@ -145,6 +168,84 @@ TEST(runnerTests, setfield2)
         std::string(
             "--autobroker --coretype=zmq  --step=0.1s --stoptime=2.0s --name=bbfed --set h=5;v=2 --brokerargs=\"-f2 --name=sf2broker \" ") +
         bballFile);
+    int ret = runner.load();
+    ASSERT_EQ(ret, 0);
+    ret = runner.initialize();
+    ASSERT_EQ(ret, 0);
+
+    auto fut = runner.runAsync();
+
+    helics::ValueFederate vFed("fed1", "--coretype=zmq --forcenewcore");
+
+    vFed.enterInitializingModeIterative();
+
+    auto qres = helics::vectorizeQueryResult(vFed.query("bbfed", "publications"));
+
+    ASSERT_EQ(qres.size(), 2U);
+
+    auto& sub1 = vFed.registerSubscription(qres[0]);
+    sub1.setDefault(-20.0);
+    auto& sub2 = vFed.registerSubscription(qres[1]);
+    sub2.setDefault(-20.0);
+
+    vFed.enterExecutingMode();
+    auto time1 = vFed.requestTime(2.0);
+    EXPECT_LT(time1, 2.0);
+
+    auto val = sub1.getValue<double>();
+    auto val2 = sub2.getValue<double>();
+    EXPECT_GT(val, 5.0);
+    EXPECT_LT(val2, 2.0);
+    vFed.finalize();
+    auto str = fut.get();
+    EXPECT_EQ(str, 0);
+}
+
+TEST(runnerTests, setfieldFileJson)
+{
+    static const std::string testFile = std::string(TEST_DIR) + "test1.json";
+    helics::cleanupHelicsLibrary();
+    FmiRunner runner;
+    runner.parse(fmt::format("--fmupath={} {}", FMI_REFERENCE_DIR, testFile));
+    int ret = runner.load();
+    ASSERT_EQ(ret, 0);
+    ret = runner.initialize();
+    ASSERT_EQ(ret, 0);
+
+    auto fut = runner.runAsync();
+
+    helics::ValueFederate vFed("fed1", "--coretype=zmq --forcenewcore");
+
+    vFed.enterInitializingModeIterative();
+
+    auto qres = helics::vectorizeQueryResult(vFed.query("bbfed", "publications"));
+
+    ASSERT_EQ(qres.size(), 2U);
+
+    auto& sub1 = vFed.registerSubscription(qres[0]);
+    sub1.setDefault(-20.0);
+    auto& sub2 = vFed.registerSubscription(qres[1]);
+    sub2.setDefault(-20.0);
+
+    vFed.enterExecutingMode();
+    auto time1 = vFed.requestTime(2.0);
+    EXPECT_LT(time1, 2.0);
+
+    auto val = sub1.getValue<double>();
+    auto val2 = sub2.getValue<double>();
+    EXPECT_GT(val, 5.0);
+    EXPECT_LT(val2, 2.0);
+    vFed.finalize();
+    auto str = fut.get();
+    EXPECT_EQ(str, 0);
+}
+
+TEST(runnerTests, setfieldFileToml)
+{
+    static const std::string testFile = std::string(TEST_DIR) + "test1.toml";
+    helics::cleanupHelicsLibrary();
+    FmiRunner runner;
+    runner.parse(fmt::format("--fmupath={} {}", FMI_REFERENCE_DIR, testFile));
     int ret = runner.load();
     ASSERT_EQ(ret, 0);
     ret = runner.initialize();
