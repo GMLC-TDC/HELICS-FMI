@@ -99,7 +99,7 @@ class FmiRunner {
     [[nodiscard]] std::string getFilePath(const std::string& file) const;
 
     int startBroker();
-    int loadSystemFile(readerElement& system, const std::string &inputFile);
+    int loadSystemFile(readerElement& system, const std::string& inputFile);
 };
 
 }  // namespace helicsfmi

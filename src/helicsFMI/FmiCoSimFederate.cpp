@@ -84,6 +84,7 @@ void CoSimFederate::loadFromFile(const std::string& configFile)
         case FileType::fmu:
         case FileType::none:
         case FileType::xml:
+        case FileType::rawXML:
             break;
         case FileType::unrecognized:
             throw(Error("CoSimFederate", "unrecognized file type", -102));
@@ -130,7 +131,7 @@ void CoSimFederate::configure(helics::Time step, helics::Time startTime)
             const auto& inputInfo = cs->addInputVariable(iname);
             if (inputInfo.index >= 0) {
                 auto index = findMatch(input_list, iname);
-                if (index < input_list.size()) {
+                if (index < static_cast<int>(input_list.size())) {
                     input_list_used[ii] = 1;
                 }
             } else {
@@ -139,7 +140,7 @@ void CoSimFederate::configure(helics::Time step, helics::Time startTime)
             }
         } else {
             auto index = getUnused(input_list_used);
-            if (index < input_list.size()) {
+            if (index < static_cast<int>(input_list.size())) {
                 cs->addInputVariable(input_list[index]);
                 input_list_used[ii] = 1;
             }
@@ -171,7 +172,7 @@ void CoSimFederate::configure(helics::Time step, helics::Time startTime)
             const auto& outputInfo = cs->addOutputVariable(iname);
             if (outputInfo.index >= 0) {
                 auto index = findMatch(output_list, iname);
-                if (index < output_list.size()) {
+                if (index < static_cast<int>(output_list.size())) {
                     output_list_used[ii] = 1;
                 }
             } else {
@@ -180,7 +181,7 @@ void CoSimFederate::configure(helics::Time step, helics::Time startTime)
             }
         } else {
             auto index = getUnused(output_list_used);
-            if (index < output_list.size()) {
+            if (index < static_cast<int>(output_list.size())) {
                 cs->addOutputVariable(output_list[index]);
                 output_list_used[ii] = 1;
             }

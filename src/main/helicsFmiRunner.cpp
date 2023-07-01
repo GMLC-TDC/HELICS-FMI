@@ -191,8 +191,7 @@ int FmiRunner::load()
         LOG_ERROR(fmt::format("error loading federateInfo from file :{}", e.what()));
         return errorTerminate(FILE_PROCESSING_ERROR);
     }
-    if (const int result = startBroker();result != 0)
-    {
+    if (const int result = startBroker(); result != 0) {
         return result;
     }
     LOG_SUMMARY(
@@ -266,21 +265,21 @@ int FmiRunner::load()
             return errorTerminate(FMU_ERROR);
         }
     } else if ((ext == ".json") || (ext == ".JSON")) {
-        int result=loadSystemFile(jsonReaderElement(inputFile),inputFile);
-        if (result != EXIT_SUCCESS)
-        {
+        jsonReaderElement system(inputFile);
+        int result = loadSystemFile(system, inputFile);
+        if (result != EXIT_SUCCESS) {
             return result;
         }
     } else if ((ext == ".toml") || (ext == ".TOML")) {
-        int result=loadSystemFile(tomlReaderElement(inputFile),inputFile);
-        if (result != EXIT_SUCCESS)
-        {
+        tomlReaderElement system(inputFile);
+        int result = loadSystemFile(system, inputFile);
+        if (result != EXIT_SUCCESS) {
             return result;
         }
     } else if ((ext == ".xml") || (ext == ".XML")) {
-        int result=loadSystemFile(tinyxml2ReaderElement(inputFile),inputFile);
-        if (result != EXIT_SUCCESS)
-        {
+        tinyxml2ReaderElement system(inputFile);
+        int result = loadSystemFile(system, inputFile);
+        if (result != EXIT_SUCCESS) {
             return result;
         }
     }
@@ -308,7 +307,7 @@ int FmiRunner::load()
     return EXIT_SUCCESS;
 }
 
-int FmiRunner::loadSystemFile(readerElement& system, const std::string &inputFile)
+int FmiRunner::loadSystemFile(readerElement& system, const std::string& inputFile)
 {
     if (system.isValid()) {
         try {

@@ -183,6 +183,8 @@ readerAttribute tomlReaderElement::getFirstAttribute()
                 case toml::value_t::boolean:
                     return {attIterator->first,
                             attIterator->second.as_boolean() ? "true" : "false"};
+                default:
+                    break;
             }
         }
         ++attIterator;
@@ -222,6 +224,8 @@ readerAttribute tomlReaderElement::getNextAttribute()
                 case toml::value_t::boolean:
                     return {attIterator->first,
                             attIterator->second.as_boolean() ? "true" : "false"};
+                default:
+                    break;
             }
         }
         ++attIterator;
