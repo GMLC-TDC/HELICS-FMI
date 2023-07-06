@@ -304,6 +304,23 @@ int FmiRunner::load()
             LOG_WARNING(fmt::format("flag {} was not recognized ", flag));
         }
     }
+    if (!connections.empty())
+    {
+        if (connections.size() >= 2)
+        {
+            for (int ii = 0; ii < connections.size() - 1; ii += 2)
+            {
+                crptr->dataLink(connections[ii], connections[ii + 1]);
+            }
+        }
+        else
+        {
+            if (std::filesystem::exists(connections[0]))
+            {
+                crptr->makeConnections(connections[0]);
+            }
+        }
+    }
     return EXIT_SUCCESS;
 }
 

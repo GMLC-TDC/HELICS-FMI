@@ -1,0 +1,17 @@
+{
+  "autobroker": true,
+  "coretype": "zmq",
+  "step": "0.1s",
+  "stop": "1.0s",
+  "brokerinitstring": "-f2 --name ft5broker ",
+  "fmus": [
+    {
+      "fmu": "Feedthrough.fmu",
+      "name": "fthru",
+      "connections": [["pub0", "fthru.Float64_continuous_input"],
+  ["pub1", "fthru.Float64_discrete_input"],
+  ["pub2", "fthru.Int32_input"],
+  ["pub3", "fthru.Boolean_input"]]
+    }
+  ]
+}
