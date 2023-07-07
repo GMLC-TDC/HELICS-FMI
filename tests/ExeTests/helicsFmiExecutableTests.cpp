@@ -117,7 +117,9 @@ TEST(exeTests, singleFedLoggingFile)
     const exeTestRunner hfmi(HELICS_EXE_LOC, "helics-fmi");
 
     /**test that things run to completion with auto broker*/
-    auto out = hfmi.runCaptureOutput(std::string("--autobroker --loglevel=interfaces --name=bb2 --coreinitstring=\"--logfile=testlog.txt\" ") +
+    auto out = hfmi.runCaptureOutput(
+        std::string(
+            "--autobroker --loglevel=interfaces --name=bb2 --coreinitstring=\"--logfile=testlog.txt\" ") +
         bballFile);
     EXPECT_THAT(out, HasSubstr("bb2.h"));
     EXPECT_THAT(out, HasSubstr("2 publications"));

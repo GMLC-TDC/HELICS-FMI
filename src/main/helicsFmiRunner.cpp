@@ -6,7 +6,6 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helicsFmiRunner.hpp"
-#include "helicsFMI/FmiHelics.hpp"
 
 #include "fmi/fmi_import/fmiImport.h"
 #include "formatInterpreters/jsonReaderElement.h"
@@ -20,6 +19,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/helicsCLI11.hpp"
 #include "helics/core/helicsVersion.hpp"
 #include "helicsFMI/FmiCoSimFederate.hpp"
+#include "helicsFMI/FmiHelics.hpp"
 #include "helicsFMI/FmiModelExchangeFederate.hpp"
 
 #include <filesystem>
@@ -305,7 +305,7 @@ int FmiRunner::load()
             LOG_WARNING(fmt::format("flag {} was not recognized ", flag));
         }
     }
-    
+
     return EXIT_SUCCESS;
 }
 
@@ -530,19 +530,13 @@ int FmiRunner::startBroker()
 
 int FmiRunner::makeConnections()
 {
-    if (!connections.empty())
-    {
-        if (connections.size() >= 2)
-        {
-            for (int ii = 0; ii < connections.size() - 1; ii += 2)
-            {
+    if (!connections.empty()) {
+        if (connections.size() >= 2) {
+            for (int ii = 0; ii < connections.size() - 1; ii += 2) {
                 crptr->dataLink(connections[ii], connections[ii + 1]);
             }
-        }
-        else
-        {
-            if (std::filesystem::exists(connections[0]))
-            {
+        } else {
+            if (std::filesystem::exists(connections[0])) {
                 crptr->makeConnections(connections[0]);
             }
         }

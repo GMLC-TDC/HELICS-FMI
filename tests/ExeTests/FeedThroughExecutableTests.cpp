@@ -7,7 +7,6 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "FmiCoSimFederate.hpp"
 #include "helics/application_api/helicsTypes.hpp"
 #include "helics/application_api/queryFunctions.hpp"
-
 #include "helicsFmiRunner.hpp"
 
 #include "gtest/gtest.h"
@@ -35,7 +34,6 @@ TEST(feedthrough, check)
     auto result = runner.runAsync();
 
     helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
-
 
     helics::ValueFederate vFed("fed1", fedInfo);
 
@@ -94,7 +92,6 @@ TEST(feedthrough, check)
     result.get();
 }
 
-
 TEST(feedthrough, CmdLineConnections)
 {
     FmiRunner runner;
@@ -110,7 +107,6 @@ TEST(feedthrough, CmdLineConnections)
     auto result = runner.runAsync();
 
     helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
-
 
     helics::ValueFederate vFed("fed1", fedInfo);
 
@@ -136,7 +132,6 @@ TEST(feedthrough, CmdLineConnections)
     auto& pub2 = vFed.registerGlobalPublication<double>("pub1");
     auto& pub3 = vFed.registerGlobalPublication<int>("pub2");
     auto& pub4 = vFed.registerGlobalPublication<bool>("pub3");
-
 
     vFed.enterInitializingMode();
 
@@ -166,19 +161,21 @@ TEST(feedthrough, CmdLineConnections)
 }
 
 static constexpr const char* config_files[] = {"example_connections1.json",
-"example_connections1.toml",
-"example_connections2.json",
-"example_connections2.toml"};
+                                               "example_connections1.toml",
+                                               "example_connections2.json",
+                                               "example_connections2.toml"};
 
 class ConnectionFileTests :
     public ::testing::TestWithParam<const char*> {};
 
 TEST_P(ConnectionFileTests, fileTests)
 {
-    std::string cfile=std::string(TEST_DIR)+"/"+GetParam();
+    std::string cfile = std::string(TEST_DIR) + "/" + GetParam();
     FmiRunner runner;
-    runner.parse(
-        fmt::format("--autobroker --coretype=zmq --step=0.1s --stoptime=1.0s --name=fthru  --connections {} --brokerargs=\"-f2 --name=ftfbroker\" {}",cfile,inputFile));
+    runner.parse(fmt::format(
+        "--autobroker --coretype=zmq --step=0.1s --stoptime=1.0s --name=fthru  --connections {} --brokerargs=\"-f2 --name=ftfbroker\" {}",
+        cfile,
+        inputFile));
     int ret = runner.load();
     ASSERT_EQ(ret, 0);
     ret = runner.initialize();
@@ -187,7 +184,6 @@ TEST_P(ConnectionFileTests, fileTests)
     auto result = runner.runAsync();
 
     helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
-
 
     helics::ValueFederate vFed("fed1", fedInfo);
 
@@ -213,7 +209,6 @@ TEST_P(ConnectionFileTests, fileTests)
     auto& pub2 = vFed.registerGlobalPublication<double>("pub1");
     auto& pub3 = vFed.registerGlobalPublication<int>("pub2");
     auto& pub4 = vFed.registerGlobalPublication<bool>("pub3");
-
 
     vFed.enterInitializingMode();
 
@@ -244,14 +239,10 @@ TEST_P(ConnectionFileTests, fileTests)
 
 INSTANTIATE_TEST_SUITE_P(feedthroughFiles, ConnectionFileTests, ::testing::ValuesIn(config_files));
 
-
-
-
 TEST(feedthrough, connnectionInFmuFile)
 {
-
     static const std::string testFile = std::string(TEST_DIR) + "ft_connections.json";
-    //helics::cleanupHelicsLibrary();
+    // helics::cleanupHelicsLibrary();
     FmiRunner runner;
     runner.parse(fmt::format("--fmupath={} {}", FMI_REFERENCE_DIR, testFile));
 
@@ -263,7 +254,6 @@ TEST(feedthrough, connnectionInFmuFile)
     auto result = runner.runAsync();
 
     const helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
-
 
     helics::ValueFederate vFed("fed1", fedInfo);
 
