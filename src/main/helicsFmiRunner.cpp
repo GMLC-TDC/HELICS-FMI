@@ -428,9 +428,8 @@ int FmiRunner::initialize()
             LOG_WARNING(fmt::format("parameter ({}) is unused ", setParameters[ii]));
         }
     }
-    const int result=makeConnections();
-    if (result != EXIT_SUCCESS)
-    {
+    const int result = makeConnections();
+    if (result != EXIT_SUCCESS) {
         return result;
     }
     currentState = State::INITIALIZED;
@@ -541,18 +540,16 @@ int FmiRunner::makeConnections()
             }
         }
     }
-    for (auto& ifile : inputs)
-    {
-        switch (getFileType(ifile))
-        {
-        case FileType::fmu:
-            break;
-        case FileType::json:
-        case FileType::toml:
-            crptr->makeConnections(ifile);
-            break;
-        default:
-            break;
+    for (auto& ifile : inputs) {
+        switch (getFileType(ifile)) {
+            case FileType::fmu:
+                break;
+            case FileType::json:
+            case FileType::toml:
+                crptr->makeConnections(ifile);
+                break;
+            default:
+                break;
         }
     }
     return EXIT_SUCCESS;
