@@ -12,8 +12,13 @@
 # helics fmi executable tests
 # -----------------------------------------------------------------------------
 
-set(executable_test_sources exeTestHelper.cpp exeTestHelper.h helicsFmiExecutableTests.cpp
-                            RunnerTests.cpp ResourceExecutableTests.cpp FeedThroughExecutableTests.cpp
+set(executable_test_sources
+    exeTestHelper.cpp
+    exeTestHelper.h
+    helicsFmiExecutableTests.cpp
+    RunnerTests.cpp
+    ResourceExecutableTests.cpp
+    FeedThroughExecutableTests.cpp
 )
 
 set(executable_fail_test_sources exeTestHelper.cpp exeTestHelper.h exeFailureTests.cpp
