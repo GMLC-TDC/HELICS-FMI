@@ -100,6 +100,10 @@ class FmiRunner {
 
     int startBroker();
     int loadSystemFile(readerElement& system, const std::string& inputFile);
+
+    /// @brief  make any specified connections
+    /// @return EXIT_SUCCESS if no errors, other if something went wrong
+    int makeConnections();
 };
 
 }  // namespace helicsfmi

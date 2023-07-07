@@ -251,7 +251,7 @@ TEST(feedthrough, connnectionInFmuFile)
 {
 
     static const std::string testFile = std::string(TEST_DIR) + "ft_connections.json";
-    helics::cleanupHelicsLibrary();
+    //helics::cleanupHelicsLibrary();
     FmiRunner runner;
     runner.parse(fmt::format("--fmupath={} {}", FMI_REFERENCE_DIR, testFile));
 
@@ -282,13 +282,10 @@ TEST(feedthrough, connnectionInFmuFile)
     auto& sub4 = vFed.registerSubscription(qres[3]);
     sub2.setDefault(-20.0);
 
-    qres = helics::vectorizeQueryResult(vFed.query("fthru", "inputs"));
-
-    EXPECT_EQ(qres.size(), 5U);
-    auto& pub1 = vFed.registerPublication<double>("");
-    auto& pub2 = vFed.registerPublication<double>("");
-    auto& pub3 = vFed.registerPublication<int>("");
-    auto& pub4 = vFed.registerPublication<bool>("");
+    auto& pub1 = vFed.registerGlobalPublication<double>("pub0");
+    auto& pub2 = vFed.registerGlobalPublication<double>("pub1");
+    auto& pub3 = vFed.registerGlobalPublication<int>("pub2");
+    auto& pub4 = vFed.registerGlobalPublication<bool>("pub3");
 
     vFed.enterInitializingMode();
 

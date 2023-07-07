@@ -8,6 +8,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "FmiCoSimFederate.hpp"
 
 #include "FmiHelics.hpp"
+#include "FmiHelicsLogging.hpp"
 #include "fmi/fmi_import/fmiObjects.h"
 #include "gmlc/utilities/stringConversion.h"
 

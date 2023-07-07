@@ -9,7 +9,7 @@
 
 set(helicsFMI_sources FmiCoSimFederate.cpp FmiModelExchangeFederate.cpp FmiHelics.cpp)
 
-set(helicsFMI_headers FmiCoSimFederate.hpp FmiModelExchangeFederate.hpp FmiHelics.hpp)
+set(helicsFMI_headers FmiCoSimFederate.hpp FmiModelExchangeFederate.hpp FmiHelics.hpp FmiHelicsLogging.hpp)
 
 add_library(helicsFMI STATIC ${helicsFMI_sources} ${helicsFMI_headers})
 
