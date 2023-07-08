@@ -161,13 +161,13 @@ TEST(feedthrough, CmdLineConnections)
 }
 
 static constexpr const char* connectionFiles[] = {"example_connections1.json",
-                                               "example_connections1.toml",
-                                               "example_connections2.json",
-                                               "example_connections2.toml"};
+                                                  "example_connections1.toml",
+                                                  "example_connections2.json",
+                                                  "example_connections2.toml"};
 
 class ConnectionFileTests: public ::testing::TestWithParam<const char*> {};
 
-TEST_P(ConnectionFileTests, fileTests)
+TEST_P(ConnectionFileTests, file tests)
 {
     std::string cfile = std::string(TEST_DIR) + "/" + GetParam();
     FmiRunner runner;
