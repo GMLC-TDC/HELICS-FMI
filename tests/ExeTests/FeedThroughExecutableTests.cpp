@@ -167,7 +167,7 @@ static constexpr const char* connectionFiles[] = {"example_connections1.json",
 
 class ConnectionFileTests: public ::testing::TestWithParam<const char*> {};
 
-TEST_P(ConnectionFileTests, file tests)
+TEST_P(ConnectionFileTests, connections)
 {
     std::string cfile = std::string(TEST_DIR) + "/" + GetParam();
     FmiRunner runner;
