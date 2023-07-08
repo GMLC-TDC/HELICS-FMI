@@ -1,0 +1,7 @@
+#example toml connection file connections can be an array of two element string arrays  ["publication", "input"]
+connections=[
+{publication="pub0",target="fthru.Float64_continuous_input"},
+{publication="pub1",target="fthru.Float64_discrete_input"},
+{publication="pub2",target="fthru.Int32_input"},
+{publication="pub3",target="fthru.Boolean_input"}
+]

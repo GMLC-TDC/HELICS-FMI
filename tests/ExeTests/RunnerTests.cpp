@@ -58,7 +58,8 @@ TEST(runnerTests, singleFedExtractLoc)
 {
     FmiRunner runner;
     auto folderpath = std::filesystem::path(FMI_REFERENCE_DIR) / "test1";
-    ASSERT_TRUE(std::filesystem::create_directory(folderpath));
+    std::filesystem::create_directory(folderpath);
+    ASSERT_TRUE(std::filesystem::exists(folderpath));
     runner.parse(std::string("--autobroker --core=zmq --extractpath=") + folderpath.string() + " " +
                  ftFile);
     /**test that things run to completion with auto broker*/

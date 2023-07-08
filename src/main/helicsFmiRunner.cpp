@@ -19,6 +19,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/helicsCLI11.hpp"
 #include "helics/core/helicsVersion.hpp"
 #include "helicsFMI/FmiCoSimFederate.hpp"
+#include "helicsFMI/FmiHelics.hpp"
 #include "helicsFMI/FmiModelExchangeFederate.hpp"
 
 #include <filesystem>
@@ -304,6 +305,7 @@ int FmiRunner::load()
             LOG_WARNING(fmt::format("flag {} was not recognized ", flag));
         }
     }
+
     return EXIT_SUCCESS;
 }
 
@@ -426,6 +428,10 @@ int FmiRunner::initialize()
             LOG_WARNING(fmt::format("parameter ({}) is unused ", setParameters[ii]));
         }
     }
+    const int result = makeConnections();
+    if (result != EXIT_SUCCESS) {
+        return result;
+    }
     currentState = State::INITIALIZED;
     return EXIT_SUCCESS;
 }
@@ -517,6 +523,34 @@ int FmiRunner::startBroker()
     if (broker) {
         fedInfo.brokerPort = -1;
         fedInfo.broker = broker->getAddress();
+    }
+    return EXIT_SUCCESS;
+}
+
+int FmiRunner::makeConnections()
+{
+    if (!connections.empty()) {
+        if (connections.size() >= 2) {
+            for (int ii = 0; ii < static_cast<int>(connections.size()) - 1; ii += 2) {
+                crptr->dataLink(connections[ii], connections[ii + 1]);
+            }
+        } else {
+            if (std::filesystem::exists(connections[0])) {
+                crptr->makeConnections(connections[0]);
+            }
+        }
+    }
+    for (auto& ifile : inputs) {
+        switch (getFileType(ifile)) {
+            case FileType::fmu:
+                break;
+            case FileType::json:
+            case FileType::toml:
+                crptr->makeConnections(ifile);
+                break;
+            default:
+                break;
+        }
     }
     return EXIT_SUCCESS;
 }
@@ -668,14 +702,6 @@ int FmiRunner::loadFile(readerElement& elem)
         }
         fmis.push_back(std::move(fmilib));
         elem.moveToNextSibling("fmus");
-    }
-    elem.moveToParent();
-    elem.moveToFirstChild("connections");
-    while (elem.isValid()) {
-        auto str1 = elem.getFirstAttribute().getText();
-        auto str2 = elem.getNextAttribute().getText();
-        elem.moveToNextSibling("connections");
-        core->dataLink(str1, str2);
     }
     elem.moveToParent();
     return 0;

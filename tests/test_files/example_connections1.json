@@ -1,0 +1,10 @@
+//this should be a valid json file (except comments are not recognized in standard JSON)
+{
+  //example json connection file  connections can be an array of two element string arrays  ["publication", "input"]
+  "connections": [
+    ["pub0", "fthru.Float64_continuous_input"],
+    ["pub1", "fthru.Float64_discrete_input"],
+    ["pub2", "fthru.Int32_input"],
+    ["pub3", "fthru.Boolean_input"]
+  ]
+}

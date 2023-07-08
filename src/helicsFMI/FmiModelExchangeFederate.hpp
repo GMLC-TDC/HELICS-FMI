@@ -6,6 +6,8 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include "FmiHelics.hpp"
+#include "FmiHelicsLogging.hpp"
 #include "fmi/fmi_import/fmiImport.h"
 #include "fmi/fmi_import/fmiObjects.h"
 #include "helics/application_api/Inputs.hpp"
