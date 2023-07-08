@@ -160,14 +160,14 @@ TEST(feedthrough, CmdLineConnections)
     result.get();
 }
 
-static constexpr const char* config_files[] = {"example_connections1.json",
+static constexpr const char* connectionFiles[] = {"example_connections1.json",
                                                "example_connections1.toml",
                                                "example_connections2.json",
                                                "example_connections2.toml"};
 
 class ConnectionFileTests: public ::testing::TestWithParam<const char*> {};
 
-TEST_P(ConnectionFileTests, file tests)
+TEST_P(ConnectionFileTests, fileTests)
 {
     std::string cfile = std::string(TEST_DIR) + "/" + GetParam();
     FmiRunner runner;
@@ -236,7 +236,7 @@ TEST_P(ConnectionFileTests, file tests)
     result.get();
 }
 
-INSTANTIATE_TEST_SUITE_P(feedthroughFiles, ConnectionFileTests, ::testing::ValuesIn(config_files));
+INSTANTIATE_TEST_SUITE_P(feedthrough, ConnectionFileTests, ::testing::ValuesIn(connectionFiles));
 
 TEST(feedthrough, connnectionInFmuFile)
 {
