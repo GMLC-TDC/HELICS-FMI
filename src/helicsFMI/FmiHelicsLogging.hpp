@@ -10,35 +10,35 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #define LOG_FED_ERROR(message) logMessage(HELICS_LOG_LEVEL_ERROR, message)
 #define LOG_FED_WARNING(message) logMessage(HELICS_LOG_LEVEL_WARNING, message)
 
-#define LOG_FED_SUMMARY(message)                                                                       \
+#define LOG_FED_SUMMARY(message)                                                                   \
     if (logLevel >= HELICS_LOG_LEVEL_SUMMARY) {                                                    \
         logMessage(HELICS_LOG_LEVEL_SUMMARY, message);                                             \
     }
 
-#define LOG_FED_CONNECTIONS(message)                                                                   \
+#define LOG_FED_CONNECTIONS(message)                                                               \
     if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {                                                \
         logMessage(HELICS_LOG_LEVEL_CONNECTIONS, message);                                         \
     }
 
-#define LOG_FED_INTERFACES(message)                                                                    \
+#define LOG_FED_INTERFACES(message)                                                                \
     if (logLevel >= HELICS_LOG_LEVEL_INTERFACES) {                                                 \
         logMessage(HELICS_LOG_LEVEL_INTERFACES, message);                                          \
     }
 
-#define LOG_FED_TIMING(message)                                                                        \
+#define LOG_FED_TIMING(message)                                                                    \
     if (logLevel >= HELICS_LOG_LEVEL_TIMING) {                                                     \
         logMessage(HELICS_LOG_LEVEL_TIMING, message);                                              \
     }
-#define LOG_FED_DATA_MESSAGES(message)                                                                 \
+#define LOG_FED_DATA_MESSAGES(message)                                                             \
     if (logLevel >= HELICS_LOG_LEVEL_DATA) {                                                       \
         logMessage(HELICS_LOG_LEVEL_DATA, message);                                                \
     }
-#define LOG_FED_DEBUG_MESSAGES(message)                                                                \
+#define LOG_FED_DEBUG_MESSAGES(message)                                                            \
     if (logLevel >= HELICS_LOG_LEVEL_DEBUG) {                                                      \
         logMessage(HELICS_LOG_LEVEL_DEBUG, message);                                               \
     }
 
-#define LOG_FED_TRACE(message)                                                                         \
+#define LOG_FED_TRACE(message)                                                                     \
     if (logLevel >= HELICS_LOG_LEVEL_TRACE) {                                                      \
         logMessage(HELICS_LOG_LEVEL_TRACE, message);                                               \
     }

@@ -216,10 +216,11 @@ void CoSimFederate::configure(helics::Time step, helics::Time startTime)
     }
     fed.setProperty(HELICS_PROPERTY_TIME_PERIOD, step);
     stepTime = step;
-    LOG_FED_SUMMARY(fmt::format("\n  co sim federate:\n\t{} inputs\n\t{} publications\n\tstep size={}",
-                            inputs.size(),
-                            pubs.size(),
-                            static_cast<double>(stepTime)));
+    LOG_FED_SUMMARY(
+        fmt::format("\n  co sim federate:\n\t{} inputs\n\t{} publications\n\tstep size={}",
+                    inputs.size(),
+                    pubs.size(),
+                    static_cast<double>(stepTime)));
 }
 
 void CoSimFederate::setInputs(std::vector<std::string> input_names)
