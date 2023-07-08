@@ -531,7 +531,7 @@ int FmiRunner::makeConnections()
 {
     if (!connections.empty()) {
         if (connections.size() >= 2) {
-            for (int ii = 0; ii < connections.size() - 1; ii += 2) {
+            for (int ii = 0; ii < static_cast<int>(connections.size()) - 1; ii += 2) {
                 crptr->dataLink(connections[ii], connections[ii + 1]);
             }
         } else {

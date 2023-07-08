@@ -33,7 +33,7 @@ TEST(feedthrough, check)
 
     auto result = runner.runAsync();
 
-    helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
+    const helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
 
     helics::ValueFederate vFed("fed1", fedInfo);
 
@@ -106,7 +106,7 @@ TEST(feedthrough, CmdLineConnections)
 
     auto result = runner.runAsync();
 
-    helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
+    const helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
 
     helics::ValueFederate vFed("fed1", fedInfo);
 
@@ -182,7 +182,7 @@ TEST_P(ConnectionFileTests, connections)
 
     auto result = runner.runAsync();
 
-    helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
+    const helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
 
     helics::ValueFederate vFed("fed1", fedInfo);
 

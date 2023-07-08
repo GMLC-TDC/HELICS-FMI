@@ -155,7 +155,7 @@ void CoSimFederate::configure(helics::Time step, helics::Time startTime)
             if (inputInfo.index >= 0) {
                 auto iType = helicsfmi::getHelicsType(inputInfo.type);
                 inputs.emplace_back(&fed, input, iType);
-                LOG_INTERFACES(fmt::format("created input {}", inputs.back().getName()));
+                LOG_FED_INTERFACES(fmt::format("created input {}", inputs.back().getName()));
             } else {
                 fed.logWarningMessage(input + " is not a recognized input");
             }
@@ -197,7 +197,7 @@ void CoSimFederate::configure(helics::Time step, helics::Time startTime)
             if (outputInfo.index >= 0) {
                 auto iType = helicsfmi::getHelicsType(outputInfo.type);
                 pubs.emplace_back(&fed, output, iType);
-                LOG_INTERFACES(fmt::format("created publication {}", pubs.back().getName()));
+                LOG_FED_INTERFACES(fmt::format("created publication {}", pubs.back().getName()));
             } else {
                 fed.logWarningMessage(output + " is not a recognized output");
             }
@@ -216,7 +216,7 @@ void CoSimFederate::configure(helics::Time step, helics::Time startTime)
     }
     fed.setProperty(HELICS_PROPERTY_TIME_PERIOD, step);
     stepTime = step;
-    LOG_SUMMARY(fmt::format("\n  co sim federate:\n\t{} inputs\n\t{} publications\n\tstep size={}",
+    LOG_FED_SUMMARY(fmt::format("\n  co sim federate:\n\t{} inputs\n\t{} publications\n\tstep size={}",
                             inputs.size(),
                             pubs.size(),
                             static_cast<double>(stepTime)));
@@ -263,7 +263,7 @@ void CoSimFederate::runCommand(const std::string& command)
     auto cvec = gmlc::utilities::stringOps::splitlineQuotes(
         command, " ,;:", "\"'`", gmlc::utilities::stringOps::delimiter_compression::on);
     if (cvec[0] == "set") {
-        LOG_DATA_MESSAGES(fmt::format("set command {}={}", cvec[1], cvec[2]));
+        LOG_FED_DATA_MESSAGES(fmt::format("set command {}={}", cvec[1], cvec[2]));
         auto val =
             gmlc::utilities::numeric_conversionComplete<double>(cvec[2], helics::invalidDouble);
         if (val != helics::invalidDouble) {
@@ -316,7 +316,7 @@ double CoSimFederate::initialize(double stop, std::ofstream& ofile)
             helicsfmi::setDefault(inputs[ii], cs.get(), ii);
         }
     }
-    LOG_TIMING("initializing");
+    LOG_FED_TIMING("initializing");
     return stop;
 }
 
