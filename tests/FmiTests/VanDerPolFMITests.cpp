@@ -99,7 +99,7 @@ TEST(vanderpol, loadSharedCS)
 
     fmi.reset();
 
-    auto dir = std::string(FMI_REFERENCE_DIR) + "BouncingBall";
+    auto dir = std::string(FMI_REFERENCE_DIR) + "VanDerPol";
     // this is true since we didn'time open the directory in this test
     EXPECT_TRUE(std::filesystem::exists(dir));
 
