@@ -140,16 +140,16 @@ double FmiInfo::getReal(const std::string& field) const
         return fmiVersion;
     }
     if ((fld == "start") || (fld == "starttime")) {
-        return defaultExpirement.startTime;
+        return defaultExperiment.startTime;
     }
     if ((fld == "stop") || (fld == "stoptime")) {
-        return defaultExpirement.stopTime;
+        return defaultExperiment.stopTime;
     }
     if ((fld == "step") || (fld == "stepsize")) {
-        return defaultExpirement.stepSize;
+        return defaultExperiment.stepSize;
     }
     if (fld == "tolerance") {
-        return defaultExpirement.tolerance;
+        return defaultExperiment.tolerance;
     }
     return (-1.0e-48);
 }
@@ -339,13 +339,13 @@ void FmiInfo::loadFmiHeader(std::shared_ptr<readerElement>& reader)
         att = reader->getFirstAttribute();
         while (att.isValid()) {
             if (att.getName() == "startTime") {
-                defaultExpirement.startTime = att.getValue();
+                defaultExperiment.startTime = att.getValue();
             } else if (att.getName() == "stopTime") {
-                defaultExpirement.stopTime = att.getValue();
+                defaultExperiment.stopTime = att.getValue();
             } else if (att.getName() == "stepSize") {
-                defaultExpirement.stepSize = att.getValue();
+                defaultExperiment.stepSize = att.getValue();
             } else if (att.getName() == "tolerance") {
-                defaultExpirement.tolerance = att.getValue();
+                defaultExperiment.tolerance = att.getValue();
             }
 
             att = reader->getNextAttribute();

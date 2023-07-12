@@ -24,6 +24,26 @@ fmi2Object::~fmi2Object()
         commonFunctions->fmi2FreeInstance(comp);
     }
 }
+
+void fmi2Object::setupExperiment()
+{
+    auto &exp=info->getExperiment();
+    fmi2Boolean toleranceDefined=(exp.tolerance>0.0)?fmi2True:fmi2False;
+    fmi2Real tolerance=exp.tolerance;
+    fmi2Real start=exp.startTime;
+    fmi2Real stop=exp.stopTime;
+    fmi2Boolean stopTimeDefined=(stop>0.0)?fmi2True:fmi2False;
+    auto ret = commonFunctions->fmi2SetupExperiment(comp,
+        toleranceDefined,
+        tolerance,
+        start,
+        stopTimeDefined,
+        stop);
+    if (ret != fmi2Status::fmi2OK) {
+        handleNonOKReturnValues(ret);
+    }
+}
+
 void fmi2Object::setupExperiment(bool toleranceDefined,
                                  fmi2Real tolerance,
                                  fmi2Real startTime,

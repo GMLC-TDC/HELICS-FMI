@@ -32,7 +32,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 /** data class containing the default experiment information*/
-class FmuDefaultExpirement {
+class FmuDefaultExperiment {
   public:
     double startTime = 0.0;
     double stopTime = 0.0;
@@ -170,7 +170,7 @@ class FmiInfo {
     /// Log Category information from the FMU
     FmiLogCategories logCategories;
     /// the information about the specified default experiment
-    FmuDefaultExpirement defaultExpirement;
+    FmuDefaultExperiment defaultExperiment;
 
     /// map translating strings to indices into the variables array
     std::map<std::string, int> variableLookup;
@@ -195,7 +195,7 @@ class FmiInfo {
     /** check if a given flag is set*/
     bool checkFlag(fmuCapabilityFlags flag) const;
 
-    const FmuDefaultExpirement& getExperiment() const { return defaultExpirement; }
+    const FmuDefaultExperiment& getExperiment() const { return defaultExperiment; }
     /** get the counts for various items in a fmu
     @param[in] countType the type of counts to get
     @return the count*/
