@@ -51,7 +51,7 @@ TEST(vanderpol, loadXML)
 
     const auto& vinfo = info->getVariableInfo("x0");
 
-    EXPECT_EQ("the first state",vinfo.description);
+    EXPECT_EQ("the first state", vinfo.description);
 
     fmi->deleteFMUdirectory();
 
@@ -140,11 +140,11 @@ TEST(vanderpol, csExecution)
     EXPECT_NO_THROW(fmi->loadFMU(inputFile));
 
     auto fmiObj = fmi->createCoSimulationObject("model_cs");
-    auto info=fmi->getInfo();
-    const auto &exp=info->getExperiment();
-    EXPECT_EQ(exp.startTime,0.0);
-    EXPECT_EQ(exp.stepSize,1e-2);
-    EXPECT_EQ(exp.stopTime,20.0);
+    auto info = fmi->getInfo();
+    const auto& exp = info->getExperiment();
+    EXPECT_EQ(exp.startTime, 0.0);
+    EXPECT_EQ(exp.stepSize, 1e-2);
+    EXPECT_EQ(exp.stopTime, 20.0);
 
     ASSERT_TRUE(fmiObj);
     EXPECT_EQ(fmiObj->getName(), "model_cs");
@@ -152,7 +152,6 @@ TEST(vanderpol, csExecution)
     EXPECT_EQ(fmiObj->getCurrentMode(), FmuMode::INSTANTIATED);
 
     fmiObj->setupExperiment();
-    
 
     fmiObj->setMode(FmuMode::INITIALIZATION);
     EXPECT_EQ(fmiObj->getCurrentMode(), FmuMode::INITIALIZATION);

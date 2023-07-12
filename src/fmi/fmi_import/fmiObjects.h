@@ -54,7 +54,7 @@ class fmi2Object {
                std::shared_ptr<const FmiInfo> info,
                std::shared_ptr<const fmiCommonFunctions> comFunc);
     virtual ~fmi2Object();
-    //use default experiment
+    // use default experiment
     void setupExperiment();
     void setupExperiment(bool toleranceDefined,
                          fmi2Real tolerance,

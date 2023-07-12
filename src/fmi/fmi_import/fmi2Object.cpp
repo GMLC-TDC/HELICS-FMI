@@ -27,18 +27,14 @@ fmi2Object::~fmi2Object()
 
 void fmi2Object::setupExperiment()
 {
-    auto &exp=info->getExperiment();
-    fmi2Boolean toleranceDefined=(exp.tolerance>0.0)?fmi2True:fmi2False;
-    fmi2Real tolerance=exp.tolerance;
-    fmi2Real start=exp.startTime;
-    fmi2Real stop=exp.stopTime;
-    fmi2Boolean stopTimeDefined=(stop>0.0)?fmi2True:fmi2False;
-    auto ret = commonFunctions->fmi2SetupExperiment(comp,
-        toleranceDefined,
-        tolerance,
-        start,
-        stopTimeDefined,
-        stop);
+    auto& exp = info->getExperiment();
+    fmi2Boolean toleranceDefined = (exp.tolerance > 0.0) ? fmi2True : fmi2False;
+    fmi2Real tolerance = exp.tolerance;
+    fmi2Real start = exp.startTime;
+    fmi2Real stop = exp.stopTime;
+    fmi2Boolean stopTimeDefined = (stop > 0.0) ? fmi2True : fmi2False;
+    auto ret = commonFunctions->fmi2SetupExperiment(
+        comp, toleranceDefined, tolerance, start, stopTimeDefined, stop);
     if (ret != fmi2Status::fmi2OK) {
         handleNonOKReturnValues(ret);
     }
