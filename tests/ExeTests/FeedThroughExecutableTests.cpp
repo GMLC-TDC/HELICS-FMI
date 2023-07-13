@@ -107,7 +107,7 @@ TEST(feedthrough, CmdLineConnections)
     auto result = runner.runAsync();
 
     helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
-    fedInfo.broker="ftconnbroker";
+    fedInfo.broker = "ftconnbroker";
 
     helics::ValueFederate vFed("fed1", fedInfo);
 
