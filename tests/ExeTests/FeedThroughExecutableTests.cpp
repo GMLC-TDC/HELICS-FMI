@@ -126,8 +126,6 @@ TEST(feedthrough, CmdLineConnections)
     auto& sub4 = vFed.registerSubscription(qres[3]);
     sub2.setDefault(-20.0);
 
-    qres = helics::vectorizeQueryResult(vFed.query("fthru", "inputs"));
-
     EXPECT_EQ(qres.size(), 5U);
     auto& pub1 = vFed.registerGlobalPublication<double>("pub0");
     auto& pub2 = vFed.registerGlobalPublication<double>("pub1");
@@ -253,7 +251,8 @@ TEST(feedthrough, connnectionInFmuFile)
 
     auto result = runner.runAsync();
 
-    const helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
+  helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
+  fedInfo.broker="ft5broker";
 
     helics::ValueFederate vFed("fed1", fedInfo);
 
