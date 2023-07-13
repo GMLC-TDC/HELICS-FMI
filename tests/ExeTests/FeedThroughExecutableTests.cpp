@@ -97,7 +97,7 @@ TEST(feedthrough, CmdLineConnections)
     FmiRunner runner;
     runner.parse(
         std::string(
-            "--autobroker --coretype=zmq --step=0.1s --stoptime=1.0s --name=fthru  --connections pub0,fthru.Float64_continuous_input,pub1,fthru.Float64_discrete_input --connections pub2 --connections=fthru.Int32_input --connections=pub3,fthru.Boolean_input --brokerargs=\"-f2 --name=ft1broker\" ") +
+            "--autobroker --coretype=zmq --step=0.1s --stoptime=1.0s --name=fthru  --connections pub0,fthru.Float64_continuous_input,pub1,fthru.Float64_discrete_input --connections pub2 --connections=fthru.Int32_input --connections=pub3,fthru.Boolean_input --brokerargs=\"-f2 --name=ftconnbroker\" ") +
         inputFile);
     int ret = runner.load();
     ASSERT_EQ(ret, 0);
@@ -106,7 +106,8 @@ TEST(feedthrough, CmdLineConnections)
 
     auto result = runner.runAsync();
 
-    const helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
+    helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
+    fedInfo.broker="ftconnbroker";
 
     helics::ValueFederate vFed("fed1", fedInfo);
 
