@@ -252,8 +252,8 @@ TEST(feedthrough, connnectionInFmuFile)
 
     auto result = runner.runAsync();
 
-  helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
-  fedInfo.broker="ft5broker";
+    helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
+    fedInfo.broker = "ft5broker";
 
     helics::ValueFederate vFed("fed1", fedInfo);
 
