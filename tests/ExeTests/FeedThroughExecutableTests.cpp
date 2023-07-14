@@ -90,6 +90,7 @@ TEST(feedthrough, check)
 
     vFed.finalize();
     result.get();
+    runner.close();
 }
 
 TEST(feedthrough, CmdLineConnections)
@@ -157,6 +158,7 @@ TEST(feedthrough, CmdLineConnections)
 
     vFed.finalize();
     result.get();
+    runner.close();
 }
 
 static constexpr const char* connectionFiles[] = {"example_connections1.json",
