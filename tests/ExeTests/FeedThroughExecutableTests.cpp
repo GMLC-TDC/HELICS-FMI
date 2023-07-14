@@ -233,6 +233,7 @@ TEST_P(ConnectionFileTests, connections)
 
     vFed.finalize();
     result.get();
+    runner.close();
 }
 
 INSTANTIATE_TEST_SUITE_P(feedthrough, ConnectionFileTests, ::testing::ValuesIn(connectionFiles));
