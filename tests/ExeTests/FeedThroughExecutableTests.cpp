@@ -159,6 +159,7 @@ TEST(feedthrough, CmdLineConnections)
     vFed.finalize();
     result.get();
     runner.close();
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
 
 static constexpr const char* connectionFiles[] = {"example_connections1.json",
@@ -170,10 +171,12 @@ class ConnectionFileTests: public ::testing::TestWithParam<const char*> {};
 
 TEST_P(ConnectionFileTests, connections)
 {
+    static int index{0};
     std::string cfile = std::string(TEST_DIR) + "/" + GetParam();
     FmiRunner runner;
     runner.parse(fmt::format(
-        "--autobroker --coretype=zmq --step=0.1s --stoptime=1.0s --name=fthru  --connections {} --brokerargs=\"-f2 --name=ftfbroker\" {}",
+        "--autobroker --coretype=zmq --step=0.1s --stoptime=1.0s --name=fthru  --connections {} --brokerargs=\"-f2 --name=ftfbroker{}\" {}",
+        index++,
         cfile,
         inputFile));
     int ret = runner.load();
@@ -236,6 +239,7 @@ TEST_P(ConnectionFileTests, connections)
     vFed.finalize();
     result.get();
     runner.close();
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
 
 INSTANTIATE_TEST_SUITE_P(feedthrough, ConnectionFileTests, ::testing::ValuesIn(connectionFiles));
@@ -304,4 +308,6 @@ TEST(feedthrough, connnectionInFmuFile)
 
     vFed.finalize();
     result.get();
+    runner.close();
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
