@@ -78,6 +78,8 @@ void fmi2Object::setMode(FmuMode mode)
                 break;
             case FmuMode::ERROR:
                 return;
+            default:
+                break;
         }
         ret = commonFunctions->fmi2Terminate(comp);
         handleNonOKReturnValues(ret);

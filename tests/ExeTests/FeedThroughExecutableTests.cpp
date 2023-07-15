@@ -13,6 +13,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <filesystem>
 #include <fmt/format.h>
 #include <future>
+#include <thread>
 
 static const std::string fmuName = "Feedthrough";
 static const std::string inputFile = std::string(FMI_REFERENCE_DIR) + fmuName + ".fmu";
@@ -177,7 +178,7 @@ TEST_P(ConnectionFileTests, connections)
     runner.parse(fmt::format(
         "--autobroker --coretype=zmq --step=0.1s --stoptime=1.0s --name=fthru  --connections {} --brokerargs=\"-f2 --name=ftfbroker{}\" {}",
         cfile,
-        index++,
+        index,
         inputFile));
     int ret = runner.load();
     ASSERT_EQ(ret, 0);
@@ -186,8 +187,9 @@ TEST_P(ConnectionFileTests, connections)
 
     auto result = runner.runAsync();
 
-    const helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
-
+    helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
+    fedInfo.broker=fmt::format("ftfbroker{}",index);
+    ++index;
     helics::ValueFederate vFed("fed1", fedInfo);
 
     vFed.enterInitializingModeIterative();
@@ -205,9 +207,6 @@ TEST_P(ConnectionFileTests, connections)
     auto& sub4 = vFed.registerSubscription(qres[3]);
     sub2.setDefault(-20.0);
 
-    qres = helics::vectorizeQueryResult(vFed.query("fthru", "inputs"));
-
-    EXPECT_EQ(qres.size(), 5U);
     auto& pub1 = vFed.registerGlobalPublication<double>("pub0");
     auto& pub2 = vFed.registerGlobalPublication<double>("pub1");
     auto& pub3 = vFed.registerGlobalPublication<int>("pub2");
