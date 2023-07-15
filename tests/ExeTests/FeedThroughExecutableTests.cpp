@@ -115,7 +115,7 @@ TEST(feedthrough, CmdLineConnections)
 
     vFed.enterInitializingModeIterative();
 
-    EXPECT_EQ(vFed.getCurrentMode(),helics::Federate::Modes::STARTUP);
+    EXPECT_EQ(vFed.getCurrentMode(), helics::Federate::Modes::STARTUP);
     auto qres = helics::vectorizeQueryResult(vFed.query("root", "publications"));
 
     EXPECT_EQ(qres.size(), 5U);
@@ -136,21 +136,19 @@ TEST(feedthrough, CmdLineConnections)
     auto& pub4 = vFed.registerGlobalPublication<bool>("pub3");
 
     vFed.enterInitializingMode();
-    EXPECT_EQ(vFed.getCurrentMode(),helics::Federate::Modes::INITIALIZING);
-    try
-    {
+    EXPECT_EQ(vFed.getCurrentMode(), helics::Federate::Modes::INITIALIZING);
+    try {
         pub1.publish(13.56);
         pub2.publish(18.58);
         pub3.publish(998);
         pub4.publish(true);
     }
-    catch (...)
-    {
-        EXPECT_TRUE(false)<<"Got error in publish";
+    catch (...) {
+        EXPECT_TRUE(false) << "Got error in publish";
     }
 
     vFed.enterExecutingMode();
-    EXPECT_EQ(vFed.getCurrentMode(),helics::Federate::Modes::EXECUTING);
+    EXPECT_EQ(vFed.getCurrentMode(), helics::Federate::Modes::EXECUTING);
     auto time = vFed.requestTime(2.0);
     EXPECT_LT(time, 2.0);
 
