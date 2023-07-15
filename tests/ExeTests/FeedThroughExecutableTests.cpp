@@ -188,7 +188,7 @@ TEST_P(ConnectionFileTests, connections)
     auto result = runner.runAsync();
 
     helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
-    fedInfo.broker=fmt::format("ftfbroker{}",index);
+    fedInfo.broker = fmt::format("ftfbroker{}", index);
     ++index;
     helics::ValueFederate vFed("fed1", fedInfo);
 
