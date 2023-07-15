@@ -221,13 +221,20 @@ TEST_P(ConnectionFileTests, connections)
     auto& pub4 = vFed.registerGlobalPublication<bool>("pub3");
 
     vFed.enterInitializingMode();
-
-    pub1.publish(13.56);
-    pub2.publish(18.58);
-    pub3.publish(998);
-    pub4.publish(true);
-
+    EXPECT_EQ(vFed.getCurrentMode(),helics::Federate::Modes::INITIALIZING);
+    try
+    {
+        pub1.publish(13.56);
+        pub2.publish(18.58);
+        pub3.publish(998);
+        pub4.publish(true);
+    }
+    catch (...)
+    {
+        EXPECT_TRUE(false) << "Got error in publish";
+    }
     vFed.enterExecutingMode();
+    EXPECT_EQ(vFed.getCurrentMode(),helics::Federate::Modes::EXECUTING);
 
     auto time = vFed.requestTime(2.0);
     EXPECT_LT(time, 2.0);
@@ -291,14 +298,20 @@ TEST(feedthrough, connnectionInFmuFile)
     auto& pub4 = vFed.registerGlobalPublication<bool>("pub3");
 
     vFed.enterInitializingMode();
-
-    pub1.publish(13.56);
-    pub2.publish(18.58);
-    pub3.publish(998);
-    pub4.publish(true);
-
+    EXPECT_EQ(vFed.getCurrentMode(),helics::Federate::Modes::INITIALIZING);
+    try
+    {
+        pub1.publish(13.56);
+        pub2.publish(18.58);
+        pub3.publish(998);
+        pub4.publish(true);
+    }
+    catch (...)
+    {
+        EXPECT_TRUE(false) << "Got error in publish";
+    }
     vFed.enterExecutingMode();
-
+    EXPECT_EQ(vFed.getCurrentMode(),helics::Federate::Modes::EXECUTING);
     auto time = vFed.requestTime(2.0);
     EXPECT_LT(time, 2.0);
 
