@@ -176,8 +176,8 @@ TEST_P(ConnectionFileTests, connections)
     FmiRunner runner;
     runner.parse(fmt::format(
         "--autobroker --coretype=zmq --step=0.1s --stoptime=1.0s --name=fthru  --connections {} --brokerargs=\"-f2 --name=ftfbroker{}\" {}",
-        index++,
         cfile,
+        index++,
         inputFile));
     int ret = runner.load();
     ASSERT_EQ(ret, 0);
