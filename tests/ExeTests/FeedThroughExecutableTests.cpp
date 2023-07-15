@@ -144,6 +144,8 @@ TEST(feedthrough, CmdLineConnections)
         pub4.publish(true);
     }
     catch (...) {
+        auto res=vFed.query("broker","status");
+        std::cout<<res<<std::endl;
         EXPECT_TRUE(false) << "Got error in publish";
     }
 
@@ -229,6 +231,8 @@ TEST_P(ConnectionFileTests, connections)
     }
     catch (...)
     {
+        auto res=vFed.query("broker","status");
+        std::cout<<res<<std::endl;
         EXPECT_TRUE(false) << "Got error in publish";
     }
     vFed.enterExecutingMode();
@@ -306,6 +310,8 @@ TEST(feedthrough, connnectionInFmuFile)
     }
     catch (...)
     {
+        auto res=vFed.query("broker","status");
+        std::cout<<res<<std::endl;
         EXPECT_TRUE(false) << "Got error in publish";
     }
     vFed.enterExecutingMode();
