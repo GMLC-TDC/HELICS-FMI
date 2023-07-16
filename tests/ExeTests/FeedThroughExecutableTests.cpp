@@ -112,7 +112,7 @@ TEST(feedthrough, CmdLineConnections)
     fedInfo.broker = "ftconnbroker";
 
     helics::ValueFederate vFed("fed1", fedInfo);
-
+    auto res = vFed.query("broker", "global_status");
     vFed.enterInitializingModeIterative();
 
     EXPECT_EQ(vFed.getCurrentMode(), helics::Federate::Modes::STARTUP);
@@ -144,7 +144,7 @@ TEST(feedthrough, CmdLineConnections)
         pub4.publish(true);
     }
     catch (...) {
-        auto res = vFed.query("broker", "status");
+        
         std::cout << res << std::endl;
         EXPECT_TRUE(false) << "Got error in publish";
     }
@@ -199,7 +199,7 @@ TEST_P(ConnectionFileTests, connections)
     fedInfo.broker = fmt::format("ftfbroker{}", index);
     ++index;
     helics::ValueFederate vFed("fed1", fedInfo);
-    auto res=vFed.query("broker","status");
+    auto res=vFed.query("broker","global_status");
     vFed.enterInitializingModeIterative();
 
     auto qres = helics::vectorizeQueryResult(vFed.query("root", "publications"));
@@ -275,7 +275,7 @@ TEST(feedthrough, connnectionInFmuFile)
     fedInfo.broker = "ft5broker";
 
     helics::ValueFederate vFed("fed1", fedInfo);
-
+    auto res = vFed.query("broker", "global_status");
     vFed.enterInitializingModeIterative();
 
     auto qres = helics::vectorizeQueryResult(vFed.query("root", "publications"));
@@ -305,8 +305,8 @@ TEST(feedthrough, connnectionInFmuFile)
         pub4.publish(true);
     }
     catch (...) {
-        auto res = vFed.query("broker", "status");
-        std::cout << res << std::endl;
+        auto res2 = vFed.query("broker", "status");
+        std::cout << res <<"\n--------------\n" <<res<< std::endl;
         EXPECT_TRUE(false) << "Got error in publish";
     }
     vFed.enterExecutingMode();
