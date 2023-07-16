@@ -144,7 +144,6 @@ TEST(feedthrough, CmdLineConnections)
         pub4.publish(true);
     }
     catch (...) {
-        
         std::cout << res << std::endl;
         EXPECT_TRUE(false) << "Got error in publish";
     }
@@ -199,7 +198,7 @@ TEST_P(ConnectionFileTests, connections)
     fedInfo.broker = fmt::format("ftfbroker{}", index);
     ++index;
     helics::ValueFederate vFed("fed1", fedInfo);
-    auto res=vFed.query("broker","global_status");
+    auto res = vFed.query("broker", "global_status");
     vFed.enterInitializingModeIterative();
 
     auto qres = helics::vectorizeQueryResult(vFed.query("root", "publications"));
@@ -306,7 +305,7 @@ TEST(feedthrough, connnectionInFmuFile)
     }
     catch (...) {
         auto res2 = vFed.query("broker", "status");
-        std::cout << res <<"\n--------------\n" <<res<< std::endl;
+        std::cout << res << "\n--------------\n" << res << std::endl;
         EXPECT_TRUE(false) << "Got error in publish";
     }
     vFed.enterExecutingMode();
