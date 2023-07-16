@@ -229,7 +229,7 @@ TEST_P(ConnectionFileTests, connections)
         pub4.publish(true);
     }
     catch (...) {
-        std::cout<<res<<std::endl;
+        std::cout << res << std::endl;
         EXPECT_TRUE(false) << "Got error in publish";
     }
     vFed.enterExecutingMode();
