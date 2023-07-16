@@ -199,7 +199,7 @@ TEST_P(ConnectionFileTests, connections)
     fedInfo.broker = fmt::format("ftfbroker{}", index);
     ++index;
     helics::ValueFederate vFed("fed1", fedInfo);
-
+    auto res=vFed.query("broker","status");
     vFed.enterInitializingModeIterative();
 
     auto qres = helics::vectorizeQueryResult(vFed.query("root", "publications"));
@@ -229,7 +229,6 @@ TEST_P(ConnectionFileTests, connections)
         pub4.publish(true);
     }
     catch (...) {
-        auto res=vFed.query("broker","status");
         std::cout<<res<<std::endl;
         EXPECT_TRUE(false) << "Got error in publish";
     }
