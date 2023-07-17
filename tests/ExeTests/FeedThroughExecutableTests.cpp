@@ -113,7 +113,7 @@ TEST(feedthrough, CmdLineConnections)
 
     helics::ValueFederate vFed("fed1", fedInfo);
     auto res = vFed.query("broker", "global_status");
-    vFed.sendCommand("broker","remotelog connections");
+    vFed.sendCommand("broker", "remotelog connections");
     vFed.enterInitializingModeIterative();
 
     EXPECT_EQ(vFed.getCurrentMode(), helics::Federate::Modes::STARTUP);
@@ -200,7 +200,7 @@ TEST_P(ConnectionFileTests, connections)
     ++index;
     helics::ValueFederate vFed("fed1", fedInfo);
     auto res = vFed.query("broker", "global_status");
-    vFed.sendCommand("broker","remotelog connections");
+    vFed.sendCommand("broker", "remotelog connections");
     vFed.enterInitializingModeIterative();
 
     auto qres = helics::vectorizeQueryResult(vFed.query("root", "publications"));
@@ -277,14 +277,13 @@ TEST(feedthrough, connnectionInFmuFile)
 
     helics::ValueFederate vFed("fed1", fedInfo);
     auto res = vFed.query("broker", "global_status");
-   vFed.sendCommand("broker","remotelog connections");
+    vFed.sendCommand("broker", "remotelog connections");
     vFed.enterInitializingModeIterative();
 
     auto qres = helics::vectorizeQueryResult(vFed.query("root", "publications"));
 
-    EXPECT_EQ(qres.size(), 5U)<<qres[0]<<std::endl;
-    if (qres.size() != 5U)
-    {
+    EXPECT_EQ(qres.size(), 5U) << qres[0] << std::endl;
+    if (qres.size() != 5U) {
         vFed.finalize();
         result.get();
         runner.close();
