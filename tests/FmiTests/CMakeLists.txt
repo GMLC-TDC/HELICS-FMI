@@ -12,8 +12,13 @@
 # fmi tests
 # -----------------------------------------------------------------------------
 
-set(fmi_test_sources fmiTests.cpp BouncingBallFMITests.cpp ResourceFMITests.cpp fmiFailureTests.cpp
-                     FeedThroughFMITests.cpp
+set(fmi_test_sources
+    fmiTests.cpp
+    BouncingBallFMITests.cpp
+    ResourceFMITests.cpp
+    fmiFailureTests.cpp
+    FeedThroughFMITests.cpp
+    VanDerPolFMITests.cpp
 )
 
 if(WIN32)

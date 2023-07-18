@@ -13,6 +13,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <filesystem>
 #include <fmt/format.h>
 #include <future>
+#include <thread>
 
 static const std::string fmuName = "Feedthrough";
 static const std::string inputFile = std::string(FMI_REFERENCE_DIR) + fmuName + ".fmu";
@@ -33,8 +34,8 @@ TEST(feedthrough, check)
 
     auto result = runner.runAsync();
 
-    const helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
-
+    helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
+    fedInfo.forceNewCore = true;
     helics::ValueFederate vFed("fed1", fedInfo);
 
     vFed.enterInitializingModeIterative();
@@ -90,6 +91,7 @@ TEST(feedthrough, check)
 
     vFed.finalize();
     result.get();
+    runner.close();
 }
 
 TEST(feedthrough, CmdLineConnections)
@@ -97,7 +99,7 @@ TEST(feedthrough, CmdLineConnections)
     FmiRunner runner;
     runner.parse(
         std::string(
-            "--autobroker --coretype=zmq --step=0.1s --stoptime=1.0s --name=fthru  --connections pub0,fthru.Float64_continuous_input,pub1,fthru.Float64_discrete_input --connections pub2 --connections=fthru.Int32_input --connections=pub3,fthru.Boolean_input --brokerargs=\"-f2 --name=ft1broker\" ") +
+            "--autobroker --coretype=zmq --step=0.1s --stoptime=1.0s --name=fthru  --connections pub0,fthru.Float64_continuous_input,pub1,fthru.Float64_discrete_input --connections pub2 --connections=fthru.Int32_input --connections=pub3,fthru.Boolean_input --brokerargs=\"-f2 --name=ftconnbroker\" ") +
         inputFile);
     int ret = runner.load();
     ASSERT_EQ(ret, 0);
@@ -106,12 +108,16 @@ TEST(feedthrough, CmdLineConnections)
 
     auto result = runner.runAsync();
 
-    const helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
+    helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
+    fedInfo.broker = "ftconnbroker";
+    fedInfo.forceNewCore = true;
 
     helics::ValueFederate vFed("fed1", fedInfo);
-
+    auto res = vFed.query("broker", "global_status");
+    vFed.sendCommand("broker", "remotelog connections");
     vFed.enterInitializingModeIterative();
 
+    EXPECT_EQ(vFed.getCurrentMode(), helics::Federate::Modes::STARTUP);
     auto qres = helics::vectorizeQueryResult(vFed.query("root", "publications"));
 
     EXPECT_EQ(qres.size(), 5U);
@@ -125,8 +131,6 @@ TEST(feedthrough, CmdLineConnections)
     auto& sub4 = vFed.registerSubscription(qres[3]);
     sub2.setDefault(-20.0);
 
-    qres = helics::vectorizeQueryResult(vFed.query("fthru", "inputs"));
-
     EXPECT_EQ(qres.size(), 5U);
     auto& pub1 = vFed.registerGlobalPublication<double>("pub0");
     auto& pub2 = vFed.registerGlobalPublication<double>("pub1");
@@ -134,14 +138,20 @@ TEST(feedthrough, CmdLineConnections)
     auto& pub4 = vFed.registerGlobalPublication<bool>("pub3");
 
     vFed.enterInitializingMode();
-
-    pub1.publish(13.56);
-    pub2.publish(18.58);
-    pub3.publish(998);
-    pub4.publish(true);
+    EXPECT_EQ(vFed.getCurrentMode(), helics::Federate::Modes::INITIALIZING);
+    try {
+        pub1.publish(13.56);
+        pub2.publish(18.58);
+        pub3.publish(998);
+        pub4.publish(true);
+    }
+    catch (...) {
+        std::cout << res << std::endl;
+        EXPECT_TRUE(false) << "Got error in publish";
+    }
 
     vFed.enterExecutingMode();
-
+    EXPECT_EQ(vFed.getCurrentMode(), helics::Federate::Modes::EXECUTING);
     auto time = vFed.requestTime(2.0);
     EXPECT_LT(time, 2.0);
 
@@ -158,6 +168,8 @@ TEST(feedthrough, CmdLineConnections)
 
     vFed.finalize();
     result.get();
+    runner.close();
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
 
 static constexpr const char* connectionFiles[] = {"example_connections1.json",
@@ -169,11 +181,13 @@ class ConnectionFileTests: public ::testing::TestWithParam<const char*> {};
 
 TEST_P(ConnectionFileTests, connections)
 {
+    static int index{0};
     std::string cfile = std::string(TEST_DIR) + "/" + GetParam();
     FmiRunner runner;
     runner.parse(fmt::format(
-        "--autobroker --coretype=zmq --step=0.1s --stoptime=1.0s --name=fthru  --connections {} --brokerargs=\"-f2 --name=ftfbroker\" {}",
+        "--autobroker --coretype=zmq --step=0.1s --stoptime=1.0s --name=fthru  --connections {} --brokerargs=\"-f2 --name=ftfbroker{}\" {}",
         cfile,
+        index,
         inputFile));
     int ret = runner.load();
     ASSERT_EQ(ret, 0);
@@ -182,10 +196,13 @@ TEST_P(ConnectionFileTests, connections)
 
     auto result = runner.runAsync();
 
-    const helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
-
+    helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
+    fedInfo.broker = fmt::format("ftfbroker{}", index);
+    fedInfo.forceNewCore = true;
+    ++index;
     helics::ValueFederate vFed("fed1", fedInfo);
-
+    auto res = vFed.query("broker", "global_status");
+    vFed.sendCommand("broker", "remotelog connections");
     vFed.enterInitializingModeIterative();
 
     auto qres = helics::vectorizeQueryResult(vFed.query("root", "publications"));
@@ -201,22 +218,25 @@ TEST_P(ConnectionFileTests, connections)
     auto& sub4 = vFed.registerSubscription(qres[3]);
     sub2.setDefault(-20.0);
 
-    qres = helics::vectorizeQueryResult(vFed.query("fthru", "inputs"));
-
-    EXPECT_EQ(qres.size(), 5U);
     auto& pub1 = vFed.registerGlobalPublication<double>("pub0");
     auto& pub2 = vFed.registerGlobalPublication<double>("pub1");
     auto& pub3 = vFed.registerGlobalPublication<int>("pub2");
     auto& pub4 = vFed.registerGlobalPublication<bool>("pub3");
 
     vFed.enterInitializingMode();
-
-    pub1.publish(13.56);
-    pub2.publish(18.58);
-    pub3.publish(998);
-    pub4.publish(true);
-
+    EXPECT_EQ(vFed.getCurrentMode(), helics::Federate::Modes::INITIALIZING);
+    try {
+        pub1.publish(13.56);
+        pub2.publish(18.58);
+        pub3.publish(998);
+        pub4.publish(true);
+    }
+    catch (...) {
+        std::cout << res << std::endl;
+        EXPECT_TRUE(false) << "Got error in publish";
+    }
     vFed.enterExecutingMode();
+    EXPECT_EQ(vFed.getCurrentMode(), helics::Federate::Modes::EXECUTING);
 
     auto time = vFed.requestTime(2.0);
     EXPECT_LT(time, 2.0);
@@ -234,6 +254,8 @@ TEST_P(ConnectionFileTests, connections)
 
     vFed.finalize();
     result.get();
+    runner.close();
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
 
 INSTANTIATE_TEST_SUITE_P(feedthrough, ConnectionFileTests, ::testing::ValuesIn(connectionFiles));
@@ -252,16 +274,23 @@ TEST(feedthrough, connnectionInFmuFile)
 
     auto result = runner.runAsync();
 
-    const helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
+    helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
+    fedInfo.broker = "ft5broker";
+    fedInfo.forceNewCore = true;
 
     helics::ValueFederate vFed("fed1", fedInfo);
-
+    auto res = vFed.query("broker", "global_status");
+    vFed.sendCommand("broker", "remotelog connections");
     vFed.enterInitializingModeIterative();
 
     auto qres = helics::vectorizeQueryResult(vFed.query("root", "publications"));
 
-    EXPECT_EQ(qres.size(), 5U);
-
+    EXPECT_EQ(qres.size(), 5U) << qres[0] << std::endl;
+    if (qres.size() != 5U) {
+        vFed.finalize();
+        result.get();
+        runner.close();
+    }
     auto& sub1 = vFed.registerSubscription(qres[0]);
     sub1.setDefault(-20.0);
     auto& sub2 = vFed.registerSubscription(qres[1]);
@@ -277,14 +306,20 @@ TEST(feedthrough, connnectionInFmuFile)
     auto& pub4 = vFed.registerGlobalPublication<bool>("pub3");
 
     vFed.enterInitializingMode();
-
-    pub1.publish(13.56);
-    pub2.publish(18.58);
-    pub3.publish(998);
-    pub4.publish(true);
-
+    EXPECT_EQ(vFed.getCurrentMode(), helics::Federate::Modes::INITIALIZING);
+    try {
+        pub1.publish(13.56);
+        pub2.publish(18.58);
+        pub3.publish(998);
+        pub4.publish(true);
+    }
+    catch (...) {
+        auto res2 = vFed.query("broker", "status");
+        std::cout << res << "\n--------------\n" << res << std::endl;
+        EXPECT_TRUE(false) << "Got error in publish";
+    }
     vFed.enterExecutingMode();
-
+    EXPECT_EQ(vFed.getCurrentMode(), helics::Federate::Modes::EXECUTING);
     auto time = vFed.requestTime(2.0);
     EXPECT_LT(time, 2.0);
 
@@ -301,4 +336,6 @@ TEST(feedthrough, connnectionInFmuFile)
 
     vFed.finalize();
     result.get();
+    runner.close();
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
