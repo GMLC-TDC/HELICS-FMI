@@ -35,7 +35,7 @@ TEST(feedthrough, check)
     auto result = runner.runAsync();
 
     helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
-    fedInfo.forceNewCore=true;
+    fedInfo.forceNewCore = true;
     helics::ValueFederate vFed("fed1", fedInfo);
 
     vFed.enterInitializingModeIterative();
@@ -110,7 +110,7 @@ TEST(feedthrough, CmdLineConnections)
 
     helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
     fedInfo.broker = "ftconnbroker";
-    fedInfo.forceNewCore=true;
+    fedInfo.forceNewCore = true;
 
     helics::ValueFederate vFed("fed1", fedInfo);
     auto res = vFed.query("broker", "global_status");
@@ -198,7 +198,7 @@ TEST_P(ConnectionFileTests, connections)
 
     helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
     fedInfo.broker = fmt::format("ftfbroker{}", index);
-    fedInfo.forceNewCore=true;
+    fedInfo.forceNewCore = true;
     ++index;
     helics::ValueFederate vFed("fed1", fedInfo);
     auto res = vFed.query("broker", "global_status");
@@ -276,7 +276,7 @@ TEST(feedthrough, connnectionInFmuFile)
 
     helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
     fedInfo.broker = "ft5broker";
-    fedInfo.forceNewCore=true;
+    fedInfo.forceNewCore = true;
 
     helics::ValueFederate vFed("fed1", fedInfo);
     auto res = vFed.query("broker", "global_status");
