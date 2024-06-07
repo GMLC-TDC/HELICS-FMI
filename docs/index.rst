@@ -35,7 +35,6 @@ how-to about how to use the application.  For the details see :ref:`Details`
 
 Citation
 ========
-General citation for HELICS:
 T. Hardy, B. Palmintier, P. Top, D. Krishnamurthy and J. Fuller, "HELICS: A Co-Simulation Framework for Scalable Multi-Domain Modeling and Analysis," in IEEE Access, doi: 10.1109/ACCESS.2024.3363615, available at `https://ieeexplore.ieee.org/document/10424422`_
 
 .. _https://ieeexplore.ieee.org/document/10424422/: https://ieeexplore.ieee.org/document/10424422/
