@@ -49,10 +49,10 @@ jobs:
       matrix:
         XCode-latest:
           extraFlags: '-DHELICS_DISABLE_WEBSERVER=ON -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON'
-          vmImage: 'macOS-12'
+          vmImage: 'macOS-14'
         XCode-oldest:
           extraFlags: '-DHELICS_DISABLE_WEBSERVER=ON -DHELICS_FMI_FORCE_HELICS_SUBPROJECT=ON'
-          vmImage: 'macOS-11'
+          vmImage: 'macOS-13'
           xcode_path: '/Applications/Xcode_11.7.app'
     pool:
       vmImage: $[ variables['vmImage'] ]
